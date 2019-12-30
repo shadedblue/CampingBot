@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="antxr-generated"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/telegrambots-abilities"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/telegrambots-chat-session-bot"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/telegrambots-meta"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/telegrambots-spring-boot-starter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/telegrambotsextensions"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.vdurmont.emoji-java"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.json"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ca.odell.glazedlists"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.telegram.telegrambots"/>
+	<classpathentry kind="lib" path="lib/com.javadude.antxr_2.1.9.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.postgresql.jdbc"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.ocpsoft.prettytime"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

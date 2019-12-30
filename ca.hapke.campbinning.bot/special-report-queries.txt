@@ -1,0 +1,12 @@
+# THIS 
+SELECT "campingUserId", count("campingUserId")
+	FROM public.activity
+	where "message" ilike 'this%'
+	group by "campingUserId";
+
+SELECT "campingUserId", "campingType", "message", "extraData"
+	FROM public.activity
+	WHERE
+		"extraData" IS NOT NULL AND
+		"campingType" % 4 > 0 AND
+		"message" ~* '^this[!]*';

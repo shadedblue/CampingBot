@@ -1,0 +1,253 @@
+header {
+    package ca.hapke.campbinning.bot.xml;
+    
+    import ca.hapke.campbinning.bot.*;
+    import ca.hapke.campbinning.bot.users.*;
+    import ca.hapke.campbinning.bot.interval.*;
+    import ca.hapke.campbinning.bot.commands.*;
+    import java.util.*;
+}
+
+class LoadStatsParser extends Parser;
+
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, CampingUserMonitor um]
+    :   <camping>[ cs, sg, countdownGen,um] EOF
+    ;
+    
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, CampingUserMonitor um]
+	:
+	 <system>[cs] 
+	(<spell>[sg] )?
+	(<countdown>[countdownGen])?
+	(<users>[um])?
+	;
+<system> [CampingSystem cs]
+	{ 
+		String token,botUsername,adminUser = null; 
+	}
+	:
+	 token=<token>
+	 botUsername=<botUsername>
+	(adminUser=<adminUser>)?
+	(<db>[cs]) ?
+	{
+		cs.setToken(token);
+		cs.setBotUsername(botUsername);
+		if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
+			int adminUser2 = Integer.parseInt(adminUser);
+			cs.setAdminUser(adminUser2);
+		} 
+	}
+	;
+<db> [CampingSystem cs]
+	{ 
+		String host,port,user,pass; 
+	}
+	:
+	host=<dbHost>
+	port=<dbPort>
+	user=<dbUser>
+	pass=<dbPass>
+	{
+		int port2 = 5432;
+		if (!"null".equalsIgnoreCase(port)) {
+			port2 = Integer.parseInt(port);
+		} 
+		cs.enableDb(host,port2,user,pass);
+	}
+	;
+<countdown>[CountdownGenerator countdownGen]
+	{ List<String> h; }
+	:
+	h=<hypes>
+	{
+		countdownGen.setHypes(h);
+	}
+	;
+<spell> [SpellGenerator sg]
+	{ List<String> a,i,e; }
+	:
+	a=<adjectives>
+	i=<items>
+	e=<exclamations>
+	{
+		sg.setAdjectives(a);
+		sg.setItems(i);
+		sg.setExclamations(e);
+	}
+	;
+<adjectives> returns [List<String> vals = null]
+	{ vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<adjective>
+			{vals.add(val);}
+		) *
+	;
+<hypes> returns [List<String> vals = null]
+	{ vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<hype>
+			{vals.add(val);}
+		) *
+	;
+<items> returns [List<String> vals = null]
+	{  vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
+	;
+<exclamations> returns [List<String> vals = null]
+	{  vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<exclamation>
+			{vals.add(val);}
+		) *
+	;
+<users> [CampingUserMonitor um]
+	: 
+	(<user>[um]) *
+	;
+
+<user> [CampingUserMonitor um]
+{	String campingId = "null", id, username, first, last, nickname, ballsCount, lastUpdate, rantCount, rantActivation, victimCount, spellCount, rantScore;
+	CampingUser user;}
+	:	( campingId=<campingId> ) ?
+		id=<id>
+		username=<username>
+		first=<first>
+		last=<last>
+		nickname=<nickname>
+		
+		ballsCount=<ballsCount>
+		
+		rantCount=<rantCount>
+		rantScore=<rantScore>
+		rantActivation=<rantActivation>
+		spellCount=<spellCount>
+		victimCount=<victimCount>
+		lastUpdate=<lastUpdate>
+		
+	{
+			
+		int campingIdInt = CampingUserMonitor.UNKNOWN_USER_ID;
+		if (!"null".equalsIgnoreCase(campingId)) {
+			campingIdInt = Integer.parseInt(campingId);
+		} 
+		
+		int idInt = CampingUserMonitor.UNKNOWN_USER_ID;
+		if (!"null".equalsIgnoreCase(id)) {
+			idInt = Integer.parseInt(id);
+		} 
+		if ("null".equalsIgnoreCase(username))
+			username = null;
+		
+			
+		Integer bcInt = Integer.parseInt(ballsCount);
+		Long bluInt = Long.parseLong(lastUpdate);
+		
+		int rC = 0, rA=0;
+		float rS = 0;
+		int sC = 0;
+		int vC = 0;
+		if (rantCount != null)
+			rC = Integer.parseInt(rantCount);
+		if (rantScore != null)
+			rS = Float.parseFloat(rantScore);
+		if (rantActivation != null)
+			rA = Integer.parseInt(rantActivation);
+		if (spellCount != null)
+			sC = Integer.parseInt(spellCount);
+		if (victimCount != null)
+			vC = Integer.parseInt(victimCount);
+			
+		user = um.monitor(campingIdInt, idInt, username, first, last, bcInt, bluInt, rC, rS, rA, vC,sC);
+		user.setNickname(nickname);
+	}
+	;
+<token> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<botUsername> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<adminUser> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbHost> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbPort> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbUser> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbPass> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<hype> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<adjective> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<item> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<exclamation> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<campingId> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<id> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<username> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<nickname> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<first> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+
+<last> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+
+<ballsCount> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+
+<lastUpdate> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<rantCount> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<rantActivation> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<spellCount> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<victimCount> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+
+<rantScore> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<nextWeeklyStats> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<name> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;

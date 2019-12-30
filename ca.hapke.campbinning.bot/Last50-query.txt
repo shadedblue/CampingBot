@@ -1,0 +1,5 @@
+SELECT id, "timestamp", "campingUserId", "chatId", "telegramId", "campingType", message, "extraData"
+	FROM public.activity
+	ORDER BY ID DESC
+	OFFSET 1
+	LIMIT 50;
