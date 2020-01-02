@@ -109,8 +109,16 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		) *
 	;
 <users> [CampingUserMonitor um]
+	{String campingId = null; }
 	: 
+	( campingId=<nextCampingId> ) ?
 	(<user>[um]) *
+	{
+		if (campingId != null && !"null".equalsIgnoreCase(campingId)) {
+			int campingIdInt = Integer.parseInt(campingId);
+			um.setNextCampingId(campingIdInt);
+		} 
+	}
 	;
 
 <user> [CampingUserMonitor um]
@@ -169,6 +177,9 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		user.setNickname(nickname);
 	}
 	;
+<nextCampingId> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
 <token> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 import com.javadude.antxr.scanner.BasicCrimsonXMLTokenStream;
 
@@ -20,7 +21,6 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  * @author Nathan Hapke
  */
 public class CampingXmlSerializer implements IntervalBySeconds {
-
 	@Override
 	public int getSeconds() {
 		return 60;
@@ -48,6 +48,7 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 		return shouldSave;
 	}
 
+	private static final String CHARSET_TO_USE = "UTF-16";
 	private static final String FILENAME = "camping.xml";
 	private CampingSerializable[] serializables;
 	// private SundayStatsReset sundayStats;
@@ -83,7 +84,7 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 					backup.delete();
 				f.renameTo(backup);
 			}
-			BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+			BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), CHARSET_TO_USE));
 			OutputFormatter of = new OutputFormatter();
 
 			String camping = "camping";
@@ -139,8 +140,8 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 	}
 
 	public boolean load(File f) throws IOException, ClassNotFoundException {
-		BasicCrimsonXMLTokenStream stream = new BasicCrimsonXMLTokenStream(new FileReader(f), LoadStatsParser.class,
-				false, false);
+		BasicCrimsonXMLTokenStream stream = new BasicCrimsonXMLTokenStream(
+				new FileReader(f, Charset.forName(CHARSET_TO_USE)), LoadStatsParser.class, false, false);
 		LoadStatsParser parser = new LoadStatsParser(stream);
 		try {
 			parser.document(cs,

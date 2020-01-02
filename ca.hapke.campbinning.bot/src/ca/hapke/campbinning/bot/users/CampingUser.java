@@ -2,8 +2,6 @@ package ca.hapke.campbinning.bot.users;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.HashSet;
-import java.util.Set;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingUtil;
@@ -12,24 +10,6 @@ import ca.hapke.campbinning.bot.CampingUtil;
  * @author Nathan Hapke
  */
 public class CampingUser {
-	private static int nextCampingId = 1;
-	private static Set<Integer> usedCampingIds = new HashSet<>();
-
-	private static int getNextCampingId() {
-		usedCampingIds.add(nextCampingId);
-		return nextCampingId++;
-	}
-
-	private static int getNextCampingId(int suggestedId) {
-		if (suggestedId == CampingUserMonitor.UNKNOWN_USER_ID || usedCampingIds.contains(suggestedId)) {
-			return getNextCampingId();
-		} else {
-			usedCampingIds.add(suggestedId);
-			nextCampingId = Math.max(suggestedId + 1, nextCampingId);
-			return suggestedId;
-		}
-	}
-
 	private int telegramId = -1;
 	private final int campingId;
 	private String username;
@@ -57,7 +37,7 @@ public class CampingUser {
 	}
 
 	public CampingUser(int telegramId, String username, String firstname, String lastname) {
-		this.campingId = getNextCampingId();
+		this.campingId = CampingUserMonitor.getInstance().getNextCampingId();
 		this.telegramId = telegramId;
 		this.username = username;
 		this.firstname = firstname;
@@ -65,7 +45,7 @@ public class CampingUser {
 	}
 
 	public CampingUser(int suggestedId, int telegramId, String username, String firstname, String lastname) {
-		this.campingId = getNextCampingId(suggestedId);
+		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
 		this.telegramId = telegramId;
 		this.username = username;
 		this.firstname = firstname;
@@ -250,8 +230,9 @@ public class CampingUser {
 		case RantActivatorComplete:
 		case RantRanterInitiation:
 		case RantRanterComplete:
+		case RantInitiationFailed:
 		case RantVote:
-			// case Reload:
+		case Reload:
 		case SetNickname:
 			// case Stats:
 			// case StatsEndOfWeek:
@@ -297,8 +278,9 @@ public class CampingUser {
 			// you don't get credit unless it gets completed as a non-rant.
 		case RantRanterInitiation:
 		case RantRanterComplete:
+		case RantInitiationFailed:
 		case RantVote:
-			// case Reload:
+		case Reload:
 		case SetNickname:
 			// case Stats:
 			// case StatsEndOfWeek:

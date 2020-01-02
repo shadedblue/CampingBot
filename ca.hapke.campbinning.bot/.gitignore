@@ -1,1 +1,4 @@
-/bin/
+/bin/*
+camping.xml
+camping.xml.backup
+CampingBot.bat

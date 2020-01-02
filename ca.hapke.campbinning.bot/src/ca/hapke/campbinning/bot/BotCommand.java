@@ -34,7 +34,7 @@ public enum BotCommand {
 	SetNicknameRejected(null, true, true, BotCommandIds.NICKNAME | BotCommandIds.FAILURE),
 	Spell("spell", true, true, BotCommandIds.SPELL | BotCommandIds.USE),
 	SpellDipshit(null, true, true, BotCommandIds.SPELL | BotCommandIds.FAILURE),
-	// Reload("reload", true, false),
+	Reload("reload", true, false),
 	// Test("test", true, false),
 	MBIYF(null, true, true, BotCommandIds.BALLS | BotCommandIds.USE),
 	MBIYFDipshit(null, true, true, BotCommandIds.BALLS | BotCommandIds.FAILURE),
@@ -61,12 +61,10 @@ public enum BotCommand {
 	}
 
 	/**
-	 * @param command
-	 *            The /command that the bot should respond to in the chat
+	 * @param command The /command that the bot should respond to in the chat
 	 * @param forUi
 	 * @param forDb
-	 * @param id
-	 *            For logging purposes
+	 * @param id      For logging purposes
 	 */
 	private BotCommand(String command, boolean forUi, boolean forDb, long id) {
 		this.command = command;

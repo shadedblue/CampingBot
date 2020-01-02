@@ -279,25 +279,20 @@ public class CampingBotUi extends JFrame {
 		lstChats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lstChats.setModel(chatModel);
 
-		txtChat = new JTextField();
-		txtChat.addActionListener(new ActionListener() {
+		ActionListener sendChatListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				chat();
 			}
-		});
+		};
+		txtChat = new JTextField();
+		txtChat.addActionListener(sendChatListener);
 		txtChat.setBounds(569, 31, 188, 33);
 		contentPane.add(txtChat);
 		txtChat.setColumns(10);
 
 		JButton btnSay = new JButton("Say");
-		btnSay.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				chat();
-			}
-
-		});
+		btnSay.addActionListener(sendChatListener);
 		btnSay.setBounds(765, 31, 106, 34);
 		contentPane.add(btnSay);
 

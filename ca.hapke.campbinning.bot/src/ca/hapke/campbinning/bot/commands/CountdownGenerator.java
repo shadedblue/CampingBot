@@ -1,8 +1,12 @@
 package ca.hapke.campbinning.bot.commands;
 
 import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.CampingUtil;
@@ -17,12 +21,15 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 public class CountdownGenerator extends CampingSerializable {
 
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private GregorianCalendar countdownTarget = new GregorianCalendar(2019, 11, 27, 14, 10, 00);
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2019, 11, 27, 14, 10, 00).toZonedDateTime();
 	private List<String> hypes;
 	private Resources res;
+	private MbiyfCommand ballsCommand;
+	private ZoneId zone = TimeZone.getDefault().toZoneId();
 
-	public CountdownGenerator(Resources res) {
+	public CountdownGenerator(Resources res, MbiyfCommand ballsCommand) {
 		this.res = res;
+		this.ballsCommand = ballsCommand;
 	}
 
 	public void setHypes(List<String> h) {
@@ -34,32 +41,42 @@ public class CountdownGenerator extends CampingSerializable {
 	}
 
 	public String countdownCommand(CampingUserMonitor userMonitor, Long chatId) {
+		GregorianCalendar now = new GregorianCalendar();
 		StringBuilder sb = new StringBuilder();
-		// CampingUser rtv = userMonitor.monitor(558638791, null, null, null);
-		// CampingUser andrew = userMonitor.monitor(642767839, null, null,
-		// null);
-		CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
-		CampingUser target = jamieson;
 
-		sb.append("PARTY AT ");
-		sb.append(target.getDisplayName().toUpperCase());
+		Temporal targetEvent;
+		if (countdownTarget == null || now.before(countdownTarget)) {
+			// CampingUser rtv = userMonitor.monitor(558638791, null, null, null);
+			// CampingUser andrew = userMonitor.monitor(642767839, null, null,
+			// null);
+			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
+			CampingUser target = jamieson;
 
-		sb.append("'S HOUSE COUNTDOWN\n");
-//		for (int i = 0; i < 15; i++) {
-//			sb.append("-");
-//		}
+			sb.append("PARTY AT ");
+			sb.append(target.getDisplayName().toUpperCase());
+
+			sb.append("'S HOUSE COUNTDOWN\n");
+
+			targetEvent = countdownTarget;
+		} else {
+			sb.append("MBIY\\[F]RIDAY COUNTDOWN\n");
+			targetEvent = ZonedDateTime.ofInstant(ballsCommand.getNearestFutureEnablement(), zone);
+		}
+
 		for (int i = 0; i < 5; i++) {
 			sb.append(res.getRandomFace());
 		}
 		sb.append("\n");
 		sb.append(res.getRandomBall());
 		sb.append(" ");
-		GregorianCalendar now = new GregorianCalendar();
-		Duration d = Duration.between(now.toZonedDateTime(), countdownTarget.toZonedDateTime());
+		Duration d = Duration.between(now.toZonedDateTime(), targetEvent);
 
-		addTime(sb, d.toDaysPart(), "day");
+		long daysPart = d.toDaysPart();
+		if (daysPart > 0)
+			addTime(sb, daysPart, "day");
 		addTime(sb, d.toHoursPart(), "hour");
-		// addTime(sb, d.toMinutesPart(), "minute");
+		if (daysPart == 0)
+			addTime(sb, d.toMinutesPart(), "minute");
 
 		sb.append("\n");
 

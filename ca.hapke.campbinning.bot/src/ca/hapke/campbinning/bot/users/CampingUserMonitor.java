@@ -4,8 +4,10 @@
 package ca.hapke.campbinning.bot.users;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -50,11 +52,32 @@ public class CampingUserMonitor extends CampingSerializable {
 	private final EventList<CampingUser> users = new ObservableElementList<>(
 			GlazedLists.threadSafeList(new BasicEventList<CampingUser>()), userConnector);
 
-	private final Map<Integer, CampingUser> idMap = new HashMap<Integer, CampingUser>();
+	private int nextCampingId = 1;
+	private Set<Integer> usedCampingIds = new HashSet<>();
+	private final Map<Integer, CampingUser> telegramIdMap = new HashMap<Integer, CampingUser>();
 	private final Map<String, CampingUser> usernameMap = new HashMap<String, CampingUser>();
 
+	public int getNextCampingId() {
+		usedCampingIds.add(nextCampingId);
+		return nextCampingId++;
+	}
+
+	public int getNextCampingId(int suggestedId) {
+		if (suggestedId == CampingUserMonitor.UNKNOWN_USER_ID || usedCampingIds.contains(suggestedId)) {
+			return getNextCampingId();
+		} else {
+			usedCampingIds.add(suggestedId);
+			nextCampingId = Math.max(suggestedId + 1, nextCampingId);
+			return suggestedId;
+		}
+	}
+
+	public void setNextCampingId(int suggestedId) {
+		this.nextCampingId = Math.max(suggestedId, nextCampingId);
+	}
+
 	public CampingUser find(Integer key) {
-		return idMap.get(key);
+		return telegramIdMap.get(key);
 	}
 
 	public CampingUser find(String key) {
@@ -78,13 +101,13 @@ public class CampingUserMonitor extends CampingSerializable {
 	}
 
 	public CampingUser getUser(int id) {
-		return idMap.get(id);
+		return telegramIdMap.get(id);
 	}
 
 	public CampingUser getUser(User user, String text) {
 		CampingUser result = null;
 		if (user != null) {
-			result = idMap.get(user.getId());
+			result = telegramIdMap.get(user.getId());
 		}
 		if (result == null) {
 			result = getUser(text);
@@ -131,9 +154,9 @@ public class CampingUserMonitor extends CampingSerializable {
 		return null;
 	}
 
-	public CampingUser monitor(int campingIdInt, int id, String username, String firstname, String lastname,
+	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname,
 			Integer bcInt, Long bluInt, int rCount, float rScore, int rA, int vCount, int spellCount) {
-		CampingUser target = monitor(campingIdInt, id, username, firstname, lastname);
+		CampingUser target = monitor(campingIdInt, telegramId, username, firstname, lastname);
 		target.setBalls(bcInt);
 		target.setLastUpdate(bluInt);
 		target.setRant(rCount, rScore);
@@ -148,10 +171,10 @@ public class CampingUserMonitor extends CampingSerializable {
 		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname);
 	}
 
-	public CampingUser monitor(int campingIdInt, int id, String username, String firstname, String lastname) {
+	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname) {
 		String usernameKey = CampingUtil.generateUsernameKey(username);
 
-		CampingUser target = idMap.get(id);
+		CampingUser target = telegramIdMap.get(telegramId);
 		CampingUser usernameTarget = null;
 		if (username != null && !username.equalsIgnoreCase("null")) {
 			usernameTarget = usernameMap.get(usernameKey);
@@ -159,10 +182,10 @@ public class CampingUserMonitor extends CampingSerializable {
 
 		if (target == null && usernameTarget == null) {
 			// never seen this guy before
-			target = new CampingUser(campingIdInt, id, username, firstname, lastname);
+			target = new CampingUser(campingIdInt, telegramId, username, firstname, lastname);
 			users.add(target);
-			if (id != UNKNOWN_USER_ID)
-				idMap.put(id, target);
+			if (telegramId != UNKNOWN_USER_ID)
+				telegramIdMap.put(telegramId, target);
 			if (username != null)
 				usernameMap.put(usernameKey, target);
 
@@ -171,10 +194,10 @@ public class CampingUserMonitor extends CampingSerializable {
 			return target;
 
 		} else if (target == null && usernameTarget != null) {
-			if (id != UNKNOWN_USER_ID) {
+			if (telegramId != UNKNOWN_USER_ID) {
 				// learned the id
-				usernameTarget.setId(id);
-				idMap.put(id, usernameTarget);
+				usernameTarget.setId(telegramId);
+				telegramIdMap.put(telegramId, usernameTarget);
 
 				shouldSave = true;
 			}
@@ -219,6 +242,7 @@ public class CampingUserMonitor extends CampingSerializable {
 	public void getXml(OutputFormatter of) {
 		String usersTag = "users";
 		of.start(usersTag);
+		of.tagAndValue("nextCampingId", nextCampingId);
 		// sb.append("<" + usersTag + ">");
 
 		for (CampingUser u : users) {

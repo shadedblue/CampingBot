@@ -38,6 +38,7 @@ public class MbiyfCommand extends TextCommand implements IntervalByExecutionTime
 	private boolean shouldAnnounce = false;
 	private List<TimeOfWeek<Boolean>> timeEvents = new ArrayList<>();
 	private TimeOfWeek<Boolean> nextExecEvent;
+	private Instant nearestFutureEnablement;
 	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
 	private static final long CAMPING_CHAT_ID = -1001288464383l;
 //	private static final long TESTING_CHAT_ID = -371511001l;
@@ -121,6 +122,7 @@ public class MbiyfCommand extends TextCommand implements IntervalByExecutionTime
 		List<Instant> thisWeekInstants = createThisWeekInstants(now);
 
 		Instant nearestFuture = null;
+		nearestFutureEnablement = null;
 		for (int i = 0; i < thisWeekInstants.size(); i++) {
 			Instant then = thisWeekInstants.get(i);
 
@@ -131,6 +133,10 @@ public class MbiyfCommand extends TextCommand implements IntervalByExecutionTime
 			if (nearestFuture == null || then.isBefore(nearestFuture)) {
 				nearestFuture = then;
 				nextExecEvent = timeEvents.get(i);
+			}
+
+			if (nearestFutureEnablement == null || then.isBefore(nearestFutureEnablement)) {
+				nearestFutureEnablement = then;
 			}
 		}
 
@@ -236,5 +242,9 @@ public class MbiyfCommand extends TextCommand implements IntervalByExecutionTime
 	@Override
 	public long getNextExecutionTime() {
 		return nextExecTime;
+	}
+
+	public Instant getNearestFutureEnablement() {
+		return nearestFutureEnablement;
 	}
 }

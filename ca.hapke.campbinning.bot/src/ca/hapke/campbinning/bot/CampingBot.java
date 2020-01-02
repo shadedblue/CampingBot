@@ -35,7 +35,7 @@ public class CampingBot extends CampingBotEngine {
 
 	private MbiyfCommand ballsCommand = new MbiyfCommand(this, res);
 
-	private CountdownGenerator countdownGen = new CountdownGenerator(res);
+	private CountdownGenerator countdownGen = new CountdownGenerator(res, ballsCommand);
 	private DatabaseConsumer databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
 	private InlineCommand nicknameConverter = new NicknameConversionCommand();
@@ -156,10 +156,10 @@ public class CampingBot extends CampingBotEngine {
 		case SetNicknameRejected:
 			// must be after SetNickname:
 			break;
-		// case Reload:
-		// rest = reloadCommand(campingFromUser);
-		// sendMsg(chatId, prefix + rest);
-		// break;
+		case Reload:
+			rest = reloadCommand(campingFromUser);
+			sendMsg(chatId, campingFromUser, rest);
+			break;
 		// case Test:
 		// rest = testCommand(campingFromUser, chatId);
 		// break;
@@ -193,25 +193,23 @@ public class CampingBot extends CampingBotEngine {
 		return out;
 	}
 
-	// private String reloadCommand(CampingUser fromUser) {
-	// String result;
-	// if (system.isAdmin(fromUser)) {
-	// res.loadAllEmoji();
-	// serializer.load();
-	// // spellGen.loadStuff();
-	// result = " Done!";
-	// } else {
-	// result = " Access Denied!";
-	// }
-	// return result;
-	// }
+	private String reloadCommand(CampingUser fromUser) {
+		String result;
+		if (system.isAdmin(fromUser)) {
+			res.loadAllEmoji();
+			serializer.load();
+			result = " Done!";
+		} else {
+			result = " Access Denied!";
+		}
+		return result;
+	}
 
 	// public String testCommand(CampingUser fromUser, Long chatId) {
 	// return "";
 	// }
 
 	private String setNicknameCommand(CampingUser campingFromUser, Message message) throws NicknameRejectedException {
-
 		String originalMsg = message.getText();
 		List<MessageEntity> entities = message.getEntities();
 		int targetOffset = originalMsg.indexOf(" ") + 1;
