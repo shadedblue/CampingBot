@@ -147,6 +147,7 @@ public abstract class VoteTracker<T> {
 				return new EventItem(BotCommand.Vote, user, null, chat, topicMessage.getMessageId(), display,
 						topicMessage.getMessageId());
 			} catch (Exception e) {
+				return new EventItem(e.getLocalizedMessage());
 			}
 
 		}
@@ -190,9 +191,9 @@ public abstract class VoteTracker<T> {
 		completionMsg.setParseMode("Markdown");
 		Integer messageId = topicMessage.getMessageId();
 		completionMsg.setReplyToMessageId(messageId);
+		EventLogger logger = EventLogger.getInstance();
 		try {
 			bot.execute(completionMsg);
-			EventLogger logger = EventLogger.getInstance();
 			if (votesNotApplicable.size() < naQuorum) {
 				logger.add(
 						new EventItem(BotCommand.VoteTopicComplete, ranter, null, chat, messageId, votes, messageId));
@@ -200,6 +201,7 @@ public abstract class VoteTracker<T> {
 						messageId));
 			}
 		} catch (TelegramApiException e) {
+			logger.add(new EventItem(e.getLocalizedMessage()));
 		}
 	}
 
@@ -235,9 +237,18 @@ public abstract class VoteTracker<T> {
 
 	protected String getVotesText(boolean completed) {
 		int notApplicable = votesNotApplicable.size();
-		int count = votes.size() + notApplicable;
+		int naturalVotes = votes.size();
+		int count = naturalVotes + notApplicable;
 		float score = getScore();
-		String scoreStr = count > 0 ? nf.format(score) : "(n/a)";
+		String scoreStr;
+		if (naturalVotes > 0) {
+			scoreStr = nf.format(score) ;
+			String scoreSuffix = getScoreSuffix();
+			if (scoreSuffix != null && scoreSuffix.length() > 0)
+				scoreStr = scoreStr + scoreSuffix;
+		} else {
+			scoreStr = "(n/a)";
+		}
 
 		StringBuilder sb = new StringBuilder();
 		addVotesTextPrefix(completed, sb);
@@ -252,12 +263,10 @@ public abstract class VoteTracker<T> {
 			sb.append("Current");
 		sb.append(" Score: *");
 		sb.append(scoreStr);
-		String scoreSuffix = getScoreSuffix();
-		if (scoreSuffix != null && scoreSuffix.length() > 0)
-			sb.append(scoreSuffix);
+		sb.append("*");
 
 		if (!completed) {
-			sb.append("*\nNot Applicable Votes: *");
+			sb.append("\nNot Applicable Votes: *");
 			sb.append(notApplicable);
 			sb.append("*");
 		}
