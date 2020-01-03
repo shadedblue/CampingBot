@@ -227,11 +227,12 @@ public class CampingUser {
 		case AllNicknames:
 		case Countdown:
 		case RantActivatorInitiation:
-		case RantActivatorComplete:
-		case RantRanterInitiation:
-		case RantRanterComplete:
-		case RantInitiationFailed:
-		case RantVote:
+		case AitaActivatorInitiation:
+		case VoteActivatorComplete:
+		case VoteTopicInitiation:
+		case VoteTopicComplete:
+		case VoteInitiationFailed:
+		case Vote:
 		case Reload:
 		case SetNickname:
 			// case Stats:
@@ -266,7 +267,7 @@ public class CampingUser {
 			setSpellCount(spellCount + 1);
 			setLastUpdate(now);
 			break;
-		case RantActivatorComplete:
+		case VoteActivatorComplete:
 			setRantActivation(rantActivation + 1);
 			break;
 		case AllBalls:
@@ -275,11 +276,12 @@ public class CampingUser {
 		case Countdown:
 		case NicknameConversion:
 		case RantActivatorInitiation:
+		case AitaActivatorInitiation:
 			// you don't get credit unless it gets completed as a non-rant.
-		case RantRanterInitiation:
-		case RantRanterComplete:
-		case RantInitiationFailed:
-		case RantVote:
+		case VoteTopicInitiation:
+		case VoteTopicComplete:
+		case VoteInitiationFailed:
+		case Vote:
 		case Reload:
 		case SetNickname:
 			// case Stats:

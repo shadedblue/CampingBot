@@ -10,14 +10,14 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
-import ca.hapke.campbinning.bot.commands.RantCreationFailedException;
-import ca.hapke.campbinning.bot.commands.RantManager;
 import ca.hapke.campbinning.bot.commands.SpellDipshitException;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.inline.NicknameConversionCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
+import ca.hapke.campbinning.bot.commands.voting.VoteCreationFailedException;
+import ca.hapke.campbinning.bot.commands.voting.VotingManager;
 import ca.hapke.campbinning.bot.interval.CampingIntervalThread;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -31,7 +31,7 @@ public class CampingBot extends CampingBotEngine {
 	public static final String STRING_NULL = "null";
 
 	private Resources res = new Resources();
-	private RantManager rants = new RantManager();
+	private VotingManager voting = new VotingManager();
 	private SpellGenerator spellGen = new SpellGenerator();
 
 	private MbiyfCommand ballsCommand = new MbiyfCommand(this, res);
@@ -56,16 +56,16 @@ public class CampingBot extends CampingBotEngine {
 		textCommands.add(new PleasureModelCommand(this));
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameConverter);
-		callbackCommands.add(rants);
+		callbackCommands.add(voting);
 
 		CampingIntervalThread.put(serializer);
 		CampingIntervalThread.put(databaseConsumer);
 		// CampingIntervalThread.put(userMonitor);
 		// CampingIntervalThread.put(sundayStats);
 		CampingIntervalThread.put(ballsCommand);
-		CampingIntervalThread.put(rants);
+		CampingIntervalThread.put(voting);
 
-		hasCategories = new HasCategories[] { spellGen, countdownGen };
+		hasCategories = new HasCategories[] { spellGen, countdownGen, voting };
 	}
 
 	@Override
@@ -99,11 +99,11 @@ public class CampingBot extends CampingBotEngine {
 		case PleasureModel:
 			// NOOP
 			break;
-		case RantRanterComplete:
-		case RantVote:
-		case RantActivatorComplete:
-		case RantRanterInitiation:
-		case RantInitiationFailed:
+		case VoteTopicComplete:
+		case Vote:
+		case VoteActivatorComplete:
+		case VoteTopicInitiation:
+		case VoteInitiationFailed:
 			// case StatsEndOfWeek:
 			// NOOP : internal events, not responses
 			break;
@@ -133,9 +133,20 @@ public class CampingBot extends CampingBotEngine {
 
 		case RantActivatorInitiation:
 			try {
-				rest = rants.startRant(this, message, chatId, campingFromUser);
-			} catch (RantCreationFailedException rcfe) {
-				command = BotCommand.RantInitiationFailed;
+				rest = voting.startRant(this, message, chatId, campingFromUser);
+			} catch (VoteCreationFailedException rcfe) {
+				command = BotCommand.VoteInitiationFailed;
+				String reason = rcfe.getMessage();
+				rest = reason;
+				sendMsg(chatId, campingFromUser, reason);
+			}
+			break;
+
+		case AitaActivatorInitiation:
+			try {
+				rest = voting.startAita(this, message, chatId, campingFromUser);
+			} catch (VoteCreationFailedException rcfe) {
+				command = BotCommand.VoteInitiationFailed;
 				String reason = rcfe.getMessage();
 				rest = reason;
 				sendMsg(chatId, campingFromUser, reason);

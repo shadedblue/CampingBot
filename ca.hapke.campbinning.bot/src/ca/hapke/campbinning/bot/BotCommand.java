@@ -19,16 +19,17 @@ public enum BotCommand {
 	Countdown("countdown", true, false),
 
 	// Activator is the user who invokes /rant
-	RantActivatorInitiation("rant", true, true, BotCommandIds.RANT | BotCommandIds.SET),
-	RantInitiationFailed(null, true, true, BotCommandIds.RANT | BotCommandIds.FAILURE),
+	RantActivatorInitiation("rant", true, true, BotCommandIds.RANT | BotCommandIds.VOTING | BotCommandIds.SET),
+	AitaActivatorInitiation("aita", true, true, BotCommandIds.AITA | BotCommandIds.VOTING | BotCommandIds.SET),
+	VoteInitiationFailed(null, true, true, BotCommandIds.VOTING | BotCommandIds.FAILURE),
 	// Ranter is the person who did the complaining
-	RantRanterInitiation(null, true, true, BotCommandIds.RANT | BotCommandIds.REGULAR_CHAT | BotCommandIds.SET),
-	RantActivatorComplete(null, true, true, BotCommandIds.RANT | BotCommandIds.FINISH),
-	RantRanterComplete(null, true, true, BotCommandIds.RANT | BotCommandIds.REGULAR_CHAT | BotCommandIds.FINISH),
+	VoteTopicInitiation(null, true, true, BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.SET),
+	VoteActivatorComplete(null, true, true, BotCommandIds.VOTING | BotCommandIds.FINISH),
+	VoteTopicComplete(null, true, true, BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.FINISH),
 
 	// TODO add Rant events for Completion as non-rant?
 
-	RantVote(null, true, true, BotCommandIds.RANT | BotCommandIds.USE),
+	Vote(null, true, true, BotCommandIds.VOTING | BotCommandIds.USE),
 	AllNicknames("allnicknames", false, false),
 	SetNickname("setnickname", true, true, BotCommandIds.NICKNAME | BotCommandIds.SET),
 	SetNicknameRejected(null, true, true, BotCommandIds.NICKNAME | BotCommandIds.FAILURE),
