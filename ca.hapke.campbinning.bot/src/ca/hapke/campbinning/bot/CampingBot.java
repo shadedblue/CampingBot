@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
@@ -45,6 +46,8 @@ public class CampingBot extends CampingBotEngine {
 			// sundayStats,
 			spellGen, countdownGen, userMonitor);
 
+	private HasCategories[] hasCategories;
+
 	public CampingBot() {
 		res.loadAllEmoji();
 		serializer.load();
@@ -61,6 +64,8 @@ public class CampingBot extends CampingBotEngine {
 		// CampingIntervalThread.put(sundayStats);
 		CampingIntervalThread.put(ballsCommand);
 		CampingIntervalThread.put(rants);
+
+		hasCategories = new HasCategories[] { spellGen, countdownGen };
 	}
 
 	@Override
@@ -75,6 +80,10 @@ public class CampingBot extends CampingBotEngine {
 
 	public CampingUser getMeCamping() {
 		return meCamping;
+	}
+
+	public HasCategories[] getCategories() {
+		return hasCategories;
 	}
 
 	@Override

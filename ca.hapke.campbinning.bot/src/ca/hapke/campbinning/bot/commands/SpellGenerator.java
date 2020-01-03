@@ -5,28 +5,61 @@ import java.util.List;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.CampingUtil;
+import ca.hapke.campbinning.bot.category.CategoriedItems;
+import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
 /**
  * @author Nathan Hapke
  */
-public class SpellGenerator extends CampingSerializable {
+public class SpellGenerator extends CampingSerializable implements HasCategories {
 
+	private static final String ADJECTIVE_CATEGORY = "adjective";
+	private static final String EXCLAMATION_CATEGORY = "exclamation";
+	private static final String ITEM_CATEGORY = "item";
+
+	public SpellGenerator() {
+		categories = new CategoriedItems<String>(ADJECTIVE_CATEGORY, ITEM_CATEGORY, EXCLAMATION_CATEGORY);
+		adjectives = categories.getList(ADJECTIVE_CATEGORY);
+		items = categories.getList(ITEM_CATEGORY);
+		exclamations = categories.getList(EXCLAMATION_CATEGORY);
+	}
+
+	@Override
+	public String getContainerName() {
+		return "Spell";
+	}
+
+	private CategoriedItems<String> categories;
 	private List<String> adjectives;
 	private List<String> items;
 	private List<String> exclamations;
 
 	public void setAdjectives(List<String> adjectives) {
-		this.adjectives = adjectives;
+		if (categories.putAll(ADJECTIVE_CATEGORY, adjectives))
+			shouldSave = true;
 	}
 
 	public void setItems(List<String> items) {
-		this.items = items;
+		if (categories.putAll(ITEM_CATEGORY, items))
+			shouldSave = true;
 	}
 
 	public void setExclamations(List<String> exclamations) {
-		this.exclamations = exclamations;
+		if (categories.putAll(EXCLAMATION_CATEGORY, exclamations))
+			shouldSave = true;
+	}
+
+	@Override
+	public List<String> getCategoryNames() {
+		return categories.getCategoryNames();
+	}
+
+	@Override
+	public void addItem(String category, String value) {
+		if (categories.put(category, value))
+			shouldSave = true;
 	}
 
 	public String cast(String target) {
@@ -43,25 +76,14 @@ public class SpellGenerator extends CampingSerializable {
 		return last == '.' || last == '!' || last == '?';
 	}
 
-	public List<String> getAdjectives() {
-		return adjectives;
-	}
-
-	public List<String> getItems() {
-		return items;
-	}
-
-	public List<String> getExclamations() {
-		return exclamations;
-	}
-
 	@Override
 	public void getXml(OutputFormatter of) {
 		String outerTag = "spell";
 		of.start(outerTag);
-		of.tagAndValue("adjective", adjectives);
-		of.tagAndValue("item", items);
-		of.tagAndValue("exclamation", exclamations);
+		of.tagCategories(categories);
+		// of.tagAndValue(ADJECTIVE_CATEGORY, adjectives);
+		// of.tagAndValue(ITEM_CATEGORY, items);
+		// of.tagAndValue(EXCLAMATION_CATEGORY, exclamations);
 		of.finish(outerTag);
 	}
 
@@ -69,5 +91,7 @@ public class SpellGenerator extends CampingSerializable {
 		fromUser.increment(BotCommand.Spell);
 		targetUser.victimize(BotCommand.Spell);
 	}
+
+
 
 }

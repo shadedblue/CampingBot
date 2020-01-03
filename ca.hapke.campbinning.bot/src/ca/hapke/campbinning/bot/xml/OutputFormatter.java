@@ -2,6 +2,8 @@ package ca.hapke.campbinning.bot.xml;
 
 import java.util.List;
 
+import ca.hapke.campbinning.bot.category.CategoriedItems;
+
 /**
  * @author Nathan Hapke
  */
@@ -76,5 +78,11 @@ public class OutputFormatter {
 
 	public void tagAndValue(String tag, float value) {
 		tagAndValue(tag, Float.toString(value));
+	}
+
+	public void tagCategories(CategoriedItems<String> categories) {
+		for (String c : categories.getCategoryNames()) {
+			tagAndValue(c, categories.getList(c));
+		}
 	}
 }

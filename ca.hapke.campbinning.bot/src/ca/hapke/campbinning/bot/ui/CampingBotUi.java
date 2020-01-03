@@ -15,9 +15,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -25,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -39,9 +47,9 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import ca.hapke.campbinning.bot.CampingBot;
-import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.CampingXmlSerializer;
+import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.interval.CampingIntervalThread;
@@ -126,7 +134,7 @@ public class CampingBotUi extends JFrame {
 	private DefaultEventTableModel<IntervalByExecutionTime> timeModel;
 
 	private EventLogger eventLogger = EventLogger.getInstance();
-	private CampingBotEngine bot;
+	private CampingBot bot;
 	private JScrollPane sclUsers;
 	private JLabel lblStatus;
 	private JButton btnConnect;
@@ -134,6 +142,10 @@ public class CampingBotUi extends JFrame {
 	private JList<CampingChat> lstChats;
 	private JScrollPane sclChats;
 	private JLabel lblChats;
+	private JTextArea txtCategoryValue;
+	private JComboBox<String> cmbCategories;
+	private Map<String, HasCategories> categoriesMap = new HashMap<>();
+	private Map<String, String> categoryMap = new HashMap<>();
 
 	/**
 	 * Launch the application.
@@ -176,6 +188,7 @@ public class CampingBotUi extends JFrame {
 				usersFormat);
 
 		sclUsers = new JScrollPane();
+		sclUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclUsers.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		sclUsers.setBounds(10, 103, 861, 217);
 		contentPane.add(sclUsers);
@@ -202,6 +215,7 @@ public class CampingBotUi extends JFrame {
 		secModel = new DefaultEventTableModel<>(GlazedListsSwing.swingThreadProxyList(bySecs), secondsFormat);
 
 		JScrollPane sclSec = new JScrollPane();
+		sclSec.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclSec.setBounds(683, 363, 188, 98);
 		contentPane.add(sclSec);
 
@@ -219,6 +233,7 @@ public class CampingBotUi extends JFrame {
 		timeModel = new DefaultEventTableModel<>(GlazedListsSwing.swingThreadProxyList(byTime), timeFormat);
 
 		JScrollPane sclTime = new JScrollPane();
+		sclTime.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclTime.setBounds(683, 500, 188, 98);
 		contentPane.add(sclTime);
 
@@ -271,6 +286,7 @@ public class CampingBotUi extends JFrame {
 				GlazedListsSwing.swingThreadProxyList(chatMgr.getChatList()));
 
 		sclChats = new JScrollPane();
+		sclChats.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclChats.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		sclChats.setBounds(140, 33, 419, 59);
 		contentPane.add(sclChats);
@@ -287,20 +303,22 @@ public class CampingBotUi extends JFrame {
 		};
 		txtChat = new JTextField();
 		txtChat.addActionListener(sendChatListener);
-		txtChat.setBounds(569, 31, 188, 33);
+		txtChat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		txtChat.setBounds(190, 5, 270, 26);
 		contentPane.add(txtChat);
 		txtChat.setColumns(10);
 
 		JButton btnSay = new JButton("Say");
 		btnSay.addActionListener(sendChatListener);
-		btnSay.setBounds(765, 31, 106, 34);
+		btnSay.setBounds(465, 5, 94, 26);
 		contentPane.add(btnSay);
 
-		lblChats = new JLabel("Chats");
-		lblChats.setBounds(140, 14, 179, 14);
+		lblChats = new JLabel("Chat");
+		lblChats.setBounds(140, 11, 46, 17);
 		contentPane.add(lblChats);
 
 		JScrollPane sclLog = new JScrollPane();
+		sclLog.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclLog.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		sclLog.setBounds(10, 362, 663, 244);
 		contentPane.add(sclLog);
@@ -334,6 +352,55 @@ public class CampingBotUi extends JFrame {
 		JLabel lblByExecutionTime = new JLabel("By Execution Time");
 		lblByExecutionTime.setBounds(683, 470, 123, 20);
 		contentPane.add(lblByExecutionTime);
+
+		JLabel lblNewLabel = new JLabel("Category");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblNewLabel.setBounds(569, 5, 61, 20);
+		contentPane.add(lblNewLabel);
+
+		cmbCategories = new JComboBox<String>();
+		HasCategories[] hasCategoriess = bot.getCategories();
+		Vector<String> categoriesList = new Vector<>();
+		for (int i = 0; i < hasCategoriess.length; i++) {
+			HasCategories hasCategories = hasCategoriess[i];
+			String first = hasCategories.getContainerName();
+			List<String> categories = hasCategories.getCategoryNames();
+			for (String category : categories) {
+				String categoryCapitalized = Character.toUpperCase(category.charAt(0)) + category.substring(1).toLowerCase();
+				String display = first + " :: " + categoryCapitalized;
+				categoriesList.add(display);
+				categoriesMap.put(display, hasCategories);
+				categoryMap.put(display, category);
+			}
+		}
+		ComboBoxModel<String> aModel = new DefaultComboBoxModel<String>(categoriesList);
+		cmbCategories.setModel(aModel);
+		cmbCategories.setBounds(635, 5, 160, 20);
+		contentPane.add(cmbCategories);
+
+		txtCategoryValue = new JTextArea();
+		txtCategoryValue.setBounds(569, 31, 302, 61);
+		txtCategoryValue.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		contentPane.add(txtCategoryValue);
+
+		JButton btnAddToCategory = new JButton("Add");
+		btnAddToCategory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object s = cmbCategories.getSelectedItem();
+				if (s != null) {
+					HasCategories categories = categoriesMap.get(s);
+					String category = categoryMap.get(s);
+					if (categories == null || category == null)
+						return;
+
+					String value = txtCategoryValue.getText();
+					categories.addItem(category, value);
+					txtCategoryValue.setText("");
+				}
+			}
+		});
+		btnAddToCategory.setBounds(800, 5, 70, 23);
+		contentPane.add(btnAddToCategory);
 
 		Image app = null;
 		try {
