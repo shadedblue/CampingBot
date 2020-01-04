@@ -25,6 +25,6 @@ public abstract class BotCommandIds {
 	public static final long PLEASURE = 2 << 27;
 	public static final long BALLS = 2 << 27;
 	public static final long AITA = 2 << 28;
-	public static final long VOTING = 2 << 28;
+	public static final long VOTING = 2 << 29;
 
 }
