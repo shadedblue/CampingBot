@@ -133,8 +133,13 @@ public class CampingBot extends CampingBotEngine {
 			break;
 
 		case RantActivatorInitiation:
+		case AitaActivatorInitiation:
 			try {
-				rest = voting.startRant(this, message, chatId, campingFromUser);
+				if (command == BotCommand.RantActivatorInitiation)
+					rest = voting.startRant(this, message, chatId, campingFromUser);
+				else if (command == BotCommand.AitaActivatorInitiation)
+					rest = voting.startAita(this, message, chatId, campingFromUser);
+
 			} catch (VoteCreationFailedException rcfe) {
 				command = BotCommand.VoteInitiationFailed;
 				String reason = rcfe.getMessage();
@@ -143,16 +148,6 @@ public class CampingBot extends CampingBotEngine {
 			}
 			break;
 
-		case AitaActivatorInitiation:
-			try {
-				rest = voting.startAita(this, message, chatId, campingFromUser);
-			} catch (VoteCreationFailedException rcfe) {
-				command = BotCommand.VoteInitiationFailed;
-				String reason = rcfe.getMessage();
-				rest = reason;
-				sendMsg(chatId, campingFromUser, reason);
-			}
-			break;
 
 		case Countdown:
 			String countdown = countdownGen.countdownCommand(userMonitor, chatId);
