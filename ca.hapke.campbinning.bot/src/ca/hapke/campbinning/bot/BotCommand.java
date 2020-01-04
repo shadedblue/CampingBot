@@ -7,6 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import ca.hapke.campbinning.bot.util.CampingUtil;
+
 /**
  * @author Nathan Hapke
  */

@@ -22,6 +22,7 @@ import ca.hapke.campbinning.bot.interval.CampingIntervalThread;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.NicknameRejectedException;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 
 /**
  * @author Nathan Hapke

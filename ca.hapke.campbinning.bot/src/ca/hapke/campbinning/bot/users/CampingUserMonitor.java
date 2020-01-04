@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
-import ca.hapke.campbinning.bot.CampingUtil;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

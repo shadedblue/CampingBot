@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import ca.hapke.campbinning.bot.BotCommand;
-import ca.hapke.campbinning.bot.CampingUtil;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 
 /**
  * @author Nathan Hapke

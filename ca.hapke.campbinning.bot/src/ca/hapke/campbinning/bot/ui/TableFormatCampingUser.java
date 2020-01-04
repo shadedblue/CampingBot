@@ -1,7 +1,7 @@
 package ca.hapke.campbinning.bot.ui;
 
-import ca.hapke.campbinning.bot.CampingUtil;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 
 /**

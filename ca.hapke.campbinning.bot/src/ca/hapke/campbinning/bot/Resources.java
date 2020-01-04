@@ -12,6 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
+import ca.hapke.campbinning.bot.util.CampingUtil;
+
 /**
  * @author Nathan Hapke
  */

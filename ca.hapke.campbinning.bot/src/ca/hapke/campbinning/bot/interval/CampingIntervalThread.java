@@ -1,11 +1,6 @@
 package ca.hapke.campbinning.bot.interval;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-
-import org.ocpsoft.prettytime.PrettyTime;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -86,43 +81,5 @@ public class CampingIntervalThread extends TimerThreadWithKill {
 		}
 	}
 
-	@Override
-	public String toString() {
-		LocalDateTime now = LocalDateTime.now();
-		StringBuilder builder = new StringBuilder();
-		builder.append("CampingIntervalThread [");
-		if (regularBySeconds.size() > 0) {
-			builder.append("By Seconds\n");
 
-			for (ExecutionTimeTracker<IntervalBySeconds> item : regularBySeconds) {
-				IntervalBySeconds sec = item.getItem();
-				long time = item.getTime();
-				builder.append(sec.toString());
-				builder.append(" - ");
-				builder.append(sec.getSeconds());
-				builder.append(" - ");
-				LocalDateTime t = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
-
-				java.time.Duration duration = java.time.Duration.between(t, now);
-				builder.append(duration.toSecondsPart());
-				builder.append(" seconds ago");
-				builder.append('\n');
-			}
-			// builder.append(", ");
-			builder.append('\n');
-		}
-		PrettyTime pt = new PrettyTime();
-		if (regularByExecutionTime.size() > 0) {
-			builder.append("By Execution Times\n");
-			for (IntervalByExecutionTime ext : regularByExecutionTime) {
-				builder.append(ext.toString());
-				builder.append(" - ");
-				Date duration = new Date(ext.getNextExecutionTime());
-				builder.append(pt.format(duration));
-				builder.append('\n');
-			}
-		}
-		builder.append("]");
-		return builder.toString();
-	}
 }

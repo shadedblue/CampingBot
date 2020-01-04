@@ -1,6 +1,11 @@
-package ca.hapke.campbinning.bot;
+package ca.hapke.campbinning.bot.util;
 
+import static java.util.Arrays.asList;
+
+import java.util.Iterator;
 import java.util.List;
+
+import ca.hapke.campbinning.bot.CampingBot;
 
 /**
  * @author Nathan Hapke
@@ -69,4 +74,26 @@ public abstract class CampingUtil {
 		return false;
 	}
 
+	/**
+	 * Stolen from jdk.internal.joptsimple.internal.Strings
+	 */
+	public static String join(String[] pieces, String separator) {
+		return join(asList(pieces), separator);
+	}
+
+	/**
+	 * Stolen from jdk.internal.joptsimple.internal.Strings
+	 */
+	public static String join(Iterable<String> pieces, String separator) {
+		StringBuilder buffer = new StringBuilder();
+
+		for (Iterator<String> iter = pieces.iterator(); iter.hasNext();) {
+			buffer.append(iter.next());
+
+			if (iter.hasNext())
+				buffer.append(separator);
+		}
+
+		return buffer.toString();
+	}
 }

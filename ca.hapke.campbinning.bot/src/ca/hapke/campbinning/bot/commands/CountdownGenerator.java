@@ -1,20 +1,19 @@
 package ca.hapke.campbinning.bot.commands;
 
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
 import ca.hapke.campbinning.bot.CampingSerializable;
-import ca.hapke.campbinning.bot.CampingUtil;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
+import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.TimeFormatter;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
 /**
@@ -30,6 +29,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 	private MbiyfCommand ballsCommand;
 	private ZoneId zone = TimeZone.getDefault().toZoneId();
 	private CategoriedItems<String> categories;
+	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
 
 	public CountdownGenerator(Resources res, MbiyfCommand ballsCommand) {
 		this.res = res;
@@ -66,7 +66,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		GregorianCalendar now = new GregorianCalendar();
 		StringBuilder sb = new StringBuilder();
 
-		Temporal targetEvent;
+		ZonedDateTime targetEvent;
 		if (countdownTarget == null || now.before(countdownTarget)) {
 			// CampingUser rtv = userMonitor.monitor(558638791, null, null,
 			// null);
@@ -92,14 +92,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		sb.append("\n");
 		sb.append(res.getRandomBall());
 		sb.append(" ");
-		Duration d = Duration.between(now.toZonedDateTime(), targetEvent);
-
-		long daysPart = d.toDaysPart();
-		if (daysPart > 0)
-			addTime(sb, daysPart, "day");
-		addTime(sb, d.toHoursPart(), "hour");
-		if (daysPart == 0)
-			addTime(sb, d.toMinutesPart(), "minute");
+		sb.append(tf.toPrettyString(targetEvent));
 
 		sb.append("\n");
 
@@ -110,17 +103,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		return out;
 	}
 
-	private void addTime(StringBuilder sb, long amt, String unit) {
-		if (amt > 0) {
-			sb.append(amt);
 
-			sb.append(" ");
-			sb.append(unit);
-			if (amt > 1)
-				sb.append("s");
-			sb.append(" ");
-		}
-	}
 
 	@Override
 	public void getXml(OutputFormatter of) {

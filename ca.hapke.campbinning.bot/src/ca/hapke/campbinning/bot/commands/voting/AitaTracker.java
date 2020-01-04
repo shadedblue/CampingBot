@@ -1,6 +1,5 @@
 package ca.hapke.campbinning.bot.commands.voting;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +8,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.CampingUtil;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 
 /**
  * @author Nathan Hapke
@@ -59,7 +58,7 @@ public class AitaTracker extends VoteTracker<String> {
 	public String getBannerText() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Am I The Asshole Voting! (");
-		sb.append(formatter.formatDuration(new Date(completionTime)));
+		sb.append(formatter.toPrettyString(completionTime));
 		sb.append(" left)");
 		for (int i = 0; i < buttonText.length && i < fullText.length; i++) {
 			String shorter = buttonText[i];
@@ -75,7 +74,7 @@ public class AitaTracker extends VoteTracker<String> {
 
 	@Override
 	protected long getVotingTime() {
-		return 3 * 60 * 1000;
+		return 10 * 60 * 1000;
 	}
 
 	@Override

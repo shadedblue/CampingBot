@@ -18,6 +18,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.telegram.telegrambots"/>
 	<classpathentry kind="lib" path="lib/com.javadude.antxr_2.1.9.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.postgresql.jdbc"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.ocpsoft.prettytime"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.ocpsoft.prettytime.PrettyTime;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -26,6 +25,7 @@ import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
+import ca.hapke.campbinning.bot.util.TimeFormatter;
 
 /**
  * @author Nathan Hapke
@@ -54,7 +54,7 @@ public abstract class VoteTracker<T> {
 	protected Message topicMessage;
 	protected final long creationTime = System.currentTimeMillis();
 	protected final long completionTime = System.currentTimeMillis() + getVotingTime();
-	protected PrettyTime formatter = new PrettyTime();
+	protected TimeFormatter formatter = new TimeFormatter(1, "", false, true);
 	protected final String[] buttonText;
 	protected final String[] buttonValue;
 

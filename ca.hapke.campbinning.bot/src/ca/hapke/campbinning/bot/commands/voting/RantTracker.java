@@ -1,7 +1,5 @@
 package ca.hapke.campbinning.bot.commands.voting;
 
-import java.util.Date;
-
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -23,7 +21,7 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	@Override
 	public String getBannerText() {
-		return "Rant Scoring! (" + formatter.formatDuration(new Date(completionTime)) + " left)";
+		return "Rant Scoring! (" + formatter.toPrettyString(completionTime) + " left)";
 	}
 
 
@@ -45,7 +43,7 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	@Override
 	protected long getVotingTime() {
-		return 60 * 60 * 1000;
+		return 10 * 60 * 1000;
 	}
 
 	@Override
