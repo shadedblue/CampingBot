@@ -43,9 +43,8 @@ public class CampingBot extends CampingBotEngine {
 	private InlineCommand nicknameConverter = new NicknameConversionCommand();
 	private InlineCommand spellInline = new SpellInlineCommand(spellGen);
 
-	private CampingXmlSerializer serializer = new CampingXmlSerializer(system,
-			// sundayStats,
-			spellGen, countdownGen, userMonitor);
+	private CampingXmlSerializer serializer = new CampingXmlSerializer(system, spellGen, countdownGen, voting,
+			userMonitor);
 
 	private HasCategories[] hasCategories;
 
@@ -135,11 +134,13 @@ public class CampingBot extends CampingBotEngine {
 		case RantActivatorInitiation:
 		case AitaActivatorInitiation:
 			try {
-				if (command == BotCommand.RantActivatorInitiation)
-					rest = voting.startRant(this, message, chatId, campingFromUser);
-				else if (command == BotCommand.AitaActivatorInitiation)
-					rest = voting.startAita(this, message, chatId, campingFromUser);
-
+				// if (command == BotCommand.RantActivatorInitiation)
+				// rest = voting.startRant(this, message, chatId,
+				// campingFromUser);
+				// else if (command == BotCommand.AitaActivatorInitiation)
+				// rest = voting.startAita(this, message, chatId,
+				// campingFromUser);
+				rest = voting.startVoting(command, this, message, chatId, campingFromUser);
 			} catch (VoteCreationFailedException rcfe) {
 				command = BotCommand.VoteInitiationFailed;
 				String reason = rcfe.getMessage();

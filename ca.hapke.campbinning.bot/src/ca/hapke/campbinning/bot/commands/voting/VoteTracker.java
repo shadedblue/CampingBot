@@ -253,7 +253,35 @@ public abstract class VoteTracker<T> {
 		StringBuilder sb = new StringBuilder();
 		addVotesTextPrefix(completed, sb);
 
-		sb.append("Votes: *");
+
+		if (shouldShowVotesInCategories()) {
+			int[] votes = new int[buttonValue.length];
+			for (T vote : this.votes.values()) {
+				for (int i = 0; i < buttonValue.length; i++) {
+					String txt = buttonValue[i];
+					if (vote instanceof String && txt.equalsIgnoreCase((String) vote)) {
+						votes[i]++;
+						break;
+					}
+				}
+			}
+			for (int i = 0; i < buttonValue.length; i++) {
+				String txt = buttonValue[i];
+				if (NOT_APPLICABLE.equalsIgnoreCase(txt)) {
+					votes[i] = votesNotApplicable.size();
+					break;
+				}
+			}
+			for (int i = 0; i < buttonText.length; i++) {
+				String txt = buttonText[i];
+				sb.append("\n*");
+				sb.append(txt);
+				sb.append("*: ");
+				sb.append(votes[i]);
+			}
+		}
+
+		sb.append("\n--------\nTotal Votes: *");
 		sb.append(count);
 
 		sb.append("*\n");
@@ -265,15 +293,17 @@ public abstract class VoteTracker<T> {
 		sb.append(scoreStr);
 		sb.append("*");
 
-		if (!completed) {
-			sb.append("\nNot Applicable Votes: *");
-			sb.append(notApplicable);
-			sb.append("*");
-		}
+		// if (!completed) {
+		// sb.append("\nNot Applicable Votes: *");
+		// sb.append(notApplicable);
+		// sb.append("*");
+		// }
 		addVotesTextSuffix(sb, completed, score);
 
 		return sb.toString();
 	}
+
+	protected abstract boolean shouldShowVotesInCategories();
 
 	public void addVotesTextPrefix(boolean completed, StringBuilder sb) {
 		if (completed)

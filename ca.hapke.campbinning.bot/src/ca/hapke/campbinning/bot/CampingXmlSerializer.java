@@ -12,6 +12,7 @@ import com.javadude.antxr.scanner.BasicCrimsonXMLTokenStream;
 
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.voting.VotingManager;
 import ca.hapke.campbinning.bot.interval.IntervalBySeconds;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.xml.LoadStatsParser;
@@ -55,19 +56,17 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 	private CampingSystem cs;
 	private SpellGenerator sg;
 	private CountdownGenerator countdownGen;
+	private VotingManager voting;
 	private CampingUserMonitor um;
 
-	public CampingXmlSerializer(CampingSystem cs, // SundayStatsReset
-													// sundayStats,
-			SpellGenerator sg, CountdownGenerator countdownGen, CampingUserMonitor um) {
+	public CampingXmlSerializer(CampingSystem cs, 
+			SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, CampingUserMonitor um) {
 		this.cs = cs;
-		// this.sundayStats = sundayStats;
 		this.sg = sg;
 		this.countdownGen = countdownGen;
+		this.voting = voting;
 		this.um = um;
-		this.serializables = new CampingSerializable[] {
-				// sundayStats,
-				cs, sg, countdownGen, um };
+		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, voting, um };
 	}
 
 	public File save() {
@@ -144,9 +143,7 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), LoadStatsParser.class, false, false);
 		LoadStatsParser parser = new LoadStatsParser(stream);
 		try {
-			parser.document(cs,
-					// sundayStats,
-					sg, countdownGen, um);
+			parser.document(cs, sg, countdownGen, voting, um);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

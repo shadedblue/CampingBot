@@ -60,4 +60,9 @@ public class RantTracker extends VoteTracker<Integer> {
 	protected String getScoreSuffix() {
 		return "/2";
 	}
+
+	@Override
+	protected boolean shouldShowVotesInCategories() {
+		return false;
+	}
 }

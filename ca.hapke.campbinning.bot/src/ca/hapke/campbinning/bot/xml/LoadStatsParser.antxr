@@ -5,21 +5,54 @@ header {
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.interval.*;
     import ca.hapke.campbinning.bot.commands.*;
+    import ca.hapke.campbinning.bot.commands.voting.*;
     import java.util.*;
 }
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, CampingUserMonitor um]
-    :   <camping>[ cs, sg, countdownGen,um] EOF
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, CampingUserMonitor um]
+    :   <camping>[ cs, sg, countdownGen,voting,um] EOF
     ;
     
-<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, CampingUserMonitor um]
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, CampingUserMonitor um]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
 	(<countdown>[countdownGen])?
+	(<voting>[voting]) ?
 	(<users>[um])?
+	;
+<voting>[VotingManager voting]
+	:
+	<assholes>[voting]
+	<mediocres>[voting]
+	<nices>[voting]
+	;
+	
+<assholes>[VotingManager voting]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{voting.addItem("asshole", val);}
+		) *
+	;
+<mediocres>[VotingManager voting]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{voting.addItem("mediocre", val);}
+		) *
+	;
+<nices>[VotingManager voting]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{voting.addItem("nice", val);}
+		) *
 	;
 <system> [CampingSystem cs]
 	{ 
@@ -80,7 +113,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	{ vals = new ArrayList<String>(); String val; }
 	:	
 		(
-			val=<adjective>
+			val=<item>
 			{vals.add(val);}
 		) *
 	;
@@ -88,7 +121,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	{ vals = new ArrayList<String>(); String val; }
 	:	
 		(
-			val=<hype>
+			val=<item>
 			{vals.add(val);}
 		) *
 	;
@@ -104,7 +137,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	{  vals = new ArrayList<String>(); String val; }
 	:	
 		(
-			val=<exclamation>
+			val=<item>
 			{vals.add(val);}
 		) *
 	;
@@ -201,16 +234,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 <dbPass> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
-<hype> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<adjective> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
 <item> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<exclamation> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <campingId> returns [String value = null]

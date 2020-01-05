@@ -17,13 +17,13 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  */
 public class AitaTracker extends VoteTracker<String> {
 	private static final String YTA = "YTA";
-	private static final String NYBM = "NYBM";
+	private static final String ESH = "ESH";
 	private static final String NTA = "NTA";
 	private static final String N_A = "N/A";
-	static final String[] buttonText = new String[] { YTA, NYBM, NTA, N_A };
-	static final String[] fullText = new String[] { "You're The Asshole", "Not Your Best Moment",
-			"Not The Asshole (unlikely)", "Not Applicable" };
-	static final String[] buttonValue = new String[] { YTA, NYBM, NTA, NOT_APPLICABLE };
+	static final String[] buttonText = new String[] { YTA, ESH, NTA, N_A };
+	static final String[] fullText = new String[] { "You're The Asshole", "Everybody Sucks Here",
+			"Not The Asshole (... unlikely)", "Not Applicable" };
+	static final String[] buttonValue = new String[] { YTA, ESH, NTA, NOT_APPLICABLE };
 	static final int NOT_QUORUM = 2;
 	public static final String[] assholeLevels = new String[] { "asshole", "mediocre", "nice" };
 	private Map<String, Float> valueMap;
@@ -36,7 +36,7 @@ public class AitaTracker extends VoteTracker<String> {
 
 		valueMap = new HashMap<>();
 		valueMap.put(YTA, 1f);
-		valueMap.put(NYBM, 0.75f);
+		valueMap.put(ESH, 0.5f);
 		valueMap.put(NTA, 0f);
 	}
 
@@ -57,7 +57,7 @@ public class AitaTracker extends VoteTracker<String> {
 	@Override
 	public String getBannerText() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Am I The Asshole Voting! (");
+		sb.append("Am I The Asshole? (");
 		sb.append(formatter.toPrettyString(completionTime));
 		sb.append(" left)");
 		for (int i = 0; i < buttonText.length && i < fullText.length; i++) {
@@ -66,7 +66,7 @@ public class AitaTracker extends VoteTracker<String> {
 
 			sb.append("\n*");
 			sb.append(shorter);
-			sb.append("* - ");
+			sb.append("*: ");
 			sb.append(longer);
 		}
 		return sb.toString();
@@ -95,7 +95,6 @@ public class AitaTracker extends VoteTracker<String> {
 	@Override
 	public void addVotesTextSuffix(StringBuilder sb, boolean completed, float score) {
 		if (completed) {
-			sb.append("\n");
 			List<String> category;
 			int i;
 			if (score >= 75) {
@@ -107,9 +106,16 @@ public class AitaTracker extends VoteTracker<String> {
 			}
 			category = resultCategories.getList(assholeLevels[i]);
 			String response = CampingUtil.getRandom(category);
-			if (response != null)
+			if (response != null && response.length() > 0) {
+				sb.append("\n\n");
 				sb.append(response);
+			}
 		}
+	}
+
+	@Override
+	protected boolean shouldShowVotesInCategories() {
+		return true;
 	}
 
 }

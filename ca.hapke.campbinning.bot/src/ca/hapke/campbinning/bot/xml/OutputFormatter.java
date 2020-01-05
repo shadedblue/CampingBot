@@ -56,7 +56,7 @@ public class OutputFormatter {
 
 		if (list != null) {
 			for (String a : list) {
-				tagAndValue(tag, a);
+				tagAndValue("item", a);
 			}
 		}
 		finish(outerTag);

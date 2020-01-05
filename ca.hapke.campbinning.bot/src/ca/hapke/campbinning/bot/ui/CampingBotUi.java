@@ -379,6 +379,7 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(cmbCategories);
 
 		txtCategoryValue = new JTextArea();
+		txtCategoryValue.setLineWrap(true);
 		txtCategoryValue.setBounds(569, 31, 302, 61);
 		txtCategoryValue.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		contentPane.add(txtCategoryValue);

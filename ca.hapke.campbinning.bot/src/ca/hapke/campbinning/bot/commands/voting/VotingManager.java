@@ -26,6 +26,7 @@ import ca.odell.glazedlists.GlazedLists;
 /**
  * @author Nathan Hapke
  */
+@SuppressWarnings("rawtypes")
 public class VotingManager extends CampingSerializable implements IntervalBySeconds, CallbackCommand, HasCategories {
 
 	private Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
@@ -35,18 +36,17 @@ public class VotingManager extends CampingSerializable implements IntervalBySeco
 
 	private CategoriedItems<String> resultCategories;
 
+	private enum VoteType {
+		Rant,
+		Aita;
+	}
 	public VotingManager() {
 		resultCategories = new CategoriedItems<>(AitaTracker.assholeLevels);
-		for (String s : AitaTracker.assholeLevels) {
-			for (int i = 0; i < 3; i++) {
-				resultCategories.put(s, s.substring(0, 1) + i);
-			}
-		}
 	}
 
 	@Override
 	public int getSeconds() {
-		return 60;
+		return 15;
 	}
 
 	@Override
@@ -68,8 +68,9 @@ public class VotingManager extends CampingSerializable implements IntervalBySeco
 		}
 	}
 
-	public String startAita(CampingBotEngine bot, Message activation, Long chatId, CampingUser activater)
-			throws TelegramApiException, VoteCreationFailedException {
+	public String startVoting(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
+			CampingUser activater)
+			throws VoteCreationFailedException, TelegramApiException {
 		String rest;
 
 		Message topic = activation.getReplyToMessage();
@@ -80,35 +81,17 @@ public class VotingManager extends CampingSerializable implements IntervalBySeco
 			} else {
 				CampingUserMonitor uM = CampingUserMonitor.getInstance();
 				CampingUser ranter = uM.monitor(topic.getFrom());
-
-				VoteTracker rant = new AitaTracker(bot, ranter, activater, chatId, activation, topic, resultCategories);
-
-				inProgress.add(rant);
-				voteOnMessages.put(rantMessageId, rant);
-				voteOnBanners.put(rant.getBanner().getMessageId(), rant);
-				rest = topic.getText();
-				ranter.increment(BotCommand.RantActivatorInitiation);
-			}
-		} else {
-			throw new VoteCreationFailedException(VoteCreationFailedException.NO_TOPIC_PROVIDED);
-		}
-		return rest;
-	}
-
-	public String startRant(CampingBotEngine bot, Message activation, Long chatId, CampingUser activater)
-			throws TelegramApiException, VoteCreationFailedException {
-		String rest;
-
-		Message topic = activation.getReplyToMessage();
-		if (topic != null) {
-			Integer rantMessageId = topic.getMessageId();
-			if (voteOnMessages.containsKey(rantMessageId)) {
-				throw new VoteCreationFailedException(VoteCreationFailedException.ALREADY_BEING_VOTED_ON);
-			} else {
-				CampingUserMonitor uM = CampingUserMonitor.getInstance();
-				CampingUser ranter = uM.monitor(topic.getFrom());
-
-				VoteTracker tracker = new RantTracker(bot, ranter, activater, chatId, activation, topic);
+				VoteTracker tracker = null;
+				switch (type) {
+				case AitaActivatorInitiation:
+					tracker = new AitaTracker(bot, ranter, activater, chatId, activation, topic, resultCategories);
+					break;
+				case RantActivatorInitiation:
+					tracker = new RantTracker(bot, ranter, activater, chatId, activation, topic);
+					break;
+				default:
+					return null;
+				}
 
 				inProgress.add(tracker);
 				voteOnMessages.put(rantMessageId, tracker);
@@ -121,6 +104,7 @@ public class VotingManager extends CampingSerializable implements IntervalBySeco
 		}
 		return rest;
 	}
+
 
 	@Override
 	public EventItem reactToCallback(CallbackQuery callbackQuery) {
