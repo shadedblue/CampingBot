@@ -1,5 +1,7 @@
 package ca.hapke.campbinning.bot.commands.voting;
 
+import java.util.List;
+
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -10,21 +12,26 @@ import ca.hapke.campbinning.bot.users.CampingUser;
  * @author Nathan Hapke
  */
 public class RantTracker extends VoteTracker<Integer> {
-	static final String[] rantButtonText = new String[] { "-1", "0", "+1", "+2", "Not Rant" };
-	static final String[] rantButtonValue = new String[] { "-1", "0", "1", "2", NOT_APPLICABLE };
 	static final int NOT_QUORUM = 2;
 
 	public RantTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
 			Message rant) throws TelegramApiException {
-		super(bot, ranter, activater, chatId, activation, rant, rantButtonText, rantButtonValue, NOT_QUORUM);
+		super(bot, ranter, activater, chatId, activation, rant, NOT_QUORUM);
 	}
 
 	@Override
-	public String getBannerText() {
-		return "Rant Scoring! (" + formatter.toPrettyString(completionTime) + " left)";
+	protected boolean createOptions(List<VotingOption<Integer>> optionsList) {
+		optionsList.add(new VotingOption<Integer>("+2", "Smoking Lady", 2));
+		optionsList.add(new VotingOption<Integer>("+1", "Regular Complaining", 1));
+		optionsList.add(new VotingOption<Integer>("0", "(yawn)", 0));
+		optionsList.add(new VotingOption<Integer>("-1", "Pssshhh", -1));
+		return true;
 	}
 
-
+	@Override
+	public String getBannerTitle() {
+		return "Rant Scoring!";
+	}
 
 	@Override
 	public float getScore() {
@@ -33,27 +40,17 @@ public class RantTracker extends VoteTracker<Integer> {
 			return 0;
 
 		int sum = 0;
-		for (int x : votes.values()) {
-			sum += x;
+		for (String v : votes.values()) {
+			Integer pts = valueMap.get(v);
+			sum += pts.intValue();
 		}
 		float avg = ((float) sum) / count;
 		return avg;
 	}
 
-
 	@Override
 	protected long getVotingTime() {
 		return 10 * 60 * 1000;
-	}
-
-	@Override
-	protected Integer processVote(String vote) {
-		return Integer.parseInt(vote);
-	}
-
-	@Override
-	protected String makeStringFromVote(Integer vote) {
-		return vote.toString();
 	}
 
 	@Override

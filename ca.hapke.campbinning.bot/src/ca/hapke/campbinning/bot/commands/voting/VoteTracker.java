@@ -34,16 +34,12 @@ import ca.hapke.campbinning.bot.util.TimeFormatter;
 public abstract class VoteTracker<T> {
 
 	public abstract float getScore();
-
-
-	public abstract String getBannerText();
-
 	protected CampingBotEngine bot;
 	protected final CampingUser ranter;
 	protected final CampingUser activater;
 	protected final Long chatId;
 	protected CampingChat chat;
-	protected Map<CampingUser, T> votes = new HashMap<>();
+	protected Map<CampingUser, String> votes = new HashMap<>();
 	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
 	protected boolean completed = false;
 	protected NumberFormat nf;
@@ -55,20 +51,22 @@ public abstract class VoteTracker<T> {
 	protected final long creationTime = System.currentTimeMillis();
 	protected final long completionTime = System.currentTimeMillis() + getVotingTime();
 	protected TimeFormatter formatter = new TimeFormatter(1, "", false, true);
-	protected final String[] buttonText;
-	protected final String[] buttonValue;
+	protected final String[] shortButtons;
+	protected final String[] longDescriptions;
+	protected final Map<String, T> valueMap;
+	protected final boolean addNa;
 
-	protected static final String VOTING_COMPLETED = "Voting Completed!\n";
-	protected static final String NOT_APPLICABLE = "na";
+	protected static final String VOTING_COMPLETED = "Voting Completed!";
+	protected static final String NOT_APPLICABLE_SHORT = "N/A";
+	protected static final String NOT_APPLICABLE_LONG = "Not Applicable";
 	protected final int naQuorum;
 
 	public VoteTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic, String[] buttonText, String[] buttonValue, int naQuorum) throws TelegramApiException {
+			Message topic, int naQuorum) throws TelegramApiException {
 		this.ranter = ranter;
 		this.activater = activater;
 		this.chatId = chatId;
-		this.buttonText = buttonText;
-		this.buttonValue = buttonValue;
+
 		this.naQuorum = naQuorum;
 		this.bot = bot;
 		this.chat = CampingChatManager.getInstance().get(chatId, bot);
@@ -77,6 +75,25 @@ public abstract class VoteTracker<T> {
 		nf.setMinimumFractionDigits(0);
 		nf.setMaximumFractionDigits(1);
 
+		List<VotingOption<T>> optionsList = new ArrayList<>();
+		addNa = createOptions(optionsList);
+
+		int count = optionsList.size() + (addNa ? 1 : 0);
+		shortButtons = new String[count];
+		longDescriptions = new String[count];
+		valueMap = new HashMap<String, T>(count);
+		for (int i = 0; i < optionsList.size(); i++) {
+			VotingOption<T> opt = optionsList.get(i);
+			String key = opt.shortButton;
+			shortButtons[i] = key;
+			longDescriptions[i] = opt.longDescription;
+			valueMap.put(key, opt.value);
+		}
+
+		if (addNa) {
+			shortButtons[count - 1] = NOT_APPLICABLE_SHORT;
+			longDescriptions[count - 1] = NOT_APPLICABLE_LONG;
+		}
 		previousBanner = getBannerText();
 		SendMessage out = new SendMessage(chatId, previousBanner);
 		out.setReplyMarkup(getKeyboard());
@@ -93,6 +110,11 @@ public abstract class VoteTracker<T> {
 	}
 
 	/**
+	 * @return add Not Applicable?
+	 */
+	protected abstract boolean createOptions(List<VotingOption<T>> optionsList);
+
+	/**
 	 * @return milliseconds
 	 */
 	protected abstract long getVotingTime();
@@ -105,41 +127,43 @@ public abstract class VoteTracker<T> {
 		String callbackQueryId = callbackQuery.getId();
 
 		String vote = null, display = null;
-		for (int i = 0; i < buttonValue.length; i++) {
-			String value = buttonValue[i];
+		for (int i = 0; i < shortButtons.length; i++) {
+			String value = shortButtons[i];
 			if (value.equalsIgnoreCase(data)) {
 				vote = value;
-				display = buttonText[i];
+				display = longDescriptions[i];
 				break;
 			}
 		}
 		if (vote != null) {
 			CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
+			String previousVote = votes.get(user);
+			if (previousVote == null && votesNotApplicable.contains(user))
+				previousVote = NOT_APPLICABLE_SHORT;
 
-			boolean voteChanged = !vote.equalsIgnoreCase(getVote(user));
-			if (NOT_APPLICABLE.equalsIgnoreCase(vote)) {
+			boolean voteChanged = !vote.equals(previousVote);
+			if (NOT_APPLICABLE_SHORT.equalsIgnoreCase(vote)) {
 				votes.remove(user);
 				votesNotApplicable.add(user);
 				if (votesNotApplicable.size() >= naQuorum)
 					complete();
 			} else {
-				T score = processVote(vote);
-				try {
-					votes.put(user, score);
-					votesNotApplicable.remove(user);
-				} catch (NumberFormatException e) {
-					votes.remove(user);
-					votesNotApplicable.add(user);
-				}
+				votes.put(user, vote);
+				votesNotApplicable.remove(user);
 			}
-			String newVotesMessage = getVotesText(completed);
 			if (voteChanged) {
+				String newVotesMessage = getVotesText(completed);
 				if (attemptMessageEdit(voteTrackingMessage, newVotesMessage, previousVotes))
 					previousVotes = newVotesMessage;
 			}
 
 			AnswerCallbackQuery answer = new AnswerCallbackQuery();
-			answer.setText("Received your vote of: " + display + "!");
+			String voteDisplayToUser;
+			if (voteChanged)
+				voteDisplayToUser = "Received your vote of: " + display + "!";
+			else
+				voteDisplayToUser = "Your vote was already: " + display + "!";
+			answer.setText(voteDisplayToUser);
 			answer.setCallbackQueryId(callbackQueryId);
 			try {
 				bot.execute(answer);
@@ -155,15 +179,12 @@ public abstract class VoteTracker<T> {
 		return null;
 	}
 
-	protected abstract T processVote(String vote);
-
 	protected InlineKeyboardMarkup getKeyboard() {
 		InlineKeyboardMarkup board = new InlineKeyboardMarkup();
 		List<InlineKeyboardButton> row = new ArrayList<>();
-		for (int i = 0; i < buttonText.length && i < buttonValue.length; i++) {
-			String text = buttonText[i];
-			String value = buttonValue[i];
-			row.add(new InlineKeyboardButton(text).setCallbackData(value));
+		for (int i = 0; i < shortButtons.length; i++) {
+			String text = shortButtons[i];
+			row.add(new InlineKeyboardButton(text).setCallbackData(text));
 		}
 		List<List<InlineKeyboardButton>> fullKeyboard = new ArrayList<List<InlineKeyboardButton>>();
 		fullKeyboard.add(row);
@@ -226,15 +247,30 @@ public abstract class VoteTracker<T> {
 
 	protected String getVote(CampingUser user) {
 		if (votesNotApplicable.contains(user))
-			return NOT_APPLICABLE;
-		else {
-			T vote = votes.get(user);
-			if (vote != null)
-				return makeStringFromVote(vote);
-		}
-		return null;
+			return NOT_APPLICABLE_SHORT;
+		else
+			return votes.get(user);
 	}
 
+	public String getBannerText() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getBannerTitle());
+		sb.append(" (");
+		sb.append(formatter.toPrettyString(completionTime));
+		sb.append(" left)");
+		for (int i = 0; i < shortButtons.length && i < longDescriptions.length; i++) {
+			String shorter = shortButtons[i];
+			String longer = longDescriptions[i];
+
+			sb.append("\n*");
+			sb.append(shorter);
+			sb.append("*: ");
+			sb.append(longer);
+		}
+		return sb.toString();
+	}
+
+	public abstract String getBannerTitle();
 	protected String getVotesText(boolean completed) {
 		int notApplicable = votesNotApplicable.size();
 		int naturalVotes = votes.size();
@@ -255,25 +291,22 @@ public abstract class VoteTracker<T> {
 
 
 		if (shouldShowVotesInCategories()) {
-			int[] votes = new int[buttonValue.length];
-			for (T vote : this.votes.values()) {
-				for (int i = 0; i < buttonValue.length; i++) {
-					String txt = buttonValue[i];
-					if (vote instanceof String && txt.equalsIgnoreCase((String) vote)) {
+			int[] votes = new int[shortButtons.length];
+			for (String vote : this.votes.values()) {
+				for (int i = 0; i < shortButtons.length; i++) {
+					String txt = shortButtons[i];
+					if (txt.equalsIgnoreCase(vote)) {
 						votes[i]++;
 						break;
 					}
 				}
 			}
-			for (int i = 0; i < buttonValue.length; i++) {
-				String txt = buttonValue[i];
-				if (NOT_APPLICABLE.equalsIgnoreCase(txt)) {
-					votes[i] = votesNotApplicable.size();
-					break;
-				}
+			if (addNa) {
+				votes[shortButtons.length - 1] = votesNotApplicable.size();
 			}
-			for (int i = 0; i < buttonText.length; i++) {
-				String txt = buttonText[i];
+
+			for (int i = 0; i < shortButtons.length; i++) {
+				String txt = shortButtons[i];
 				sb.append("\n*");
 				sb.append(txt);
 				sb.append("*: ");
@@ -292,12 +325,6 @@ public abstract class VoteTracker<T> {
 		sb.append(" Score: *");
 		sb.append(scoreStr);
 		sb.append("*");
-
-		// if (!completed) {
-		// sb.append("\nNot Applicable Votes: *");
-		// sb.append(notApplicable);
-		// sb.append("*");
-		// }
 		addVotesTextSuffix(sb, completed, score);
 
 		return sb.toString();
@@ -314,8 +341,6 @@ public abstract class VoteTracker<T> {
 	}
 
 	protected abstract String getScoreSuffix();
-
-	protected abstract String makeStringFromVote(T vote);
 
 	public CampingUser getRanter() {
 		return ranter;

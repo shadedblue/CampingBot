@@ -36,10 +36,6 @@ public class VotingManager extends CampingSerializable implements IntervalBySeco
 
 	private CategoriedItems<String> resultCategories;
 
-	private enum VoteType {
-		Rant,
-		Aita;
-	}
 	public VotingManager() {
 		resultCategories = new CategoriedItems<>(AitaTracker.assholeLevels);
 	}
