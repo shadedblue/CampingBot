@@ -30,6 +30,7 @@ import ca.hapke.campbinning.bot.commands.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
+import ca.hapke.campbinning.bot.ui.IStatus;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 
@@ -44,6 +45,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	private User me;
 	protected CampingUser meCamping;
+	private IStatus status;
 
 	protected EventLogger eventLogger = EventLogger.getInstance();
 	protected CampingChatManager chatManager = CampingChatManager.getInstance();
@@ -64,6 +66,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			try {
 				me = getMe();
 				meCamping = userMonitor.monitor(me);
+				status.statusChanged("Online", meCamping);
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			}
@@ -312,5 +315,9 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			}
 		}
 		return targetUser;
+	}
+
+	public void setStatusUpdate(IStatus status) {
+		this.status = status;
 	}
 }

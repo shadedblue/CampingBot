@@ -243,15 +243,10 @@ public class CampingBotUi extends JFrame {
 		TableColumnModel timeColumnModel = tblTime.getColumnModel();
 		timeColumnModel.getColumn(1).setCellRenderer(timeRenderer);
 		timeFormat.setTableWidths(timeColumnModel);
-		///
-
-		JLabel lblStatusL = new JLabel("Status:");
-		lblStatusL.setHorizontalAlignment(SwingConstants.TRAILING);
-		lblStatusL.setBounds(10, 11, 64, 20);
-		contentPane.add(lblStatusL);
 
 		lblStatus = new JLabel("Offline");
-		lblStatus.setBounds(84, 10, 46, 23);
+		lblStatus.setVerticalAlignment(SwingConstants.TOP);
+		lblStatus.setBounds(10, 32, 120, 60);
 		contentPane.add(lblStatus);
 
 		btnConnect = new JButton("Connect");
@@ -270,16 +265,17 @@ public class CampingBotUi extends JFrame {
 					try {
 						TelegramBotsApi api = new TelegramBotsApi();
 						api.registerBot(bot);
+						bot.setStatusUpdate(new StatusUpdate());
 						lblStatus.setText("Online");
 						btnConnect.setEnabled(false);
 					} catch (TelegramApiRequestException ex) {
 						ex.printStackTrace();
-						lblStatusL.setText("Connect Failed");
+						lblStatus.setText("Connect Failed");
 					}
 				}
 			}
 		});
-		btnConnect.setBounds(10, 31, 120, 23);
+		btnConnect.setBounds(10, 7, 120, 23);
 		contentPane.add(btnConnect);
 		CampingChatManager chatMgr = CampingChatManager.getInstance();
 		DefaultEventComboBoxModel<CampingChat> chatModel = new DefaultEventComboBoxModel<>(
@@ -366,7 +362,8 @@ public class CampingBotUi extends JFrame {
 			String first = hasCategories.getContainerName();
 			List<String> categories = hasCategories.getCategoryNames();
 			for (String category : categories) {
-				String categoryCapitalized = Character.toUpperCase(category.charAt(0)) + category.substring(1).toLowerCase();
+				String categoryCapitalized = Character.toUpperCase(category.charAt(0))
+						+ category.substring(1).toLowerCase();
 				String display = first + " :: " + categoryCapitalized;
 				categoriesList.add(display);
 				categoriesMap.put(display, hasCategories);
@@ -386,6 +383,7 @@ public class CampingBotUi extends JFrame {
 
 		JButton btnAddToCategory = new JButton("Add");
 		btnAddToCategory.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				Object s = cmbCategories.getSelectedItem();
 				if (s != null) {
@@ -456,6 +454,16 @@ public class CampingBotUi extends JFrame {
 		if (chat != null && msg.length() > 0) {
 			bot.sendMsg(chat.chatId, msg);
 			txtChat.setText("");
+		}
+	}
+
+	private class StatusUpdate implements IStatus {
+		@Override
+		public void statusChanged(String connected, CampingUser meCamping) {
+			String username = meCamping.getUsername();
+			lblStatus.setText(
+					"<html>" + connected + ": <br>" + username + "<br>" + meCamping.getTelegramId() + "</html>");
+			setTitle(username + " " + connected + " | " + CAMPING_BOT);
 		}
 	}
 }
