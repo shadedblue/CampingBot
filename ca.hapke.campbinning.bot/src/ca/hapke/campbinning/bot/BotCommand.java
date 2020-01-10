@@ -54,7 +54,7 @@ public enum BotCommand {
 
 	private static final String BOT_COMMAND = "bot_command";
 
-	private String command;
+	public final String command;
 	private boolean forUi;
 	private boolean forDb;
 	public final long id;

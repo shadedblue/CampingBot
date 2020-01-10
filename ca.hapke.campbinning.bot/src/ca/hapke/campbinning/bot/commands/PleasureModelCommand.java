@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -15,7 +16,7 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
 /**
  * @author Nathan Hapke
  */
-public class PleasureModelCommand extends TextCommand {
+public class PleasureModelCommand implements TextCommand {
 	public static final String PLEASURE_MODEL = "pleasure model";
 
 	private static final int STATIC = 1;
@@ -34,7 +35,8 @@ public class PleasureModelCommand extends TextCommand {
 	 * FIXME only detects if @CampingBot is last entity
 	 */
 	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId) {
+	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+			Message message) {
 
 		int i = CampingUtil.getRandomIndex(urls);
 		if (i >= 0) {

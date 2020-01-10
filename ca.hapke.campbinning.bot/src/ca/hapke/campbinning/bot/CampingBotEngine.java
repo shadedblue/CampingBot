@@ -222,7 +222,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 						TextCommandResult result = null;
 						for (TextCommand textCommand : textCommands) {
 							if (textCommand.isMatch(msg, entities)) {
-								result = textCommand.textCommand(campingFromUser, entities, chatId);
+								result = textCommand.textCommand(campingFromUser, entities, chatId, message);
 								if (result != null)
 									break;
 							}

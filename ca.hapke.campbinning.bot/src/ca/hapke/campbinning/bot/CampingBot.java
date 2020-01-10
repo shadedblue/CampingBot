@@ -32,7 +32,7 @@ public class CampingBot extends CampingBotEngine {
 	public static final String STRING_NULL = "null";
 
 	private Resources res = new Resources();
-	private VotingManager voting = new VotingManager();
+	private VotingManager voting = new VotingManager(this);
 	private SpellGenerator spellGen = new SpellGenerator();
 
 	private MbiyfCommand ballsCommand = new MbiyfCommand(this, res);
@@ -53,6 +53,7 @@ public class CampingBot extends CampingBotEngine {
 		serializer.load();
 
 		textCommands.add(ballsCommand);
+		textCommands.add(voting);
 		textCommands.add(new PleasureModelCommand(this));
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameConverter);
@@ -148,7 +149,6 @@ public class CampingBot extends CampingBotEngine {
 				sendMsg(chatId, campingFromUser, reason);
 			}
 			break;
-
 
 		case Countdown:
 			String countdown = countdownGen.countdownCommand(userMonitor, chatId);

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import com.vdurmont.emoji.Emoji;
@@ -26,7 +27,7 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 /**
  * @author Nathan Hapke
  */
-public class MbiyfCommand extends TextCommand implements IntervalByExecutionTime {
+public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 	private static final int COUNT = 6;
 	private static final int REPEATS = 2;
 
@@ -59,7 +60,8 @@ public class MbiyfCommand extends TextCommand implements IntervalByExecutionTime
 	}
 
 	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId) {
+	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+			Message message) {
 		CampingUser targetUser = bot.findTarget(entities);
 		if (targetUser == bot.getMeCamping()) {
 			campingFromUser.decrement(BotCommand.MBIYF);
