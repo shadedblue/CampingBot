@@ -10,11 +10,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,35 +85,6 @@ public class CampingBotUi extends JFrame {
 		@Override
 		public boolean shouldRun() {
 			return isVisible();
-		}
-	}
-
-	private class UiDailyEvent implements IntervalByExecutionTime {
-		SimpleDateFormat df = new SimpleDateFormat("EEEE MMMM d k");
-		private long nextExecutionTime = 0;
-
-		@Override
-		public long getNextExecutionTime() {
-			return nextExecutionTime;
-		}
-
-		@Override
-		public void doWork() {
-			String dayOfWeek = df.format(new Date());
-			eventLogger.add(new EventItem(dayOfWeek));
-		}
-
-		@Override
-		public boolean shouldRun() {
-			return true;
-		}
-
-		@Override
-		public void generateNextExecTime() {
-			Instant next = Instant.now();
-			next = next.plus(Duration.ofHours(1));
-			next = next.truncatedTo(ChronoUnit.HOURS);
-			nextExecutionTime = next.toEpochMilli();
 		}
 	}
 
@@ -445,7 +411,6 @@ public class CampingBotUi extends JFrame {
 			}
 		}
 		CampingIntervalThread.put(new UiTableRefresher());
-		CampingIntervalThread.put(new UiDailyEvent());
 	}
 
 	public void chat() {
