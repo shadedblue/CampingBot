@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ca.hapke.campbinning.bot.users;
 
 import java.util.HashMap;
@@ -261,6 +258,12 @@ public class CampingUserMonitor extends CampingSerializable {
 			of.tagAndValue("first", u.getFirstname());
 			of.tagAndValue("last", u.getLastname());
 			of.tagAndValue("nickname", u.getNickname());
+			int day = u.getBirthdayDay();
+			int month = u.getBirthdayMonth();
+			if (month != -1 && day != -1) {
+				of.tagAndValue("birthdayMonth", month);
+				of.tagAndValue("birthdayDay", day);
+			}
 			of.tagAndValue("ballsCount", u.getBallsCount());
 			of.tagAndValue("rantCount", u.getRantCount());
 			of.tagAndValue("rantScore", u.getRantScore());
