@@ -29,7 +29,7 @@ public class AitaTracker extends VoteTracker<Float> {
 	protected boolean createOptions(List<VotingOption<Float>> optionsList) {
 		optionsList.add(new VotingOption<Float>("YTA", "You're The Asshole", 1f));
 		optionsList.add(new VotingOption<Float>("ESH", "Everybody Sucks Here", 0.5f));
-		optionsList.add(new VotingOption<Float>("NTA", "You're The Asshole", 0f));
+		optionsList.add(new VotingOption<Float>("NTA", "Not The Asshole (... unlikely)", 0f));
 		return true;
 	}
 
@@ -54,7 +54,7 @@ public class AitaTracker extends VoteTracker<Float> {
 
 	@Override
 	protected long getVotingTime() {
-		return 10 * 60 * 1000;
+		return 20 * 60 * 1000;
 	}
 
 	@Override
