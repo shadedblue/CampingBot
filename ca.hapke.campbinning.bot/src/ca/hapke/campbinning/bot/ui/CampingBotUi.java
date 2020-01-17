@@ -162,13 +162,13 @@ public class CampingBotUi extends JFrame {
 		sclUsers.setViewportView(tblUsers);
 		TableComparatorChooser.install(tblUsers, usersSorted, TableComparatorChooser.SINGLE_COLUMN);
 
-		NumberCellRenderer numberRenderer = new NumberCellRenderer();
+//		NumberCellRenderer numberRenderer = new NumberCellRenderer();
 		PrettyTimeCellRenderer timeRenderer = new PrettyTimeCellRenderer();
 		TableColumnModel userColumnModel = tblUsers.getColumnModel();
-		for (int i = 6; i <= 10; i++) {
-			userColumnModel.getColumn(i).setCellRenderer(numberRenderer);
-		}
-		userColumnModel.getColumn(11).setCellRenderer(timeRenderer);
+//		for (int i = 6; i <= 10; i++) {
+//			userColumnModel.getColumn(i).setCellRenderer(numberRenderer);
+//		}
+		userColumnModel.getColumn(7).setCellRenderer(timeRenderer);
 		usersFormat.setTableWidths(userColumnModel);
 		tblUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 

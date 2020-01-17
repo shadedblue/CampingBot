@@ -23,6 +23,8 @@ public class CampingUser {
 	private float rantScore;
 	private int rantActivation;
 	private long lastUpdate;
+	private int birthdayMonth = -1;
+	private int birthdayDay = -1;
 
 	// For GlazedLists to autosort
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -112,6 +114,37 @@ public class CampingUser {
 
 		support.firePropertyChange("rantCount", oldCount, rantCount);
 		support.firePropertyChange("rantScore", oldScore, rantScore);
+	}
+
+	public void setBirthday(int month, int day) {
+		if (birthdayMonth != -1 || birthdayDay != -1)
+			return;
+
+		if (month == -1 || day == -1)
+			return;
+
+		int oldMonth = birthdayMonth;
+		float oldDay = birthdayDay;
+		birthdayMonth = month;
+		birthdayDay = day;
+
+		support.firePropertyChange("birthdayMonth", oldMonth, birthdayMonth);
+		support.firePropertyChange("birthdayDay", oldDay, birthdayDay);
+	}
+
+	public int getBirthdayMonth() {
+		return birthdayMonth;
+	}
+
+	public int getBirthdayDay() {
+		return birthdayDay;
+	}
+
+	public String getBirthday() {
+		String result = "";
+		if (birthdayMonth != -1 && birthdayDay != -1)
+			result = birthdayMonth + "/" + birthdayDay;
+		return result;
 	}
 
 	public int getRantActivation() {

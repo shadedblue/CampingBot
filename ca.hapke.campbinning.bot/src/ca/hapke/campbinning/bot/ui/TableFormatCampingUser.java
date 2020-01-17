@@ -10,14 +10,12 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 public class TableFormatCampingUser extends CampingTableFormat implements AdvancedTableFormat<CampingUser> {
 
 	public TableFormatCampingUser() {
-		super(new String[] { "Camping ID", "Telegram ID", "Username", "First", "Last", "Nickname",
+		super(new String[] { "Camping ID", "Telegram ID", "Username", "First", "Last", "Nickname", "Birthday",
 				// "Balls",
-				"Spells", "Rants", "RScore", "RActv", "Victim",
+//				"Spells", "Rants", "RScore", "RActv", "Victim",
 				// "Score",
-				"Last Update" },
-				new int[] { 100, 100, 150, 100, 100, 150,
-						// 50,
-						50, 50, 50, 50, 50,
+				"Last Update" }, new int[] { 100, 100, 150, 100, 100, 150, 50,
+//						50, 50, 50, 50, 50,
 						// 50,
 						150 });
 	}
@@ -38,16 +36,17 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 		case 5:
 			return u.getNickname();
 		case 6:
-			return u.getSpellCount();
+			return u.getBirthday();
+//			return u.getSpellCount();
 		case 7:
-			return u.getRantCount();
-		case 8:
-			return u.getRantScore();
-		case 9:
-			return u.getRantActivation();
-		case 10:
-			return u.getVictimCount();
-		case 11:
+//			return u.getRantCount();
+//		case 8:
+//			return u.getRantScore();
+//		case 9:
+//			return u.getRantActivation();
+//		case 10:
+//			return u.getVictimCount();
+//		case 11:
 			return u.getLastUpdate();
 
 		// return u.getBallsCount();
@@ -64,19 +63,14 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 		switch (column) {
 		case 0:
 		case 1:
-		case 6:
-		case 7:
-		case 8:
-		case 10:
 			return Integer.class;
 		case 2:
 		case 3:
 		case 4:
 		case 5:
+		case 6:
 			return String.class;
-		case 9:
-			return Float.class;
-		case 11:
+		case 7:
 			return Long.class;
 		}
 		throw new IllegalStateException();
