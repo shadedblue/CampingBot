@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
+import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellDipshitException;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
@@ -55,6 +56,7 @@ public class CampingBot extends CampingBotEngine {
 		textCommands.add(ballsCommand);
 		textCommands.add(voting);
 		textCommands.add(new PleasureModelCommand(this));
+		textCommands.add(new PartyEverydayCommand(this));
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameConverter);
 		callbackCommands.add(voting);
@@ -98,6 +100,7 @@ public class CampingBot extends CampingBotEngine {
 		case RegularChatUpdate:
 		case RegularChatReply:
 		case PleasureModel:
+		case PartyEveryday:
 			// NOOP
 			break;
 		case VoteTopicComplete:

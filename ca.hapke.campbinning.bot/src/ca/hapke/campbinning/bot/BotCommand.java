@@ -42,6 +42,7 @@ public enum BotCommand {
 	MBIYF(null, true, true, BotCommandIds.BALLS | BotCommandIds.USE),
 	MBIYFDipshit(null, true, true, BotCommandIds.BALLS | BotCommandIds.FAILURE),
 	PleasureModel(null, true, true, BotCommandIds.PLEASURE),
+	PartyEveryday(null, true, true, BotCommandIds.PARTY),
 	UiString(null, true, false),
 	NicknameConversion(null, true, true, BotCommandIds.NICKNAME | BotCommandIds.USE),
 	RegularChatUpdate(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT),

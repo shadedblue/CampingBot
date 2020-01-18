@@ -271,6 +271,7 @@ public class CampingUser {
 			// case Stats:
 			// case StatsEndOfWeek:
 			// case Test:
+		case PartyEveryday:
 		case PleasureModel:
 		case RegularChatReply:
 		case RegularChatUpdate:
@@ -321,6 +322,7 @@ public class CampingUser {
 			// case StatsEndOfWeek:
 			// case Test:
 		case PleasureModel:
+		case PartyEveryday:
 		case RegularChatReply:
 		case RegularChatUpdate:
 		case SetNicknameRejected:
