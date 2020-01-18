@@ -1,67 +1,68 @@
 package ca.hapke.campbinning.bot.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
-import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 
 /**
  * @author Nathan Hapke
  */
-public abstract class RespondWithImage implements TextCommand {
+public class RespondWithImage {
 
-	protected static final int STATIC = 1;
-	protected static final int GIF = 2;
 	protected CampingBot bot;
-	private String[] urls;
-	private int[] imageTypes;
+	protected final List<ImageLink> images = new ArrayList<>();
 
-	public RespondWithImage(CampingBot bot, String[] urls, int[] imageTypes) {
+	public RespondWithImage(CampingBot bot) {
 		this.bot = bot;
-		this.urls = urls;
-		this.imageTypes = imageTypes;
 	}
 
-	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
-			Message message) {
+	public TextCommandResult sendImage(BotCommand commandType, Long chatId, String caption) {
 
-		int i = CampingUtil.getRandomIndex(urls);
-		if (i >= 0) {
-			String url = urls[i];
+		ImageLink image = CampingUtil.getRandom(images);
+		if (image != null) {
+			String url = image.url;
 
 			try {
-				switch (imageTypes[i]) {
-				case STATIC:
+				String msg = url;
+				switch (image.type) {
+				case ImageLink.STATIC:
 					SendPhoto p = new SendPhoto();
 					p.setChatId(chatId);
 					p.setPhoto(url);
-
+					if (caption != null) {
+						p.setCaption(caption);
+						msg = msg + " " + caption;
+					}
 					bot.execute(p);
 					break;
-				case GIF:
+				case ImageLink.GIF:
 					SendAnimation ani = new SendAnimation();
-					ani.setAnimation(url);
 					ani.setChatId(chatId);
+					ani.setAnimation(url);
+					if (caption != null) {
+						ani.setCaption(caption);
+						msg = msg + " " + caption;
+					}
 					bot.execute(ani);
 					break;
 				}
 
-				return new TextCommandResult(getCommandType(), url, false);
+				return new TextCommandResult(commandType, msg, false);
 			} catch (TelegramApiException e) {
 			}
 		}
 		return null;
 	}
 
-	protected abstract BotCommand getCommandType();
+	public boolean add(ImageLink e) {
+		return images.add(e);
+	}
 
 }

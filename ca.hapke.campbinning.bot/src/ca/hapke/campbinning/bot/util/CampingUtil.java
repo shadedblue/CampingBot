@@ -2,6 +2,7 @@ package ca.hapke.campbinning.bot.util;
 
 import static java.util.Arrays.asList;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,9 +29,23 @@ public abstract class CampingUtil {
 	}
 
 	public static <T> int getRandomIndex(T[] l) {
-		if (l == null || l.length == 0)
+		if (l == null)
 			return -1;
-		return (int) (Math.random() * l.length);
+		int length = l.length;
+		return getRandomIndex(length);
+	}
+
+	public static <T> int getRandomIndex(Collection<T> l) {
+		if (l == null)
+			return -1;
+		int length = l.size();
+		return getRandomIndex(length);
+	}
+
+	private static int getRandomIndex(int length) {
+		if (length == 0)
+			return -1;
+		return (int) (Math.random() * length);
 	}
 
 	public static String prefixAt(String input) {

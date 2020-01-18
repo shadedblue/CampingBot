@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import com.javadude.antxr.scanner.BasicCrimsonXMLTokenStream;
 
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
+import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
 import ca.hapke.campbinning.bot.interval.IntervalBySeconds;
@@ -58,15 +59,17 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 	private CountdownGenerator countdownGen;
 	private VotingManager voting;
 	private CampingUserMonitor um;
+	private PartyEverydayCommand pc;
 
-	public CampingXmlSerializer(CampingSystem cs, 
-			SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, CampingUserMonitor um) {
+	public CampingXmlSerializer(CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen,
+			VotingManager voting, PartyEverydayCommand partyCommand, CampingUserMonitor um) {
 		this.cs = cs;
 		this.sg = sg;
 		this.countdownGen = countdownGen;
 		this.voting = voting;
+		this.pc = partyCommand;
 		this.um = um;
-		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, voting, um };
+		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, voting, pc, um };
 	}
 
 	public File save() {
@@ -143,7 +146,7 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), LoadStatsParser.class, false, false);
 		LoadStatsParser parser = new LoadStatsParser(stream);
 		try {
-			parser.document(cs, sg, countdownGen, voting, um);
+			parser.document(cs, sg, countdownGen, voting, pc, um);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

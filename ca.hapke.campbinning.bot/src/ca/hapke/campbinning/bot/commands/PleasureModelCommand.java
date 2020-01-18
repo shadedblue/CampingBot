@@ -2,6 +2,7 @@ package ca.hapke.campbinning.bot.commands;
 
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import ca.hapke.campbinning.bot.BotCommand;
@@ -11,15 +12,18 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 /**
  * @author Nathan Hapke
  */
-public class PleasureModelCommand extends RespondWithImage {
+public class PleasureModelCommand implements TextCommand {
+
 	public static final String PLEASURE_MODEL = "pleasure model";
 
-	private static final String[] urls = new String[] { "http://www.hapke.ca/images/lame.jpg",
-			"http://www.hapke.ca/images/business-time.gif" };
-	private static final int[] imageTypes = new int[] { STATIC, GIF };
+	protected CampingBot bot;
+	private RespondWithImage images;
 
 	public PleasureModelCommand(CampingBot bot) {
-		super(bot, urls, imageTypes);
+		this.bot = bot;
+		images = new RespondWithImage(bot);
+		images.add(new ImageLink("http://www.hapke.ca/images/lame.jpg", ImageLink.STATIC));
+		images.add(new ImageLink("http://www.hapke.ca/images/business-time.gif", ImageLink.GIF));
 	}
 
 	/**
@@ -33,8 +37,9 @@ public class PleasureModelCommand extends RespondWithImage {
 	}
 
 	@Override
-	protected BotCommand getCommandType() {
-		return BotCommand.PleasureModel;
+	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+			Message message) {
+		return images.sendImage(BotCommand.PleasureModel, chatId, null);
 	}
 
 }

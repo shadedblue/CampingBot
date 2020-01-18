@@ -37,6 +37,8 @@ public class CampingBot extends CampingBotEngine {
 	private SpellGenerator spellGen = new SpellGenerator();
 
 	private MbiyfCommand ballsCommand = new MbiyfCommand(this, res);
+	private PleasureModelCommand pleasureCommand = new PleasureModelCommand(this);
+	private PartyEverydayCommand partyCommand = new PartyEverydayCommand(this);
 
 	private CountdownGenerator countdownGen = new CountdownGenerator(res, ballsCommand);
 	private DatabaseConsumer databaseConsumer = new DatabaseConsumer(system, eventLogger);
@@ -45,7 +47,7 @@ public class CampingBot extends CampingBotEngine {
 	private InlineCommand spellInline = new SpellInlineCommand(spellGen);
 
 	private CampingXmlSerializer serializer = new CampingXmlSerializer(system, spellGen, countdownGen, voting,
-			userMonitor);
+			partyCommand, userMonitor);
 
 	private HasCategories[] hasCategories;
 
@@ -55,8 +57,8 @@ public class CampingBot extends CampingBotEngine {
 
 		textCommands.add(ballsCommand);
 		textCommands.add(voting);
-		textCommands.add(new PleasureModelCommand(this));
-		textCommands.add(new PartyEverydayCommand(this));
+		textCommands.add(pleasureCommand);
+		textCommands.add(partyCommand);
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameConverter);
 		callbackCommands.add(voting);
@@ -68,7 +70,7 @@ public class CampingBot extends CampingBotEngine {
 		CampingIntervalThread.put(ballsCommand);
 		CampingIntervalThread.put(voting);
 
-		hasCategories = new HasCategories[] { spellGen, countdownGen, voting };
+		hasCategories = new HasCategories[] { spellGen, countdownGen, voting, partyCommand };
 	}
 
 	@Override

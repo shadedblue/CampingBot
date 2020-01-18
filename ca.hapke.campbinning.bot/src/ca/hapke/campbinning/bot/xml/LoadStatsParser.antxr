@@ -11,17 +11,22 @@ header {
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, CampingUserMonitor um]
-    :   <camping>[ cs, sg, countdownGen,voting,um] EOF
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingUserMonitor um]
+    :   <camping>[ cs, sg, countdownGen, voting, pc, um] EOF
     ;
     
-<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, CampingUserMonitor um]
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingUserMonitor um]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
 	(<countdown>[countdownGen])?
 	(<voting>[voting]) ?
+	(<party>[pc]) ?
 	(<users>[um])?
+	;
+<party>[PartyEverydayCommand pc]
+	:
+	<excessives>[pc]
 	;
 <voting>[VotingManager voting]
 	:
@@ -30,6 +35,14 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	<nices>[voting]
 	;
 	
+<excessives>[PartyEverydayCommand pc]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{pc.addItem("excessive", val);}
+		) *
+	;
 <assholes>[VotingManager voting]
 	{ String val; }
 	:	
