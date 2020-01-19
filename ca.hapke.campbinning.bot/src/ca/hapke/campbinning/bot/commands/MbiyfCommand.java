@@ -64,7 +64,6 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 			Message message) {
 		CampingUser targetUser = bot.findTarget(entities);
 		if (targetUser == bot.getMeCamping()) {
-			campingFromUser.decrement(BotCommand.MBIYF);
 			return new TextCommandResult(BotCommand.MBIYFDipshit, "Fuck you, I'm not ballsing myself!", true);
 		}
 
@@ -74,7 +73,6 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 		if (targetUser == null)
 			return null;
 
-		targetUser.victimize(BotCommand.MBIYF);
 		campingFromUser.increment(BotCommand.MBIYF);
 		String msg = "My " + ball + " in " + targetUser.target() + "'s " + face + "!";
 		return new TextCommandResult(BotCommand.MBIYF, msg, true);

@@ -168,7 +168,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	;
 
 <user> [CampingUserMonitor um]
-{	String campingId = "null", id, username, first, last, nickname, birthdayMonth = null, birthdayDay = null, ballsCount, lastUpdate, rantCount, rantActivation, victimCount, spellCount, rantScore;
+{	String campingId = "null", id, username, first, last, nickname, birthdayMonth = null, birthdayDay = null, lastUpdate;
 	CampingUser user;}
 	:	( campingId=<campingId> ) ?
 		id=<id>
@@ -179,14 +179,6 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		(
 		birthdayMonth=<birthdayMonth>
 		birthdayDay=<birthdayDay> ) ?
-		
-		ballsCount=<ballsCount>
-		
-		rantCount=<rantCount>
-		rantScore=<rantScore>
-		rantActivation=<rantActivation>
-		spellCount=<spellCount>
-		victimCount=<victimCount>
 		lastUpdate=<lastUpdate>
 		
 	{
@@ -204,30 +196,15 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 			username = null;
 		
 			
-		Integer bcInt = Integer.parseInt(ballsCount);
-		Long bluInt = Long.parseLong(lastUpdate);
+		Long lastUpdateInt = Long.parseLong(lastUpdate);
 		
-		int rC = 0, rA=0;
-		float rS = 0;
-		int sC = 0;
-		int vC = 0;
 		int bM = -1, bD=-1;
 		if (birthdayMonth != null)
 			bM = Integer.parseInt(birthdayMonth);
 		if (birthdayDay != null)
 			bD = Integer.parseInt(birthdayDay);
-		if (rantCount != null)
-			rC = Integer.parseInt(rantCount);
-		if (rantScore != null)
-			rS = Float.parseFloat(rantScore);
-		if (rantActivation != null)
-			rA = Integer.parseInt(rantActivation);
-		if (spellCount != null)
-			sC = Integer.parseInt(spellCount);
-		if (victimCount != null)
-			vC = Integer.parseInt(victimCount);
 			
-		user = um.monitor(campingIdInt, idInt, username, first, last, bcInt, bluInt, rC, rS, rA, vC,sC);
+		user = um.monitor(campingIdInt, idInt, username, first, last, lastUpdateInt);
 		user.setNickname(nickname);
 		
 		if (bM > 0 && bD > 0) {
@@ -283,37 +260,9 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 <first> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
-
 <last> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
-
-<ballsCount> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-
 <lastUpdate> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<rantCount> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<rantActivation> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<spellCount> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<victimCount> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-
-<rantScore> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<nextWeeklyStats> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<name> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;

@@ -89,9 +89,6 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 
 	public static void countSpellActivation(CampingUser fromUser, CampingUser targetUser) {
 		fromUser.increment(BotCommand.Spell);
-		targetUser.victimize(BotCommand.Spell);
 	}
-
-
 
 }

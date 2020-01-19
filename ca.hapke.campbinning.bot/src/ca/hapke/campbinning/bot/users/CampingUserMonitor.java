@@ -152,14 +152,9 @@ public class CampingUserMonitor extends CampingSerializable {
 	}
 
 	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname,
-			Integer bcInt, Long bluInt, int rCount, float rScore, int rA, int vCount, int spellCount) {
+			Long lastUpdate) {
 		CampingUser target = monitor(campingIdInt, telegramId, username, firstname, lastname);
-		target.setBalls(bcInt);
-		target.setLastUpdate(bluInt);
-		target.setRant(rCount, rScore);
-		target.setRantActivation(rA);
-		target.setVictimCount(vCount);
-		target.setSpellCount(spellCount);
+		target.setLastUpdate(lastUpdate);
 
 		return target;
 	}
@@ -264,12 +259,6 @@ public class CampingUserMonitor extends CampingSerializable {
 				of.tagAndValue("birthdayMonth", month);
 				of.tagAndValue("birthdayDay", day);
 			}
-			of.tagAndValue("ballsCount", u.getBallsCount());
-			of.tagAndValue("rantCount", u.getRantCount());
-			of.tagAndValue("rantScore", u.getRantScore());
-			of.tagAndValue("rantActivation", u.getRantActivation());
-			of.tagAndValue("spellCount", u.getSpellCount());
-			of.tagAndValue("victimCount", u.getVictimCount());
 			of.tagAndValue("lastUpdate", u.getLastUpdate());
 
 			of.finish(userTag);

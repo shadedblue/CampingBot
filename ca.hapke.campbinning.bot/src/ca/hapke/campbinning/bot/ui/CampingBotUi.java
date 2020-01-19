@@ -112,6 +112,7 @@ public class CampingBotUi extends JFrame {
 	private JComboBox<String> cmbCategories;
 	private Map<String, HasCategories> categoriesMap = new HashMap<>();
 	private Map<String, String> categoryMap = new HashMap<>();
+	private TrayIcon trayIcon;
 
 	/**
 	 * Launch the application.
@@ -387,7 +388,7 @@ public class CampingBotUi extends JFrame {
 				URL fireUrl = fire.toURI().toURL();
 				ImageIcon fireIcon = new ImageIcon(fireUrl, "tray-icon");
 				Image fireImg = fireIcon.getImage();
-				TrayIcon trayIcon = new TrayIcon(fireImg, CAMPING_BOT);
+				trayIcon = new TrayIcon(fireImg, CAMPING_BOT);
 				trayIcon.setImageAutoSize(true);
 				trayIcon.addActionListener(new ActionListener() {
 
@@ -428,7 +429,9 @@ public class CampingBotUi extends JFrame {
 			String username = meCamping.getUsername();
 			lblStatus.setText(
 					"<html>" + connected + ": <br>" + username + "<br>" + meCamping.getTelegramId() + "</html>");
-			setTitle(username + " " + connected + " | " + CAMPING_BOT);
+			String tooltip = username + " :: " + connected + " | " + CAMPING_BOT;
+			setTitle(tooltip);
+			trayIcon.setToolTip(tooltip);
 		}
 	}
 }

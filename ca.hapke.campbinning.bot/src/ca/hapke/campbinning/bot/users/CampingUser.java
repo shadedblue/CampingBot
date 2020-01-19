@@ -16,12 +16,7 @@ public class CampingUser {
 	private String firstname;
 	private String lastname;
 	private String nickname;
-	private int ballsCount;
-	private int victimCount;
-	private int spellCount;
-	private int rantCount;
-	private float rantScore;
-	private int rantActivation;
+
 	private long lastUpdate;
 	private int birthdayMonth = -1;
 	private int birthdayDay = -1;
@@ -74,46 +69,12 @@ public class CampingUser {
 		return lastname;
 	}
 
-	public int getBallsCount() {
-		return ballsCount;
-	}
-
 	public long getLastUpdate() {
 		return lastUpdate;
 	}
 
 	public String getNickname() {
 		return nickname;
-	}
-
-	public int getVictimCount() {
-		return victimCount;
-	}
-
-	public int getRantCount() {
-		return rantCount;
-	}
-
-	public float getRantScore() {
-		return rantScore;
-	}
-
-	public int getSpellCount() {
-		return spellCount;
-	}
-
-	public void completeRant(float score) {
-		setRant(rantCount + 1, rantScore + score);
-	}
-
-	public void setRant(int count, float score) {
-		int oldCount = rantCount;
-		float oldScore = rantScore;
-		rantCount = count;
-		rantScore = score;
-
-		support.firePropertyChange("rantCount", oldCount, rantCount);
-		support.firePropertyChange("rantScore", oldScore, rantScore);
 	}
 
 	public void setBirthday(int month, int day) {
@@ -147,32 +108,6 @@ public class CampingUser {
 		return result;
 	}
 
-	public int getRantActivation() {
-		return rantActivation;
-	}
-
-	public void setRantActivation(int rantActivation) {
-		int oldCount = this.rantActivation;
-		this.rantActivation = rantActivation;
-		support.firePropertyChange("rantActivation", oldCount, rantActivation);
-	}
-
-	public void victimize(BotCommand cmd) {
-		setVictimCount(victimCount + 1);
-	}
-
-	public void setSpellCount(int spellCount) {
-		int oldCount = spellCount;
-		this.spellCount = spellCount;
-		support.firePropertyChange("spellCount", oldCount, spellCount);
-	}
-
-	public void setVictimCount(int victimCount) {
-		int oldCount = victimCount;
-		this.victimCount = victimCount;
-		support.firePropertyChange("victimCount", oldCount, victimCount);
-	}
-
 	public void mergeFrom(CampingUser other) {
 		if (username == null)
 			setUsername(other.username);
@@ -183,11 +118,6 @@ public class CampingUser {
 		if (nickname == null)
 			setNickname(other.nickname);
 
-		setBalls(this.ballsCount + other.ballsCount);
-		setVictimCount(victimCount + other.victimCount);
-		setSpellCount(spellCount + other.spellCount);
-		setRant(rantCount + other.rantCount, rantScore + other.rantScore);
-		setRantActivation(rantActivation + other.rantActivation);
 		setLastUpdate(Math.max(other.lastUpdate, this.lastUpdate));
 
 	}
@@ -228,64 +158,10 @@ public class CampingUser {
 		support.firePropertyChange("nickname", oldVal, newVal);
 	}
 
-	public void setBalls(Integer bcInt) {
-		int oldVal = ballsCount;
-		ballsCount = bcInt;
-		support.firePropertyChange("ballsCount", oldVal, ballsCount);
-	}
-
 	public void setLastUpdate(Long lastUpdate) {
 		long oldLastUpdate = this.lastUpdate;
 		this.lastUpdate = lastUpdate;
 		support.firePropertyChange("lastUpdate", oldLastUpdate, lastUpdate);
-	}
-
-	public void decrement(BotCommand spell) {
-		long now = System.currentTimeMillis();
-
-		switch (spell) {
-		case MBIYF:
-		case MBIYFDipshit:
-			setBalls(ballsCount - 1);
-			setLastUpdate(now);
-			break;
-
-		case Spell:
-			setSpellCount(spellCount - 1);
-			setLastUpdate(now);
-			break;
-		case NicknameConversion:
-		case AllBalls:
-		case AllFaces:
-		case AllNicknames:
-		case Countdown:
-		case RantActivatorInitiation:
-		case AitaActivatorInitiation:
-		case VoteActivatorComplete:
-		case VoteTopicInitiation:
-		case VoteTopicComplete:
-		case VoteInitiationFailed:
-		case Vote:
-		case Reload:
-		case SetNickname:
-			// case Stats:
-			// case StatsEndOfWeek:
-			// case Test:
-		case PartyEveryday:
-		case PleasureModel:
-		case RegularChatReply:
-		case RegularChatUpdate:
-		case SetNicknameRejected:
-		case SpellDipshit:
-		case UiString:
-			// case RegularChatAnimation:
-		case RegularChatEdit:
-		case RegularChatVideo:
-		case RegularChatGif:
-		case RegularChatPhoto:
-		case RegularChatSticker:
-			break;
-		}
 	}
 
 	public void increment(BotCommand spell) {
@@ -293,25 +169,23 @@ public class CampingUser {
 
 		switch (spell) {
 		case MBIYF:
-			setBalls(ballsCount + 1);
-			setLastUpdate(now);
-			break;
 		case MBIYFDipshit:
 		case Spell:
-			setSpellCount(spellCount + 1);
+		case SpellDipshit:
+		case RantActivatorInitiation:
+		case AitaActivatorInitiation:
+		case PleasureModel:
+		case PartyEveryday:
+			// you don't get credit unless it gets completed as a rant.
 			setLastUpdate(now);
 			break;
 		case VoteActivatorComplete:
-			setRantActivation(rantActivation + 1);
-			break;
 		case AllBalls:
 		case AllFaces:
 		case AllNicknames:
 		case Countdown:
 		case NicknameConversion:
-		case RantActivatorInitiation:
-		case AitaActivatorInitiation:
-			// you don't get credit unless it gets completed as a non-rant.
+
 		case VoteTopicInitiation:
 		case VoteTopicComplete:
 		case VoteInitiationFailed:
@@ -321,12 +195,9 @@ public class CampingUser {
 			// case Stats:
 			// case StatsEndOfWeek:
 			// case Test:
-		case PleasureModel:
-		case PartyEveryday:
 		case RegularChatReply:
 		case RegularChatUpdate:
 		case SetNicknameRejected:
-		case SpellDipshit:
 		case UiString:
 			// case RegularChatAnimation:
 		case RegularChatGif:
@@ -339,11 +210,6 @@ public class CampingUser {
 	}
 
 	public void resetStats() {
-		setBalls(0);
-		setRant(0, 0);
-		setRantActivation(0);
-		setVictimCount(0);
-		setSpellCount(0);
 		// setLastUpdate(0l);
 	}
 
@@ -400,10 +266,6 @@ public class CampingUser {
 			sb.append(")");
 		}
 		return sb.toString();
-	}
-
-	public float getScore() {
-		return ballsCount + rantScore + spellCount + ((victimCount + rantActivation) / 2f);
 	}
 
 }

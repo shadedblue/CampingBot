@@ -50,13 +50,5 @@ public interface LoadStatsParserTokenTypes {
 	// "<nickname>" = 37
 	// "<first>" = 38
 	// "<last>" = 39
-	// "<ballsCount>" = 40
-	// "<lastUpdate>" = 41
-	// "<rantCount>" = 42
-	// "<rantActivation>" = 43
-	// "<spellCount>" = 44
-	// "<victimCount>" = 45
-	// "<rantScore>" = 46
-	// "<nextWeeklyStats>" = 47
-	// "<name>" = 48
+	// "<lastUpdate>" = 40
 }

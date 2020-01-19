@@ -1,7 +1,5 @@
 package ca.hapke.campbinning.bot.interval;
 
-import java.time.LocalDateTime;
-
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -80,6 +78,5 @@ public class CampingIntervalThread extends TimerThreadWithKill {
 			}
 		}
 	}
-
 
 }

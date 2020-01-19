@@ -60,8 +60,7 @@ public class VotingManager extends CampingSerializable
 			long now = System.currentTimeMillis();
 			if (now > r.getCompletionTime() || r.isCompleted()) {
 				r.complete();
-				float score = r.getScore();
-				r.getRanter().completeRant(score);
+//				float score = r.getScore();
 				r.getActivater().increment(BotCommand.VoteActivatorComplete);
 				inProgress.remove(r);
 				continue;
