@@ -11,14 +11,11 @@ import java.util.Map;
  * @author Nathan Hapke
  */
 public class TimesProvider<T> {
-
-//	private final ZoneId zone = ZoneId.systemDefault();
-
-	private List<TimeOfWeek<T>> times = new ArrayList<>();
+	private List<ByTimeOfCalendar<T>> times = new ArrayList<>();
 //	private EventList<Instant> futures = new BasicEventList<>(); 
 //	private EventList<Instant> pasts = new BasicEventList<>(); 
-	private Map<TimeOfWeek<T>, ZonedDateTime> futures = new HashMap<>();
-	private Map<TimeOfWeek<T>, ZonedDateTime> pasts = new HashMap<>();
+	private Map<ByTimeOfCalendar<T>, ZonedDateTime> futures = new HashMap<>();
+	private Map<ByTimeOfCalendar<T>, ZonedDateTime> pasts = new HashMap<>();
 
 	public Collection<ZonedDateTime> getNearestFutures() {
 		return futures.values();
@@ -28,7 +25,7 @@ public class TimesProvider<T> {
 		return pasts.values();
 	}
 
-	public void add(TimeOfWeek<T> t) {
+	public void add(ByTimeOfCalendar<T> t) {
 		times.add(t);
 		generateFutureAndPasts(ZonedDateTime.now(), t);
 	}
@@ -47,12 +44,12 @@ public class TimesProvider<T> {
 	 * public for testing
 	 */
 	public void generateFutureAndPasts(ZonedDateTime when) {
-		for (TimeOfWeek<T> time : times) {
+		for (ByTimeOfCalendar<T> time : times) {
 			generateFutureAndPasts(when, time);
 		}
 	}
 
-	private void generateFutureAndPasts(ZonedDateTime when, TimeOfWeek<T> time) {
+	private void generateFutureAndPasts(ZonedDateTime when, ByTimeOfCalendar<T> time) {
 		time.generateNearestEvents(when);
 
 		futures.put(time, time.getFuture());

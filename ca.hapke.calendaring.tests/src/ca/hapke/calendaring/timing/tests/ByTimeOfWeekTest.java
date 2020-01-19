@@ -9,34 +9,34 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.GregorianCalendar;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import ca.hapke.calendaring.timing.TimeOfWeek;
+import ca.hapke.calendaring.timing.ByTimeOfWeek;
 
 /**
  * @author Nathan Hapke
  */
-public class TimeOfWeekTest {
+public class ByTimeOfWeekTest {
 
 	private static final int FRIDAY_JAN_2020_DOW = 3;
 	private static final DayOfWeek FRIDAY = DayOfWeek.FRIDAY;
-	private TimeOfWeek<Boolean> fridayAm;
+	private ByTimeOfWeek<Boolean> fridayAm;
 
-	@BeforeEach
-	void setUp() throws Exception {
-		fridayAm = new TimeOfWeek<Boolean>(FRIDAY, 7, 0, true);
+	@Before
+	public void setUp() throws Exception {
+		fridayAm = new ByTimeOfWeek<Boolean>(FRIDAY, 7, 0, true);
 
 	}
 
-	@AfterEach
-	void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		fridayAm = null;
 	}
 
 	@Test
-	void testGenerateTargetTimeJan15() {
+	public void testGenerateTargetTimeJan15() {
 
 		GregorianCalendar mainTime;
 		ZonedDateTime when;
@@ -86,7 +86,7 @@ public class TimeOfWeekTest {
 	 * future goes into next month
 	 */
 	@Test
-	void testGenerateTargetTimeMar30() {
+	public void testGenerateTargetTimeMar30() {
 		GregorianCalendar mainTime = new GregorianCalendar(2020, 2, 30, 12, 35);
 		// mar 27, apr 3
 		testDaysAndMonths(mainTime, 3, 27, 4, 3);
@@ -96,7 +96,7 @@ public class TimeOfWeekTest {
 	 * goes into prev month (with leap-year)
 	 */
 	@Test
-	void testGenerateTargetTimeMar3_2020() {
+	public void testGenerateTargetTimeMar3_2020() {
 		GregorianCalendar mainTime = new GregorianCalendar(2020, 2, 3, 12, 35);
 		// feb 28, mar 6
 		testDaysAndMonths(mainTime, 2, 28, 3, 6);
@@ -106,7 +106,7 @@ public class TimeOfWeekTest {
 	 * goes into prev month (no leap-year)
 	 */
 	@Test
-	void testGenerateTargetTimeMar3_2021() {
+	public void testGenerateTargetTimeMar3_2021() {
 		GregorianCalendar mainTime = new GregorianCalendar(2021, 2, 3, 12, 35);
 		// feb 28, mar 6
 		testDaysAndMonths(mainTime, 2, 26, 3, 5);

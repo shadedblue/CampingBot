@@ -10,13 +10,13 @@ import java.time.temporal.ChronoUnit;
  * @author Nathan Hapke
  *
  */
-public class TimeOfWeek<T> extends ByTimeOfCalendar<T> {
+public class ByTimeOfWeek<T> extends ByTimeOfCalendar<T> {
 
 	public final DayOfWeek day;
 	public final int h;
 	public final int m;
 
-	public TimeOfWeek(DayOfWeek day, int h, int m, T value) {
+	public ByTimeOfWeek(DayOfWeek day, int h, int m, T value) {
 		super(value, 1, ChronoUnit.WEEKS);
 		this.day = day;
 		this.h = h;
