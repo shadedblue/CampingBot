@@ -1,10 +1,7 @@
 package ca.hapke.campbinning.bot.commands;
 
 import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,31 +12,37 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import com.vdurmont.emoji.Emoji;
 
+import ca.hapke.calendaring.timing.ByTimeOfCalendar;
+import ca.hapke.calendaring.timing.ByTimeOfWeek;
+import ca.hapke.calendaring.timing.ByTimeOfYear;
+import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.interval.IntervalByExecutionTime;
-import ca.hapke.campbinning.bot.interval.TimeOfWeek;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 
 /**
  * @author Nathan Hapke
  */
 public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
+	private static final int ENABLE_LENGTH_HOURS = 17;
+	private static final int ENABLE_HOUR = 7;
+	private static final int DISABLE_HOUR = 0;
+	private static final int ENABLE_MIN = 0;
 	private static final int COUNT = 6;
 	private static final int REPEATS = 2;
 
-	private final ZoneId zone = ZoneId.systemDefault();
 	private CampingBot bot;
 	private Resources res;
-	private long nextExecTime;
 	private boolean enabled = false;
 	private boolean shouldAnnounce = false;
-	private List<TimeOfWeek<Boolean>> timeEvents = new ArrayList<>();
-	private TimeOfWeek<Boolean> nextExecEvent;
-	private Instant nearestFutureEnablement;
+	private TimesProvider<Boolean> times = new TimesProvider<>();
+	private ByTimeOfCalendar<Boolean> nextExecEvent;
+
 	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
 	private static final long CAMPING_CHAT_ID = -1001288464383l;
 //	private static final long TESTING_CHAT_ID = -371511001l;
@@ -48,10 +51,25 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 	public MbiyfCommand(CampingBot campingBot, Resources res) {
 		this.bot = campingBot;
 		this.res = res;
-		// timeEvents.add(new TimeOfWeek<Boolean>(DayOfWeek.TUESDAY, 17, 0, true));
-		// timeEvents.add(new TimeOfWeek<Boolean>(DayOfWeek.TUESDAY, 23, 0, false));
-		timeEvents.add(new TimeOfWeek<Boolean>(DayOfWeek.FRIDAY, 7, 0, true));
-		timeEvents.add(new TimeOfWeek<Boolean>(DayOfWeek.SATURDAY, 0, 0, false));
+		times.use(new ByTimeOfWeek<Boolean>(DayOfWeek.FRIDAY, ENABLE_HOUR, 0, true));
+		times.use(new ByTimeOfWeek<Boolean>(DayOfWeek.SATURDAY, DISABLE_HOUR, 0, false));
+	}
+
+	public void init() {
+		CampingUserMonitor monitor = CampingUserMonitor.getInstance();
+		for (CampingUser u : monitor.getUsers()) {
+			if (u.hasBirthday()) {
+				ByTimeOfYear<Boolean> enable = new ByTimeOfYear<Boolean>(u.getBirthdayMonth(), u.getBirthdayDay(),
+						ENABLE_HOUR, ENABLE_MIN, true);
+				times.use(enable);
+
+				ZonedDateTime disableTime = enable.generateATargetTime().plus(ENABLE_LENGTH_HOURS, ChronoUnit.HOURS);
+
+				ByTimeOfYear<Boolean> disable = new ByTimeOfYear<Boolean>(disableTime.getMonthValue(),
+						disableTime.getDayOfMonth(), disableTime.getHour(), disableTime.getMinute(), false);
+				times.use(disable);
+			}
+		}
 
 		findStartupMode();
 		doWork();
@@ -92,76 +110,13 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 	}
 
 	private void findStartupMode() {
-		Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
-
-		List<Instant> thisWeekInstants = createThisWeekInstants(now);
-
-		Instant nearestPast = null;
-		TimeOfWeek<Boolean> currentEvent = null;
-		for (int i = 0; i < thisWeekInstants.size(); i++) {
-			Instant then = thisWeekInstants.get(i);
-
-			// translate them to the past to find the most recent one
-			if (then.isAfter(now))
-				then = then.minus(7, ChronoUnit.DAYS);
-
-			if (nearestPast == null || then.isAfter(nearestPast)) {
-				nearestPast = then;
-				currentEvent = timeEvents.get(i);
-			}
-		}
-
 		// the doWork activates it.
-		nextExecEvent = currentEvent;
+		nextExecEvent = times.getMostNearestPast();
 	}
 
 	@Override
 	public void generateNextExecTime() {
-		Instant now = Instant.now().truncatedTo(ChronoUnit.MINUTES);
-
-		List<Instant> thisWeekInstants = createThisWeekInstants(now);
-
-		Instant nearestFuture = null;
-		nearestFutureEnablement = null;
-		for (int i = 0; i < thisWeekInstants.size(); i++) {
-			Instant then = thisWeekInstants.get(i);
-
-			// translate them to the future to find the next one
-			if (now.isAfter(then) || now.equals(then))
-				then = then.plus(7, ChronoUnit.DAYS);
-
-			if (nearestFuture == null || then.isBefore(nearestFuture)) {
-				nearestFuture = then;
-				nextExecEvent = timeEvents.get(i);
-			}
-
-			if (nearestFutureEnablement == null || then.isBefore(nearestFutureEnablement)) {
-				nearestFutureEnablement = then;
-			}
-		}
-
-		nextExecTime = nearestFuture.toEpochMilli();
-	}
-
-	public List<Instant> createThisWeekInstants(Instant now) {
-		LocalDate ld = LocalDate.ofInstant(now, zone);
-		DayOfWeek day = ld.getDayOfWeek();
-		LocalTime lt = LocalTime.ofInstant(now, zone);
-
-		Instant then;
-
-		List<Instant> thisWeekInstants = new ArrayList<>(timeEvents.size());
-		// TimeOfWeek<Boolean> target = timeEvents.get(0);
-		for (TimeOfWeek<Boolean> target : timeEvents) {
-			int daysAhead = target.day.ordinal() - day.ordinal();
-			int hoursAhead = target.h - lt.getHour();
-			int minsAhead = target.m - lt.getMinute();
-			then = now.plus(daysAhead, ChronoUnit.DAYS);
-			then = then.plus(hoursAhead, ChronoUnit.HOURS);
-			then = then.plus(minsAhead, ChronoUnit.MINUTES);
-			thisWeekInstants.add(then);
-		}
-		return thisWeekInstants;
+		times.generateNearestEvents();
 	}
 
 	@Override
@@ -241,10 +196,13 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 
 	@Override
 	public long getNextExecutionTime() {
-		return nextExecTime;
+		return times.getNearestFuture().getFuture().toEpochSecond() * 1000;
 	}
 
-	public Instant getNearestFutureEnablement() {
-		return nearestFutureEnablement;
+	/**
+	 * FIXME may be disablement.
+	 */
+	public ZonedDateTime getNearestFutureEnablement() {
+		return times.getNearestFuture().getFuture();
 	}
 }

@@ -28,4 +28,20 @@ public class ByTimeOfYear<T> extends ByTimeOfCalendar<T> {
 
 		return target;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ByTimeOfYear [");
+		builder.append(month);
+		builder.append("/");
+		builder.append(d);
+		builder.append(" ");
+		builder.append(h);
+		builder.append(":");
+		builder.append(min);
+		builder.append("]=");
+		builder.append(this.value);
+		return builder.toString();
+	}
 }

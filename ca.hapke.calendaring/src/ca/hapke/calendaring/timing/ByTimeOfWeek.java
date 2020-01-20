@@ -44,4 +44,18 @@ public class ByTimeOfWeek<T> extends ByTimeOfCalendar<T> {
 		return target;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ByTimeOfWeek [");
+		builder.append(day);
+		builder.append(" ");
+		builder.append(h);
+		builder.append(":");
+		builder.append(m);
+		builder.append("]=");
+		builder.append(this.value);
+		return builder.toString();
+	}
+
 }

@@ -101,6 +101,10 @@ public class CampingUser {
 		return birthdayDay;
 	}
 
+	public boolean hasBirthday() {
+		return birthdayMonth != -1 && birthdayDay != -1;
+	}
+
 	public String getBirthday() {
 		String result = "";
 		if (birthdayMonth != -1 && birthdayDay != -1)

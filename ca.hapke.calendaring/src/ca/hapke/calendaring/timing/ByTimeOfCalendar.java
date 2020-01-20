@@ -26,6 +26,10 @@ public abstract class ByTimeOfCalendar<T> {
 		translateFuturePast(when, target);
 	}
 
+	public ZonedDateTime generateATargetTime() {
+		return generateATargetTime(ZonedDateTime.now());
+	}
+
 	public abstract ZonedDateTime generateATargetTime(ZonedDateTime when);
 
 	public ZonedDateTime getFuture() {

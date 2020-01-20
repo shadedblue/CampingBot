@@ -36,24 +36,37 @@ public class CampingBot extends CampingBotEngine {
 	private VotingManager voting = new VotingManager(this);
 	private SpellGenerator spellGen = new SpellGenerator();
 
-	private MbiyfCommand ballsCommand = new MbiyfCommand(this, res);
-	private PleasureModelCommand pleasureCommand = new PleasureModelCommand(this);
-	private PartyEverydayCommand partyCommand = new PartyEverydayCommand(this);
+	private MbiyfCommand ballsCommand;
+	private PleasureModelCommand pleasureCommand;
+	private PartyEverydayCommand partyCommand;
 
-	private CountdownGenerator countdownGen = new CountdownGenerator(res, ballsCommand);
-	private DatabaseConsumer databaseConsumer = new DatabaseConsumer(system, eventLogger);
+	private CountdownGenerator countdownGen;
+	private DatabaseConsumer databaseConsumer;
 
-	private InlineCommand nicknameConverter = new NicknameConversionCommand();
-	private InlineCommand spellInline = new SpellInlineCommand(spellGen);
+	private InlineCommand nicknameConverter;
+	private InlineCommand spellInline;
 
-	private CampingXmlSerializer serializer = new CampingXmlSerializer(system, spellGen, countdownGen, voting,
-			partyCommand, userMonitor);
+	private CampingXmlSerializer serializer;
 
 	private HasCategories[] hasCategories;
 
 	public CampingBot() {
+		nicknameConverter = new NicknameConversionCommand();
+		pleasureCommand = new PleasureModelCommand(this);
+		partyCommand = new PartyEverydayCommand(this);
+		databaseConsumer = new DatabaseConsumer(system, eventLogger);
+
+		ballsCommand = new MbiyfCommand(this, res);
+		countdownGen = new CountdownGenerator(res, ballsCommand);
+
+		spellInline = new SpellInlineCommand(spellGen);
+
+		serializer = new CampingXmlSerializer(system, spellGen, countdownGen, voting, partyCommand, userMonitor);
+
 		res.loadAllEmoji();
 		serializer.load();
+
+		ballsCommand.init();
 
 		textCommands.add(ballsCommand);
 		textCommands.add(voting);

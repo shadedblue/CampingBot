@@ -1,10 +1,8 @@
 package ca.hapke.campbinning.bot.commands;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
@@ -27,7 +25,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 	private List<String> hypes;
 	private Resources res;
 	private MbiyfCommand ballsCommand;
-	private ZoneId zone = TimeZone.getDefault().toZoneId();
+//	private ZoneId zone = TimeZone.getDefault().toZoneId();
 	private CategoriedItems<String> categories;
 	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
 
@@ -83,7 +81,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 			targetEvent = countdownTarget;
 		} else {
 			sb.append("MBIY\\[F]RIDAY COUNTDOWN\n");
-			targetEvent = ZonedDateTime.ofInstant(ballsCommand.getNearestFutureEnablement(), zone);
+			targetEvent = ballsCommand.getNearestFutureEnablement();
 		}
 
 		for (int i = 0; i < 5; i++) {
@@ -102,8 +100,6 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		String out = sb.toString().trim();
 		return out;
 	}
-
-
 
 	@Override
 	public void getXml(OutputFormatter of) {
