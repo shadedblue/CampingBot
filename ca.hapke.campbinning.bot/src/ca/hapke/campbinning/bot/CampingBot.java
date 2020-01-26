@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
+import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
@@ -38,6 +39,7 @@ public class CampingBot extends CampingBotEngine {
 
 	private MbiyfCommand ballsCommand;
 	private PleasureModelCommand pleasureCommand;
+	private IunnoCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
 
 	private CountdownGenerator countdownGen;
@@ -53,6 +55,7 @@ public class CampingBot extends CampingBotEngine {
 	public CampingBot() {
 		nicknameConverter = new NicknameConversionCommand();
 		pleasureCommand = new PleasureModelCommand(this);
+		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
@@ -71,6 +74,7 @@ public class CampingBot extends CampingBotEngine {
 		textCommands.add(ballsCommand);
 		textCommands.add(voting);
 		textCommands.add(pleasureCommand);
+		textCommands.add(iunnoCommand);
 		textCommands.add(partyCommand);
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameConverter);
@@ -126,6 +130,9 @@ public class CampingBot extends CampingBotEngine {
 			// case StatsEndOfWeek:
 			// NOOP : internal events, not responses
 			break;
+		case SpellDipshit:
+			// NOOP, but must be before Spell
+			break;
 
 		case AllBalls:
 			sendMsg(chatId, res.listBalls());
@@ -137,9 +144,9 @@ public class CampingBot extends CampingBotEngine {
 		// sendMsg(chatId, stats.statsCommand(chatId));
 		// break;
 
-		case SpellDipshit:
-			// NOOP, but must be before Spell
-			break;
+		case IunnoGoogleIt:
+			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
+
 		case Spell:
 			try {
 				rest = spellCommand(campingFromUser, message);
