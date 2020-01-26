@@ -180,6 +180,7 @@ public class CampingUser {
 		case AitaActivatorInitiation:
 		case PleasureModel:
 		case PartyEveryday:
+		case IunnoGoogleIt:
 			// you don't get credit unless it gets completed as a rant.
 			setLastUpdate(now);
 			break;
