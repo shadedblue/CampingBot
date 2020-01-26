@@ -21,7 +21,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 	private static final String HYPE_CATEGORY = "hype";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2019, 11, 27, 14, 10, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 3, 9, 18, 20, 00).toZonedDateTime();
 	private List<String> hypes;
 	private Resources res;
 	private MbiyfCommand ballsCommand;
@@ -68,15 +68,14 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		if (countdownTarget == null || now.before(countdownTarget)) {
 			// CampingUser rtv = userMonitor.monitor(558638791, null, null,
 			// null);
-			// CampingUser andrew = userMonitor.monitor(642767839, null, null,
-			// null);
-			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
-			CampingUser target = jamieson;
+			CampingUser andrew = userMonitor.monitor(642767839, null, null, null);
+//			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
+			CampingUser target = andrew;
 
-			sb.append("PARTY AT ");
+			sb.append("MY BALLS IN  ");
 			sb.append(target.getDisplayName().toUpperCase());
 
-			sb.append("'S HOUSE COUNTDOWN\n");
+			sb.append("'S EASTER COUNTDOWN\n");
 
 			targetEvent = countdownTarget;
 		} else {
