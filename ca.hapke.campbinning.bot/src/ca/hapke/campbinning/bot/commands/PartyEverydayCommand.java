@@ -26,6 +26,8 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  */
 public class PartyEverydayCommand extends CampingSerializable implements HasCategories, TextCommand {
 
+	private static final int SFW_START_HOUR = 8;
+	private static final int SFW_END_HOUR = 16;
 	private static final String EXCESSIVE_CATEGORY = "excessive";
 	private static final String PARTY_START = "I kinda feel like pa";
 	private static final String PARTY_END = "tying!";
@@ -39,17 +41,30 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	private Pattern p;
 	protected CampingBot bot;
 	private CategoriedItems<String> categories = new CategoriedItems<String>(EXCESSIVE_CATEGORY);
-	private RespondWithImage images;
+	private RespondWithImage imagesNsfw;
+	private RespondWithImage imagesSfw;
 	private List<String> excessives;
 
 	public PartyEverydayCommand(CampingBot bot) {
 		this.bot = bot;
-		images = new RespondWithImage(bot);
+		imagesNsfw = new RespondWithImage(bot);
+		imagesSfw = new RespondWithImage(bot);
 		excessives = categories.getList(EXCESSIVE_CATEGORY);
 		for (int i = 1; i <= 3; i++) {
-			images.add(new ImageLink("http://www.hapke.ca/images/party-boy" + i + ".gif", ImageLink.GIF));
+			addImage("http://www.hapke.ca/images/party-boy" + i + ".gif", false);
 		}
+		addImage("http://www.hapke.ca/images/party-rave-girls.gif", true);
+		addImage("http://www.hapke.ca/images/party-beasties.gif", true);
+		addImage("http://www.hapke.ca/images/party-futurama.gif", true);
+		addImage("http://www.hapke.ca/images/party-office.gif", true);
+		addImage("http://www.hapke.ca/images/party-zebra.gif", true);
 		p = Pattern.compile(PARTY_REGEX);
+	}
+
+	private void addImage(String url, boolean sfw) {
+		imagesSfw.add(new ImageLink(url, ImageLink.GIF));
+		if (!sfw)
+			imagesNsfw.add(new ImageLink(url, ImageLink.GIF));
 	}
 
 	@Override
@@ -58,7 +73,6 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 			return false;
 
 		String lowerCase = msg.toLowerCase();
-//		boolean matches = lowerCase.matches(PARTY_REGEX);
 		Matcher m = p.matcher(lowerCase);
 
 		return m.matches();
@@ -77,12 +91,15 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 
 		String partying = generateParrrty(message);
 
-		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hours >= 8 && hours <= 16) {
-			// weekdays SFW
-			return new TextCommandResult(BotCommand.PartyEveryday, partying, true);
+		RespondWithImage images;
+//		if (true) {
+		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hours >= SFW_START_HOUR
+				&& hours < SFW_END_HOUR) {
+			images = imagesSfw;
 		} else {
-			return images.sendImage(BotCommand.PartyEveryday, chatId, partying);
+			images = imagesNsfw;
 		}
+		return images.sendImage(BotCommand.PartyEveryday, chatId, partying);
 	}
 
 	public String generateParrrty(Message message) {
@@ -103,7 +120,7 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		}
 		sb.append(PARTY_END);
 
-		if (count >= 7) {
+		if (count >= 5) {
 			sb.append("\n\n");
 			sb.append(CampingUtil.getRandom(excessives));
 		}
