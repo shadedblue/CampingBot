@@ -66,7 +66,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			try {
 				me = getMe();
 				meCamping = userMonitor.monitor(me);
-				status.statusChanged("Online", meCamping);
+				status.statusOnline(meCamping);
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			}

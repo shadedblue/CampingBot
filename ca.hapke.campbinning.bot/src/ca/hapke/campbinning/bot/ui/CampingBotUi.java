@@ -114,6 +114,8 @@ public class CampingBotUi extends JFrame {
 	private Map<String, String> categoryMap = new HashMap<>();
 	private TrayIcon trayIcon;
 
+	private StatusUpdate statusUpdater = new StatusUpdate();
+
 	/**
 	 * Launch the application.
 	 */
@@ -220,25 +222,21 @@ public class CampingBotUi extends JFrame {
 		btnConnect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CampingSystem system = CampingSystem.getInstance();
-				String u = system.getBotUsername();
-				String token = system.getToken();
-
-				if (u == null || token == null) {
-					JOptionPane.showMessageDialog(CampingBotUi.this,
-							"Cannot connect without the bot's username and token", "Failure",
-							JOptionPane.ERROR_MESSAGE);
-				} else {
+				if (CampingSystem.getInstance().canConnect()) {
 					try {
 						TelegramBotsApi api = new TelegramBotsApi();
 						api.registerBot(bot);
-						bot.setStatusUpdate(new StatusUpdate());
-						lblStatus.setText("Online");
+						bot.setStatusUpdate(statusUpdater);
+						statusUpdater.statusOnline(bot.getMeCamping());
 						btnConnect.setEnabled(false);
 					} catch (TelegramApiRequestException ex) {
 						ex.printStackTrace();
 						lblStatus.setText("Connect Failed");
 					}
+				} else {
+					JOptionPane.showMessageDialog(CampingBotUi.this,
+							"Cannot connect without the bot's username and token", "Failure",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -412,6 +410,7 @@ public class CampingBotUi extends JFrame {
 			}
 		}
 		CampingIntervalThread.put(new UiTableRefresher());
+		statusUpdater.statusOffline(bot.getBotUsername());
 	}
 
 	public void chat() {
@@ -424,11 +423,38 @@ public class CampingBotUi extends JFrame {
 	}
 
 	private class StatusUpdate implements IStatus {
+		private String username;
+		private int id;
+
+		private void updateUserInfo(String inUser, int inTId) {
+			if (inUser != null)
+				username = inUser;
+			if (inTId >= 1)
+				id = inTId;
+		}
+
 		@Override
-		public void statusChanged(String connected, CampingUser meCamping) {
-			String username = meCamping.getUsername();
-			lblStatus.setText(
-					"<html>" + connected + ": <br>" + username + "<br>" + meCamping.getTelegramId() + "</html>");
+		public void statusOffline(String username) {
+			updateUserInfo(username, -1);
+			statusChanged("Offline");
+		}
+
+		@Override
+		public void statusOnline(CampingUser meCamping) {
+			if (meCamping != null) {
+				updateUserInfo(meCamping.getUsername(), meCamping.getTelegramId());
+			}
+			statusChanged("Online");
+		}
+
+		private void statusChanged(String connected) {
+			String idStr;
+			if (id >= 1) {
+				idStr = "<br>" + id;
+			} else {
+				idStr = "";
+			}
+			lblStatus.setText("<html>" + connected + ": <br>" + username + idStr + "</html>");
 			String tooltip = username + " :: " + connected + " | " + CAMPING_BOT;
 			setTitle(tooltip);
 			trayIcon.setToolTip(tooltip);

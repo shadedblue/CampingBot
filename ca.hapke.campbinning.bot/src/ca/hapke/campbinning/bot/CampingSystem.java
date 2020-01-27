@@ -107,4 +107,8 @@ public class CampingSystem extends CampingSerializable {
 		of.finish(outerTag);
 	}
 
+	public boolean canConnect() {
+		return botUsername != null && token != null;
+	}
+
 }
