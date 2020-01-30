@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
@@ -20,7 +21,6 @@ import ca.hapke.campbinning.bot.commands.inline.NicknameConversionCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
 import ca.hapke.campbinning.bot.commands.voting.VoteCreationFailedException;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
-import ca.hapke.campbinning.bot.interval.CampingIntervalThread;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.NicknameRejectedException;
@@ -52,6 +52,8 @@ public class CampingBot extends CampingBotEngine {
 
 	private HasCategories[] hasCategories;
 
+	private CalendarMonitor calMonitor;
+
 	public CampingBot() {
 		nicknameConverter = new NicknameConversionCommand();
 		pleasureCommand = new PleasureModelCommand(this);
@@ -80,12 +82,13 @@ public class CampingBot extends CampingBotEngine {
 		inlineCommands.add(nicknameConverter);
 		callbackCommands.add(voting);
 
-		CampingIntervalThread.put(serializer);
-		CampingIntervalThread.put(databaseConsumer);
+		calMonitor = CalendarMonitor.getInstance();
+		calMonitor.add(serializer);
+		calMonitor.add(databaseConsumer);
 		// CampingIntervalThread.put(userMonitor);
 		// CampingIntervalThread.put(sundayStats);
-		CampingIntervalThread.put(ballsCommand);
-		CampingIntervalThread.put(voting);
+		calMonitor.add(ballsCommand);
+		calMonitor.add(voting);
 
 		hasCategories = new HasCategories[] { spellGen, countdownGen, voting, partyCommand };
 	}

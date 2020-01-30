@@ -5,7 +5,6 @@
     
     import ca.hapke.campbinning.bot.*;
     import ca.hapke.campbinning.bot.users.*;
-    import ca.hapke.campbinning.bot.interval.*;
     import ca.hapke.campbinning.bot.commands.*;
     import ca.hapke.campbinning.bot.commands.voting.*;
     import java.util.*;
@@ -388,13 +387,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop1566:
+			_loop257:
 			do {
 				if ((LA(1)==21)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop1566;
+					break _loop257;
 				}
 				
 			} while (true);
@@ -426,14 +425,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop1523:
+			_loop214:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop1523;
+					break _loop214;
 				}
 				
 			} while (true);
@@ -459,14 +458,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop1527:
+			_loop218:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					voting.addItem("asshole", val);
 				}
 				else {
-					break _loop1527;
+					break _loop218;
 				}
 				
 			} while (true);
@@ -492,14 +491,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop1531:
+			_loop222:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					voting.addItem("mediocre", val);
 				}
 				else {
-					break _loop1531;
+					break _loop222;
 				}
 				
 			} while (true);
@@ -525,14 +524,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop1535:
+			_loop226:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					voting.addItem("nice", val);
 				}
 				else {
-					break _loop1535;
+					break _loop226;
 				}
 				
 			} while (true);
@@ -774,14 +773,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop1553:
+			_loop244:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop1553;
+					break _loop244;
 				}
 				
 			} while (true);
@@ -807,14 +806,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop1549:
+			_loop240:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop1549;
+					break _loop240;
 				}
 				
 			} while (true);
@@ -840,14 +839,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop1557:
+			_loop248:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop1557;
+					break _loop248;
 				}
 				
 			} while (true);
@@ -873,14 +872,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop1561:
+			_loop252:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop1561;
+					break _loop252;
 				}
 				
 			} while (true);

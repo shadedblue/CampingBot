@@ -12,14 +12,15 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import com.vdurmont.emoji.Emoji;
 
-import ca.hapke.calendaring.timing.ByTimeOfCalendar;
+import ca.hapke.calendaring.event.CalendaredEvent;
+import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByTimeOfWeek;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
-import ca.hapke.campbinning.bot.interval.IntervalByExecutionTime;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -28,7 +29,7 @@ import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 /**
  * @author Nathan Hapke
  */
-public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
+public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 	private static final int ENABLE_LENGTH_HOURS = 17;
 	private static final int ENABLE_HOUR = 7;
 	private static final int DISABLE_HOUR = 0;
@@ -40,8 +41,7 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 	private Resources res;
 	private boolean enabled = false;
 	private boolean shouldAnnounce = false;
-	private TimesProvider<Boolean> times = new TimesProvider<>();
-	private ByTimeOfCalendar<Boolean> nextExecEvent;
+	private TimesProvider<Boolean> times;
 
 	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
 	private static final long CAMPING_CHAT_ID = -1001288464383l;
@@ -51,29 +51,27 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 	public MbiyfCommand(CampingBot campingBot, Resources res) {
 		this.bot = campingBot;
 		this.res = res;
-		times.use(new ByTimeOfWeek<Boolean>(DayOfWeek.FRIDAY, ENABLE_HOUR, 0, true));
-		times.use(new ByTimeOfWeek<Boolean>(DayOfWeek.SATURDAY, DISABLE_HOUR, 0, false));
 	}
 
 	public void init() {
 		CampingUserMonitor monitor = CampingUserMonitor.getInstance();
+		List<ByCalendar<Boolean>> targets = new ArrayList<>();
+		targets.add(new ByTimeOfWeek<Boolean>(DayOfWeek.FRIDAY, ENABLE_HOUR, 0, true));
+		targets.add(new ByTimeOfWeek<Boolean>(DayOfWeek.SATURDAY, DISABLE_HOUR, 0, false));
 		for (CampingUser u : monitor.getUsers()) {
 			if (u.hasBirthday()) {
 				ByTimeOfYear<Boolean> enable = new ByTimeOfYear<Boolean>(u.getBirthdayMonth(), u.getBirthdayDay(),
 						ENABLE_HOUR, ENABLE_MIN, true);
-				times.use(enable);
+				targets.add(enable);
 
 				ZonedDateTime disableTime = enable.generateATargetTime().plus(ENABLE_LENGTH_HOURS, ChronoUnit.HOURS);
 
 				ByTimeOfYear<Boolean> disable = new ByTimeOfYear<Boolean>(disableTime.getMonthValue(),
 						disableTime.getDayOfMonth(), disableTime.getHour(), disableTime.getMinute(), false);
-				times.use(disable);
+				targets.add(disable);
 			}
 		}
-
-		findStartupMode();
-		doWork();
-		generateNextExecTime();
+		times = new TimesProvider<Boolean>(targets);
 		shouldAnnounce = true;
 	}
 
@@ -109,19 +107,9 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 		return false;
 	}
 
-	private void findStartupMode() {
-		// the doWork activates it.
-		nextExecEvent = times.getMostNearestPast();
-	}
-
 	@Override
-	public void generateNextExecTime() {
-		times.generateNearestEvents();
-	}
-
-	@Override
-	public void doWork() {
-		enabled = nextExecEvent.value;
+	public void doWork(Boolean value) {
+		enabled = value;
 		if (enabled && shouldAnnounce) {
 			announce();
 		}
@@ -194,15 +182,25 @@ public class MbiyfCommand implements TextCommand, IntervalByExecutionTime {
 		return true;
 	}
 
-	@Override
-	public long getNextExecutionTime() {
-		return times.getNearestFuture().getFuture().toEpochSecond() * 1000;
-	}
-
 	/**
 	 * FIXME may be disablement.
 	 */
 	public ZonedDateTime getNearestFutureEnablement() {
 		return times.getNearestFuture().getFuture();
+	}
+
+	@Override
+	public TimesProvider<Boolean> getTimeProvider() {
+		return times;
+	}
+
+	@Override
+	public StartupMode getStartupMode() {
+		ByCalendar<Boolean> past = times.getMostNearestPast();
+		if (past.value)
+			return StartupMode.Always;
+		else
+			return StartupMode.Never;
+
 	}
 }

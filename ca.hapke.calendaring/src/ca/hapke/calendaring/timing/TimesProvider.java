@@ -1,5 +1,7 @@
 package ca.hapke.calendaring.timing;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,49 +10,67 @@ import java.util.List;
  * @author Nathan Hapke
  */
 public class TimesProvider<T> {
-	private List<ByTimeOfCalendar<T>> times = new ArrayList<>();
-//	private EventList<Instant> futures = new BasicEventList<>(); 
-//	private EventList<Instant> pasts = new BasicEventList<>(); 
-//	private Map<ByTimeOfCalendar<T>, ZonedDateTime> futures = new HashMap<>();
-//	private Map<ByTimeOfCalendar<T>, ZonedDateTime> pasts = new HashMap<>();
+	// For GlazedLists to autosort
+	private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-//	public Collection<ZonedDateTime> getNearestFutures() {
-//		return futures.values();
-//	}
-//
-//	public Collection<ZonedDateTime> getNearestPasts() {
-//		return pasts.values();
-//	}
+	public void addPropertyChangeListener(PropertyChangeListener pcl) {
+		support.addPropertyChangeListener(pcl);
+	}
+
+	public void removePropertyChangeListener(PropertyChangeListener pcl) {
+		support.removePropertyChangeListener(pcl);
+	}
+
+	///
+
+	private List<ByCalendar<T>> times = new ArrayList<>();
+	private ZonedDateTime lastExecTime = null;
+
+	@SafeVarargs
+	public TimesProvider(ByCalendar<T>... inputs) {
+		for (ByCalendar<T> x : inputs) {
+			times.add(x);
+		}
+		generateNearestEvents();
+	}
+
+	public TimesProvider(List<ByCalendar<T>> inputs) {
+		times.addAll(inputs);
+		generateNearestEvents();
+	}
+
+	public TimesProvider(ByCalendar<T> input) {
+		times.add(input);
+		generateNearestEvents();
+	}
+
 	public void generateNearestEvents() {
 		generateNearestEvents(ZonedDateTime.now());
 	}
 
 	public void generateNearestEvents(ZonedDateTime when) {
-		for (ByTimeOfCalendar<T> t : times) {
+		for (ByCalendar<T> t : times) {
 			t.generateNearestEvents(when);
 			use(t, when);
 		}
 	}
 
-	public void use(ByTimeOfCalendar<T> t) {
-		use(t, ZonedDateTime.now());
-	}
+//	private void use(ByCalendar<T> t) {
+//		use(t, ZonedDateTime.now());
+//	}
 
-	public void use(ByTimeOfCalendar<T> t, ZonedDateTime when) {
+	private void use(ByCalendar<T> t, ZonedDateTime when) {
 		if (!times.contains(t))
 			times.add(t);
 
 		t.generateNearestEvents(when);
-
-//		futures.put(t, t.getFuture());
-//		pasts.put(t, t.getPast());
 	}
 
-	public ByTimeOfCalendar<T> getMostNearestPast() {
-		ByTimeOfCalendar<T> result = null;
+	public ByCalendar<T> getMostNearestPast() {
+		ByCalendar<T> result = null;
 		ZonedDateTime nearest = null;
 
-		for (ByTimeOfCalendar<T> t : times) {
+		for (ByCalendar<T> t : times) {
 			ZonedDateTime past = t.getPast();
 			if (nearest == null || past.isAfter(nearest)) {
 				nearest = past;
@@ -61,11 +81,11 @@ public class TimesProvider<T> {
 		return result;
 	}
 
-	public ByTimeOfCalendar<T> getNearestFuture() {
-		ByTimeOfCalendar<T> result = null;
+	public ByCalendar<T> getNearestFuture() {
+		ByCalendar<T> result = null;
 		ZonedDateTime nearest = null;
 
-		for (ByTimeOfCalendar<T> t : times) {
+		for (ByCalendar<T> t : times) {
 			ZonedDateTime f = t.getFuture();
 			if (nearest == null || f.isBefore(nearest)) {
 				nearest = f;
@@ -74,5 +94,19 @@ public class TimesProvider<T> {
 		}
 
 		return result;
+	}
+
+	public ZonedDateTime getLastExecTime() {
+		return lastExecTime;
+	}
+
+	public void setLastExecTime() {
+		setLastExecTime(ZonedDateTime.now());
+	}
+
+	public void setLastExecTime(ZonedDateTime time) {
+		ZonedDateTime oldTime = this.lastExecTime;
+		this.lastExecTime = time;
+		support.firePropertyChange("lastExecTime", oldTime, lastExecTime);
 	}
 }

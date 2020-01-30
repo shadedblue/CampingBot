@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot.commands.voting;
 
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,10 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
+import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByFrequency;
+import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
@@ -18,7 +23,6 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.TextCommandResult;
-import ca.hapke.campbinning.bot.interval.IntervalBySeconds;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
@@ -32,7 +36,7 @@ import ca.odell.glazedlists.GlazedLists;
  */
 @SuppressWarnings("rawtypes")
 public class VotingManager extends CampingSerializable
-		implements IntervalBySeconds, CallbackCommand, TextCommand, HasCategories {
+		implements CalendaredEvent<Void>, CallbackCommand, TextCommand, HasCategories {
 
 	private Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
 	private Map<Integer, VoteTracker> voteOnBanners = new HashMap<Integer, VoteTracker>();
@@ -41,19 +45,26 @@ public class VotingManager extends CampingSerializable
 
 	private CategoriedItems<String> resultCategories;
 	private CampingBot bot;
+	private TimesProvider<Void> times;
 
 	public VotingManager(CampingBot campingBot) {
 		this.bot = campingBot;
+		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
 		resultCategories = new CategoriedItems<>(AitaTracker.assholeLevels);
 	}
 
 	@Override
-	public int getSeconds() {
-		return 15;
+	public TimesProvider<Void> getTimeProvider() {
+		return times;
 	}
 
 	@Override
-	public void doWork() {
+	public StartupMode getStartupMode() {
+		return StartupMode.Never;
+	}
+
+	@Override
+	public void doWork(Void value) {
 		for (int i = 0; i < inProgress.size(); i++) {
 			VoteTracker r = inProgress.get(i);
 

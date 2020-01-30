@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * @author Nathan Hapke
  */
-public class ByTimeOfYear<T> extends ByTimeOfCalendar<T> {
+public class ByTimeOfYear<T> extends ByCalendar<T> {
 
 	public final int month;
 	public final int d;

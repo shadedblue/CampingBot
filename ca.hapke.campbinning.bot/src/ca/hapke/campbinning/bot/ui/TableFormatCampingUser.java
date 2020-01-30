@@ -11,7 +11,7 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 
 	public TableFormatCampingUser() {
 		super(new String[] { "C-ID", "T-ID", "Username", "First", "Last", "Nickname", "B-Day", "Last Update" },
-				new int[] { 75, 100, 150, 100, 100, 250, 75, 100 });
+				new int[] { 50, 75, 150, 100, 100, 250, 75, 200 });
 	}
 
 	@Override

@@ -7,14 +7,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.time.temporal.ChronoUnit;
 
 import com.javadude.antxr.scanner.BasicCrimsonXMLTokenStream;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
+import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByFrequency;
+import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
-import ca.hapke.campbinning.bot.interval.IntervalBySeconds;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.xml.LoadStatsParser;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -22,16 +26,12 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class CampingXmlSerializer implements IntervalBySeconds {
-	@Override
-	public int getSeconds() {
-		return 60;
-	}
-
+public class CampingXmlSerializer implements CalendaredEvent<Void> {
+	private TimesProvider<Void> times;
 	private boolean shouldSave = false;
 
 	@Override
-	public void doWork() {
+	public void doWork(Void value) {
 		if (shouldSave) {
 			File file = save();
 			if (file != null)
@@ -70,6 +70,7 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 		this.pc = partyCommand;
 		this.um = um;
 		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, voting, pc, um };
+		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
 	public File save() {
@@ -152,5 +153,15 @@ public class CampingXmlSerializer implements IntervalBySeconds {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public TimesProvider<Void> getTimeProvider() {
+		return times;
+	}
+
+	@Override
+	public StartupMode getStartupMode() {
+		return StartupMode.Never;
 	}
 }

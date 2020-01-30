@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.interval;
+package ca.hapke.calendaring.event;
 
 /**
  * @author Nathan Hapke

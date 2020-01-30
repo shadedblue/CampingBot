@@ -5,7 +5,6 @@
     
     import ca.hapke.campbinning.bot.*;
     import ca.hapke.campbinning.bot.users.*;
-    import ca.hapke.campbinning.bot.interval.*;
     import ca.hapke.campbinning.bot.commands.*;
     import ca.hapke.campbinning.bot.commands.voting.*;
     import java.util.*;

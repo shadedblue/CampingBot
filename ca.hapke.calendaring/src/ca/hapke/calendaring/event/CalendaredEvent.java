@@ -1,11 +1,16 @@
 package ca.hapke.calendaring.event;
 
-import java.time.Instant;
-import java.util.List;
+import ca.hapke.calendaring.timing.TimesProvider;
 
 /**
  * @author Nathan Hapke
  */
-public abstract class CalendaredEvent {
-	public abstract List<Instant> getTimes();
+public interface CalendaredEvent<T> {
+	public TimesProvider<T> getTimeProvider();
+
+	public void doWork(T value);
+
+	public boolean shouldRun();
+
+	public StartupMode getStartupMode();
 }

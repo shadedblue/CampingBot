@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.net.URL;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +42,17 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
+import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.monitor.CalendarMonitor;
+import ca.hapke.calendaring.timing.ByFrequency;
+import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.CampingXmlSerializer;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
-import ca.hapke.campbinning.bot.interval.CampingIntervalThread;
-import ca.hapke.campbinning.bot.interval.ExecutionTimeTracker;
-import ca.hapke.campbinning.bot.interval.IntervalByExecutionTime;
-import ca.hapke.campbinning.bot.interval.IntervalBySeconds;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -69,22 +71,31 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  */
 public class CampingBotUi extends JFrame {
 
-	private class UiTableRefresher implements IntervalBySeconds {
-		@Override
-		public int getSeconds() {
-			return 10;
-		}
+	private class UiTableRefresher implements CalendaredEvent<Void> {
+
+		private TimesProvider<Void> times = new TimesProvider<Void>(
+				new ByFrequency<Void>(null, 10, ChronoUnit.SECONDS));
 
 		@Override
-		public void doWork() {
+		public void doWork(Void value) {
 			userModel.fireTableDataChanged();
-			secModel.fireTableDataChanged();
-			timeModel.fireTableDataChanged();
+			calendaredModel.fireTableDataChanged();
+//			eventLogger.add(new EventItem("Update: " + ZonedDateTime.now().toLocalTime().toString()));
 		}
 
 		@Override
 		public boolean shouldRun() {
 			return isVisible();
+		}
+
+		@Override
+		public TimesProvider<Void> getTimeProvider() {
+			return times;
+		}
+
+		@Override
+		public StartupMode getStartupMode() {
+			return StartupMode.Never;
 		}
 	}
 
@@ -95,9 +106,8 @@ public class CampingBotUi extends JFrame {
 	private JTable tblUsers;
 	private DefaultEventTableModel<CampingUser> userModel;
 	private JTable tblSeconds;
-	private DefaultEventTableModel<ExecutionTimeTracker<IntervalBySeconds>> secModel;
-	private JTable tblTime;
-	private DefaultEventTableModel<IntervalByExecutionTime> timeModel;
+	@SuppressWarnings("rawtypes")
+	private DefaultEventTableModel<CalendaredEvent> calendaredModel;
 
 	private EventLogger eventLogger = EventLogger.getInstance();
 	private CampingBot bot;
@@ -115,6 +125,7 @@ public class CampingBotUi extends JFrame {
 	private TrayIcon trayIcon;
 
 	private StatusUpdate statusUpdater = new StatusUpdate();
+	private JScrollPane scrollPane;
 
 	/**
 	 * Launch the application.
@@ -142,7 +153,7 @@ public class CampingBotUi extends JFrame {
 
 		setTitle(CAMPING_BOT);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 903, 654);
+		setBounds(100, 100, 1066, 654);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -159,7 +170,7 @@ public class CampingBotUi extends JFrame {
 		sclUsers = new JScrollPane();
 		sclUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclUsers.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sclUsers.setBounds(10, 103, 861, 217);
+		sclUsers.setBounds(10, 103, 1018, 217);
 		contentPane.add(sclUsers);
 		tblUsers = new JTable(userModel);
 		sclUsers.setViewportView(tblUsers);
@@ -177,41 +188,29 @@ public class CampingBotUi extends JFrame {
 
 		///
 
-		CampingIntervalThread intervalThread = CampingIntervalThread.getInstance();
+//		CampingIntervalThread intervalThread = CampingIntervalThread.getInstance();
+		CalendarMonitor intervalThread = CalendarMonitor.getInstance();
 
-		TableFormatSecondsExecutionTimeTracker secondsFormat = new TableFormatSecondsExecutionTimeTracker();
-		EventList<ExecutionTimeTracker<IntervalBySeconds>> bySecs = intervalThread.getRegularBySeconds();
-		secModel = new DefaultEventTableModel<>(GlazedListsSwing.swingThreadProxyList(bySecs), secondsFormat);
+		TableFormatCalendaredEvent calendaredFormat = new TableFormatCalendaredEvent();
+		@SuppressWarnings("rawtypes")
+		EventList<CalendaredEvent> byCalendared = intervalThread.getEvents();
+		calendaredModel = new DefaultEventTableModel<CalendaredEvent>(
+				GlazedListsSwing.swingThreadProxyList(byCalendared), calendaredFormat);
 
 		JScrollPane sclSec = new JScrollPane();
 		sclSec.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		sclSec.setBounds(683, 363, 188, 98);
+		sclSec.setBounds(683, 363, 345, 243);
 		contentPane.add(sclSec);
 
-		tblSeconds = new JTable(secModel);
+		tblSeconds = new JTable(calendaredModel);
 		sclSec.setViewportView(tblSeconds);
 
 		TableColumnModel secColumnModel = tblSeconds.getColumnModel();
+		secColumnModel.getColumn(1).setCellRenderer(timeRenderer);
 		secColumnModel.getColumn(2).setCellRenderer(timeRenderer);
-		secondsFormat.setTableWidths(secColumnModel);
+		calendaredFormat.setTableWidths(secColumnModel);
 
 		///
-
-		TableFormatTimeExecutionTimeTracker timeFormat = new TableFormatTimeExecutionTimeTracker();
-		EventList<IntervalByExecutionTime> byTime = intervalThread.getRegularByExecutionTime();
-		timeModel = new DefaultEventTableModel<>(GlazedListsSwing.swingThreadProxyList(byTime), timeFormat);
-
-		JScrollPane sclTime = new JScrollPane();
-		sclTime.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		sclTime.setBounds(683, 500, 188, 98);
-		contentPane.add(sclTime);
-
-		tblTime = new JTable(timeModel);
-		sclTime.setViewportView(tblTime);
-
-		TableColumnModel timeColumnModel = tblTime.getColumnModel();
-		timeColumnModel.getColumn(1).setCellRenderer(timeRenderer);
-		timeFormat.setTableWidths(timeColumnModel);
 
 		lblStatus = new JLabel("Offline");
 		lblStatus.setVerticalAlignment(SwingConstants.TOP);
@@ -306,13 +305,9 @@ public class CampingBotUi extends JFrame {
 		btnLoadMore.setBounds(53, 331, 123, 23);
 		contentPane.add(btnLoadMore);
 
-		JLabel lblBySeconds = new JLabel("By Seconds");
+		JLabel lblBySeconds = new JLabel("Calendared Events");
 		lblBySeconds.setBounds(683, 334, 123, 14);
 		contentPane.add(lblBySeconds);
-
-		JLabel lblByExecutionTime = new JLabel("By Execution Time");
-		lblByExecutionTime.setBounds(683, 470, 123, 20);
-		contentPane.add(lblByExecutionTime);
 
 		JLabel lblNewLabel = new JLabel("Category");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -337,14 +332,17 @@ public class CampingBotUi extends JFrame {
 		}
 		ComboBoxModel<String> aModel = new DefaultComboBoxModel<String>(categoriesList);
 		cmbCategories.setModel(aModel);
-		cmbCategories.setBounds(635, 5, 160, 20);
+		cmbCategories.setBounds(635, 5, 313, 20);
 		contentPane.add(cmbCategories);
 
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(569, 31, 459, 61);
+		contentPane.add(scrollPane);
+
 		txtCategoryValue = new JTextArea();
+		scrollPane.setViewportView(txtCategoryValue);
 		txtCategoryValue.setLineWrap(true);
-		txtCategoryValue.setBounds(569, 31, 302, 61);
 		txtCategoryValue.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		contentPane.add(txtCategoryValue);
 
 		JButton btnAddToCategory = new JButton("Add");
 		btnAddToCategory.addActionListener(new ActionListener() {
@@ -363,7 +361,7 @@ public class CampingBotUi extends JFrame {
 				}
 			}
 		});
-		btnAddToCategory.setBounds(800, 5, 70, 23);
+		btnAddToCategory.setBounds(958, 5, 70, 23);
 		contentPane.add(btnAddToCategory);
 
 		Image app = null;
@@ -409,7 +407,7 @@ public class CampingBotUi extends JFrame {
 			} catch (Exception e1) {
 			}
 		}
-		CampingIntervalThread.put(new UiTableRefresher());
+		intervalThread.add(new UiTableRefresher());
 		statusUpdater.statusOffline(bot.getBotUsername());
 	}
 

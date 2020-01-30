@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * @author Nathan Hapke
  */
-public abstract class ByTimeOfCalendar<T> {
+public abstract class ByCalendar<T> {
 
 	protected ZonedDateTime future;
 	protected ZonedDateTime past;
@@ -15,7 +15,7 @@ public abstract class ByTimeOfCalendar<T> {
 	protected final int qty;
 	protected final ChronoUnit unit;
 
-	public ByTimeOfCalendar(T value, int qty, ChronoUnit unit) {
+	public ByCalendar(T value, int qty, ChronoUnit unit) {
 		this.value = value;
 		this.qty = qty;
 		this.unit = unit;
