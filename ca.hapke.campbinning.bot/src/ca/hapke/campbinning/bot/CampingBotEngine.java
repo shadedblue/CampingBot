@@ -43,9 +43,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	public static final String TEXT_MENTION = "text_mention";
 	public static final String MENTION = "mention";
 
+	private boolean online = false;
 	private User me;
 	protected CampingUser meCamping;
-	private IStatus status;
+	private List<IStatus> statusMonitors = new ArrayList<>();
 
 	protected EventLogger eventLogger = EventLogger.getInstance();
 	protected CampingChatManager chatManager = CampingChatManager.getInstance();
@@ -55,6 +56,24 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected List<CallbackCommand> callbackCommands = new ArrayList<>();
 	protected List<TextCommand> textCommands = new ArrayList<>();
 	protected List<InlineCommand> inlineCommands = new ArrayList<>();
+
+	private class ConnectionMonitor implements IStatus {
+
+		@Override
+		public void statusOffline(String username) {
+			online = false;
+		}
+
+		@Override
+		public void statusOnline(CampingUser meCamping) {
+			online = true;
+		}
+
+	}
+
+	public CampingBotEngine() {
+		statusMonitors.add(new ConnectionMonitor());
+	}
 
 	@Override
 	public void onUpdateReceived(Update update) {
@@ -66,7 +85,9 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			try {
 				me = getMe();
 				meCamping = userMonitor.monitor(me);
-				status.statusOnline(meCamping);
+				for (IStatus status : statusMonitors) {
+					status.statusOnline(meCamping);
+				}
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			}
@@ -317,7 +338,11 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		return targetUser;
 	}
 
-	public void setStatusUpdate(IStatus status) {
-		this.status = status;
+	public void addStatusUpdate(IStatus status) {
+		this.statusMonitors.add(status);
+	}
+
+	public boolean isOnline() {
+		return online;
 	}
 }

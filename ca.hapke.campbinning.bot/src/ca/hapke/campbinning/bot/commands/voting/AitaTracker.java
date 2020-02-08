@@ -54,7 +54,7 @@ public class AitaTracker extends VoteTracker<Float> {
 
 	@Override
 	protected long getVotingTime() {
-		return 20 * 60 * 1000;
+		return 45 * 60 * 1000;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class AitaTracker extends VoteTracker<Float> {
 		if (completed) {
 			List<String> category;
 			int i;
-			if (score >= 75) {
+			if (score >= 66) {
 				i = 0;
 			} else if (score >= 40) {
 				i = 1;

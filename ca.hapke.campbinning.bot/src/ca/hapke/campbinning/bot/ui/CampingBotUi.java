@@ -225,7 +225,7 @@ public class CampingBotUi extends JFrame {
 					try {
 						TelegramBotsApi api = new TelegramBotsApi();
 						api.registerBot(bot);
-						bot.setStatusUpdate(statusUpdater);
+						bot.addStatusUpdate(statusUpdater);
 						statusUpdater.statusOnline(bot.getMeCamping());
 						btnConnect.setEnabled(false);
 					} catch (TelegramApiRequestException ex) {

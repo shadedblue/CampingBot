@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
+import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
+import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -34,6 +37,7 @@ import ca.hapke.campbinning.bot.util.TimeFormatter;
 public abstract class VoteTracker<T> {
 
 	public abstract float getScore();
+
 	protected CampingBotEngine bot;
 	protected final CampingUser ranter;
 	protected final CampingUser activater;
@@ -100,6 +104,9 @@ public abstract class VoteTracker<T> {
 		out.setParseMode("Markdown");
 		out.setReplyToMessageId(activation.getMessageId());
 		bannerMessage = bot.execute(out);
+		PinChatMessage pinBanner = new PinChatMessage(chatId, bannerMessage.getMessageId());
+		pinBanner.setDisableNotification(Boolean.valueOf(true));
+		bot.execute(pinBanner);
 
 		previousVotes = getVotesText(completed);
 		out = new SendMessage(chatId, previousVotes);
@@ -201,12 +208,21 @@ public abstract class VoteTracker<T> {
 	public void complete() {
 		if (completed)
 			return;
-	
+
 		completed = true;
 		String newMsg = VOTING_COMPLETED;
 		if (attemptMessageEdit(bannerMessage, newMsg, previousBanner))
 			previousBanner = newMsg;
-	
+
+		try {
+			Message pinnedMsg = bot.execute(new GetChat(chatId)).getPinnedMessage();
+			if (pinnedMsg != null && bannerMessage.getMessageId().equals(pinnedMsg.getMessageId())) {
+				UnpinChatMessage unpin = new UnpinChatMessage(chatId);
+				bot.execute(unpin);
+			}
+		} catch (TelegramApiException e1) {
+		}
+
 		String votes = getVotesText(true);
 		SendMessage completionMsg = new SendMessage(chatId, votes);
 		completionMsg.setParseMode("Markdown");
@@ -229,7 +245,7 @@ public abstract class VoteTracker<T> {
 	public boolean attemptMessageEdit(Message msg, String newMsg, String previousMsg) {
 		if (newMsg == null || newMsg.equalsIgnoreCase(previousMsg))
 			return false;
-	
+
 		EditMessageText update = new EditMessageText();
 		update.setChatId(chatId);
 		if (msg == bannerMessage && !completed)
@@ -271,6 +287,7 @@ public abstract class VoteTracker<T> {
 	}
 
 	public abstract String getBannerTitle();
+
 	protected String getVotesText(boolean completed) {
 		int notApplicable = votesNotApplicable.size();
 		int naturalVotes = votes.size();
@@ -278,7 +295,7 @@ public abstract class VoteTracker<T> {
 		float score = getScore();
 		String scoreStr;
 		if (naturalVotes > 0) {
-			scoreStr = nf.format(score) ;
+			scoreStr = nf.format(score);
 			String scoreSuffix = getScoreSuffix();
 			if (scoreSuffix != null && scoreSuffix.length() > 0)
 				scoreStr = scoreStr + scoreSuffix;
@@ -288,7 +305,6 @@ public abstract class VoteTracker<T> {
 
 		StringBuilder sb = new StringBuilder();
 		addVotesTextPrefix(completed, sb);
-
 
 		if (shouldShowVotesInCategories()) {
 			int[] votes = new int[shortButtons.length];

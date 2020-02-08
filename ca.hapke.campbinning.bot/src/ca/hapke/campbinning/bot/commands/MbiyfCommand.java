@@ -110,10 +110,12 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 	@Override
 	public void doWork(Boolean value) {
 		enabled = value;
-		if (enabled && shouldAnnounce) {
+		boolean makeAnnouncement = shouldAnnounce && bot.isOnline();
+		if (enabled && makeAnnouncement) {
 			announce();
 		}
-		EventLogger.getInstance().add(new EventItem("MbiyFriday announcement: " + (enabled ? "en" : "dis") + "abled"));
+		EventLogger.getInstance().add(
+				new EventItem("MbiyFriday: " + (enabled ? "en" : "dis") + "abled. Announcement? " + makeAnnouncement));
 	}
 
 	public void announce() {
