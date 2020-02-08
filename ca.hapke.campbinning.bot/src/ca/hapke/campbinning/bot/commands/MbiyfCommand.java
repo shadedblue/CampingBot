@@ -4,7 +4,9 @@ import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -29,7 +31,7 @@ import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 /**
  * @author Nathan Hapke
  */
-public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
+public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	private static final int ENABLE_LENGTH_HOURS = 17;
 	private static final int ENABLE_HOUR = 7;
 	private static final int DISABLE_HOUR = 0;
@@ -41,7 +43,8 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 	private Resources res;
 	private boolean enabled = false;
 	private boolean shouldAnnounce = false;
-	private TimesProvider<Boolean> times;
+	private TimesProvider<MbiyfMode> times;
+	private List<CampingUser> userRestriction;
 
 	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
 	private static final long CAMPING_CHAT_ID = -1001288464383l;
@@ -55,23 +58,37 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 
 	public void init() {
 		CampingUserMonitor monitor = CampingUserMonitor.getInstance();
-		List<ByCalendar<Boolean>> targets = new ArrayList<>();
-		targets.add(new ByTimeOfWeek<Boolean>(DayOfWeek.FRIDAY, ENABLE_HOUR, 0, true));
-		targets.add(new ByTimeOfWeek<Boolean>(DayOfWeek.SATURDAY, DISABLE_HOUR, 0, false));
+		List<ByCalendar<MbiyfMode>> targets = new ArrayList<>();
+		targets.add(new ByTimeOfWeek<MbiyfMode>(DayOfWeek.FRIDAY, ENABLE_HOUR, 0, new MbiyfMode(MbiyfType.Friday)));
+		targets.add(new ByTimeOfWeek<MbiyfMode>(DayOfWeek.SATURDAY, DISABLE_HOUR, 0, new MbiyfMode(MbiyfType.Off)));
+
+		Map<String, List<CampingUser>> birthdayMap = new HashMap<>();
 		for (CampingUser u : monitor.getUsers()) {
 			if (u.hasBirthday()) {
-				ByTimeOfYear<Boolean> enable = new ByTimeOfYear<Boolean>(u.getBirthdayMonth(), u.getBirthdayDay(),
-						ENABLE_HOUR, ENABLE_MIN, true);
-				targets.add(enable);
-
-				ZonedDateTime disableTime = enable.generateATargetTime().plus(ENABLE_LENGTH_HOURS, ChronoUnit.HOURS);
-
-				ByTimeOfYear<Boolean> disable = new ByTimeOfYear<Boolean>(disableTime.getMonthValue(),
-						disableTime.getDayOfMonth(), disableTime.getHour(), disableTime.getMinute(), false);
-				targets.add(disable);
+				String key = u.getBirthdayMonth() + "$" + u.getBirthdayDay();
+				List<CampingUser> lst = birthdayMap.get(key);
+				if (lst == null) {
+					lst = new ArrayList<>();
+					birthdayMap.put(key, lst);
+				}
+				lst.add(u);
 			}
 		}
-		times = new TimesProvider<Boolean>(targets);
+
+		for (List<CampingUser> usersByDay : birthdayMap.values()) {
+			CampingUser u = usersByDay.get(0);
+			ByTimeOfYear<MbiyfMode> enable = new ByTimeOfYear<MbiyfMode>(u.getBirthdayMonth(), u.getBirthdayDay(),
+					ENABLE_HOUR, ENABLE_MIN, new MbiyfMode(MbiyfType.Birthday, usersByDay));
+			targets.add(enable);
+
+			ZonedDateTime disableTime = enable.generateATargetTime().plus(ENABLE_LENGTH_HOURS, ChronoUnit.HOURS);
+
+			ByTimeOfYear<MbiyfMode> disable = new ByTimeOfYear<MbiyfMode>(disableTime.getMonthValue(),
+					disableTime.getDayOfMonth(), disableTime.getHour(), disableTime.getMinute(),
+					new MbiyfMode(MbiyfType.Off));
+			targets.add(disable);
+		}
+		times = new TimesProvider<MbiyfMode>(targets);
 		shouldAnnounce = true;
 	}
 
@@ -79,6 +96,9 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		CampingUser targetUser = bot.findTarget(entities);
+		if (userRestriction != null && !userRestriction.contains(targetUser))
+			return null;
+
 		if (targetUser == bot.getMeCamping()) {
 			return new TextCommandResult(BotCommand.MBIYFDipshit, "Fuck you, I'm not ballsing myself!", true);
 		}
@@ -108,17 +128,32 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 	}
 
 	@Override
-	public void doWork(Boolean value) {
-		enabled = value;
+	public void doWork(MbiyfMode value) {
+		enabled = value != null && value.isEnablement();
+		userRestriction = value.getRestrictedToUsers();
 		boolean makeAnnouncement = shouldAnnounce && bot.isOnline();
 		if (enabled && makeAnnouncement) {
-			announce();
+			announce(value);
 		}
-		EventLogger.getInstance().add(
-				new EventItem("MbiyFriday: " + (enabled ? "en" : "dis") + "abled. Announcement? " + makeAnnouncement));
+		StringBuilder sb = new StringBuilder();
+		sb.append("Mbiyf: ");
+		if (enabled) {
+			sb.append("enabled[");
+			sb.append(value.getType().toString());
+			if (userRestriction != null && userRestriction.size() > 0)
+				sb.append(":");
+			appendBirthdayNames(sb);
+			sb.append("]");
+		} else
+			sb.append("disabled");
+		sb.append(" Announcement[");
+		sb.append(makeAnnouncement);
+		sb.append("]");
+//		sb.append();
+		EventLogger.getInstance().add(new EventItem(sb.toString()));
 	}
 
-	public void announce() {
+	public void announce(MbiyfMode value) {
 		StringBuilder sb = new StringBuilder();
 
 		List<Emoji> bar = new ArrayList<>();
@@ -143,7 +178,17 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 		sb.append(poopUni);
 		sb.append("OHHHHH SHITTTT");
 		sb.append(poopUni);
-		sb.append("\nIt's MBIYFriday motha'uckas!\n");
+		MbiyfType type = value.getType();
+		switch (type) {
+		case Birthday:
+			sb.append("\nIt's MB'dayIYF motha'uckas!\n");
+			break;
+		case Friday:
+			sb.append("\nIt's MBIYFriday motha'uckas!\n");
+			break;
+		case Off:
+			break;
+		}
 
 		for (int i = bar.size() - 1; i >= 0; i--) {
 			String emoji = bar.get(i).getUnicode();
@@ -152,7 +197,13 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 			}
 		}
 
-		sb.append("\n\nPREPARE YOUR\n");
+		sb.append("\n\n");
+		if (type == MbiyfType.Birthday) {
+			appendBirthdayNames(sb);
+			sb.append(": ");
+		}
+
+		sb.append("PREPARE YOUR\n");
 		List<Emoji> emojis = new ArrayList<Emoji>(COUNT);
 
 		getTen(res::getRandomFaceEmoji, emojis);
@@ -169,6 +220,25 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 
 		String out = sb.toString();
 		bot.sendMsg(ANNOUNCE_CHAT_ID, out);
+	}
+
+	private void appendBirthdayNames(StringBuilder sb) {
+		if (userRestriction != null) {
+			int size = userRestriction.size();
+			for (int i = 0; i < size; i++) {
+				CampingUser u = userRestriction.get(i);
+				if (i > 0) {
+					int last = size - 1;
+					if (i < last) {
+						sb.append(", ");
+
+					} else if (i == last) {
+						sb.append(" AND ");
+					}
+				}
+				sb.append(u.getFirstname().toUpperCase());
+			}
+		}
 	}
 
 	private void getTen(Supplier<Emoji> s, List<Emoji> emojis) {
@@ -192,14 +262,14 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<Boolean> {
 	}
 
 	@Override
-	public TimesProvider<Boolean> getTimeProvider() {
+	public TimesProvider<MbiyfMode> getTimeProvider() {
 		return times;
 	}
 
 	@Override
 	public StartupMode getStartupMode() {
-		ByCalendar<Boolean> past = times.getMostNearestPast();
-		if (past.value)
+		ByCalendar<MbiyfMode> past = times.getMostNearestPast();
+		if (past.value.isEnablement())
 			return StartupMode.Always;
 		else
 			return StartupMode.Never;
