@@ -26,8 +26,11 @@ import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
-import ca.hapke.campbinning.bot.commands.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.DefaultMessageProcessor;
+import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.ui.IStatus;
@@ -57,6 +60,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected List<TextCommand> textCommands = new ArrayList<>();
 	protected List<InlineCommand> inlineCommands = new ArrayList<>();
 
+	protected MessageProcessor processor = new DefaultMessageProcessor();
+
 	private class ConnectionMonitor implements IStatus {
 
 		@Override
@@ -77,7 +82,12 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update update) {
-		EventItem event = null;
+		InputType inputType = null;
+		EventItem inputEvent = null;
+		Integer telegramId = null;
+		String inputRest = "";
+		CampingUser campingFromUser = null;
+		EventItem outputEvent = null;
 		Integer eventTime = null;
 
 		// res.getCampbinningStickerPack(this);
@@ -96,12 +106,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		if (update.hasCallbackQuery()) {
 			CallbackQuery callbackQuery = update.getCallbackQuery();
 			for (CallbackCommand callback : callbackCommands) {
-				event = callback.reactToCallback(callbackQuery);
-
+				outputEvent = callback.reactToCallback(callbackQuery);
 			}
 		}
 		if (update.hasInlineQuery()) {
-
 			InlineQuery inlineQuery = update.getInlineQuery();
 			if (inlineQuery.hasQuery()) {
 
@@ -111,7 +119,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				String input = inlineQuery.getQuery();
 
 				for (InlineCommand inline : inlineCommands) {
-					InlineQueryResult r = inline.provideInlineQuery(input, updateId);
+					InlineQueryResult r = inline.provideInlineQuery(input, updateId, processor);
 					if (r != null)
 						results.add(r);
 				}
@@ -133,68 +141,67 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 		if (update.hasChosenInlineQuery()) {
 			// User chose an inline spell or @username conversion
-
+			inputType = InputType.InlineChatUpdate;
 			ChosenInlineQuery inlineChosen = update.getChosenInlineQuery();
-			String[] words = inlineChosen.getResultId().split(InlineCommand.INLINE_DELIMITER);
-			Integer inlineMessageId = Integer.parseInt(words[1]);
+			String fullInput = inlineChosen.getResultId();
+			String[] words = fullInput.split(InlineCommand.INLINE_DELIMITER);
+			telegramId = Integer.parseInt(words[1]);
 
-			User from = inlineChosen.getFrom();
-			CampingUser campingFromUser = userMonitor.getUser(from);
+			campingFromUser = userMonitor.getUser(inlineChosen.getFrom());
 			if (words.length >= 1) {
+				try {
+					int secondDelimiter = fullInput.indexOf(InlineCommand.INLINE_DELIMITER,
+							fullInput.indexOf(InlineCommand.INLINE_DELIMITER) + 1);
+					inputRest = fullInput.substring(secondDelimiter);
+				} catch (Exception e) {
+				}
 
 				for (InlineCommand inline : inlineCommands) {
 					String commandName = inline.getCommandName();
 					if (commandName.equalsIgnoreCase(words[0])) {
-						event = inline.chosenInlineQuery(words, campingFromUser, inlineMessageId);
+						outputEvent = inline.chosenInlineQuery(words, campingFromUser, telegramId);
 					}
 				}
 
 			}
 		}
 
-		Message message = update.getMessage();
-		Integer telegramId;
+		// FIGURE OUT WHAT THE INPUT IS
+
+		Message message;
+		List<MessageEntity> entities = null;
+		Long chatId = null;
+		CampingChat chat = null;
 		if (update.hasEditedMessage()) {
 			message = update.getEditedMessage();
+		} else {
+			message = update.getMessage();
+		}
+		if (message != null) {
 			telegramId = message.getMessageId();
-			List<MessageEntity> entities = message.getEntities();
+			entities = message.getEntities();
 
-			CampingUser campingFromUser = userMonitor.monitor(message.getFrom(), entities);
-
-			Long chatId = message.getChatId();
-			CampingChat chat = chatManager.get(chatId, this);
-
-			String afterText = message.getText();
-			eventTime = message.getEditDate();
-
-			event = new EventItem(BotCommand.RegularChatEdit, campingFromUser, eventTime, chat, telegramId, afterText,
-					null);
+			campingFromUser = userMonitor.monitor(message.getFrom(), entities);
+			chatId = message.getChatId();
+			chat = chatManager.get(chatId, this);
 		}
 
-		if (message != null) {
-			User fromUser = message.getFrom();
-			List<MessageEntity> entities = message.getEntities();
-
-			CampingUser campingFromUser = userMonitor.monitor(fromUser, entities);
-			CampingChat chat = null;
-			telegramId = message.getMessageId();
-			Long chatId = message.getChatId();
-			if (chatId != null)
-				chat = chatManager.get(chatId, this);
-
-			BotCommand command = null;
-			String rest = "";
-			Object extraData = null;
+		Object inputExtraData = null;
+		if (update.hasEditedMessage()) {
+			inputType = InputType.RegularChatEdit;
+			inputRest = message.getText();
+			eventTime = message.getEditDate();
+		} else if (message != null) {
 			eventTime = message.getDate();
 
 			if (message.hasAnimation()) {
 				// responds to GIFs
-				command = BotCommand.RegularChatGif;
+				inputType = InputType.RegularChatGif;
 				Animation animation = message.getAnimation();
-				rest = animation.getFileId();
-				extraData = animation.getDuration();
+				inputRest = animation.getFileId();
+				inputExtraData = animation.getDuration();
 			} else if (message.hasPhoto()) {
-				command = BotCommand.RegularChatPhoto;
+				inputType = InputType.RegularChatPhoto;
 				try {
 					List<PhotoSize> photos = message.getPhoto();
 					Map<String, PhotoSize> photosLargest = new HashMap<>(photos.size());
@@ -206,88 +213,97 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 							photosLargest.put(key, photo);
 					}
 					for (PhotoSize photo : photosLargest.values()) {
-						if (rest.length() > 0)
-							rest = rest + "\n";
-						rest = rest + photo.toString();
+						if (inputRest.length() > 0)
+							inputRest = inputRest + "\n";
+						inputRest = inputRest + photo.toString();
 					}
-					extraData = photosLargest.size();
+					inputExtraData = photosLargest.size();
 				} catch (Exception e) {
 				}
 			} else if (message.hasVideo()) {
-				command = BotCommand.RegularChatVideo;
+				inputType = InputType.RegularChatVideo;
 				Video video = message.getVideo();
-				rest = video.toString();
-				extraData = video.getDuration();
+				inputRest = video.toString();
+				inputExtraData = video.getDuration();
 			} else if (message.hasSticker()) {
-				command = BotCommand.RegularChatSticker;
+				inputType = InputType.RegularChatSticker;
 				Sticker stick = message.getSticker();
-				rest = stick.getEmoji();
-				extraData = stick.getSetName();
+				inputRest = stick.getEmoji();
+				inputExtraData = stick.getSetName();
 			}
+		}
+		if (inputType != null) {
+			inputEvent = new EventItem(inputType, campingFromUser, eventTime, chat, telegramId, inputRest,
+					inputExtraData);
+		}
 
+		// PROCESS FOR OUTPUT
+
+		if (message != null) {
 			if (update.hasMessage() && message.hasText()) {
 				String originalMsg = message.getText();
+				BotCommand outputCommand = null;
+				CommandResult outputResult = null;
 
-				if (command == null) {
-					command = BotCommand.findCommand(update, me);
-				}
+				outputCommand = BotCommand.findCommand(update, me);
 
 				try {
-					if (command != null) {
-						TextCommandResult result = reactToSlashCommandInText(command, message, chatId, campingFromUser);
-						if (result != null) {
-							rest = result.msg;
-							command = result.cmd;
-						}
+					if (outputCommand != null) {
+						outputResult = reactToSlashCommandInText(outputCommand, message, chatId, campingFromUser);
+
 					} else {
 						String msg = originalMsg.toLowerCase().trim();
 
 						// react to non /commands that occur in regular text
-						TextCommandResult result = null;
+//						CommandResult result = null;
 						for (TextCommand textCommand : textCommands) {
 							if (textCommand.isMatch(msg, entities)) {
-								result = textCommand.textCommand(campingFromUser, entities, chatId, message);
-								if (result != null)
+								outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
+								if (outputResult != null)
 									break;
 							}
 						}
-						if (result != null) {
-							rest = result.msg;
-							if (result.shouldSendMsg)
-								sendMsg(chatId, rest);
-							command = result.cmd;
-						}
 
 						// still not doing anything, just log it.
-						if (command == null) {
+						if (inputType == null) {
 							/*- figure out what type of message it is...
 							 *  ie: regular message/edit/delete
 							 */
 							Message replyTo = message.getReplyToMessage();
 							if (replyTo != null) {
-								command = BotCommand.RegularChatReply;
-								extraData = replyTo.getMessageId();
+								inputType = InputType.RegularChatReply;
+								inputExtraData = replyTo.getMessageId();
 							} else {
-								command = BotCommand.RegularChatUpdate;
+								inputType = InputType.RegularChatUpdate;
 							}
-							rest = originalMsg;
+							inputRest = originalMsg;
 						}
 					}
+
+					if (outputResult != null) {
+						SendResult sendResult = outputResult.send(this, chatId, processor);
+						outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
+								sendResult.msg, sendResult.extraData);
+					}
 				} catch (TelegramApiException e) {
-					event = new EventItem(command, campingFromUser, eventTime, chat, telegramId,
+					outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
 							"Exception: " + e.getMessage(), null);
 
 				}
 			}
-			if (event == null && command != null)
-				event = new EventItem(command, campingFromUser, eventTime, chat, telegramId, rest, extraData);
+
 		}
-		if (event != null)
-			eventLogger.add(event);
+		if (inputEvent == null && inputType != null)
+			inputEvent = new EventItem(inputType, campingFromUser, eventTime, chat, telegramId, inputRest,
+					inputExtraData);
+		if (inputEvent != null)
+			eventLogger.add(inputEvent);
+		if (outputEvent != null)
+			eventLogger.add(outputEvent);
 
 	}
 
-	protected abstract TextCommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
+	protected abstract CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
 
 	public void sendMsg(Long chatId, CampingUser target, String msg) {

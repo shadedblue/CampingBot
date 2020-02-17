@@ -8,6 +8,9 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.commands.SpellDipshitException;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
@@ -39,26 +42,25 @@ public class SpellInlineCommand extends InlineCommand {
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
 		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
 		String result = words[2];
-		EventItem event = new EventItem(BotCommand.Spell, campingFromUser, null, null, inlineMessageId,
-				result,
+		EventItem event = new EventItem(BotCommand.Spell, campingFromUser, null, null, inlineMessageId, result,
 				targetUser.getCampingId());
 		return event;
 	}
 
 	@Override
-	public InlineQueryResult provideInlineQuery(String input, int updateId) {
+	public InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor) {
 		String[] words = input.split(" ");
 		if (words.length == 0)
 			return null;
 
-		String outputSpell;
+		ResultFragment[] outputSpell;
 		CampingUser targetUser = userMonitor.getUser(words[0]);
 		String targetFirst;
 		if (targetUser != null) {
-			outputSpell = spellGen.cast(targetUser.target());
+			outputSpell = spellGen.cast(targetUser);
 			targetFirst = targetUser.getFirstname();
 		} else {
-			outputSpell = SpellDipshitException.IM_A_DIPSHIT;
+			outputSpell = new ResultFragment[] { new TextFragment(SpellDipshitException.IM_A_DIPSHIT) };
 			targetFirst = CampingUser.UNKNOWN_TARGET;
 		}
 
@@ -70,7 +72,7 @@ public class SpellInlineCommand extends InlineCommand {
 
 		InputTextMessageContent mcSpell = new InputTextMessageContent();
 		mcSpell.setDisableWebPagePreview(true);
-		mcSpell.setMessageText(outputSpell);
+		mcSpell.setMessageText(processor.process(outputSpell));
 		mcSpell.setParseMode(CampingBotEngine.MARKDOWN);
 
 		InlineQueryResultArticle articleSpell = new InlineQueryResultArticle();

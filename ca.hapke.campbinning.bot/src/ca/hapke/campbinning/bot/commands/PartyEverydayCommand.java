@@ -17,6 +17,7 @@ import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -79,7 +80,7 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	}
 
 	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		cooldown.setExec();
 

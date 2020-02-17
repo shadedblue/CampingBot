@@ -14,6 +14,8 @@ public abstract class BotCommandIds {
 	public static final long VID = 2 << 5;
 	public static final long STICKER = 2 << 6;
 
+	public static final long INLINE = 2 << 15;
+
 	public static final long USE = 2 << 16;
 	public static final long SET = 2 << 17;
 	public static final long FAILURE = 2 << 18;

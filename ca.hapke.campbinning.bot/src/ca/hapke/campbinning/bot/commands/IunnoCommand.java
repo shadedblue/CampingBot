@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**
@@ -23,7 +24,7 @@ public class IunnoCommand implements TextCommand {
 	}
 
 	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		return images.sendImage(BotCommand.IunnoGoogleIt, chatId, null);
 	}

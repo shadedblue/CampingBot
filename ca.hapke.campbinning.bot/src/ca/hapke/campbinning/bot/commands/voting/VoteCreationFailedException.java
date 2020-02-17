@@ -1,8 +1,9 @@
 package ca.hapke.campbinning.bot.commands.voting;
 
 /**
+ * TODO Eliminate... Move strings into {@link VotingManager}
+ * 
  * @author Nathan Hapke
- *
  */
 public class VoteCreationFailedException extends Exception {
 	private static final long serialVersionUID = 60775625369182115L;

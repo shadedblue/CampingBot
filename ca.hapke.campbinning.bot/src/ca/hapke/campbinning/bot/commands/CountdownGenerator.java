@@ -4,10 +4,13 @@ import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
@@ -60,9 +63,9 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 	// return hypes;
 	// }
 
-	public String countdownCommand(CampingUserMonitor userMonitor, Long chatId) {
+	public CommandResult countdownCommand(CampingUserMonitor userMonitor, Long chatId) {
 		GregorianCalendar now = new GregorianCalendar();
-		StringBuilder sb = new StringBuilder();
+		CommandResult result = new TextCommandResult(BotCommand.Countdown);
 
 		ZonedDateTime targetEvent;
 		if (countdownTarget == null || now.before(countdownTarget)) {
@@ -72,32 +75,32 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 //			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
 			CampingUser target = andrew;
 
-			sb.append("MY BALLS IN  ");
-			sb.append(target.getDisplayName().toUpperCase());
+			result.add("MY BALLS IN  ");
+			result.add(target);
 
-			sb.append("'S EASTER COUNTDOWN\n");
+			result.add("'S EASTER COUNTDOWN\n");
 
 			targetEvent = countdownTarget;
 		} else {
-			sb.append("MBIY\\[F]RIDAY COUNTDOWN\n");
+			result.add("MBIY\\[F]RIDAY COUNTDOWN\n");
 			targetEvent = ballsCommand.getNearestFutureEnablement();
 		}
 
 		for (int i = 0; i < 5; i++) {
-			sb.append(res.getRandomFace());
+			result.add(res.getRandomFace());
 		}
-		sb.append("\n");
-		sb.append(res.getRandomBall());
-		sb.append(" ");
-		sb.append(tf.toPrettyString(targetEvent));
+		result.add("\n");
+		result.add(res.getRandomBallEmoji());
+		result.add(" ");
+		result.add(tf.toPrettyString(targetEvent));
 
-		sb.append("\n");
+		result.add("\n");
 
-		sb.append(res.getRandomBall());
-		sb.append(" ");
-		sb.append(CampingUtil.getRandom(hypes));
-		String out = sb.toString().trim();
-		return out;
+		result.add(res.getRandomBallEmoji());
+		result.add(" ");
+		result.add(CampingUtil.getRandom(hypes));
+
+		return result;
 	}
 
 	@Override

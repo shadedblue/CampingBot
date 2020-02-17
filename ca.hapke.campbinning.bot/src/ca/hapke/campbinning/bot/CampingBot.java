@@ -15,11 +15,13 @@ import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellDipshitException;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
-import ca.hapke.campbinning.bot.commands.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.inline.NicknameConversionCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
-import ca.hapke.campbinning.bot.commands.voting.VoteCreationFailedException;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -112,15 +114,17 @@ public class CampingBot extends CampingBotEngine {
 	}
 
 	@Override
-	protected TextCommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
+	protected CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		String rest = null;
+		CommandResult result = null;
+//		String rest = null;
+
+		String value;
+
 		switch (command) {
 		case NicknameConversion:
 		case MBIYF:
 		case MBIYFDipshit:
-		case RegularChatUpdate:
-		case RegularChatReply:
 		case PleasureModel:
 		case PartyEveryday:
 			// NOOP
@@ -138,10 +142,14 @@ public class CampingBot extends CampingBotEngine {
 			break;
 
 		case AllBalls:
-			sendMsg(chatId, res.listBalls());
+			// sendMsg(chatId, res.listBalls());
+			value = res.listBalls();
+			result = new TextCommandResult(command, new TextFragment(value));
 			break;
 		case AllFaces:
-			sendMsg(chatId, res.listFaces());
+//			sendMsg(chatId, res.listFaces());
+			value = res.listFaces();
+			result = new TextCommandResult(command, new TextFragment(value));
 			break;
 		// case Stats:
 		// sendMsg(chatId, stats.statsCommand(chatId));
@@ -151,101 +159,88 @@ public class CampingBot extends CampingBotEngine {
 			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
 
 		case Spell:
-			try {
-				rest = spellCommand(campingFromUser, message);
-				sendMsg(chatId, rest);
-			} catch (SpellDipshitException e) {
-				command = BotCommand.SpellDipshit;
-				sendMsg(chatId, campingFromUser, SpellDipshitException.YA_DIPSHIT);
-			}
+//			try {
+//				rest = spellCommand(campingFromUser, message);
+//				sendMsg(chatId, rest);
+//			} catch (SpellDipshitException e) {
+//				command = BotCommand.SpellDipshit;
+//				sendMsg(chatId, campingFromUser, SpellDipshitException.YA_DIPSHIT);
+//			}
+			result = spellCommand(campingFromUser, message);
 			break;
 
 		case RantActivatorInitiation:
 		case AitaActivatorInitiation:
-			try {
-				// if (command == BotCommand.RantActivatorInitiation)
-				// rest = voting.startRant(this, message, chatId,
-				// campingFromUser);
-				// else if (command == BotCommand.AitaActivatorInitiation)
-				// rest = voting.startAita(this, message, chatId,
-				// campingFromUser);
-				rest = voting.startVoting(command, this, message, chatId, campingFromUser);
-			} catch (VoteCreationFailedException rcfe) {
-				command = BotCommand.VoteInitiationFailed;
-				String reason = rcfe.getMessage();
-				rest = reason;
-				sendMsg(chatId, campingFromUser, reason);
-			}
+//			try {
+//				// if (command == BotCommand.RantActivatorInitiation)
+//				// rest = voting.startRant(this, message, chatId,
+//				// campingFromUser);
+//				// else if (command == BotCommand.AitaActivatorInitiation)
+//				// rest = voting.startAita(this, message, chatId,
+//				// campingFromUser);
+//				rest = voting.startVoting(command, this, message, chatId, campingFromUser);
+//			} catch (VoteCreationFailedException rcfe) {
+//				command = BotCommand.VoteInitiationFailed;
+//				String reason = rcfe.getMessage();
+//				rest = reason;
+//				sendMsg(chatId, campingFromUser, reason);
+//			}
+			result = voting.startVoting(command, this, message, chatId, campingFromUser);
 			break;
 
 		case Countdown:
-			String countdown = countdownGen.countdownCommand(userMonitor, chatId);
-			sendMsg(chatId, countdown);
-			rest = countdown;
+			result = countdownGen.countdownCommand(userMonitor, chatId);
 			break;
 
 		case AllNicknames:
-			rest = allNicknamesCommand();
-			sendMsg(chatId, rest);
+			result = allNicknamesCommand();
 			break;
 		case SetNickname:
-			try {
-				rest = setNicknameCommand(campingFromUser, message);
-			} catch (NicknameRejectedException e) {
-				command = BotCommand.SetNicknameRejected;
-				rest = e.getMessage();
-			}
-			sendMsg(chatId, campingFromUser, rest);
+			result = setNicknameCommand(campingFromUser, message);
+
 			break;
 
 		case SetNicknameRejected:
 			// must be after SetNickname:
 			break;
 		case Reload:
-			rest = reloadCommand(campingFromUser);
-			sendMsg(chatId, campingFromUser, rest);
+			result = reloadCommand(campingFromUser);
 			break;
 		// case Test:
 		// rest = testCommand(campingFromUser, chatId);
 		// break;
 		case UiString:
 			break;
-		// case RegularChatAnimation:
-		case RegularChatGif:
-		case RegularChatPhoto:
-		case RegularChatEdit:
-		case RegularChatVideo:
-		case RegularChatSticker:
-			break;
 		}
 
 		// return rest;
-		if (rest != null)
-			return new TextCommandResult(command, rest, false);
-		else
-			return null;
+//		if (rest != null)
+//			return new TextCommandResult(command, rest);
+//		else
+		return result;
 	}
 
-	private String spellCommand(CampingUser campingFromUser, Message message) throws SpellDipshitException {
+	private CommandResult spellCommand(CampingUser campingFromUser, Message message)  {
 		List<MessageEntity> entities = message.getEntities();
 		CampingUser targetUser = findTarget(entities);
 		if (targetUser == null) {
-			throw new SpellDipshitException();
+			return new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(campingFromUser),
+					new TextFragment(SpellDipshitException.YA_DIPSHIT));
 		}
 
-		String out = spellGen.cast(targetUser.target());
+		CommandResult out = new TextCommandResult(BotCommand.Spell, spellGen.cast(targetUser));
 		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
 		return out;
 	}
 
-	private String reloadCommand(CampingUser fromUser) {
-		String result;
+	private CommandResult reloadCommand(CampingUser fromUser) {
+		CommandResult result = new TextCommandResult(BotCommand.Reload).add(fromUser);
 		if (system.isAdmin(fromUser)) {
 			res.loadAllEmoji();
 			serializer.load();
-			result = " Done!";
+			result.add(": Done!");
 		} else {
-			result = " Access Denied!";
+			result.add(": Access Denied!");
 		}
 		return result;
 	}
@@ -254,7 +249,8 @@ public class CampingBot extends CampingBotEngine {
 	// return "";
 	// }
 
-	private String setNicknameCommand(CampingUser campingFromUser, Message message) throws NicknameRejectedException {
+	private CommandResult setNicknameCommand(CampingUser campingFromUser, Message message) {
+
 		String originalMsg = message.getText();
 		List<MessageEntity> entities = message.getEntities();
 		int targetOffset = originalMsg.indexOf(" ") + 1;
@@ -275,36 +271,41 @@ public class CampingBot extends CampingBotEngine {
 
 				if (targetUser != null) {
 					if (targetUser == campingFromUser) {
-						throw new NicknameRejectedException(NicknameRejectedException.CANT_GIVE_YOURSELF_A_NICKNAME);
+						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
+								.add(NicknameRejectedException.CANT_GIVE_YOURSELF_A_NICKNAME);
 					} else {
 						targetUser.setNickname(newNickname);
-
-						return targetUser.getFirstOrUserName() + "'s nickname changed to: " + targetUser.target();
+						CommandResult sb = new TextCommandResult(BotCommand.SetNickname);
+						sb.add(targetUser.getFirstOrUserName());
+						sb.add("'s nickname changed to: ");
+						sb.add(targetUser);
+						return sb;
 					}
 				}
 			} else {
-				throw new NicknameRejectedException(NicknameRejectedException.USER_NOT_FOUND);
+				return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
+						.add(NicknameRejectedException.USER_NOT_FOUND);
 			}
 		}
-		throw new NicknameRejectedException(NicknameRejectedException.INVALID_SYNTAX);
+		return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
+				.add(NicknameRejectedException.INVALID_SYNTAX);
 	}
 
-	private String allNicknamesCommand() {
-		StringBuilder sb = new StringBuilder();
+	private CommandResult allNicknamesCommand() {
+		CommandResult sb = new TextCommandResult(BotCommand.AllNicknames);
 		for (CampingUser u : userMonitor.getUsers()) {
 			String first = u.getFirstname();
 			String nick = u.getNickname();
 			if (CampingUtil.notEmptyOrNull(nick) && CampingUtil.notEmptyOrNull(first)) {
-				sb.append("*");
-				sb.append(first);
-				sb.append("*: ");
-				sb.append(nick);
-				sb.append("\n");
+				sb.add("*");
+				sb.add(first);
+				sb.add("*: ");
+				sb.add(nick);
+				sb.add("\n");
 			}
 
 		}
-		String out = sb.toString();
-		return out;
+		return sb;
 	}
 
 }

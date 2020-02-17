@@ -90,7 +90,7 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 						ps.setInt(2, item.user.getCampingId());
 						ps.setLong(3, item.chat.chatId);
 						ps.setInt(4, item.telegramId);
-						ps.setLong(5, item.command.id);
+						ps.setLong(5, item.command.getId());
 						ps.setString(6, item.rest);
 						if (extraData != null)
 							setExtraData(ps, 7, extraData);

@@ -1,6 +1,6 @@
 package ca.hapke.campbinning.bot.log;
 
-import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.CommandType;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -34,7 +34,7 @@ public class EventLogger {
 				while (listChanges.next()) {
 					EventItem e = fullLog.get(listChanges.getIndex());
 					if (listChanges.getType() == ListEvent.INSERT) {
-						BotCommand command = e.command;
+						CommandType command = e.command;
 						if (command != null && command.isForUi()) {
 							uiLog.add(e);
 						}

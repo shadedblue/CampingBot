@@ -6,6 +6,9 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -62,13 +65,16 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 			shouldSave = true;
 	}
 
-	public String cast(String target) {
+	public ResultFragment[] cast(CampingUser target) {
 		String adj = CampingUtil.getRandom(adjectives);
 		String item = CampingUtil.getRandom(items);
 		String excl = CampingUtil.getRandom(exclamations);
 
 		String punc = hasPunc(excl) ? "" : "!";
-		return "I cast the *" + adj + "* of *" + item + "* on " + target + " and yell \"*" + excl + punc + "\"*";
+		TextFragment a = new TextFragment("I cast the *" + adj + "* of *" + item + "* on ");
+		MentionFragment b = new MentionFragment(target);
+		TextFragment c = new TextFragment(" and yell \"*" + excl + punc + "\"*");
+		return new ResultFragment[] { a, b, c };
 	}
 
 	private boolean hasPunc(String excl) {

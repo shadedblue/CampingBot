@@ -9,6 +9,9 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
@@ -18,10 +21,11 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 public class NicknameConversionCommand extends InlineCommand {
 
 	private static final String INLINE_NICKS = "nicks";
+
 	@Override
-	public InlineQueryResult provideInlineQuery(String input, int updateId) {
+	public InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor) {
 		String[] words = input.split(" ");
-		String[] out = new String[words.length];
+		ResultFragment[] out = new ResultFragment[words.length];
 		String converted = null;
 		List<Integer> convertedIds = new ArrayList<>();
 		for (int i = 0; i < words.length; i++) {
@@ -41,11 +45,9 @@ public class NicknameConversionCommand extends InlineCommand {
 				}
 
 			}
-			out[i] = newWord;
+			out[i] = new TextFragment(newWord);
 		}
-		String output = String.join(" ", out);
-
-
+		String output = processor.process(out);
 
 		InputTextMessageContent mc = new InputTextMessageContent();
 		mc.setDisableWebPagePreview(true);
@@ -75,8 +77,7 @@ public class NicknameConversionCommand extends InlineCommand {
 
 		String rest = String.join(", ", targets);
 		EventItem event = new EventItem(BotCommand.NicknameConversion, campingFromUser, null, null, inlineMessageId,
-				rest,
-				targets.length);
+				rest, targets.length);
 		return event;
 	}
 
