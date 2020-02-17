@@ -2,10 +2,14 @@ package ca.hapke.campbinning.bot.commands;
 
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
+
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
@@ -38,6 +42,31 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 	private List<String> adjectives;
 	private List<String> items;
 	private List<String> exclamations;
+	public static final String YA_DIPSHIT = "Spells must be cast upon a victim, ya dipshit.";
+	public static final String IM_A_DIPSHIT = "I'm a dipshit, and didn't pick a victim to cast a spell on!";
+
+	public CommandResult spellCommand(CampingUser campingFromUser, CampingUser targetUser, Message message) {
+		if (targetUser == null) {
+			return new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(campingFromUser),
+					new TextFragment(YA_DIPSHIT));
+		}
+
+		CommandResult out = new TextCommandResult(BotCommand.Spell, cast(targetUser));
+		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
+		return out;
+	}
+
+	public ResultFragment[] cast(CampingUser target) {
+		String adj = CampingUtil.getRandom(adjectives);
+		String item = CampingUtil.getRandom(items);
+		String excl = CampingUtil.getRandom(exclamations);
+
+		String punc = hasPunc(excl) ? "" : "!";
+		TextFragment a = new TextFragment("I cast the *" + adj + "* of *" + item + "* on ");
+		MentionFragment b = new MentionFragment(target);
+		TextFragment c = new TextFragment(" and yell \"*" + excl + punc + "\"*");
+		return new ResultFragment[] { a, b, c };
+	}
 
 	public void setAdjectives(List<String> adjectives) {
 		if (categories.putAll(ADJECTIVE_CATEGORY, adjectives))
@@ -65,18 +94,6 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 			shouldSave = true;
 	}
 
-	public ResultFragment[] cast(CampingUser target) {
-		String adj = CampingUtil.getRandom(adjectives);
-		String item = CampingUtil.getRandom(items);
-		String excl = CampingUtil.getRandom(exclamations);
-
-		String punc = hasPunc(excl) ? "" : "!";
-		TextFragment a = new TextFragment("I cast the *" + adj + "* of *" + item + "* on ");
-		MentionFragment b = new MentionFragment(target);
-		TextFragment c = new TextFragment(" and yell \"*" + excl + punc + "\"*");
-		return new ResultFragment[] { a, b, c };
-	}
-
 	private boolean hasPunc(String excl) {
 		char last = excl.charAt(excl.length() - 1);
 		return last == '.' || last == '!' || last == '?';
@@ -87,9 +104,6 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 		String outerTag = "spell";
 		of.start(outerTag);
 		of.tagCategories(categories);
-		// of.tagAndValue(ADJECTIVE_CATEGORY, adjectives);
-		// of.tagAndValue(ITEM_CATEGORY, items);
-		// of.tagAndValue(EXCLAMATION_CATEGORY, exclamations);
 		of.finish(outerTag);
 	}
 

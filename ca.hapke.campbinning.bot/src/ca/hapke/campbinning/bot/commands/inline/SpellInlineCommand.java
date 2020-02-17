@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.commands.SpellDipshitException;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
@@ -60,7 +59,7 @@ public class SpellInlineCommand extends InlineCommand {
 			outputSpell = spellGen.cast(targetUser);
 			targetFirst = targetUser.getFirstname();
 		} else {
-			outputSpell = new ResultFragment[] { new TextFragment(SpellDipshitException.IM_A_DIPSHIT) };
+			outputSpell = new ResultFragment[] { new TextFragment(SpellGenerator.IM_A_DIPSHIT) };
 			targetFirst = CampingUser.UNKNOWN_TARGET;
 		}
 

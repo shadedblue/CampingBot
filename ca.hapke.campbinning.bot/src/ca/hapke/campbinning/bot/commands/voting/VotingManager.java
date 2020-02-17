@@ -48,6 +48,8 @@ public class VotingManager extends CampingSerializable
 	private CategoriedItems<String> resultCategories;
 	private CampingBot bot;
 	private TimesProvider<Void> times;
+	public static final String ALREADY_BEING_VOTED_ON = "Topic already being voted on";
+	public static final String NO_TOPIC_PROVIDED = "Reply to the topic you would like to vote on!";
 
 	public VotingManager(CampingBot campingBot) {
 		this.bot = campingBot;
@@ -94,7 +96,7 @@ public class VotingManager extends CampingSerializable
 				result = startVotingInternal(type, bot, activation, chatId, activater, topic);
 			} else {
 				result = new TextCommandResult(BotCommand.VoteInitiationFailed,
-						new TextFragment(VoteCreationFailedException.NO_TOPIC_PROVIDED));
+						new TextFragment(VotingManager.NO_TOPIC_PROVIDED));
 			}
 		} catch (Exception e) {
 			result = new TextCommandResult(BotCommand.VoteInitiationFailed, new TextFragment(e.getMessage()));
@@ -110,7 +112,7 @@ public class VotingManager extends CampingSerializable
 		if (voteOnMessages.containsKey(rantMessageId)) {
 //			throw new VoteCreationFailedException(VoteCreationFailedException.ALREADY_BEING_VOTED_ON);
 			return new TextCommandResult(BotCommand.VoteInitiationFailed,
-					new TextFragment(VoteCreationFailedException.ALREADY_BEING_VOTED_ON));
+					new TextFragment(VotingManager.ALREADY_BEING_VOTED_ON));
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
 			CampingUser ranter = uM.monitor(topic.getFrom());
