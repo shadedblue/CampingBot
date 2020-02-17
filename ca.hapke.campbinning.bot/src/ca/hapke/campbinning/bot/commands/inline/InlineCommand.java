@@ -20,7 +20,8 @@ public abstract class InlineCommand {
 
 	public abstract String getCommandName();
 
-	public abstract EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId);
+	public abstract EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
+			String resultText);
 
 	public abstract InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor);
 

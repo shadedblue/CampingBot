@@ -149,17 +149,13 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 			campingFromUser = userMonitor.getUser(inlineChosen.getFrom());
 			if (words.length >= 1) {
-				try {
-					int secondDelimiter = fullInput.indexOf(InlineCommand.INLINE_DELIMITER,
-							fullInput.indexOf(InlineCommand.INLINE_DELIMITER) + 1);
-					inputRest = fullInput.substring(secondDelimiter);
-				} catch (Exception e) {
-				}
+
+				inputRest = inlineChosen.getQuery();
 
 				for (InlineCommand inline : inlineCommands) {
 					String commandName = inline.getCommandName();
 					if (commandName.equalsIgnoreCase(words[0])) {
-						outputEvent = inline.chosenInlineQuery(words, campingFromUser, telegramId);
+						outputEvent = inline.chosenInlineQuery(words, campingFromUser, telegramId, inputRest);
 					}
 				}
 

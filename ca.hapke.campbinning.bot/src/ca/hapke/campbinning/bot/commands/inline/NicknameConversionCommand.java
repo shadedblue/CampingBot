@@ -65,7 +65,8 @@ public class NicknameConversionCommand extends InlineCommand {
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId) {
+	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
+			String resultText) {
 		if (words.length < 2)
 			return null;
 
@@ -77,7 +78,7 @@ public class NicknameConversionCommand extends InlineCommand {
 
 		String rest = String.join(", ", targets);
 		EventItem event = new EventItem(BotCommand.NicknameConversion, campingFromUser, null, null, inlineMessageId,
-				rest, targets.length);
+				resultText, rest);
 		return event;
 	}
 

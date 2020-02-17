@@ -33,7 +33,8 @@ public class SpellInlineCommand extends InlineCommand {
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId) {
+	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
+			String resultText) {
 		if (words.length < 3)
 			return null;
 
@@ -41,8 +42,7 @@ public class SpellInlineCommand extends InlineCommand {
 
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
 		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
-		String result = words[2];
-		EventItem event = new EventItem(BotCommand.Spell, campingFromUser, null, null, inlineMessageId, result,
+		EventItem event = new EventItem(BotCommand.Spell, campingFromUser, null, null, inlineMessageId, resultText,
 				targetUser.getCampingId());
 		return event;
 	}
@@ -72,7 +72,8 @@ public class SpellInlineCommand extends InlineCommand {
 
 		InputTextMessageContent mcSpell = new InputTextMessageContent();
 		mcSpell.setDisableWebPagePreview(true);
-		mcSpell.setMessageText(processor.process(outputSpell));
+		String spell = processor.process(outputSpell);
+		mcSpell.setMessageText(spell);
 		mcSpell.setParseMode(CampingBotEngine.MARKDOWN);
 
 		InlineQueryResultArticle articleSpell = new InlineQueryResultArticle();
