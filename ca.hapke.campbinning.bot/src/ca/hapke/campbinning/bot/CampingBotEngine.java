@@ -226,12 +226,25 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				Sticker stick = message.getSticker();
 				inputRest = stick.getEmoji();
 				inputExtraData = stick.getSetName();
+			} else {
+				/*- figure out what type of message it is...
+				 *  ie: regular message/edit/delete
+				 */
+				inputRest = message.getText();
+				Message replyTo = message.getReplyToMessage();
+				if (replyTo != null) {
+					inputType = InputType.RegularChatReply;
+					inputExtraData = replyTo.getMessageId();
+				} else {
+					inputType = InputType.RegularChatUpdate;
+				}
 			}
 		}
 		if (inputType != null) {
 			inputEvent = new EventItem(inputType, campingFromUser, eventTime, chat, telegramId, inputRest,
 					inputExtraData);
 		}
+		eventLogger.add(inputEvent);
 
 		// PROCESS FOR OUTPUT
 
@@ -259,21 +272,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 									break;
 							}
 						}
-
-						// still not doing anything, just log it.
-						if (inputType == null) {
-							/*- figure out what type of message it is...
-							 *  ie: regular message/edit/delete
-							 */
-							Message replyTo = message.getReplyToMessage();
-							if (replyTo != null) {
-								inputType = InputType.RegularChatReply;
-								inputExtraData = replyTo.getMessageId();
-							} else {
-								inputType = InputType.RegularChatUpdate;
-							}
-							inputRest = originalMsg;
-						}
 					}
 
 					if (outputResult != null) {
@@ -289,11 +287,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			}
 
 		}
-		if (inputEvent == null && inputType != null)
-			inputEvent = new EventItem(inputType, campingFromUser, eventTime, chat, telegramId, inputRest,
-					inputExtraData);
-		if (inputEvent != null)
-			eventLogger.add(inputEvent);
 		if (outputEvent != null)
 			eventLogger.add(outputEvent);
 

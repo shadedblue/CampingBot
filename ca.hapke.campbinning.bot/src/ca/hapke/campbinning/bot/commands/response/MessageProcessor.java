@@ -46,7 +46,7 @@ public abstract class MessageProcessor {
 			results[i] = fragments.get(i).getValue(this);
 		}
 
-		return String.join(" ", results);
+		return String.join("", results);
 	}
 
 	public String process(ResultFragment[] fragments) {
@@ -55,6 +55,6 @@ public abstract class MessageProcessor {
 			results[i] = fragments[i].getValue(this);
 		}
 
-		return String.join(" ", results);
+		return String.join("", results);
 	}
 }

@@ -66,7 +66,8 @@ public class EventLogger {
 	}
 
 	public void add(EventItem e) {
-		fullLog.add(e);
+		if (e != null)
+			fullLog.add(e);
 	}
 
 	public EventList<EventItem> getUiLog() {

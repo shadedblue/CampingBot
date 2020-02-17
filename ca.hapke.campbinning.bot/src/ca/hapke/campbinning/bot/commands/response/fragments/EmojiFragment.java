@@ -19,7 +19,7 @@ public class EmojiFragment extends ResultFragment {
 	 * No changes to emoji.. for now?
 	 */
 	public String getValue(MessageProcessor processor) {
-		return target.getUnicode();
+		return target.getUnicode().trim();
 	}
 
 }

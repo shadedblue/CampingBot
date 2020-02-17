@@ -16,7 +16,7 @@ public class MentionFragment extends ResultFragment {
 	@Override
 	public String getValue(MessageProcessor processor) {
 		String display = processor.processString(target.getDisplayName());
-		return CampingUser.target(display, target.getTelegramId());
+		return CampingUser.target(display, target.getTelegramId()).trim();
 	}
 
 }
