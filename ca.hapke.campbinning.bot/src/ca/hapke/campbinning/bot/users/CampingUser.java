@@ -199,16 +199,8 @@ public class CampingUser {
 			// case Stats:
 			// case StatsEndOfWeek:
 			// case Test:
-		case RegularChatReply:
-		case RegularChatUpdate:
 		case SetNicknameRejected:
 		case UiString:
-			// case RegularChatAnimation:
-		case RegularChatGif:
-		case RegularChatPhoto:
-		case RegularChatEdit:
-		case RegularChatVideo:
-		case RegularChatSticker:
 			break;
 		}
 	}
@@ -239,7 +231,13 @@ public class CampingUser {
 	}
 
 	public String target() {
-		return "[" + getDisplayName() + "](tg://user?id=" + telegramId + ")";
+		String displayName = getDisplayName();
+		int id = telegramId;
+		return target(displayName, id);
+	}
+
+	public static String target(String displayName, int id) {
+		return "[" + displayName + "](tg://user?id=" + id + ")";
 	}
 
 	public String getDisplayName() {

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.CommandType;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
@@ -14,7 +15,7 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 public class EventItem {
 	private static final DateFormat df = new SimpleDateFormat("HH:mm:ss");
 
-	public final BotCommand command;
+	public final CommandType command;
 	public final CampingUser user;
 	public final Integer telegramId;
 	public final String rest;
@@ -31,7 +32,7 @@ public class EventItem {
 		return new Date();
 	}
 
-	public EventItem(BotCommand command, CampingUser user, Integer ctime, CampingChat chat, Integer telegramId,
+	public EventItem(CommandType command, CampingUser user, Integer ctime, CampingChat chat, Integer telegramId,
 			String rest, Object extraData) {
 		this.command = command;
 		this.user = user;
@@ -61,6 +62,11 @@ public class EventItem {
 		builder.append(df.format(d));
 		builder.append("] ");
 
+		if (telegramId != null) {
+			builder.append("(");
+			builder.append(telegramId);
+			builder.append(")");
+		}
 		if (command != null) {
 			builder.append(command);
 			builder.append(": ");

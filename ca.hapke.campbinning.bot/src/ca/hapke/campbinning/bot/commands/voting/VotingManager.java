@@ -22,7 +22,9 @@ import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
-import ca.hapke.campbinning.bot.commands.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
@@ -46,6 +48,8 @@ public class VotingManager extends CampingSerializable
 	private CategoriedItems<String> resultCategories;
 	private CampingBot bot;
 	private TimesProvider<Void> times;
+	public static final String ALREADY_BEING_VOTED_ON = "Topic already being voted on";
+	public static final String NO_TOPIC_PROVIDED = "Reply to the topic you would like to vote on!";
 
 	public VotingManager(CampingBot campingBot) {
 		this.bot = campingBot;
@@ -81,29 +85,37 @@ public class VotingManager extends CampingSerializable
 		}
 	}
 
-	public String startVoting(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
-			CampingUser activater) throws VoteCreationFailedException, TelegramApiException {
-		String rest;
+	public CommandResult startVoting(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
+			CampingUser activater) {
+//		String rest;
+		CommandResult result;
 
-		Message topic = activation.getReplyToMessage();
-		if (topic != null) {
-			rest = startVotingInternal(type, bot, activation, chatId, activater, topic);
-		} else {
-			throw new VoteCreationFailedException(VoteCreationFailedException.NO_TOPIC_PROVIDED);
+		try {
+			Message topic = activation.getReplyToMessage();
+			if (topic != null) {
+				result = startVotingInternal(type, bot, activation, chatId, activater, topic);
+			} else {
+				result = new TextCommandResult(BotCommand.VoteInitiationFailed,
+						new TextFragment(VotingManager.NO_TOPIC_PROVIDED));
+			}
+		} catch (Exception e) {
+			result = new TextCommandResult(BotCommand.VoteInitiationFailed, new TextFragment(e.getMessage()));
 		}
-		return rest;
+		return result;
 	}
 
-	private String startVotingInternal(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
-			CampingUser activater, Message topic) throws VoteCreationFailedException, TelegramApiException {
-		String rest;
+	private CommandResult startVotingInternal(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
+			CampingUser activater, Message topic) throws TelegramApiException {
+//		String rest;
+		VoteTracker tracker = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
-			throw new VoteCreationFailedException(VoteCreationFailedException.ALREADY_BEING_VOTED_ON);
+//			throw new VoteCreationFailedException(VoteCreationFailedException.ALREADY_BEING_VOTED_ON);
+			return new TextCommandResult(BotCommand.VoteInitiationFailed,
+					new TextFragment(VotingManager.ALREADY_BEING_VOTED_ON));
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
 			CampingUser ranter = uM.monitor(topic.getFrom());
-			VoteTracker tracker = null;
 			switch (type) {
 			case AitaActivatorInitiation:
 				tracker = new AitaTracker(bot, ranter, activater, chatId, activation, topic, resultCategories);
@@ -118,10 +130,11 @@ public class VotingManager extends CampingSerializable
 			inProgress.add(tracker);
 			voteOnMessages.put(rantMessageId, tracker);
 			voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
-			rest = topic.getText();
+//			rest = topic.getText();
 			ranter.increment(BotCommand.RantActivatorInitiation);
 		}
-		return rest;
+		return new TextCommandResult(BotCommand.VoteTopicInitiation, new TextFragment(tracker.getBannerTitle()),
+				new TextFragment(topic.getText()));
 	}
 
 	@Override
@@ -163,7 +176,7 @@ public class VotingManager extends CampingSerializable
 	}
 
 	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 
 		BotCommand type = null;
@@ -175,9 +188,7 @@ public class VotingManager extends CampingSerializable
 
 		if (type != null) {
 			try {
-				String vote = startVotingInternal(type, bot, message, chatId, campingFromUser, message);
-				return new TextCommandResult(type, vote, false);
-			} catch (VoteCreationFailedException e) {
+				return startVotingInternal(type, bot, message, chatId, campingFromUser, message);
 			} catch (TelegramApiException e) {
 			}
 		}

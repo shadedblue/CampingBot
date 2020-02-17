@@ -23,6 +23,11 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.EmojiFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -93,25 +98,27 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	}
 
 	@Override
-	public TextCommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		CampingUser targetUser = bot.findTarget(entities);
 		if (userRestriction != null && !userRestriction.contains(targetUser))
 			return null;
 
 		if (targetUser == bot.getMeCamping()) {
-			return new TextCommandResult(BotCommand.MBIYFDipshit, "Fuck you, I'm not ballsing myself!", true);
+			return new TextCommandResult(BotCommand.MBIYFDipshit,
+					new TextFragment("Fuck you, I'm not ballsing myself!"));
 		}
 
-		String ball = res.getRandomBall();
-		String face = res.getRandomFace();
+		Emoji ball = res.getRandomBallEmoji();
+		Emoji face = res.getRandomFaceEmoji();
 
 		if (targetUser == null)
 			return null;
 
 		campingFromUser.increment(BotCommand.MBIYF);
-		String msg = "My " + ball + " in " + targetUser.target() + "'s " + face + "!";
-		return new TextCommandResult(BotCommand.MBIYF, msg, true);
+		return new TextCommandResult(BotCommand.MBIYF, new TextFragment("My "), new EmojiFragment(ball),
+				new TextFragment(" in "), new MentionFragment(targetUser), new TextFragment("'s "),
+				new EmojiFragment(face), new TextFragment("!"));
 	}
 
 	@Override

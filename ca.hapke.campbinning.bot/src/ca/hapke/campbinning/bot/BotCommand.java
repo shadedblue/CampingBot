@@ -12,7 +12,7 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
 /**
  * @author Nathan Hapke
  */
-public enum BotCommand {
+public enum BotCommand implements CommandType {
 
 	AllFaces("allfaces", true, true, BotCommandIds.BALLS | BotCommandIds.USE),
 	AllBalls("allballs", true, true, BotCommandIds.BALLS | BotCommandIds.USE),
@@ -45,21 +45,14 @@ public enum BotCommand {
 	IunnoGoogleIt("iunno", true, true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),
 	PartyEveryday(null, true, true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),
 	UiString(null, true, false),
-	NicknameConversion(null, true, true, BotCommandIds.NICKNAME | BotCommandIds.USE),
-	RegularChatUpdate(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT),
-	RegularChatReply(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.REPLY),
-	RegularChatEdit(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.EDIT),
-	RegularChatGif(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.GIF),
-	RegularChatSticker(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.STICKER),
-	RegularChatPhoto(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.PIC),
-	RegularChatVideo(null, true, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.VID);
+	NicknameConversion(null, true, true, BotCommandIds.NICKNAME | BotCommandIds.USE);
 
 	private static final String BOT_COMMAND = "bot_command";
 
 	public final String command;
-	private boolean forUi;
-	private boolean forDb;
-	public final long id;
+	private final boolean forUi;
+	private final boolean forDb;
+	private final long id;
 
 	private BotCommand(String command, boolean forUi, boolean forDb) {
 		this(command, forUi, forDb, 0);
@@ -78,12 +71,19 @@ public enum BotCommand {
 		this.id = id;
 	}
 
+	@Override
 	public boolean isForUi() {
 		return forUi;
 	}
 
+	@Override
 	public boolean isForDb() {
 		return forDb;
+	}
+
+	@Override
+	public long getId() {
+		return id;
 	}
 
 	public static BotCommand fromText(String msg) {
