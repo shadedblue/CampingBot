@@ -230,16 +230,6 @@ public class CampingUser {
 		return "CampingUser [#" + telegramId + " " + firstname + middle + lastname + "]";
 	}
 
-	public String target() {
-		String displayName = getDisplayName();
-		int id = telegramId;
-		return target(displayName, id);
-	}
-
-	public static String target(String displayName, int id) {
-		return "[" + displayName + "](tg://user?id=" + id + ")";
-	}
-
 	public String getDisplayName() {
 		if (CampingUtil.isNonNull(nickname))
 			return nickname;

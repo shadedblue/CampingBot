@@ -17,7 +17,7 @@ public abstract class MessageProcessor {
 	public final String processString(String value) {
 		String result = internalProcessString(value);
 		if (next != null)
-			result = next.internalProcessString(value);
+			result = next.internalProcessString(result);
 		return result;
 	}
 
@@ -27,17 +27,19 @@ public abstract class MessageProcessor {
 		return next;
 	}
 
-	public void pushNext(MessageProcessor add) {
+	public MessageProcessor pushNext(MessageProcessor add) {
 		add.next = next;
 		next = add;
+		return this;
 	}
 
-	public void addAtEnd(MessageProcessor add) {
+	public MessageProcessor addAtEnd(MessageProcessor add) {
 		MessageProcessor end = this;
 		while (end.next != null) {
 			end = end.next;
 		}
 		end.next = add;
+		return this;
 	}
 
 	public String process(List<ResultFragment> fragments) {

@@ -14,6 +14,7 @@ import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -40,11 +41,11 @@ public class NicknameCommand extends InlineCommand {
 		List<Integer> convertedIds = new ArrayList<>();
 		for (int i = 0; i < words.length; i++) {
 			String word = words[i];
-			String newWord = word;
+			ResultFragment frag = null;
 			if (word.length() > 0 && word.charAt(0) == '@') {
 				CampingUser cu = userMonitor.getUser(word);
 				if (cu != null) {
-					newWord = cu.target();
+					frag = new MentionFragment(cu);
 					String firstOrUser = cu.getFirstOrUserName();
 					if (converted == null) {
 						converted = firstOrUser;
@@ -55,7 +56,9 @@ public class NicknameCommand extends InlineCommand {
 				}
 
 			}
-			out[i] = new TextFragment(newWord);
+			if (frag == null)
+				frag = new TextFragment(word);
+			out[i] = frag;
 		}
 		String output = processor.process(out);
 
