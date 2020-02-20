@@ -64,11 +64,11 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 	// }
 
 	public CommandResult countdownCommand(CampingUserMonitor userMonitor, Long chatId) {
-		GregorianCalendar now = new GregorianCalendar();
+		ZonedDateTime now = new GregorianCalendar().toZonedDateTime();
 		CommandResult result = new TextCommandResult(BotCommand.Countdown);
 
 		ZonedDateTime targetEvent;
-		if (countdownTarget == null || now.before(countdownTarget)) {
+		if (countdownTarget != null && now.isBefore(countdownTarget)) {
 			// CampingUser rtv = userMonitor.monitor(558638791, null, null,
 			// null);
 			CampingUser andrew = userMonitor.monitor(642767839, null, null, null);
@@ -76,7 +76,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 			CampingUser target = andrew;
 
 			result.add("MY BALLS IN  ");
-			result.add(target);
+			result.add(target.getDisplayName().toUpperCase());
 
 			result.add("'S EASTER COUNTDOWN\n");
 
@@ -87,7 +87,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		}
 
 		for (int i = 0; i < 5; i++) {
-			result.add(res.getRandomFace());
+			result.add(res.getRandomFaceEmoji());
 		}
 		result.add("\n");
 		result.add(res.getRandomBallEmoji());
