@@ -23,6 +23,7 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.NoopCommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -133,8 +134,8 @@ public class VotingManager extends CampingSerializable
 //			rest = topic.getText();
 			ranter.increment(BotCommand.RantActivatorInitiation);
 		}
-		return new TextCommandResult(BotCommand.VoteTopicInitiation, new TextFragment(tracker.getBannerTitle()),
-				new TextFragment(topic.getText()));
+		return new NoopCommandResult(BotCommand.VoteTopicInitiation, new TextFragment(tracker.getBannerTitle()),
+				new TextFragment(tracker.previousBanner));
 	}
 
 	@Override
