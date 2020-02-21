@@ -270,7 +270,8 @@ public abstract class VoteTracker<T> {
 
 	public String getBannerText() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getBannerTitle());
+		String bannerTitle = getBannerTitle();
+		sb.append(bannerTitle);
 		sb.append(" (");
 		sb.append(formatter.toPrettyString(completionTime));
 		sb.append(" left)");

@@ -9,12 +9,9 @@ public class ImageLink {
 
 	public final String url;
 	public final int type;
-//	public final String caption;
 
 	public ImageLink(String url, int type) {
 		this.url = url;
 		this.type = type;
-//		this.caption = caption;
 	}
-
 }

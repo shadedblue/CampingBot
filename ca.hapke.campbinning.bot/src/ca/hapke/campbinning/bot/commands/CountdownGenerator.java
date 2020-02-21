@@ -20,7 +20,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class CountdownGenerator extends CampingSerializable implements HasCategories {
+public class CountdownGenerator extends CampingSerializable implements HasCategories<String> {
 
 	private static final String HYPE_CATEGORY = "hype";
 	// Month is 0-indexed for some stupid inconsistent reason...
@@ -75,7 +75,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 //			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
 			CampingUser target = andrew;
 
-			result.add("MY BALLS IN  ");
+			result.add("MY BALLS IN ");
 			result.add(target.getDisplayName().toUpperCase());
 
 			result.add("'S EASTER COUNTDOWN\n");

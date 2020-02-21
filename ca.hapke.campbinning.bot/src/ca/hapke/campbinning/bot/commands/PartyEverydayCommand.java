@@ -18,6 +18,8 @@ import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -25,7 +27,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class PartyEverydayCommand extends CampingSerializable implements HasCategories, TextCommand {
+public class PartyEverydayCommand extends CampingSerializable implements HasCategories<String>, TextCommand {
 
 	private static final int SFW_START_HOUR = 8;
 	private static final int SFW_END_HOUR = 16;
@@ -34,6 +36,8 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	private static final String PARTY_END = "tying!";
 
 	private static final String PARTY_REGEX = ".*pa([r]{3,})ty.*";
+	private static final String NSFW_CATEGORY = "NSFW";
+	private static final String SFW_CATEGORY = "SFW";
 
 	private final ZoneId zone = ZoneId.systemDefault();
 
@@ -42,14 +46,15 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	private Pattern p;
 	protected CampingBot bot;
 	private CategoriedItems<String> categories = new CategoriedItems<String>(EXCESSIVE_CATEGORY);
-	private RespondWithImage imagesNsfw;
-	private RespondWithImage imagesSfw;
+	private CategoriedItems<ImageLink> imgCategories = new CategoriedItems<ImageLink>(NSFW_CATEGORY, SFW_CATEGORY);
+	private List<ImageLink> imagesNsfw;
+	private List<ImageLink> imagesSfw;
 	private List<String> excessives;
 
 	public PartyEverydayCommand(CampingBot bot) {
 		this.bot = bot;
-		imagesNsfw = new RespondWithImage(bot);
-		imagesSfw = new RespondWithImage(bot);
+		imagesNsfw = imgCategories.getList(NSFW_CATEGORY);
+		imagesSfw = imgCategories.getList(SFW_CATEGORY);
 		excessives = categories.getList(EXCESSIVE_CATEGORY);
 		for (int i = 1; i <= 3; i++) {
 			addImage("http://www.hapke.ca/images/party-boy" + i + ".gif", false);
@@ -92,7 +97,7 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 
 		String partying = generateParrrty(message);
 
-		RespondWithImage images;
+		List<ImageLink> images;
 //		if (true) {
 		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hours >= SFW_START_HOUR
 				&& hours < SFW_END_HOUR) {
@@ -100,7 +105,8 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		} else {
 			images = imagesNsfw;
 		}
-		return images.sendImage(BotCommand.PartyEveryday, chatId, partying);
+		TextFragment captionFrag = new TextFragment(partying);
+		return new ImageCommandResult(BotCommand.PartyEveryday, CampingUtil.getRandom(images), captionFrag);
 	}
 
 	public String generateParrrty(Message message) {

@@ -38,7 +38,7 @@ import ca.odell.glazedlists.GlazedLists;
  */
 @SuppressWarnings("rawtypes")
 public class VotingManager extends CampingSerializable
-		implements CalendaredEvent<Void>, CallbackCommand, TextCommand, HasCategories {
+		implements CalendaredEvent<Void>, CallbackCommand, TextCommand, HasCategories<String> {
 
 	private Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
 	private Map<Integer, VoteTracker> voteOnBanners = new HashMap<Integer, VoteTracker>();

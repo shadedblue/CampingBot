@@ -6,10 +6,10 @@ import java.util.List;
  * @author Nathan Hapke
  *
  */
-public interface HasCategories {
+public interface HasCategories<T> {
 	public List<String> getCategoryNames();
 
-	public void addItem(String category, String value);
+	public void addItem(String category, T value);
 
 	public String getContainerName();
 }

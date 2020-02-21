@@ -43,18 +43,32 @@ public abstract class MessageProcessor {
 	}
 
 	public String process(List<ResultFragment> fragments) {
-		String[] results = new String[fragments.size()];
-		for (int i = 0; i < fragments.size(); i++) {
-			results[i] = fragments.get(i).getValue(this);
+		if (fragments == null)
+			return null;
+		int size = fragments.size();
+		String[] results = new String[size];
+		for (int i = 0; i < size; i++) {
+			ResultFragment f = fragments.get(i);
+			if (f == null)
+				results[i] = "";
+			else
+				results[i] = f.getValue(this);
 		}
 
 		return String.join("", results);
 	}
 
 	public String process(ResultFragment[] fragments) {
-		String[] results = new String[fragments.length];
-		for (int i = 0; i < fragments.length; i++) {
-			results[i] = fragments[i].getValue(this);
+		if (fragments == null)
+			return null;
+		int size = fragments.length;
+		String[] results = new String[size];
+		for (int i = 0; i < size; i++) {
+			ResultFragment f = fragments[i];
+			if (f == null)
+				results[i] = "";
+			else
+				results[i] = f.getValue(this);
 		}
 
 		return String.join("", results);

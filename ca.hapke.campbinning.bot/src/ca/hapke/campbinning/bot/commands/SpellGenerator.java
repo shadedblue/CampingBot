@@ -20,7 +20,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class SpellGenerator extends CampingSerializable implements HasCategories {
+public class SpellGenerator extends CampingSerializable implements HasCategories<String> {
 
 	private static final String ADJECTIVE_CATEGORY = "adjective";
 	private static final String EXCLAMATION_CATEGORY = "exclamation";

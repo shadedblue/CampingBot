@@ -18,6 +18,11 @@ public class ImageCommandResult extends CommandResult {
 
 	private ImageLink image;
 
+	public ImageCommandResult(BotCommand cmd, ImageLink image) {
+		super(cmd);
+		this.image = image;
+	}
+
 	public ImageCommandResult(BotCommand cmd, ImageLink image, ResultFragment... fragments) {
 		super(cmd, fragments);
 		this.image = image;
@@ -38,7 +43,7 @@ public class ImageCommandResult extends CommandResult {
 				SendPhoto p = new SendPhoto();
 				p.setChatId(chatId);
 				p.setPhoto(url);
-				if (caption != null) {
+				if (caption != null && caption.length() > 0) {
 					p.setCaption(caption);
 				}
 				bot.execute(p);
@@ -47,7 +52,7 @@ public class ImageCommandResult extends CommandResult {
 				SendAnimation ani = new SendAnimation();
 				ani.setChatId(chatId);
 				ani.setAnimation(url);
-				if (caption != null) {
+				if (caption != null && caption.length() > 0) {
 					ani.setCaption(caption);
 				}
 				bot.execute(ani);

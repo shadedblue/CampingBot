@@ -26,11 +26,20 @@ public abstract class CommandResult {
 
 	protected final BotCommand cmd;
 
+	public CommandResult(BotCommand cmd) {
+		this.cmd = cmd;
+		this.fragments = new ArrayList<>();
+	}
+
 	public CommandResult(BotCommand cmd, ResultFragment... fragments) {
 		this.cmd = cmd;
-		this.fragments = new ArrayList<>(fragments.length);
-		for (ResultFragment f : fragments) {
-			this.fragments.add(f);
+		if (fragments == null) {
+			this.fragments = new ArrayList<>();
+		} else {
+			this.fragments = new ArrayList<>(fragments.length);
+			for (ResultFragment f : fragments) {
+				this.fragments.add(f);
+			}
 		}
 	}
 

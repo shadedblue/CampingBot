@@ -107,6 +107,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			CallbackQuery callbackQuery = update.getCallbackQuery();
 			for (CallbackCommand callback : callbackCommands) {
 				outputEvent = callback.reactToCallback(callbackQuery);
+				if (outputEvent != null)
+					break;
 			}
 		}
 		if (update.hasInlineQuery()) {
@@ -156,6 +158,9 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					String commandName = inline.getCommandName();
 					if (commandName.equalsIgnoreCase(words[0])) {
 						outputEvent = inline.chosenInlineQuery(words, campingFromUser, telegramId, inputRest);
+
+						if (outputEvent != null)
+							break;
 					}
 				}
 
@@ -268,8 +273,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 						for (TextCommand textCommand : textCommands) {
 							if (textCommand.isMatch(msg, entities)) {
 								outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
-								if (outputResult != null)
+								if (outputResult != null) {
+									outputCommand = outputResult.getCmd();
 									break;
+								}
 							}
 						}
 					}
