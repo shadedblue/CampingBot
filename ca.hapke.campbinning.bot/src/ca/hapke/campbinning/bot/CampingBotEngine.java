@@ -302,12 +302,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected abstract CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
 
-//	public void sendMsg(Long chatId, CampingUser target, String msg) {
-//		if (target != null)
-//			msg = target.target() + ": " + msg;
-//		sendMsg(chatId, msg);
-//	}
-
 	public Message sendMsg(Long chatId, String msg) {
 		return sendMsg(chatId, (Message) null, msg);
 	}
