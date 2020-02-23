@@ -18,17 +18,15 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class Resources {
-
-	// private StickerSet campbinningStickers;
-	final Map<Emoji, List<Sticker>> emojiStickerMap = new HashMap<>();
-	final Set<Emoji> respondTo = new HashSet<>();
-	final List<Emoji> faces = new ArrayList<>();
-	final Map<String, Emoji> facesMap = new HashMap<>();
-	final List<Emoji> balls = new ArrayList<>();
-	final Map<String, Emoji> ballsMap = new HashMap<>();
-	// public final Emoji[] statsBanner = new Emoji[3];
-	// public final Emoji[] victimBanner = new Emoji[3];
-	// public final Emoji[] statsTrophy = new Emoji[3];
+	private final Map<Emoji, List<Sticker>> emojiStickerMap = new HashMap<>();
+	private final Set<Emoji> respondTo = new HashSet<>();
+	private final List<Emoji> faces = new ArrayList<>();
+	private final Map<String, Emoji> facesMap = new HashMap<>();
+	private final List<Emoji> balls = new ArrayList<>();
+	private final Map<String, Emoji> ballsMap = new HashMap<>();
+	private final List<Emoji> various = new ArrayList<>();
+	private final Map<String, Emoji> variousMap = new HashMap<>();
+	private Emoji cake;
 
 	public void loadAllEmoji() {
 		faces.clear();
@@ -48,15 +46,11 @@ public class Resources {
 				"cherries", "corn", "fire", "zap", "volcano", "floppy_disk", "cd", "tennis", "beers", "fried_shrimp",
 				"grapes", "melon", "tomato", "hot_dog", "taco", "cheese", "cloud_tornado", "peanuts");
 
-		// statsBanner[0] = EmojiManager.getForAlias("trophy");
-		// statsBanner[1] = EmojiManager.getForAlias("checkered_flag");
-		// statsBanner[2] = EmojiManager.getForAlias("tada");
-		// victimBanner[0] = EmojiManager.getForAlias("gun");
-		// victimBanner[1] = EmojiManager.getForAlias("bomb");
-		// victimBanner[2] = EmojiManager.getForAlias("knife");
-		// statsTrophy[0] = EmojiManager.getForAlias("first_place_medal");
-		// statsTrophy[1] = EmojiManager.getForAlias("second_place_medal");
-		// statsTrophy[2] = EmojiManager.getForAlias("third_place_medal");
+		loadVarious();
+	}
+
+	public void loadVarious() {
+		cake = loadEmoji(various, variousMap, "cake");
 	}
 
 	private static void loadEmoji(List<Emoji> emojis, Map<String, Emoji> emojisMap, String... aliases) {
@@ -69,8 +63,10 @@ public class Resources {
 	public static Emoji loadEmoji(List<Emoji> emojis, Map<String, Emoji> emojisMap, String a) {
 		Emoji e = EmojiManager.getForAlias(a);
 		if (e != null) {
-			emojis.add(e);
-			emojisMap.put(a, e);
+			if (emojis != null)
+				emojis.add(e);
+			if (emojisMap != null)
+				emojisMap.put(a, e);
 		}
 		return e;
 	}
@@ -124,33 +120,13 @@ public class Resources {
 		return CampingUtil.getRandom(faces);
 	}
 
+	public Emoji getCake() {
+		if (cake == null)
+			loadVarious();
+		return cake;
+	}
+
 	private static String getRandom(List<Emoji> l) {
 		return CampingUtil.getRandom(l).getUnicode();
 	}
-
-	// public StickerSet getCampbinningStickerPack(CampingBot bot) {
-	// if (campbinningStickers == null) {
-	// GetStickerSet getStickers;
-	// getStickers = new GetStickerSet("campbinning");
-	//
-	// try {
-	// campbinningStickers = bot.execute(getStickers);
-	// for (Sticker s : campbinningStickers.getStickers()) {
-	// Emoji e = EmojiManager.getByUnicode(s.getEmoji());
-	// List<Sticker> stickers = emojiStickerMap.get(e);
-	// if (stickers == null) {
-	// stickers = new ArrayList<>();
-	// emojiStickerMap.put(e, stickers);
-	// }
-	// stickers.add(s);
-	// respondTo.add(e);
-	// }
-	// } catch (TelegramApiException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// return campbinningStickers;
-	//
-	// }
-
 }

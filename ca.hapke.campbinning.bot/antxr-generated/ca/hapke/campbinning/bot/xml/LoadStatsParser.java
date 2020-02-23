@@ -207,15 +207,34 @@ public LoadStatsParser(ParserSharedInputState state) {
 			match(12);
 			{
 			
-					String token,botUsername,adminUser = null; 
+					String token,botUsername,adminUser = null,announceChat=null; 
 				
 			token=__xml_token();
 			botUsername=__xml_botUsername();
 			{
 			switch ( LA(1)) {
-			case 28:
+			case 29:
 			{
 				adminUser=__xml_adminUser();
+				break;
+			}
+			case XML_END_TAG:
+			case 13:
+			case 28:
+			{
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			{
+			switch ( LA(1)) {
+			case 28:
+			{
+				announceChat=__xml_announceChat();
 				break;
 			}
 			case XML_END_TAG:
@@ -252,6 +271,10 @@ public LoadStatsParser(ParserSharedInputState state) {
 					if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
 						int adminUser2 = Integer.parseInt(adminUser);
 						cs.setAdminUser(adminUser2);
+					} 
+					if (announceChat != null && !"null".equalsIgnoreCase(announceChat)) {
+						long ac = Long.parseLong(announceChat);
+						cs.setAnnounceChat(ac);
 					} 
 				
 			}
@@ -387,13 +410,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop158:
+			_loop457:
 			do {
 				if ((LA(1)==21)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop158;
+					break _loop457;
 				}
 				
 			} while (true);
@@ -425,14 +448,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop115:
+			_loop413:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop115;
+					break _loop413;
 				}
 				
 			} while (true);
@@ -458,14 +481,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop119:
+			_loop417:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					voting.addItem("asshole", val);
 				}
 				else {
-					break _loop119;
+					break _loop417;
 				}
 				
 			} while (true);
@@ -491,14 +514,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop123:
+			_loop421:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					voting.addItem("mediocre", val);
 				}
 				else {
-					break _loop123;
+					break _loop421;
 				}
 				
 			} while (true);
@@ -524,14 +547,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop127:
+			_loop425:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					voting.addItem("nice", val);
 				}
 				else {
-					break _loop127;
+					break _loop425;
 				}
 				
 			} while (true);
@@ -553,7 +576,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(33);
+			match(34);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -622,7 +645,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(28);
+			match(29);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -633,6 +656,29 @@ public LoadStatsParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_12);
+		}
+		return value;
+	}
+	
+	public final String  __xml_announceChat() throws RecognitionException, TokenStreamException {
+		String value = null;
+		
+		Token  __xml_startTag = null;
+		Token  pcdata = null;
+		
+		try {      // for error handling
+			__xml_startTag = LT(1);
+			match(28);
+			{
+			pcdata = LT(1);
+			match(PCDATA);
+			value = pcdata.getText();
+			}
+			match(XML_END_TAG);
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_13);
 		}
 		return value;
 	}
@@ -678,29 +724,6 @@ public LoadStatsParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(29);
-			{
-			pcdata = LT(1);
-			match(PCDATA);
-			value = pcdata.getText();
-			}
-			match(XML_END_TAG);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_13);
-		}
-		return value;
-	}
-	
-	public final String  __xml_dbPort() throws RecognitionException, TokenStreamException {
-		String value = null;
-		
-		Token  __xml_startTag = null;
-		Token  pcdata = null;
-		
-		try {      // for error handling
-			__xml_startTag = LT(1);
 			match(30);
 			{
 			pcdata = LT(1);
@@ -716,7 +739,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_dbUser() throws RecognitionException, TokenStreamException {
+	public final String  __xml_dbPort() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -739,7 +762,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_dbPass() throws RecognitionException, TokenStreamException {
+	public final String  __xml_dbUser() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -748,6 +771,29 @@ public LoadStatsParser(ParserSharedInputState state) {
 		try {      // for error handling
 			__xml_startTag = LT(1);
 			match(32);
+			{
+			pcdata = LT(1);
+			match(PCDATA);
+			value = pcdata.getText();
+			}
+			match(XML_END_TAG);
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_16);
+		}
+		return value;
+	}
+	
+	public final String  __xml_dbPass() throws RecognitionException, TokenStreamException {
+		String value = null;
+		
+		Token  __xml_startTag = null;
+		Token  pcdata = null;
+		
+		try {      // for error handling
+			__xml_startTag = LT(1);
+			match(33);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -773,14 +819,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop145:
+			_loop444:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop145;
+					break _loop444;
 				}
 				
 			} while (true);
@@ -806,14 +852,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop141:
+			_loop440:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop141;
+					break _loop440;
 				}
 				
 			} while (true);
@@ -823,7 +869,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_16);
+			recover(ex,_tokenSet_17);
 		}
 		return vals;
 	}
@@ -839,14 +885,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop149:
+			_loop448:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop149;
+					break _loop448;
 				}
 				
 			} while (true);
@@ -856,7 +902,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_17);
+			recover(ex,_tokenSet_18);
 		}
 		return vals;
 	}
@@ -872,14 +918,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop153:
+			_loop452:
 			do {
-				if ((LA(1)==33)) {
+				if ((LA(1)==34)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop153;
+					break _loop452;
 				}
 				
 			} while (true);
@@ -912,7 +958,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_18);
+			recover(ex,_tokenSet_19);
 		}
 		return value;
 	}
@@ -931,12 +977,12 @@ public LoadStatsParser(ParserSharedInputState state) {
 				CampingUser user;
 			{
 			switch ( LA(1)) {
-			case 34:
+			case 35:
 			{
 				campingId=__xml_campingId();
 				break;
 			}
-			case 35:
+			case 36:
 			{
 				break;
 			}
@@ -959,7 +1005,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 				birthdayDay=__xml_birthdayDay();
 				break;
 			}
-			case 40:
+			case 41:
 			{
 				break;
 			}
@@ -1005,34 +1051,11 @@ public LoadStatsParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_18);
+			recover(ex,_tokenSet_19);
 		}
 	}
 	
 	public final String  __xml_campingId() throws RecognitionException, TokenStreamException {
-		String value = null;
-		
-		Token  __xml_startTag = null;
-		Token  pcdata = null;
-		
-		try {      // for error handling
-			__xml_startTag = LT(1);
-			match(34);
-			{
-			pcdata = LT(1);
-			match(PCDATA);
-			value = pcdata.getText();
-			}
-			match(XML_END_TAG);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_19);
-		}
-		return value;
-	}
-	
-	public final String  __xml_id() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -1055,7 +1078,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_username() throws RecognitionException, TokenStreamException {
+	public final String  __xml_id() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -1078,7 +1101,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_first() throws RecognitionException, TokenStreamException {
+	public final String  __xml_username() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -1086,7 +1109,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(38);
+			match(37);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -1101,7 +1124,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_last() throws RecognitionException, TokenStreamException {
+	public final String  __xml_first() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -1124,7 +1147,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_nickname() throws RecognitionException, TokenStreamException {
+	public final String  __xml_last() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -1132,7 +1155,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(37);
+			match(40);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -1143,6 +1166,29 @@ public LoadStatsParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_24);
+		}
+		return value;
+	}
+	
+	public final String  __xml_nickname() throws RecognitionException, TokenStreamException {
+		String value = null;
+		
+		Token  __xml_startTag = null;
+		Token  pcdata = null;
+		
+		try {      // for error handling
+			__xml_startTag = LT(1);
+			match(38);
+			{
+			pcdata = LT(1);
+			match(PCDATA);
+			value = pcdata.getText();
+			}
+			match(XML_END_TAG);
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_25);
 		}
 		return value;
 	}
@@ -1165,7 +1211,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_25);
+			recover(ex,_tokenSet_26);
 		}
 		return value;
 	}
@@ -1188,7 +1234,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_26);
+			recover(ex,_tokenSet_27);
 		}
 		return value;
 	}
@@ -1201,7 +1247,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(40);
+			match(41);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -1246,6 +1292,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 		"\"<nextCampingId>\"",
 		"\"<token>\"",
 		"\"<botUsername>\"",
+		"\"<announceChat>\"",
 		"\"<adminUser>\"",
 		"\"<dbHost>\"",
 		"\"<dbPort>\"",
@@ -1307,7 +1354,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
 	private static final long[] mk_tokenSet_9() {
-		long[] data = { 8589934624L, 0L};
+		long[] data = { 17179869216L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
@@ -1317,17 +1364,17 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
 	private static final long[] mk_tokenSet_11() {
-		long[] data = { 268443680L, 0L};
+		long[] data = { 805314592L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
 	private static final long[] mk_tokenSet_12() {
-		long[] data = { 8224L, 0L};
+		long[] data = { 268443680L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_12 = new BitSet(mk_tokenSet_12());
 	private static final long[] mk_tokenSet_13() {
-		long[] data = { 1073741824L, 0L};
+		long[] data = { 8224L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_13 = new BitSet(mk_tokenSet_13());
@@ -1342,22 +1389,22 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_15 = new BitSet(mk_tokenSet_15());
 	private static final long[] mk_tokenSet_16() {
-		long[] data = { 262144L, 0L};
+		long[] data = { 8589934592L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_16 = new BitSet(mk_tokenSet_16());
 	private static final long[] mk_tokenSet_17() {
-		long[] data = { 524288L, 0L};
+		long[] data = { 262144L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_17 = new BitSet(mk_tokenSet_17());
 	private static final long[] mk_tokenSet_18() {
-		long[] data = { 2097184L, 0L};
+		long[] data = { 524288L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_18 = new BitSet(mk_tokenSet_18());
 	private static final long[] mk_tokenSet_19() {
-		long[] data = { 34359738368L, 0L};
+		long[] data = { 2097184L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_19 = new BitSet(mk_tokenSet_19());
@@ -1367,7 +1414,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_20 = new BitSet(mk_tokenSet_20());
 	private static final long[] mk_tokenSet_21() {
-		long[] data = { 274877906944L, 0L};
+		long[] data = { 137438953472L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_21 = new BitSet(mk_tokenSet_21());
@@ -1377,24 +1424,29 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_22 = new BitSet(mk_tokenSet_22());
 	private static final long[] mk_tokenSet_23() {
-		long[] data = { 137438953472L, 0L};
+		long[] data = { 1099511627776L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_23 = new BitSet(mk_tokenSet_23());
 	private static final long[] mk_tokenSet_24() {
-		long[] data = { 1099515822080L, 0L};
+		long[] data = { 274877906944L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_24 = new BitSet(mk_tokenSet_24());
 	private static final long[] mk_tokenSet_25() {
-		long[] data = { 16777216L, 0L};
+		long[] data = { 2199027449856L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_25 = new BitSet(mk_tokenSet_25());
 	private static final long[] mk_tokenSet_26() {
-		long[] data = { 1099511627776L, 0L};
+		long[] data = { 16777216L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_26 = new BitSet(mk_tokenSet_26());
+	private static final long[] mk_tokenSet_27() {
+		long[] data = { 2199023255552L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_27 = new BitSet(mk_tokenSet_27());
 	
 	}

@@ -22,6 +22,7 @@ import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -48,11 +49,9 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	private boolean shouldAnnounce = false;
 	private TimesProvider<MbiyfMode> times;
 	private List<CampingUser> userRestriction;
+	private MbiyfType mode = MbiyfType.Off;
 
 	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
-	private static final long CAMPING_CHAT_ID = -1001288464383l;
-//	private static final long TESTING_CHAT_ID = -371511001l;
-	private static final long ANNOUNCE_CHAT_ID = CAMPING_CHAT_ID;
 
 	public MbiyfCommand(CampingBot campingBot, Resources res) {
 		this.bot = campingBot;
@@ -114,8 +113,12 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			return null;
 
 		campingFromUser.increment(BotCommand.MBIYF);
-		CommandResult result = new TextCommandResult(BotCommand.MBIYF).add("My ").add(ball).add(" in ").add(targetUser)
-				.add("'s ").add(face).add("!");
+		CommandResult result = new TextCommandResult(BotCommand.MBIYF).add("My ");
+		result.add(ball).add(" in ").add(targetUser).add("'s ");
+		if (mode == MbiyfType.Birthday) {
+			result.add(res.getCake());
+		}
+		result.add(face).add("!");
 		return result;
 	}
 
@@ -134,6 +137,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 	@Override
 	public void doWork(MbiyfMode value) {
+		mode = value.getType();
 		enabled = value != null && value.isEnablement();
 		userRestriction = value.getRestrictedToUsers();
 		boolean makeAnnouncement = shouldAnnounce && bot.isOnline();
@@ -149,13 +153,16 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	}
 
 	public void announce(MbiyfMode value) {
+		long chatId = CampingSystem.getInstance().getAnnounceChat();
+		if (chatId == -1)
+			return;
 		MbiyfType type = value.getType();
 		switch (type) {
 		case Birthday:
-			announceBirthday(value);
+			announceBirthday(value, chatId);
 			break;
 		case Friday:
-			announceFriday(value);
+			announceFriday(value, chatId);
 			break;
 		case Off:
 			break;
@@ -163,8 +170,8 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 	}
 
-	public void announceBirthday(MbiyfMode value) {
-		Emoji cake = res.getBall("cake");
+	public void announceBirthday(MbiyfMode value, long chatId) {
+		Emoji cake = res.getCake();
 
 		StringBuilder sb = new StringBuilder();
 		List<Emoji> bar = new ArrayList<>();
@@ -218,10 +225,10 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		sb.append("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
 
 		String out = sb.toString();
-		bot.sendMsg(ANNOUNCE_CHAT_ID, out);
+		bot.sendMsg(chatId, out);
 	}
 
-	public void announceFriday(MbiyfMode value) {
+	public void announceFriday(MbiyfMode value, long chatId) {
 		StringBuilder sb = new StringBuilder();
 
 		List<Emoji> bar = new ArrayList<>();
@@ -273,7 +280,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		}
 
 		String out = sb.toString();
-		bot.sendMsg(ANNOUNCE_CHAT_ID, out);
+		bot.sendMsg(chatId, out);
 	}
 
 	private void appendBirthdayNames(StringBuilder sb) {

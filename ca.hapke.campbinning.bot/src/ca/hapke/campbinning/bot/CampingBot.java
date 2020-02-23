@@ -1,5 +1,8 @@
 package ca.hapke.campbinning.bot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -45,7 +48,7 @@ public class CampingBot extends CampingBotEngine {
 
 	private CampingXmlSerializer serializer;
 
-	private HasCategories[] hasCategories;
+	private List<HasCategories<String>> hasCategories = new ArrayList<>();
 
 	private CalendarMonitor calMonitor;
 
@@ -83,7 +86,10 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(ballsCommand);
 		calMonitor.add(voting);
 
-		hasCategories = new HasCategories[] { spellGen, countdownGen, voting, partyCommand };
+		hasCategories.add(spellGen);
+		hasCategories.add(countdownGen);
+		hasCategories.add(voting);
+		hasCategories.add(partyCommand);
 	}
 
 	@Override
@@ -100,7 +106,7 @@ public class CampingBot extends CampingBotEngine {
 		return meCamping;
 	}
 
-	public HasCategories[] getCategories() {
+	public List<HasCategories<String>> getCategories() {
 		return hasCategories;
 	}
 

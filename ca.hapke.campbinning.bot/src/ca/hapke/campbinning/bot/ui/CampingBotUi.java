@@ -315,10 +315,10 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(lblNewLabel);
 
 		cmbCategories = new JComboBox<String>();
-		HasCategories[] hasCategoriess = bot.getCategories();
+		List<HasCategories<String>> hasCategoriess = bot.getCategories();
 		Vector<String> categoriesList = new Vector<>();
-		for (int i = 0; i < hasCategoriess.length; i++) {
-			HasCategories hasCategories = hasCategoriess[i];
+		for (int i = 0; i < hasCategoriess.size(); i++) {
+			HasCategories<String> hasCategories = hasCategoriess.get(i);
 			String first = hasCategories.getContainerName();
 			List<String> categories = hasCategories.getCategoryNames();
 			for (String category : categories) {

@@ -68,12 +68,13 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	;
 <system> [CampingSystem cs]
 	{ 
-		String token,botUsername,adminUser = null; 
+		String token,botUsername,adminUser = null,announceChat=null; 
 	}
 	:
 	 token=<token>
 	 botUsername=<botUsername>
 	(adminUser=<adminUser>)?
+	(announceChat=<announceChat>)?
 	(<db>[cs]) ?
 	{
 		cs.setToken(token);
@@ -81,6 +82,10 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
 			int adminUser2 = Integer.parseInt(adminUser);
 			cs.setAdminUser(adminUser2);
+		} 
+		if (announceChat != null && !"null".equalsIgnoreCase(announceChat)) {
+			long ac = Long.parseLong(announceChat);
+			cs.setAnnounceChat(ac);
 		} 
 	}
 	;
@@ -224,6 +229,9 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <botUsername> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<announceChat> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <adminUser> returns [String value = null]
