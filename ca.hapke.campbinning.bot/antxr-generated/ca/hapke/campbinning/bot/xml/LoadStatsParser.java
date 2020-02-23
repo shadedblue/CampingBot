@@ -387,13 +387,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop257:
+			_loop158:
 			do {
 				if ((LA(1)==21)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop257;
+					break _loop158;
 				}
 				
 			} while (true);
@@ -425,14 +425,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop214:
+			_loop115:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop214;
+					break _loop115;
 				}
 				
 			} while (true);
@@ -458,14 +458,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop218:
+			_loop119:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					voting.addItem("asshole", val);
 				}
 				else {
-					break _loop218;
+					break _loop119;
 				}
 				
 			} while (true);
@@ -491,14 +491,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop222:
+			_loop123:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					voting.addItem("mediocre", val);
 				}
 				else {
-					break _loop222;
+					break _loop123;
 				}
 				
 			} while (true);
@@ -524,14 +524,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop226:
+			_loop127:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					voting.addItem("nice", val);
 				}
 				else {
-					break _loop226;
+					break _loop127;
 				}
 				
 			} while (true);
@@ -773,14 +773,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop244:
+			_loop145:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop244;
+					break _loop145;
 				}
 				
 			} while (true);
@@ -806,14 +806,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop240:
+			_loop141:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop240;
+					break _loop141;
 				}
 				
 			} while (true);
@@ -839,14 +839,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop248:
+			_loop149:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop248;
+					break _loop149;
 				}
 				
 			} while (true);
@@ -872,14 +872,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop252:
+			_loop153:
 			do {
 				if ((LA(1)==33)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop252;
+					break _loop153;
 				}
 				
 			} while (true);

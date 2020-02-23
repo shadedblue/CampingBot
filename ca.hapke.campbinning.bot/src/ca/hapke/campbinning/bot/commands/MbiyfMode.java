@@ -37,4 +37,22 @@ public class MbiyfMode {
 		this.type = type;
 		this.restrictedToUsers = restrictedToUsers;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MbiyfMode[");
+		builder.append(isEnablement() ? "en" : "dis");
+		builder.append("able ");
+		if (type != null) {
+			builder.append("type=");
+			builder.append(type);
+		}
+		if (restrictedToUsers != null) {
+			builder.append("\nrestrictedTo=");
+			builder.append(restrictedToUsers);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 }

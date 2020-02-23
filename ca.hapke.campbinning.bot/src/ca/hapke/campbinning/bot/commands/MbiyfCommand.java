@@ -25,8 +25,6 @@ import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.fragments.EmojiFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
@@ -39,8 +37,8 @@ import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	private static final int ENABLE_LENGTH_HOURS = 17;
 	private static final int ENABLE_HOUR = 7;
-	private static final int DISABLE_HOUR = 0;
 	private static final int ENABLE_MIN = 0;
+	private static final int DISABLE_HOUR = 0;
 	private static final int COUNT = 6;
 	private static final int REPEATS = 2;
 
@@ -116,9 +114,9 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			return null;
 
 		campingFromUser.increment(BotCommand.MBIYF);
-		return new TextCommandResult(BotCommand.MBIYF, new TextFragment("My "), new EmojiFragment(ball),
-				new TextFragment(" in "), new MentionFragment(targetUser), new TextFragment("'s "),
-				new EmojiFragment(face), new TextFragment("!"));
+		CommandResult result = new TextCommandResult(BotCommand.MBIYF).add("My ").add(ball).add(" in ").add(targetUser)
+				.add("'s ").add(face).add("!");
+		return result;
 	}
 
 	@Override
@@ -143,24 +141,87 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			announce(value);
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append("Mbiyf: ");
-		if (enabled) {
-			sb.append("enabled[");
-			sb.append(value.getType().toString());
-			if (userRestriction != null && userRestriction.size() > 0)
-				sb.append(":");
-			appendBirthdayNames(sb);
-			sb.append("]");
-		} else
-			sb.append("disabled");
-		sb.append(" Announcement[");
+		sb.append(value.toString());
+		sb.append(" Announce?[");
 		sb.append(makeAnnouncement);
 		sb.append("]");
-//		sb.append();
 		EventLogger.getInstance().add(new EventItem(sb.toString()));
 	}
 
 	public void announce(MbiyfMode value) {
+		MbiyfType type = value.getType();
+		switch (type) {
+		case Birthday:
+			announceBirthday(value);
+			break;
+		case Friday:
+			announceFriday(value);
+			break;
+		case Off:
+			break;
+		}
+
+	}
+
+	public void announceBirthday(MbiyfMode value) {
+		Emoji cake = res.getBall("cake");
+
+		StringBuilder sb = new StringBuilder();
+		List<Emoji> bar = new ArrayList<>();
+		Emoji add = res.getFace("smirk");
+		if (add != null)
+			bar.add(add);
+		add = res.getBall("boom");
+		if (add != null)
+			bar.add(add);
+		add = res.getBall("fire");
+		if (add != null)
+			bar.add(add);
+
+		for (int i = 0; i < bar.size(); i++) {
+			String emoji = bar.get(i).getUnicode();
+			for (int j = 0; j < REPEATS; j++) {
+				sb.append(emoji);
+			}
+		}
+		sb.append("\n");
+		String poopUni = res.getBall("poop").getUnicode();
+		sb.append(poopUni);
+		sb.append("OHHHHH SHITTTT");
+		sb.append(poopUni);
+
+		sb.append("\nHEY ");
+		appendBirthdayNames(sb);
+		sb.append("...\n");
+
+		for (int i = bar.size() - 1; i >= 0; i--) {
+			String emoji = bar.get(i).getUnicode();
+			for (int j = 0; j < REPEATS; j++) {
+				sb.append(emoji);
+			}
+		}
+
+		sb.append("\n\nWATCH OUT FOR MY\n");
+
+		int qty = 6;
+		List<Emoji> emojis = new ArrayList<Emoji>(qty);
+		getQty(res::getRandomBallEmoji, emojis, qty);
+		for (Emoji emoji : emojis) {
+			sb.append(emoji.getUnicode());
+		}
+
+		sb.append("\nIN YOUR\n");
+		for (int i = 0; i < qty; i++) {
+			sb.append(cake.getUnicode());
+		}
+
+		sb.append("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
+
+		String out = sb.toString();
+		bot.sendMsg(ANNOUNCE_CHAT_ID, out);
+	}
+
+	public void announceFriday(MbiyfMode value) {
 		StringBuilder sb = new StringBuilder();
 
 		List<Emoji> bar = new ArrayList<>();
@@ -185,17 +246,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		sb.append(poopUni);
 		sb.append("OHHHHH SHITTTT");
 		sb.append(poopUni);
-		MbiyfType type = value.getType();
-		switch (type) {
-		case Birthday:
-			sb.append("\nIt's MB'dayIYF motha'uckas!\n");
-			break;
-		case Friday:
-			sb.append("\nIt's MBIYFriday motha'uckas!\n");
-			break;
-		case Off:
-			break;
-		}
+		sb.append("\nIt's MBIYFriday motha'uckas!\n");
 
 		for (int i = bar.size() - 1; i >= 0; i--) {
 			String emoji = bar.get(i).getUnicode();
@@ -205,22 +256,18 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		}
 
 		sb.append("\n\n");
-		if (type == MbiyfType.Birthday) {
-			appendBirthdayNames(sb);
-			sb.append(": ");
-		}
 
 		sb.append("PREPARE YOUR\n");
 		List<Emoji> emojis = new ArrayList<Emoji>(COUNT);
 
-		getTen(res::getRandomFaceEmoji, emojis);
+		getQty(res::getRandomFaceEmoji, emojis, COUNT);
 		for (Emoji emoji : emojis) {
 			sb.append(emoji.getUnicode());
 		}
 		sb.append("\nFOR\n");
 		emojis.clear();
 
-		getTen(res::getRandomBallEmoji, emojis);
+		getQty(res::getRandomBallEmoji, emojis, COUNT);
 		for (Emoji emoji : emojis) {
 			sb.append(emoji.getUnicode());
 		}
@@ -248,8 +295,8 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		}
 	}
 
-	private void getTen(Supplier<Emoji> s, List<Emoji> emojis) {
-		while (emojis.size() < COUNT) {
+	private void getQty(Supplier<Emoji> s, List<Emoji> emojis, int count) {
+		while (emojis.size() < count) {
 			Emoji val = s.get();
 			if (!emojis.contains(val))
 				emojis.add(val);
