@@ -40,6 +40,7 @@ import javax.swing.table.TableColumnModel;
 
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
@@ -415,7 +416,11 @@ public class CampingBotUi extends JFrame {
 		CampingChat chat = lstChats.getSelectedValue();
 		String msg = txtChat.getText().trim();
 		if (chat != null && msg.length() > 0) {
-			bot.sendMsg(chat.chatId, msg);
+			try {
+				bot.sendMsg(chat.chatId, msg);
+			} catch (TelegramApiException e) {
+				JOptionPane.showMessageDialog(this, e.getMessage());
+			}
 			txtChat.setText("");
 		}
 	}

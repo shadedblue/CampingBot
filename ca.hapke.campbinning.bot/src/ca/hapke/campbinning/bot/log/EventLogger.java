@@ -35,9 +35,7 @@ public class EventLogger {
 					EventItem e = fullLog.get(listChanges.getIndex());
 					if (listChanges.getType() == ListEvent.INSERT) {
 						CommandType command = e.command;
-						if (command != null && command.isForUi()) {
-							uiLog.add(e);
-						}
+						uiLog.add(e);
 						if (command != null && command.isForDb()) {
 							dbLog.add(e);
 						}

@@ -6,7 +6,5 @@ package ca.hapke.campbinning.bot;
 public interface CommandType {
 	public long getId();
 
-	public boolean isForUi();
-
 	public boolean isForDb();
 }

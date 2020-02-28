@@ -3,6 +3,8 @@ package ca.hapke.campbinning.bot.commands.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 import com.vdurmont.emoji.Emoji;
 
 import ca.hapke.campbinning.bot.BotCommand;
@@ -76,6 +78,7 @@ public abstract class CommandResult {
 		return cmd;
 	}
 
-	public abstract SendResult send(CampingBotEngine bot, Long chatId, MessageProcessor processor);
+	public abstract SendResult send(CampingBotEngine bot, Long chatId, MessageProcessor processor)
+			throws TelegramApiException;
 
 }

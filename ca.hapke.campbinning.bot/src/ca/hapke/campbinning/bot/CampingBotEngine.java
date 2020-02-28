@@ -274,7 +274,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 							if (textCommand.isMatch(msg, entities)) {
 								outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
 								if (outputResult != null) {
-									outputCommand = outputResult.getCmd();
 									break;
 								}
 							}
@@ -283,6 +282,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 					if (outputResult != null) {
 						SendResult sendResult = outputResult.send(this, chatId, processor);
+						// command may change to a Rejected
+						outputCommand = outputResult.getCmd();
 						outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
 								sendResult.msg, sendResult.extraData);
 					}
@@ -302,21 +303,16 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected abstract CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
 
-	public Message sendMsg(Long chatId, String msg) {
+	public Message sendMsg(Long chatId, String msg) throws TelegramApiException {
 		return sendMsg(chatId, (Message) null, msg);
 	}
 
-	public Message sendMsg(Long chatId, Message replyTo, String msg) {
+	public Message sendMsg(Long chatId, Message replyTo, String msg) throws TelegramApiException {
 		SendMessage send = new SendMessage(chatId, msg);
 		if (replyTo != null)
 			send.setReplyToMessageId(replyTo.getMessageId());
 		send.setParseMode(MARKDOWN);
-		try {
-			return execute(send);
-		} catch (TelegramApiException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return execute(send);
 	}
 
 	public CampingUser findTarget(List<MessageEntity> entities) {

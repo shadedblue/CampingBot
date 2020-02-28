@@ -32,6 +32,7 @@ public class NicknameCommand extends InlineCommand {
 	public static final String CANT_GIVE_YOURSELF_A_NICKNAME = "No fuckin' way.\n#1 rule of nicknames... you can't give yourself a nickname";
 	public static final String USER_NOT_FOUND = "Dunno who you're trying to nickname";
 	public static final String INVALID_SYNTAX = "Invalid syntax, DUMB ASS.";
+	private static final char[] invalidCharacters = new char[] { '*', '_', '[', ']', '`', '\\', '~' };
 
 	@Override
 	public InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor) {
@@ -118,16 +119,23 @@ public class NicknameCommand extends InlineCommand {
 				CampingUser targetUser = userMonitor.getUser(targeting);
 
 				if (targetUser != null) {
+					char c;
 					if (targetUser == campingFromUser) {
 						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
 								.add(NicknameCommand.CANT_GIVE_YOURSELF_A_NICKNAME);
+					} else if ((c = rejectNickname(newNickname)) != 0) {
+						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+								.add(": Nickname rejected... Invalid character in nickname.");
 					} else {
-						targetUser.setNickname(newNickname);
 						CommandResult sb = new TextCommandResult(BotCommand.SetNickname);
+						sb.add(campingFromUser);
+						sb.add(": ");
+						targetUser.setNickname(newNickname);
 						sb.add(targetUser.getFirstOrUserName());
 						sb.add("'s nickname changed to: ");
 						sb.add(targetUser);
 						return sb;
+
 					}
 				}
 			} else {
@@ -137,6 +145,14 @@ public class NicknameCommand extends InlineCommand {
 		}
 		return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
 				.add(NicknameCommand.INVALID_SYNTAX);
+	}
+
+	private char rejectNickname(String nickname) {
+		for (char c : invalidCharacters) {
+			if (nickname.indexOf(c) >= 0)
+				return c;
+		}
+		return 0;
 	}
 
 	public CommandResult allNicknamesCommand() {
