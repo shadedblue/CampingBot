@@ -28,9 +28,9 @@ import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.DefaultMessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
+import ca.hapke.campbinning.bot.commands.response.darkmode.DarkModeMessageProcessor;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.ui.IStatus;
@@ -60,7 +60,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected List<TextCommand> textCommands = new ArrayList<>();
 	protected List<InlineCommand> inlineCommands = new ArrayList<>();
 
-	protected MessageProcessor processor = new DefaultMessageProcessor();
+	protected MessageProcessor processor = new DarkModeMessageProcessor();
 
 	private class ConnectionMonitor implements IStatus {
 
@@ -274,7 +274,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 							if (textCommand.isMatch(msg, entities)) {
 								outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
 								if (outputResult != null) {
-									outputCommand = outputResult.getCmd();
 									break;
 								}
 							}
@@ -283,6 +282,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 					if (outputResult != null) {
 						SendResult sendResult = outputResult.send(this, chatId, processor);
+						// command may change to a Rejected
+						outputCommand = outputResult.getCmd();
 						outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
 								sendResult.msg, sendResult.extraData);
 					}
@@ -302,21 +303,16 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected abstract CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
 
-	public Message sendMsg(Long chatId, String msg) {
+	public Message sendMsg(Long chatId, String msg) throws TelegramApiException {
 		return sendMsg(chatId, (Message) null, msg);
 	}
 
-	public Message sendMsg(Long chatId, Message replyTo, String msg) {
+	public Message sendMsg(Long chatId, Message replyTo, String msg) throws TelegramApiException {
 		SendMessage send = new SendMessage(chatId, msg);
 		if (replyTo != null)
 			send.setReplyToMessageId(replyTo.getMessageId());
 		send.setParseMode(MARKDOWN);
-		try {
-			return execute(send);
-		} catch (TelegramApiException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return execute(send);
 	}
 
 	public CampingUser findTarget(List<MessageEntity> entities) {

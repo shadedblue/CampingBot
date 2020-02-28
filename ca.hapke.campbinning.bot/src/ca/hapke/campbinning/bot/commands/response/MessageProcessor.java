@@ -15,13 +15,15 @@ public abstract class MessageProcessor {
 	protected MessageProcessor next;
 
 	public final String processString(String value) {
-		String result = internalProcessString(value);
+		String result = internalProcessStringFragment(value);
 		if (next != null)
-			result = next.internalProcessString(result);
+			result = next.internalProcessStringFragment(result);
 		return result;
 	}
 
-	protected abstract String internalProcessString(String value);
+	protected abstract String internalProcessStringFragment(String value);
+
+	protected abstract String internalProcessStringAssembled(String value);
 
 	public MessageProcessor getNext() {
 		return next;
@@ -55,7 +57,9 @@ public abstract class MessageProcessor {
 				results[i] = f.getValue(this);
 		}
 
-		return String.join("", results);
+		String result = String.join("", results);
+		result = internalProcessStringAssembled(result);
+		return result;
 	}
 
 	public String process(ResultFragment[] fragments) {
@@ -71,6 +75,8 @@ public abstract class MessageProcessor {
 				results[i] = f.getValue(this);
 		}
 
-		return String.join("", results);
+		String result = String.join("", results);
+		result = internalProcessStringAssembled(result);
+		return result;
 	}
 }

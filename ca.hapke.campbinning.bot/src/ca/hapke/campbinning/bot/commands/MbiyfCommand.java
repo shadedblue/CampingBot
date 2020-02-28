@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.vdurmont.emoji.Emoji;
 
@@ -141,18 +142,24 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		enabled = value != null && value.isEnablement();
 		userRestriction = value.getRestrictedToUsers();
 		boolean makeAnnouncement = shouldAnnounce && bot.isOnline();
-		if (enabled && makeAnnouncement) {
-			announce(value);
-		}
 		StringBuilder sb = new StringBuilder();
-		sb.append(value.toString());
-		sb.append(" Announce?[");
-		sb.append(makeAnnouncement);
-		sb.append("]");
-		EventLogger.getInstance().add(new EventItem(sb.toString()));
+		EventItem e;
+		try {
+			if (enabled && makeAnnouncement) {
+				announce(value);
+			}
+			sb.append(value.toString());
+			sb.append(" Announce?[");
+			sb.append(makeAnnouncement);
+			sb.append("]");
+			e = new EventItem(sb.toString());
+		} catch (TelegramApiException ex) {
+			e = new EventItem(ex.getMessage());
+		}
+		EventLogger.getInstance().add(e);
 	}
 
-	public void announce(MbiyfMode value) {
+	public void announce(MbiyfMode value) throws TelegramApiException {
 		long chatId = CampingSystem.getInstance().getAnnounceChat();
 		if (chatId == -1)
 			return;
@@ -170,7 +177,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 	}
 
-	public void announceBirthday(MbiyfMode value, long chatId) {
+	public void announceBirthday(MbiyfMode value, long chatId) throws TelegramApiException {
 		Emoji cake = res.getCake();
 
 		StringBuilder sb = new StringBuilder();
@@ -228,7 +235,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		bot.sendMsg(chatId, out);
 	}
 
-	public void announceFriday(MbiyfMode value, long chatId) {
+	public void announceFriday(MbiyfMode value, long chatId) throws TelegramApiException {
 		StringBuilder sb = new StringBuilder();
 
 		List<Emoji> bar = new ArrayList<>();

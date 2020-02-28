@@ -55,4 +55,15 @@ public class CategoriedItems<T> {
 		}
 		return result;
 	}
+
+	@SuppressWarnings("unchecked")
+	public boolean putAll(String cat, T... items) {
+		boolean result = false;
+		List<T> list = getList(cat);
+		for (T item : items) {
+			if (list.add(item))
+				result = true;
+		}
+		return result;
+	}
 }

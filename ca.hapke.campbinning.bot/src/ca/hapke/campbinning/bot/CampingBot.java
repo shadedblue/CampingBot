@@ -6,6 +6,7 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
@@ -85,6 +86,11 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
 		calMonitor.add(voting);
+		if (processor instanceof CalendaredEvent) {
+			@SuppressWarnings("rawtypes")
+			CalendaredEvent ce = (CalendaredEvent) processor;
+			calMonitor.add(ce);
+		}
 
 		hasCategories.add(spellGen);
 		hasCategories.add(countdownGen);

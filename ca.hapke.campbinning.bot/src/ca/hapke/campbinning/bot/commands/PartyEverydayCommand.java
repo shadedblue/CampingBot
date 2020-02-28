@@ -68,9 +68,10 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	}
 
 	private void addImage(String url, boolean sfw) {
-		imagesSfw.add(new ImageLink(url, ImageLink.GIF));
-		if (!sfw)
-			imagesNsfw.add(new ImageLink(url, ImageLink.GIF));
+		ImageLink lnk = new ImageLink(url, ImageLink.GIF);
+		imagesNsfw.add(lnk);
+		if (sfw)
+			imagesSfw.add(lnk);
 	}
 
 	@Override
@@ -93,14 +94,13 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		LocalDate ld = LocalDate.ofInstant(now, zone);
 		LocalTime lt = LocalTime.ofInstant(now, zone);
 		int day = ld.getDayOfWeek().getValue();
-		int hours = lt.getHour();
+		int hour = lt.getHour();
 
 		String partying = generateParrrty(message);
 
 		List<ImageLink> images;
-//		if (true) {
-		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hours >= SFW_START_HOUR
-				&& hours < SFW_END_HOUR) {
+		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hour >= SFW_START_HOUR
+				&& hour < SFW_END_HOUR) {
 			images = imagesSfw;
 		} else {
 			images = imagesNsfw;

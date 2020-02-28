@@ -8,7 +8,12 @@ package ca.hapke.campbinning.bot.commands.response;
 public class DefaultMessageProcessor extends MessageProcessor {
 
 	@Override
-	protected String internalProcessString(String value) {
+	protected String internalProcessStringAssembled(String value) {
+		return value;
+	}
+
+	@Override
+	protected String internalProcessStringFragment(String value) {
 		return value;
 	}
 
