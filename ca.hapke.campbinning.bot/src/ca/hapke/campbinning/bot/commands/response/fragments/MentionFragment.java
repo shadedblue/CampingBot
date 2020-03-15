@@ -11,22 +11,37 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 public class MentionFragment extends ResultFragment {
 	private CampingUser target;
 	private String prefix, suffix;
+	private MentionDisplay displayMode;
 
 	public MentionFragment(CampingUser target) {
-		super(CaseChoice.Normal, TextStyle.Normal);
-		this.target = target;
+		this(target, MentionDisplay.Nickname, CaseChoice.Normal, null, null);
 	}
 
-	public MentionFragment(CampingUser target, CaseChoice caseChoice, String prefix, String suffix) {
+	public MentionFragment(CampingUser target, MentionDisplay displayMode, CaseChoice caseChoice, String prefix,
+			String suffix) {
 		super(caseChoice, TextStyle.Normal);
 		this.target = target;
+		this.displayMode = displayMode;
 		this.prefix = prefix;
 		this.suffix = suffix;
 	}
 
 	@Override
 	public String getValue(MessageProcessor processor) {
-		String display = target.getDisplayName();
+		String display;
+		switch (displayMode) {
+		case Nickname:
+			display = target.getDisplayName();
+			break;
+		case Username:
+			display = target.getUsername();
+			break;
+		case First:
+		default:
+			display = target.getFirstOrUserName();
+			break;
+
+		}
 		if (prefix != null)
 			display = prefix + display;
 		if (suffix != null)

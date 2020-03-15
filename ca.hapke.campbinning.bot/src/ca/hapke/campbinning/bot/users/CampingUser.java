@@ -172,8 +172,9 @@ public class CampingUser {
 		long now = System.currentTimeMillis();
 
 		switch (spell) {
-		case MBIYF:
-		case MBIYFDipshit:
+		case Mbiyf:
+		case MbiyfDipshit:
+		case MbiyfAnnouncement:
 		case Spell:
 		case SpellDipshit:
 		case RantActivatorInitiation:
@@ -235,6 +236,8 @@ public class CampingUser {
 			return nickname;
 		if (firstname != null)
 			return firstname;
+		if (username != null)
+			return username;
 		return CampingUser.UNKNOWN_TARGET;
 	}
 

@@ -27,6 +27,9 @@ import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionDisplay;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
@@ -103,8 +106,8 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			return null;
 
 		if (targetUser == bot.getMeCamping()) {
-			return new TextCommandResult(BotCommand.MBIYFDipshit,
-					new TextFragment("Fuck you, I'm not ballsing myself!"));
+			return new TextCommandResult(BotCommand.MbiyfDipshit, new MentionFragment(campingFromUser),
+					new TextFragment(": Fuck you, I'm not ballsing myself!"));
 		}
 
 		Emoji ball = res.getRandomBallEmoji();
@@ -113,8 +116,8 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		if (targetUser == null)
 			return null;
 
-		campingFromUser.increment(BotCommand.MBIYF);
-		CommandResult result = new TextCommandResult(BotCommand.MBIYF).add("My ");
+		campingFromUser.increment(BotCommand.Mbiyf);
+		CommandResult result = new TextCommandResult(BotCommand.Mbiyf).add("My ");
 		result.add(ball).add(" in ").add(targetUser).add("'s ");
 		if (mode == MbiyfType.Birthday) {
 			result.add(res.getCake());
@@ -164,23 +167,28 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		if (chatId == -1)
 			return;
 		MbiyfType type = value.getType();
+		TextCommandResult result = null;
 		switch (type) {
 		case Birthday:
-			announceBirthday(value, chatId);
+			result = announceBirthday(value);
 			break;
 		case Friday:
-			announceFriday(value, chatId);
+			result = announceFriday(value);
 			break;
 		case Off:
 			break;
 		}
 
+		if (result != null) {
+			result.send(bot, chatId);
+		}
 	}
 
-	public void announceBirthday(MbiyfMode value, long chatId) throws TelegramApiException {
+	public TextCommandResult announceBirthday(MbiyfMode value) throws TelegramApiException {
 		Emoji cake = res.getCake();
 
-		StringBuilder sb = new StringBuilder();
+//		StringBuilder sb = new StringBuilder();
+		TextCommandResult sb = new TextCommandResult(BotCommand.MbiyfAnnouncement);
 		List<Emoji> bar = new ArrayList<>();
 		Emoji add = res.getFace("smirk");
 		if (add != null)
@@ -195,48 +203,50 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		for (int i = 0; i < bar.size(); i++) {
 			String emoji = bar.get(i).getUnicode();
 			for (int j = 0; j < REPEATS; j++) {
-				sb.append(emoji);
+				sb.add(emoji);
 			}
 		}
-		sb.append("\n");
+		sb.add("\n");
 		String poopUni = res.getBall("poop").getUnicode();
-		sb.append(poopUni);
-		sb.append("OHHHHH SHITTTT");
-		sb.append(poopUni);
+		sb.add(poopUni);
+		sb.add("OHHHHH SHITTTT");
+		sb.add(poopUni);
 
-		sb.append("\nHEY ");
+		sb.add("\nHEY ");
 		appendBirthdayNames(sb);
-		sb.append("...\n");
+		sb.add("...\n");
 
 		for (int i = bar.size() - 1; i >= 0; i--) {
 			String emoji = bar.get(i).getUnicode();
 			for (int j = 0; j < REPEATS; j++) {
-				sb.append(emoji);
+				sb.add(emoji);
 			}
 		}
 
-		sb.append("\n\nWATCH OUT FOR MY\n");
+		sb.add("\n\nWATCH OUT FOR MY\n");
 
 		int qty = 6;
 		List<Emoji> emojis = new ArrayList<Emoji>(qty);
 		getQty(res::getRandomBallEmoji, emojis, qty);
 		for (Emoji emoji : emojis) {
-			sb.append(emoji.getUnicode());
+			sb.add(emoji.getUnicode());
 		}
 
-		sb.append("\nIN YOUR\n");
+		sb.add("\nIN YOUR\n");
 		for (int i = 0; i < qty; i++) {
-			sb.append(cake.getUnicode());
+			sb.add(cake.getUnicode());
 		}
 
-		sb.append("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
+		sb.add("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
 
-		String out = sb.toString();
-		bot.sendMsg(chatId, out);
+//		String out = sb.toString();
+//		bot.sendMsg(chatId, out);
+		return sb;
 	}
 
-	public void announceFriday(MbiyfMode value, long chatId) throws TelegramApiException {
-		StringBuilder sb = new StringBuilder();
+	public TextCommandResult announceFriday(MbiyfMode value) throws TelegramApiException {
+//		StringBuilder sb = new StringBuilder();
+		TextCommandResult sb = new TextCommandResult(BotCommand.MbiyfAnnouncement);
 
 		List<Emoji> bar = new ArrayList<>();
 		Emoji add = res.getFace("smirk");
@@ -252,45 +262,46 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		for (int i = 0; i < bar.size(); i++) {
 			String emoji = bar.get(i).getUnicode();
 			for (int j = 0; j < REPEATS; j++) {
-				sb.append(emoji);
+				sb.add(emoji);
 			}
 		}
-		sb.append("\n");
+		sb.add("\n");
 		String poopUni = res.getBall("poop").getUnicode();
-		sb.append(poopUni);
-		sb.append("OHHHHH SHITTTT");
-		sb.append(poopUni);
-		sb.append("\nIt's MBIYFriday motha'uckas!\n");
+		sb.add(poopUni);
+		sb.add("OHHHHH SHITTTT");
+		sb.add(poopUni);
+		sb.add("\nIt's MBIYFriday motha'uckas!\n");
 
 		for (int i = bar.size() - 1; i >= 0; i--) {
 			String emoji = bar.get(i).getUnicode();
 			for (int j = 0; j < REPEATS; j++) {
-				sb.append(emoji);
+				sb.add(emoji);
 			}
 		}
 
-		sb.append("\n\n");
+		sb.add("\n\n");
 
-		sb.append("PREPARE YOUR\n");
+		sb.add("PREPARE YOUR\n");
 		List<Emoji> emojis = new ArrayList<Emoji>(COUNT);
 
 		getQty(res::getRandomFaceEmoji, emojis, COUNT);
 		for (Emoji emoji : emojis) {
-			sb.append(emoji.getUnicode());
+			sb.add(emoji.getUnicode());
 		}
-		sb.append("\nFOR\n");
+		sb.add("\nFOR\n");
 		emojis.clear();
 
 		getQty(res::getRandomBallEmoji, emojis, COUNT);
 		for (Emoji emoji : emojis) {
-			sb.append(emoji.getUnicode());
+			sb.add(emoji.getUnicode());
 		}
 
-		String out = sb.toString();
-		bot.sendMsg(chatId, out);
+//		String out = sb.toString();
+//		bot.sendMsg(chatId, out);
+		return sb;
 	}
 
-	private void appendBirthdayNames(StringBuilder sb) {
+	private void appendBirthdayNames(TextCommandResult sb) {
 		if (userRestriction != null) {
 			int size = userRestriction.size();
 			for (int i = 0; i < size; i++) {
@@ -298,13 +309,13 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 				if (i > 0) {
 					int last = size - 1;
 					if (i < last) {
-						sb.append(", ");
+						sb.add(", ");
 
 					} else if (i == last) {
-						sb.append(" AND ");
+						sb.add(" AND ");
 					}
 				}
-				sb.append(u.getFirstname().toUpperCase());
+				sb.add(new MentionFragment(u, MentionDisplay.First, CaseChoice.Upper, null, null));
 			}
 		}
 	}

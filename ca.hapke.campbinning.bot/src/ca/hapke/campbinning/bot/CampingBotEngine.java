@@ -2,10 +2,13 @@ package ca.hapke.campbinning.bot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -21,6 +24,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
@@ -49,7 +53,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	private boolean online = false;
 	private User me;
 	protected CampingUser meCamping;
-	private List<IStatus> statusMonitors = new ArrayList<>();
+	private Set<IStatus> statusMonitors = new HashSet<>();
 
 	protected EventLogger eventLogger = EventLogger.getInstance();
 	protected CampingChatManager chatManager = CampingChatManager.getInstance();
@@ -65,19 +69,43 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	private class ConnectionMonitor implements IStatus {
 
 		@Override
-		public void statusOffline(String username) {
+		public void statusOffline() {
 			online = false;
 		}
 
 		@Override
-		public void statusOnline(CampingUser meCamping) {
+		public void statusOnline() {
 			online = true;
+		}
+
+		@Override
+		public void statusMeProvided(CampingUser me) {
+
+		}
+
+		@Override
+		public void connectFailed(TelegramApiRequestException e) {
+			online = false;
 		}
 
 	}
 
 	public CampingBotEngine() {
 		statusMonitors.add(new ConnectionMonitor());
+	}
+
+	public void connect() {
+		try {
+			TelegramBotsApi api = new TelegramBotsApi();
+			api.registerBot(this);
+			for (IStatus status : statusMonitors) {
+				status.statusOnline();
+			}
+		} catch (TelegramApiRequestException e) {
+			for (IStatus status : statusMonitors) {
+				status.connectFailed(e);
+			}
+		}
 	}
 
 	@Override
@@ -96,7 +124,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				me = getMe();
 				meCamping = userMonitor.monitor(me);
 				for (IStatus status : statusMonitors) {
-					status.statusOnline(meCamping);
+					status.statusMeProvided(meCamping);
 				}
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
@@ -281,7 +309,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					}
 
 					if (outputResult != null) {
-						SendResult sendResult = outputResult.send(this, chatId, processor);
+						SendResult sendResult = outputResult.send(this, chatId);
 						// command may change to a Rejected
 						outputCommand = outputResult.getCmd();
 						outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
@@ -290,7 +318,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				} catch (TelegramApiException e) {
 					outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
 							"Exception: " + e.getMessage(), null);
-
+					System.err.println(e.toString());
+					e.printStackTrace();
 				}
 			}
 
@@ -346,5 +375,9 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public boolean isOnline() {
 		return online;
+	}
+
+	public MessageProcessor getProcessor() {
+		return processor;
 	}
 }

@@ -90,7 +90,7 @@ public abstract class CommandResult {
 		return cmd;
 	}
 
-	public abstract SendResult send(CampingBotEngine bot, Long chatId, MessageProcessor processor)
+	public abstract SendResult send(CampingBotEngine bot, Long chatId)
 			throws TelegramApiException;
 
 }

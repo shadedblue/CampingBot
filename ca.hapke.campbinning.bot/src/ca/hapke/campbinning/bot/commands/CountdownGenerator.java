@@ -12,6 +12,7 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionDisplay;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
@@ -77,7 +78,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 			CampingUser target = userMonitor.monitor(andrew, null, null, null);
 
 			result.add("Covid-19 probably ruined ", CaseChoice.Upper);
-			result.add(new MentionFragment(target, CaseChoice.Upper, null, "'s"));
+			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
 
 			result.add(" EASTER COUNTDOWN\n");
 

@@ -39,7 +39,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 
 import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
@@ -223,16 +222,8 @@ public class CampingBotUi extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CampingSystem.getInstance().canConnect()) {
-					try {
-						TelegramBotsApi api = new TelegramBotsApi();
-						api.registerBot(bot);
-						bot.addStatusUpdate(statusUpdater);
-						statusUpdater.statusOnline(bot.getMeCamping());
-						btnConnect.setEnabled(false);
-					} catch (TelegramApiRequestException ex) {
-						ex.printStackTrace();
-						lblStatus.setText("Connect Failed");
-					}
+					bot.addStatusUpdate(statusUpdater);
+					bot.connect();
 				} else {
 					JOptionPane.showMessageDialog(CampingBotUi.this,
 							"Cannot connect without the bot's username and token", "Failure",
@@ -409,7 +400,8 @@ public class CampingBotUi extends JFrame {
 			}
 		}
 		intervalThread.add(new UiTableRefresher());
-		statusUpdater.statusOffline(bot.getBotUsername());
+		statusUpdater.statusOffline();
+		statusUpdater.updateUserInfo(bot.getBotUsername(), -1);
 	}
 
 	public void chat() {
@@ -426,6 +418,9 @@ public class CampingBotUi extends JFrame {
 	}
 
 	private class StatusUpdate implements IStatus {
+		private static final String ONLINE = "Online";
+		private static final String OFFLINE = "Offline";
+		private String connected = OFFLINE;
 		private String username;
 		private int id;
 
@@ -434,23 +429,40 @@ public class CampingBotUi extends JFrame {
 				username = inUser;
 			if (inTId >= 1)
 				id = inTId;
+			statusChanged();
 		}
 
 		@Override
-		public void statusOffline(String username) {
-			updateUserInfo(username, -1);
-			statusChanged("Offline");
+		public void statusOffline() {
+			btnConnect.setEnabled(true);
+			updateUserInfo("", -1);
+			connected = OFFLINE;
+			statusChanged();
 		}
 
 		@Override
-		public void statusOnline(CampingUser meCamping) {
-			if (meCamping != null) {
-				updateUserInfo(meCamping.getUsername(), meCamping.getTelegramId());
+		public void statusOnline() {
+			btnConnect.setEnabled(false);
+			connected = ONLINE;
+			statusChanged();
+		}
+
+		@Override
+		public void statusMeProvided(CampingUser me) {
+			if (me != null) {
+				updateUserInfo(me.getUsername(), me.getTelegramId());
 			}
-			statusChanged("Online");
 		}
 
-		private void statusChanged(String connected) {
+		@Override
+		public void connectFailed(TelegramApiRequestException e) {
+			btnConnect.setEnabled(true);
+			connected = "Connect Failed: " + e.getMessage();
+			statusChanged();
+		}
+
+		private void statusChanged() {
+
 			String idStr;
 			if (id >= 1) {
 				idStr = "<br>" + id;
@@ -462,5 +474,6 @@ public class CampingBotUi extends JFrame {
 			setTitle(tooltip);
 			trayIcon.setToolTip(tooltip);
 		}
+
 	}
 }

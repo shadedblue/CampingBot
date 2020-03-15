@@ -37,8 +37,11 @@ public enum BotCommand implements CommandType {
 	SpellDipshit(null, true, BotCommandIds.SPELL | BotCommandIds.FAILURE),
 	Reload("reload", false),
 	// Test("test", false),
-	MBIYF(null, true, BotCommandIds.BALLS | BotCommandIds.USE),
-	MBIYFDipshit(null, true, BotCommandIds.BALLS | BotCommandIds.FAILURE),
+
+	MbiyfAnnouncement(null, true, BotCommandIds.BALLS | BotCommandIds.SET),
+	Mbiyf(null, true, BotCommandIds.BALLS | BotCommandIds.USE),
+	MbiyfDipshit(null, true, BotCommandIds.BALLS | BotCommandIds.FAILURE),
+
 	PleasureModel(null, true, BotCommandIds.PLEASURE | BotCommandIds.GIF),
 	IunnoGoogleIt("iunno", true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),
 	PartyEveryday(null, true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),

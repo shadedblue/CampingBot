@@ -121,8 +121,9 @@ public class CampingBot extends CampingBotEngine {
 		CommandResult result = null;
 		switch (command) {
 		case NicknameConversion:
-		case MBIYF:
-		case MBIYFDipshit:
+		case Mbiyf:
+		case MbiyfDipshit:
+		case MbiyfAnnouncement:
 		case PleasureModel:
 		case PartyEveryday:
 			// NOOP

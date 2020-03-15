@@ -14,6 +14,10 @@ import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
  */
 public class TextCommandResult extends CommandResult {
 
+	public TextCommandResult(BotCommand cmd) {
+		super(cmd);
+	}
+
 	public TextCommandResult(BotCommand cmd, ResultFragment... fragments) {
 		super(cmd, fragments);
 	}
@@ -23,7 +27,8 @@ public class TextCommandResult extends CommandResult {
 	}
 
 	@Override
-	public SendResult send(CampingBotEngine bot, Long chatId, MessageProcessor processor) throws TelegramApiException {
+	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {
+		MessageProcessor processor = bot.getProcessor();
 		String msg = processor.process(this.fragments);
 		bot.sendMsg(chatId, msg);
 		return new SendResult(msg, null);

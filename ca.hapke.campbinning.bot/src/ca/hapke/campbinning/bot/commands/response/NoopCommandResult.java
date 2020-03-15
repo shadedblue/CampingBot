@@ -22,7 +22,8 @@ public class NoopCommandResult extends CommandResult {
 	}
 
 	@Override
-	public SendResult send(CampingBotEngine bot, Long chatId, MessageProcessor processor) {
+	public SendResult send(CampingBotEngine bot, Long chatId) {
+		MessageProcessor processor = bot.getProcessor();
 		String msg = processor.process(this.fragments);
 		return new SendResult(msg, null);
 	}
