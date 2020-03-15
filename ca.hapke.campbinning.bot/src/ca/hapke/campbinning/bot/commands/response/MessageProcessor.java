@@ -21,9 +21,18 @@ public abstract class MessageProcessor {
 		return result;
 	}
 
+	public final String processImageUrl(String url) {
+		String result = internalProcessImageUrl(url);
+		if (next != null)
+			result = next.internalProcessImageUrl(url);
+		return result;
+	}
+
 	protected abstract String internalProcessStringFragment(String value);
 
 	protected abstract String internalProcessStringAssembled(String value);
+
+	protected abstract String internalProcessImageUrl(String url);
 
 	public MessageProcessor getNext() {
 		return next;

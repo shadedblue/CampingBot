@@ -14,4 +14,17 @@ public class ImageLink {
 		this.url = url;
 		this.type = type;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ImageLink [");
+		builder.append(type);
+		builder.append(": ");
+		if (url != null) {
+			builder.append(url);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 }

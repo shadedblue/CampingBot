@@ -56,14 +56,13 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		imagesNsfw = imgCategories.getList(NSFW_CATEGORY);
 		imagesSfw = imgCategories.getList(SFW_CATEGORY);
 		excessives = categories.getList(EXCESSIVE_CATEGORY);
-		for (int i = 1; i <= 3; i++) {
-			addImage("http://www.hapke.ca/images/party-boy" + i + ".gif", false);
-		}
+		addImage("http://www.hapke.ca/images/party-boy1.gif", false);
+		addImage("http://www.hapke.ca/images/party-boy3.gif", false);
 		addImage("http://www.hapke.ca/images/party-rave-girls.gif", true);
 		addImage("http://www.hapke.ca/images/party-beasties.gif", true);
 		addImage("http://www.hapke.ca/images/party-futurama.gif", true);
-		addImage("http://www.hapke.ca/images/party-office.gif", true);
-		addImage("http://www.hapke.ca/images/party-zebra.gif", true);
+		addImage("http://www.hapke.ca/images/party-office2.gif", true);
+		addImage("http://www.hapke.ca/images/party-zebra2.gif", true);
 		p = Pattern.compile(PARTY_REGEX);
 	}
 
@@ -85,6 +84,8 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		return m.matches();
 	}
 
+//	int index = 0;
+
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
@@ -105,8 +106,15 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		} else {
 			images = imagesNsfw;
 		}
+//		index++;
+//		if (index >= images.size())
+//			index = 0;
+
 		TextFragment captionFrag = new TextFragment(partying);
-		return new ImageCommandResult(BotCommand.PartyEveryday, CampingUtil.getRandom(images), captionFrag);
+
+		ImageLink random = CampingUtil.getRandom(images);
+//				images.get(index);
+		return new ImageCommandResult(BotCommand.PartyEveryday, random, captionFrag);
 	}
 
 	public String generateParrrty(Message message) {

@@ -17,4 +17,9 @@ public class DefaultMessageProcessor extends MessageProcessor {
 		return value;
 	}
 
+	@Override
+	protected String internalProcessImageUrl(String url) {
+		return url;
+	}
+
 }

@@ -22,12 +22,11 @@ public class DarkModeMessageProcessor extends MessageProcessor
 		implements HasCategories<String>, CalendaredEvent<Boolean> {
 
 	private static final String SUNSET = "sunset";
-	private DarkModeSwitch mode;
+	private DarkModeSwitch mode = DarkModeSwitch.Light;;
 	private TimesProvider<Boolean> times;
 	private CategoriedItems<String> sunsetPhrases = new CategoriedItems<>(SUNSET);
 
 	public DarkModeMessageProcessor() {
-		mode = DarkModeSwitch.Sunset;
 		sunsetPhrases.putAll(SUNSET, "dark mode enabled!\n(sshhh... be quiet... nighty nite time)",
 				"dark mode enabled!\n(sshhh... be quiet... the chilrens are sleping)");
 
@@ -62,10 +61,12 @@ public class DarkModeMessageProcessor extends MessageProcessor
 
 	@Override
 	protected String internalProcessStringAssembled(String input) {
+		String output;
 		if (input == null)
-			return null;
+			output = "";
+		else
+			output = input;
 
-		String output = input;
 		switch (mode) {
 		case Dark:
 
@@ -75,7 +76,7 @@ public class DarkModeMessageProcessor extends MessageProcessor
 			break;
 		case Sunset:
 			String sunsetText = CampingUtil.getRandom(sunsetPhrases.getList(SUNSET)).toLowerCase();
-			output = output + "\n\n" + sunsetText;
+			output = output + (output.length() > 0 ? "\n\n" : "") + sunsetText;
 			mode = DarkModeSwitch.Dark;
 			EventLogger.getInstance()
 					.add(new EventItem("Changing dark mode to: " + mode.toString() + " [" + sunsetText + "]"));
@@ -84,6 +85,28 @@ public class DarkModeMessageProcessor extends MessageProcessor
 		}
 
 		return output;
+	}
+
+	@Override
+	protected String internalProcessImageUrl(String url) {
+
+		switch (mode) {
+		case Light:
+			// NOOP
+			break;
+		case Dark:
+		case Sunset:
+			try {
+				int dotIndex = url.lastIndexOf('.');
+				String ext = url.substring(dotIndex + 1);
+				String preDot = url.substring(0, dotIndex);
+				url = preDot + "-dark." + ext;
+			} catch (Exception e) {
+
+			}
+			break;
+		}
+		return url;
 	}
 
 	@Override
@@ -109,7 +132,7 @@ public class DarkModeMessageProcessor extends MessageProcessor
 	@Override
 	public void doWork(Boolean value) {
 		if (value)
-			mode = DarkModeSwitch.Sunset;
+		mode = DarkModeSwitch.Sunset;
 		else
 			mode = DarkModeSwitch.Light;
 
@@ -123,10 +146,7 @@ public class DarkModeMessageProcessor extends MessageProcessor
 
 	@Override
 	public StartupMode getStartupMode() {
-//		if (times.getMostNearestPast().value)
 		return StartupMode.Always;
-//		else
-//			return StartupMode.Never;
 	}
 
 }

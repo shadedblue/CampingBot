@@ -36,7 +36,7 @@ public class ImageCommandResult extends CommandResult {
 	@Override
 	public SendResult send(CampingBotEngine bot, Long chatId, MessageProcessor processor) {
 		String caption = processor.process(this.fragments);
-		String url = image.url;
+		String url = processor.processImageUrl(image.url);
 		try {
 			switch (image.type) {
 			case ImageLink.STATIC:
