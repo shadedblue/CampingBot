@@ -28,9 +28,9 @@ import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.DefaultMessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
-import ca.hapke.campbinning.bot.commands.response.darkmode.DarkModeMessageProcessor;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.ui.IStatus;
@@ -42,7 +42,7 @@ import ca.hapke.campbinning.bot.users.CampingUserMonitor;
  */
 public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
-	public static final String MARKDOWN = "Markdown";
+	public static final String MARKDOWN = "MarkdownV2";
 	public static final String TEXT_MENTION = "text_mention";
 	public static final String MENTION = "mention";
 
@@ -60,7 +60,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected List<TextCommand> textCommands = new ArrayList<>();
 	protected List<InlineCommand> inlineCommands = new ArrayList<>();
 
-	protected MessageProcessor processor = new DarkModeMessageProcessor();
+	protected MessageProcessor processor = new DefaultMessageProcessor();
 
 	private class ConnectionMonitor implements IStatus {
 

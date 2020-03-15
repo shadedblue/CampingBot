@@ -11,6 +11,8 @@ import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
@@ -69,16 +71,15 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 		ZonedDateTime targetEvent;
 		if (countdownTarget != null && now.isBefore(countdownTarget)) {
-			// CampingUser rtv = userMonitor.monitor(558638791, null, null,
-			// null);
+//			CampingUser rtv = userMonitor.monitor(558638791, null, null, null);
 			CampingUser andrew = userMonitor.monitor(642767839, null, null, null);
 //			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
 			CampingUser target = andrew;
 
 			result.add("MY BALLS IN ");
-			result.add(target.getDisplayName().toUpperCase());
+			result.add(new MentionFragment(target, CaseChoice.Upper, null, "'s"));
 
-			result.add("'S EASTER COUNTDOWN\n");
+			result.add(" EASTER COUNTDOWN\n");
 
 			targetEvent = countdownTarget;
 		} else {
@@ -98,7 +99,9 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 		result.add(res.getRandomBallEmoji());
 		result.add(" ");
-		result.add(CampingUtil.getRandom(hypes));
+		String hypeMsg = CampingUtil.getRandom(hypes);
+
+		result.add(hypeMsg);
 
 		return result;
 	}

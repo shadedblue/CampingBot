@@ -1,6 +1,7 @@
 package ca.hapke.campbinning.bot.commands.response.darkmode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
@@ -11,6 +12,8 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.util.CampingUtil;
@@ -22,7 +25,7 @@ public class DarkModeMessageProcessor extends MessageProcessor
 		implements HasCategories<String>, CalendaredEvent<Boolean> {
 
 	private static final String SUNSET = "sunset";
-	private DarkModeSwitch mode = DarkModeSwitch.Light;;
+	private DarkModeSwitch mode = DarkModeSwitch.Light;
 	private TimesProvider<Boolean> times;
 	private CategoriedItems<String> sunsetPhrases = new CategoriedItems<>(SUNSET);
 
@@ -31,9 +34,7 @@ public class DarkModeMessageProcessor extends MessageProcessor
 				"dark mode enabled!\n(sshhh... be quiet... the chilrens are sleping)");
 
 		List<ByCalendar<Boolean>> targets = new ArrayList<>();
-//		targets.add(new ByTimeOfHour<Boolean>(30, true));
-//		targets.add(new ByTimeOfHour<Boolean>(0, false));
-		targets.add(new ByTimeOfDay<Boolean>(18, 0, true));
+		targets.add(new ByTimeOfDay<Boolean>(20, 0, true));
 		targets.add(new ByTimeOfDay<Boolean>(6, 30, false));
 
 		times = new TimesProvider<>(targets);
@@ -60,31 +61,40 @@ public class DarkModeMessageProcessor extends MessageProcessor
 	}
 
 	@Override
-	protected String internalProcessStringAssembled(String input) {
-		String output;
-		if (input == null)
-			output = "";
-		else
-			output = input;
+	protected ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments) {
 
 		switch (mode) {
 		case Dark:
+			break;
+		case Light:
+			break;
+		case Sunset:
+			int length = fragments.length;
+			fragments = Arrays.copyOf(fragments, length + 1);
+			String sunsetText = "\n\n" + CampingUtil.getRandom(sunsetPhrases.getList(SUNSET));
+			fragments[length] = new TextFragment(sunsetText);
+			break;
 
+		}
+
+		return fragments;
+	}
+
+	@Override
+	protected String internalAfterStringAssembled(String input) {
+		switch (mode) {
+		case Dark:
 			break;
 		case Light:
 			// noop
 			break;
 		case Sunset:
-			String sunsetText = CampingUtil.getRandom(sunsetPhrases.getList(SUNSET)).toLowerCase();
-			output = output + (output.length() > 0 ? "\n\n" : "") + sunsetText;
 			mode = DarkModeSwitch.Dark;
-			EventLogger.getInstance()
-					.add(new EventItem("Changing dark mode to: " + mode.toString() + " [" + sunsetText + "]"));
+			EventLogger.getInstance().add(new EventItem("Changing dark mode to: " + mode.toString()));
 			break;
-
 		}
 
-		return output;
+		return input;
 	}
 
 	@Override
@@ -132,7 +142,7 @@ public class DarkModeMessageProcessor extends MessageProcessor
 	@Override
 	public void doWork(Boolean value) {
 		if (value)
-		mode = DarkModeSwitch.Sunset;
+			mode = DarkModeSwitch.Sunset;
 		else
 			mode = DarkModeSwitch.Light;
 

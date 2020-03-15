@@ -6,7 +6,6 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
@@ -20,6 +19,7 @@ import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.darkmode.DarkModeMessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
@@ -86,11 +86,10 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
 		calMonitor.add(voting);
-		if (processor instanceof CalendaredEvent) {
-			@SuppressWarnings("rawtypes")
-			CalendaredEvent ce = (CalendaredEvent) processor;
-			calMonitor.add(ce);
-		}
+		DarkModeMessageProcessor dmp = new DarkModeMessageProcessor();
+		dmp.pushNext(processor);
+		processor = dmp;
+		calMonitor.add(dmp);
 
 		hasCategories.add(spellGen);
 		hasCategories.add(countdownGen);

@@ -14,10 +14,24 @@ public abstract class MessageProcessor {
 
 	protected MessageProcessor next;
 
+	private ResultFragment[] beforeStringAssembled(ResultFragment[] fragments) {
+		fragments = internalBeforeStringAssembled(fragments);
+		if (next != null)
+			fragments = next.internalBeforeStringAssembled(fragments);
+		return fragments;
+	}
+
 	public final String processString(String value) {
 		String result = internalProcessStringFragment(value);
 		if (next != null)
 			result = next.internalProcessStringFragment(result);
+		return result;
+	}
+
+	public final String afterStringAssembled(String value) {
+		String result = internalAfterStringAssembled(value);
+		if (next != null)
+			result = next.internalAfterStringAssembled(result);
 		return result;
 	}
 
@@ -28,9 +42,11 @@ public abstract class MessageProcessor {
 		return result;
 	}
 
+	protected abstract ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments);
+
 	protected abstract String internalProcessStringFragment(String value);
 
-	protected abstract String internalProcessStringAssembled(String value);
+	protected abstract String internalAfterStringAssembled(String value);
 
 	protected abstract String internalProcessImageUrl(String url);
 
@@ -54,26 +70,17 @@ public abstract class MessageProcessor {
 	}
 
 	public String process(List<ResultFragment> fragments) {
-		if (fragments == null)
-			return null;
-		int size = fragments.size();
-		String[] results = new String[size];
-		for (int i = 0; i < size; i++) {
-			ResultFragment f = fragments.get(i);
-			if (f == null)
-				results[i] = "";
-			else
-				results[i] = f.getValue(this);
-		}
-
-		String result = String.join("", results);
-		result = internalProcessStringAssembled(result);
-		return result;
+		ResultFragment[] a = new ResultFragment[fragments.size()];
+		a = fragments.toArray(a);
+		return process(a);
 	}
 
 	public String process(ResultFragment[] fragments) {
 		if (fragments == null)
 			return null;
+
+		fragments = beforeStringAssembled(fragments);
+
 		int size = fragments.length;
 		String[] results = new String[size];
 		for (int i = 0; i < size; i++) {
@@ -85,7 +92,9 @@ public abstract class MessageProcessor {
 		}
 
 		String result = String.join("", results);
-		result = internalProcessStringAssembled(result);
+
+		result = afterStringAssembled(result);
 		return result;
 	}
+
 }
