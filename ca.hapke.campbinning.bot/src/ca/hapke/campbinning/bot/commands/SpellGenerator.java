@@ -3,14 +3,12 @@ package ca.hapke.campbinning.bot.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
@@ -27,8 +25,10 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 	private static final String ADJECTIVE_CATEGORY = "adjective";
 	private static final String EXCLAMATION_CATEGORY = "exclamation";
 	private static final String ITEM_CATEGORY = "item";
+	private CampingBot bot;
 
-	public SpellGenerator() {
+	public SpellGenerator(CampingBot bot) {
+		this.bot = bot;
 		categories = new CategoriedItems<String>(ADJECTIVE_CATEGORY, ITEM_CATEGORY, EXCLAMATION_CATEGORY);
 		adjectives = categories.getList(ADJECTIVE_CATEGORY);
 		items = categories.getList(ITEM_CATEGORY);
@@ -44,18 +44,23 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 	private List<String> adjectives;
 	private List<String> items;
 	private List<String> exclamations;
-	public static final String YA_DIPSHIT = "Spells must be cast upon a victim, ya dipshit.";
-	public static final String IM_A_DIPSHIT = "I'm a dipshit, and didn't pick a victim to cast a spell on!";
 
-	public CommandResult spellCommand(CampingUser campingFromUser, CampingUser targetUser, Message message) {
+	public CommandResult spellCommand(CampingUser campingFromUser, CampingUser targetUser) {
+		SpellResult result = createSpell(campingFromUser, targetUser);
+		countSpellActivation(campingFromUser, targetUser);
+		return result.provideCommandResult();
+	}
+
+	public SpellResult createSpell(CampingUser campingFromUser, CampingUser targetUser) {
+		SpellResult result;
 		if (targetUser == null) {
-			return new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(campingFromUser),
-					new TextFragment(YA_DIPSHIT));
+			result = new SpellResult(campingFromUser, targetUser, SpellFailure.Dipshit);
+		} else if (targetUser == bot.getMeCamping()) {
+			result = new SpellResult(campingFromUser, targetUser, SpellFailure.NotMe);
+		} else {
+			result = new SpellResult(campingFromUser, targetUser, cast(targetUser));
 		}
-
-		CommandResult out = new TextCommandResult(BotCommand.Spell, cast(targetUser));
-		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
-		return out;
+		return result;
 	}
 
 	public List<ResultFragment> cast(CampingUser target) {

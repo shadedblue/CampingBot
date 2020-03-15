@@ -1,6 +1,5 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
@@ -9,10 +8,11 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.CommandType;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.SpellResult;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
@@ -37,14 +37,18 @@ public class SpellInlineCommand extends InlineCommand {
 	@Override
 	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
 			String resultText) {
-		if (words.length < 3)
+		if (words.length < 4)
 			return null;
 
 		int targetUserId = Integer.parseInt(words[2]);
+		boolean success = Integer.parseInt(words[3]) > 0;
 
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
 		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
-		EventItem event = new EventItem(BotCommand.Spell, campingFromUser, null, null, inlineMessageId, resultText,
+
+		CommandType cmd = success ? BotCommand.Spell : BotCommand.SpellDipshit;
+
+		EventItem event = new EventItem(cmd, campingFromUser, null, null, inlineMessageId, resultText,
 				targetUser.getCampingId());
 		return event;
 	}
@@ -57,12 +61,12 @@ public class SpellInlineCommand extends InlineCommand {
 
 		List<ResultFragment> outputSpell;
 		CampingUser targetUser = userMonitor.getUser(words[0]);
+		SpellResult spellResult = spellGen.createSpell(null, targetUser);
+		outputSpell = spellResult.provideInlineResult();
 		String targetFirst;
 		if (targetUser != null) {
-			outputSpell = spellGen.cast(targetUser);
 			targetFirst = targetUser.getFirstname();
 		} else {
-			outputSpell = Collections.singletonList(new TextFragment(SpellGenerator.IM_A_DIPSHIT));
 			targetFirst = CampingUser.UNKNOWN_TARGET;
 		}
 
@@ -81,7 +85,7 @@ public class SpellInlineCommand extends InlineCommand {
 		InlineQueryResultArticle articleSpell = new InlineQueryResultArticle();
 		articleSpell.setTitle("spell on " + targetFirst);
 		// TODO FIX
-		articleSpell.setId(createQueryId(updateId, targetId));
+		articleSpell.setId(createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0));
 		articleSpell.setInputMessageContent(mcSpell);
 		return articleSpell;
 	}

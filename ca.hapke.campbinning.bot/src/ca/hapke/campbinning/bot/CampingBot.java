@@ -33,8 +33,7 @@ public class CampingBot extends CampingBotEngine {
 	public static final String STRING_NULL = "null";
 
 	private Resources res = new Resources();
-	private VotingManager voting = new VotingManager(this);
-	private SpellGenerator spellGen = new SpellGenerator();
+	private VotingManager voting;
 
 	private MbiyfCommand ballsCommand;
 	private PleasureModelCommand pleasureCommand;
@@ -43,9 +42,10 @@ public class CampingBot extends CampingBotEngine {
 
 	private CountdownGenerator countdownGen;
 	private DatabaseConsumer databaseConsumer;
+	private SpellGenerator spellCommand;
 
-	private NicknameCommand nicknameCommand;
 	private InlineCommand spellInline;
+	private NicknameCommand nicknameCommand;
 
 	private CampingXmlSerializer serializer;
 
@@ -54,6 +54,8 @@ public class CampingBot extends CampingBotEngine {
 	private CalendarMonitor calMonitor;
 
 	public CampingBot() {
+		voting = new VotingManager(this);
+		spellCommand = new SpellGenerator(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
 		iunnoCommand = new IunnoCommand(this);
@@ -63,9 +65,9 @@ public class CampingBot extends CampingBotEngine {
 		ballsCommand = new MbiyfCommand(this, res);
 		countdownGen = new CountdownGenerator(res, ballsCommand);
 
-		spellInline = new SpellInlineCommand(spellGen);
+		spellInline = new SpellInlineCommand(spellCommand);
 
-		serializer = new CampingXmlSerializer(system, spellGen, countdownGen, voting, partyCommand, userMonitor);
+		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, voting, partyCommand, userMonitor);
 
 		res.loadAllEmoji();
 		serializer.load();
@@ -91,7 +93,7 @@ public class CampingBot extends CampingBotEngine {
 		processor = dmp;
 		calMonitor.add(dmp);
 
-		hasCategories.add(spellGen);
+		hasCategories.add(spellCommand);
 		hasCategories.add(countdownGen);
 		hasCategories.add(voting);
 		hasCategories.add(partyCommand);
@@ -149,7 +151,7 @@ public class CampingBot extends CampingBotEngine {
 		case IunnoGoogleIt:
 			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
 		case Spell:
-			result = spellGen.spellCommand(campingFromUser, findTarget(message.getEntities()), message);
+			result = spellCommand.spellCommand(campingFromUser, findTarget(message.getEntities()));
 			break;
 
 		case RantActivatorInitiation:
