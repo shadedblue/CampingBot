@@ -71,10 +71,10 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 		ZonedDateTime targetEvent;
 		if (countdownTarget != null && now.isBefore(countdownTarget)) {
-//			CampingUser rtv = userMonitor.monitor(558638791, null, null, null);
-			CampingUser andrew = userMonitor.monitor(642767839, null, null, null);
-//			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
-			CampingUser target = andrew;
+//			int rtv = 558638791;
+			int andrew = 642767839;
+//			int jamieson = 708570894;
+			CampingUser target = userMonitor.monitor(andrew, null, null, null);
 
 			result.add("Covid-19 probably ruined ", CaseChoice.Upper);
 			result.add(new MentionFragment(target, CaseChoice.Upper, null, "'s"));

@@ -84,8 +84,6 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		return m.matches();
 	}
 
-//	int index = 0;
-
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
@@ -106,14 +104,10 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		} else {
 			images = imagesNsfw;
 		}
-//		index++;
-//		if (index >= images.size())
-//			index = 0;
 
 		TextFragment captionFrag = new TextFragment(partying);
 
 		ImageLink random = CampingUtil.getRandom(images);
-//				images.get(index);
 		return new ImageCommandResult(BotCommand.PartyEveryday, random, captionFrag);
 	}
 
