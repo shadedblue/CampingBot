@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -13,6 +14,7 @@ import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -56,16 +58,24 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 		return out;
 	}
 
-	public ResultFragment[] cast(CampingUser target) {
+	public List<ResultFragment> cast(CampingUser target) {
 		String adj = CampingUtil.getRandom(adjectives);
 		String item = CampingUtil.getRandom(items);
 		String excl = CampingUtil.getRandom(exclamations);
 
 		String punc = hasPunc(excl) ? "" : "!";
-		TextFragment a = new TextFragment("I cast the *" + adj + "* of *" + item + "* on ");
-		MentionFragment b = new MentionFragment(target);
-		TextFragment c = new TextFragment(" and yell \"*" + excl + punc + "\"*");
-		return new ResultFragment[] { a, b, c };
+
+		List<ResultFragment> out = new ArrayList<ResultFragment>();
+		out.add(new TextFragment("I cast the "));
+		out.add(new TextFragment(adj, TextStyle.Bold));
+		out.add(new TextFragment(" of "));
+		out.add(new TextFragment(item, TextStyle.Bold));
+		out.add(new TextFragment(" on "));
+		out.add(new MentionFragment(target));
+		out.add(new TextFragment(" and yell \""));
+		out.add(new TextFragment(excl + punc, TextStyle.Bold));
+		out.add(new TextFragment("\""));
+		return out;
 	}
 
 	public void setAdjectives(List<String> adjectives) {

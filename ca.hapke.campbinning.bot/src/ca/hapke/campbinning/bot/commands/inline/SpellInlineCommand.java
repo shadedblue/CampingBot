@@ -1,5 +1,8 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
@@ -52,14 +55,14 @@ public class SpellInlineCommand extends InlineCommand {
 		if (words.length == 0)
 			return null;
 
-		ResultFragment[] outputSpell;
+		List<ResultFragment> outputSpell;
 		CampingUser targetUser = userMonitor.getUser(words[0]);
 		String targetFirst;
 		if (targetUser != null) {
 			outputSpell = spellGen.cast(targetUser);
 			targetFirst = targetUser.getFirstname();
 		} else {
-			outputSpell = new ResultFragment[] { new TextFragment(SpellGenerator.IM_A_DIPSHIT) };
+			outputSpell = Collections.singletonList(new TextFragment(SpellGenerator.IM_A_DIPSHIT));
 			targetFirst = CampingUser.UNKNOWN_TARGET;
 		}
 

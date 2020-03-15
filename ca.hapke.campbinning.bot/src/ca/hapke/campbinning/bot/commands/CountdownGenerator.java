@@ -76,7 +76,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 //			CampingUser jamieson = userMonitor.monitor(708570894, null, null, null);
 			CampingUser target = andrew;
 
-			result.add("MY BALLS IN ");
+			result.add("Covid-19 probably ruined ", CaseChoice.Upper);
 			result.add(new MentionFragment(target, CaseChoice.Upper, null, "'s"));
 
 			result.add(" EASTER COUNTDOWN\n");

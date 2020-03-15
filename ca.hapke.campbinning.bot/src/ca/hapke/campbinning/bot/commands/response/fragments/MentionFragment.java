@@ -10,17 +10,16 @@ import ca.hapke.campbinning.bot.users.CampingUser;
  */
 public class MentionFragment extends ResultFragment {
 	private CampingUser target;
-	private CaseChoice caseChoice;
 	private String prefix, suffix;
 
 	public MentionFragment(CampingUser target) {
+		super(CaseChoice.Normal, TextStyle.Normal);
 		this.target = target;
-		this.caseChoice = CaseChoice.Normal;
 	}
 
 	public MentionFragment(CampingUser target, CaseChoice caseChoice, String prefix, String suffix) {
+		super(caseChoice, TextStyle.Normal);
 		this.target = target;
-		this.caseChoice = caseChoice;
 		this.prefix = prefix;
 		this.suffix = suffix;
 	}
@@ -33,21 +32,12 @@ public class MentionFragment extends ResultFragment {
 		if (suffix != null)
 			display = display + suffix;
 
-		switch (caseChoice) {
-		case Normal:
-			// noop
-			break;
-		case Lower:
-			display = display.toLowerCase();
-			break;
-		case Upper:
-			display = display.toUpperCase();
-			break;
+		display = casify(display);
+		display = processor.processString(display);
+		display = markup(display);
 
-		}
 		int telegramId = target.getTelegramId();
 
-		display = processor.processString(display);
 		return "[" + display + "](tg://user?id=" + telegramId + ")";
 	}
 

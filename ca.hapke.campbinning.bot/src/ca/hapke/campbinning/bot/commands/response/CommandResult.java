@@ -9,10 +9,12 @@ import com.vdurmont.emoji.Emoji;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.commands.response.fragments.EmojiFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /*-
@@ -59,8 +61,18 @@ public abstract class CommandResult {
 		return this;
 	}
 
-	public CommandResult add(String s) {
-		fragments.add(new TextFragment(s));
+	public CommandResult add(String msg) {
+		fragments.add(new TextFragment(msg));
+		return this;
+	}
+
+	public CommandResult add(String msg, CaseChoice style) {
+		fragments.add(new TextFragment(msg, style));
+		return this;
+	}
+
+	public CommandResult add(String msg, TextStyle style) {
+		fragments.add(new TextFragment(msg, style));
 		return this;
 	}
 

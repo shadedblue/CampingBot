@@ -17,6 +17,7 @@ import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
@@ -164,9 +165,9 @@ public class NicknameCommand extends InlineCommand {
 			String first = u.getFirstname();
 			String nick = u.getNickname();
 			if (CampingUtil.notEmptyOrNull(nick) && CampingUtil.notEmptyOrNull(first)) {
-				sb.add("*");
-				sb.add(first);
-				sb.add("*: ");
+
+				sb.add(first, TextStyle.Bold);
+				sb.add(": ");
 				sb.add(nick);
 				sb.add("\n");
 			}

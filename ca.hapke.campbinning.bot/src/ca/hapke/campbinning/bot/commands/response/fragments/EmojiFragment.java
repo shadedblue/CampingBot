@@ -11,6 +11,7 @@ public class EmojiFragment extends ResultFragment {
 	private Emoji target;
 
 	public EmojiFragment(Emoji target) {
+		super(CaseChoice.Normal, TextStyle.Normal);
 		this.target = target;
 	}
 
