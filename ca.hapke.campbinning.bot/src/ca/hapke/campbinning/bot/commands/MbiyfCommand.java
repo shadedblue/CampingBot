@@ -207,7 +207,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			}
 		}
 		sb.add("\n");
-		String poopUni = res.getBall("poop").getUnicode();
+		Emoji poopUni = res.getBall("poop");
 		sb.add(poopUni);
 		sb.add("OHHHHH SHITTTT");
 		sb.add(poopUni);
@@ -217,7 +217,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		sb.add("...\n");
 
 		for (int i = bar.size() - 1; i >= 0; i--) {
-			String emoji = bar.get(i).getUnicode();
+			Emoji emoji = bar.get(i);
 			for (int j = 0; j < REPEATS; j++) {
 				sb.add(emoji);
 			}
@@ -229,23 +229,20 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		List<Emoji> emojis = new ArrayList<Emoji>(qty);
 		getQty(res::getRandomBallEmoji, emojis, qty);
 		for (Emoji emoji : emojis) {
-			sb.add(emoji.getUnicode());
+			sb.add(emoji);
 		}
 
 		sb.add("\nIN YOUR\n");
 		for (int i = 0; i < qty; i++) {
-			sb.add(cake.getUnicode());
+			sb.add(cake);
 		}
 
 		sb.add("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
 
-//		String out = sb.toString();
-//		bot.sendMsg(chatId, out);
 		return sb;
 	}
 
 	public TextCommandResult announceFriday(MbiyfMode value) throws TelegramApiException {
-//		StringBuilder sb = new StringBuilder();
 		TextCommandResult sb = new TextCommandResult(BotCommand.MbiyfAnnouncement);
 
 		List<Emoji> bar = new ArrayList<>();
@@ -260,7 +257,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			bar.add(add);
 
 		for (int i = 0; i < bar.size(); i++) {
-			String emoji = bar.get(i).getUnicode();
+			Emoji emoji = bar.get(i);
 			for (int j = 0; j < REPEATS; j++) {
 				sb.add(emoji);
 			}
@@ -273,7 +270,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		sb.add("\nIt's MBIYFriday motha'uckas!\n");
 
 		for (int i = bar.size() - 1; i >= 0; i--) {
-			String emoji = bar.get(i).getUnicode();
+			Emoji emoji = bar.get(i);
 			for (int j = 0; j < REPEATS; j++) {
 				sb.add(emoji);
 			}
@@ -286,18 +283,16 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 		getQty(res::getRandomFaceEmoji, emojis, COUNT);
 		for (Emoji emoji : emojis) {
-			sb.add(emoji.getUnicode());
+			sb.add(emoji);
 		}
 		sb.add("\nFOR\n");
 		emojis.clear();
 
 		getQty(res::getRandomBallEmoji, emojis, COUNT);
 		for (Emoji emoji : emojis) {
-			sb.add(emoji.getUnicode());
+			sb.add(emoji);
 		}
 
-//		String out = sb.toString();
-//		bot.sendMsg(chatId, out);
 		return sb;
 	}
 
