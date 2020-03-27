@@ -7,6 +7,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 
@@ -63,7 +65,7 @@ public class AitaTracker extends VoteTracker<Float> {
 	}
 
 	@Override
-	public void addVotesTextSuffix(StringBuilder sb, boolean completed, float score) {
+	public void addVotesTextSuffix(List<ResultFragment> sb, boolean completed, float score) {
 		if (completed) {
 			List<String> category;
 			int i;
@@ -77,8 +79,8 @@ public class AitaTracker extends VoteTracker<Float> {
 			category = resultCategories.getList(assholeLevels[i]);
 			String response = CampingUtil.getRandom(category);
 			if (response != null && response.length() > 0) {
-				sb.append("\n\n");
-				sb.append(response);
+				sb.add(new TextFragment("\n\n"));
+				sb.add(new TextFragment(response));
 			}
 		}
 	}

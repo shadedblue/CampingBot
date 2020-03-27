@@ -3,6 +3,8 @@ package ca.hapke.campbinning.bot.commands.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.vdurmont.emoji.Emoji;
@@ -24,7 +26,11 @@ import ca.hapke.campbinning.bot.users.CampingUser;
  * @author Nathan Hapke
  */
 public abstract class CommandResult {
-//	protected boolean sent = false;
+
+	protected Integer replyTo;
+	protected ReplyKeyboard keyboard;
+	// protected boolean sent = false;
+	private SendResult result;
 
 	protected List<ResultFragment> fragments;
 
@@ -90,7 +96,50 @@ public abstract class CommandResult {
 		return cmd;
 	}
 
-	public abstract SendResult send(CampingBotEngine bot, Long chatId)
-			throws TelegramApiException;
+	public void replyToOriginalMessageIfPossible(Message message) {
+		Message replyTo = message.getReplyToMessage();
+		if (replyTo != null)
+			setReplyTo(replyTo.getMessageId());
+	}
 
+	public void setReplyTo(Integer replyTo) {
+		if (this.replyTo == null)
+			this.replyTo = replyTo;
+	}
+
+	public void setKeyboard(ReplyKeyboard keyboard) {
+		if (this.keyboard == null)
+			this.keyboard = keyboard;
+	}
+
+	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {
+		if (result == null) {
+			result = sendInternal(bot, chatId);
+		}
+		return result;
+	}
+
+	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CommandResult [");
+		builder.append(cmd);
+		builder.append("]");
+		if (fragments != null) {
+//			builder.append("fragments=");
+//			builder.append(fragments);
+//			builder.append(", ");
+			for (ResultFragment f : fragments) {
+				builder.append("\n  ");
+				builder.append(f);
+			}
+		}
+		if (result != null) {
+			builder.append("\nresult=");
+			builder.append(result);
+		}
+		return builder.toString();
+	}
 }

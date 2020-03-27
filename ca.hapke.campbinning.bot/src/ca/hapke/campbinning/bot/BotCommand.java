@@ -46,7 +46,8 @@ public enum BotCommand implements CommandType {
 	IunnoGoogleIt("iunno", true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),
 	PartyEveryday(null, true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),
 	UiString(null, false),
-	NicknameConversion(null, true, BotCommandIds.NICKNAME | BotCommandIds.USE);
+	NicknameConversion(null, true, BotCommandIds.NICKNAME | BotCommandIds.USE),
+	Talk(null, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
 
 	private static final String BOT_COMMAND = "bot_command";
 

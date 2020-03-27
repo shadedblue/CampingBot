@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
@@ -34,11 +35,12 @@ public class ImageCommandResult extends CommandResult {
 	}
 
 	@Override
-	public SendResult send(CampingBotEngine bot, Long chatId) {
+	public SendResult sendInternal(CampingBotEngine bot, Long chatId) {
 		MessageProcessor processor = bot.getProcessor();
 		String caption = processor.process(this.fragments);
 		String url = processor.processImageUrl(image.url);
 		try {
+			Message outMsg = null;
 			switch (image.type) {
 			case ImageLink.STATIC:
 				SendPhoto p = new SendPhoto();
@@ -46,8 +48,13 @@ public class ImageCommandResult extends CommandResult {
 				p.setPhoto(url);
 				if (caption != null && caption.length() > 0) {
 					p.setCaption(caption);
+					p.setParseMode(CampingBotEngine.MARKDOWN);
+					if (replyTo != null)
+						p.setReplyToMessageId(replyTo);
+					if (keyboard != null)
+						p.setReplyMarkup(keyboard);
 				}
-				bot.execute(p);
+				outMsg = bot.execute(p);
 				break;
 			case ImageLink.GIF:
 				SendAnimation ani = new SendAnimation();
@@ -55,13 +62,21 @@ public class ImageCommandResult extends CommandResult {
 				ani.setAnimation(url);
 				if (caption != null && caption.length() > 0) {
 					ani.setCaption(caption);
+					ani.setParseMode(CampingBotEngine.MARKDOWN);
 				}
-				bot.execute(ani);
+				if (replyTo != null)
+					ani.setReplyToMessageId(replyTo);
+				if (keyboard != null)
+					ani.setReplyMarkup(keyboard);
+				outMsg = bot.execute(ani);
 				break;
 			}
-			return new SendResult(url, caption);
+			if (outMsg == null)
+				return null;
+			else
+				return new SendResult(url, outMsg, caption);
 		} catch (TelegramApiException e) {
-			return new SendResult(e.getMessage(), url);
+			return new SendResult(e.getMessage(), null, url);
 		}
 	}
 

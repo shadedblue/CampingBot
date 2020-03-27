@@ -39,6 +39,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 
 import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
@@ -47,12 +48,16 @@ import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
+import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.CampingXmlSerializer;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.commands.response.SendResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -409,7 +414,12 @@ public class CampingBotUi extends JFrame {
 		String msg = txtChat.getText().trim();
 		if (chat != null && msg.length() > 0) {
 			try {
-				bot.sendMsg(chat.chatId, msg);
+				TextCommandResult cmd = new TextCommandResult(BotCommand.Talk, new TextFragment(msg));
+				SendResult result = cmd.send(bot, chat.chatId);
+				Message outgoingMsg = result.outgoingMsg;
+				EventItem ei = new EventItem(BotCommand.Talk, bot.getMeCamping(), outgoingMsg.getDate(), chat,
+						outgoingMsg.getMessageId(), msg, null);
+				EventLogger.getInstance().add(ei);
 			} catch (TelegramApiException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage());
 			}

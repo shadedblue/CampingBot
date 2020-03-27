@@ -12,8 +12,6 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -24,6 +22,12 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.commands.response.EditTextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.SendResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -48,7 +52,7 @@ public abstract class VoteTracker<T> {
 	protected boolean completed = false;
 	protected NumberFormat nf;
 	protected Message voteTrackingMessage;
-	protected String previousVotes;
+//	protected String previousVotes;
 	protected Message bannerMessage;
 	protected String previousBanner;
 	protected Message topicMessage;
@@ -60,10 +64,13 @@ public abstract class VoteTracker<T> {
 	protected final Map<String, T> valueMap;
 	protected final boolean addNa;
 
-	protected static final String VOTING_COMPLETED = "Voting Completed!";
+	protected static final TextFragment VOTING_COMPLETED = new TextFragment("Voting Completed!");
 	protected static final String NOT_APPLICABLE_SHORT = "N/A";
 	protected static final String NOT_APPLICABLE_LONG = "Not Applicable";
 	protected final int naQuorum;
+	private SendResult bannerResult;
+	private SendResult voteTrackingResult;
+	private TextCommandResult bannerText;
 
 	public VoteTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
 			Message topic, int naQuorum) throws TelegramApiException {
@@ -98,21 +105,23 @@ public abstract class VoteTracker<T> {
 			shortButtons[count - 1] = NOT_APPLICABLE_SHORT;
 			longDescriptions[count - 1] = NOT_APPLICABLE_LONG;
 		}
-		previousBanner = getBannerText();
-		SendMessage out = new SendMessage(chatId, previousBanner);
-		out.setReplyMarkup(getKeyboard());
-		out.setParseMode("Markdown");
-		out.setReplyToMessageId(activation.getMessageId());
-		bannerMessage = bot.execute(out);
+		List<ResultFragment> bannerFrags = getBannerString();
+		bannerText = new TextCommandResult(BotCommand.VoteTopicInitiation, bannerFrags);
+		bannerText.setReplyTo(activation.getMessageId());
+		bannerText.setKeyboard(getKeyboard());
+		bannerResult = bannerText.send(bot, chatId);
+		previousBanner = bannerResult.msg;
+		bannerMessage = bannerResult.outgoingMsg;
+
 		PinChatMessage pinBanner = new PinChatMessage(chatId, bannerMessage.getMessageId());
 		pinBanner.setDisableNotification(Boolean.valueOf(true));
 		bot.execute(pinBanner);
 
-		previousVotes = getVotesText(completed);
-		out = new SendMessage(chatId, previousVotes);
-		out.setParseMode("Markdown");
-		out.setReplyToMessageId(topic.getMessageId());
-		voteTrackingMessage = bot.execute(out);
+		TextCommandResult votesText = new TextCommandResult(BotCommand.VoteTopicInitiation, getVotesText(completed));
+		votesText.setReplyTo(topic.getMessageId());
+		voteTrackingResult = votesText.send(bot, chatId);
+		voteTrackingMessage = voteTrackingResult.outgoingMsg;
+
 		this.topicMessage = topic;
 	}
 
@@ -159,9 +168,14 @@ public abstract class VoteTracker<T> {
 				votesNotApplicable.remove(user);
 			}
 			if (voteChanged) {
-				String newVotesMessage = getVotesText(completed);
-				if (attemptMessageEdit(voteTrackingMessage, newVotesMessage, previousVotes))
-					previousVotes = newVotesMessage;
+				try {
+					EditTextCommandResult editCmd = new EditTextCommandResult(BotCommand.Vote, voteTrackingMessage,
+							getVotesText(completed));
+					editCmd.send(bot, chatId);
+
+				} catch (TelegramApiException e) {
+					// HACK ignoring exceptions that come back for unchanged messages
+				}
 			}
 
 			AnswerCallbackQuery answer = new AnswerCallbackQuery();
@@ -200,9 +214,16 @@ public abstract class VoteTracker<T> {
 	}
 
 	public void update() {
-		String newBanner = getBannerText();
-		if (attemptMessageEdit(bannerMessage, newBanner, previousBanner))
-			previousBanner = newBanner;
+		EditTextCommandResult editCmd = new EditTextCommandResult(BotCommand.Vote, bannerMessage, getBannerString());
+
+		if (!completed)
+			editCmd.setKeyboard(getKeyboard());
+
+		try {
+			editCmd.send(bot, chatId);
+		} catch (TelegramApiException e) {
+			// HACK ignoring exceptions that come back for unchanged messages
+		}
 	}
 
 	public void complete() {
@@ -210,9 +231,13 @@ public abstract class VoteTracker<T> {
 			return;
 
 		completed = true;
-		String newMsg = VOTING_COMPLETED;
-		if (attemptMessageEdit(bannerMessage, newMsg, previousBanner))
-			previousBanner = newMsg;
+		try {
+			EditTextCommandResult edit = new EditTextCommandResult(BotCommand.VoteTopicComplete, bannerMessage,
+					VOTING_COMPLETED);
+			edit.send(bot, chatId);
+		} catch (TelegramApiException e2) {
+			// HACK ignoring exceptions that come back for unchanged messages
+		}
 
 		try {
 			Message pinnedMsg = bot.execute(new GetChat(chatId)).getPinnedMessage();
@@ -223,42 +248,20 @@ public abstract class VoteTracker<T> {
 		} catch (TelegramApiException e1) {
 		}
 
-		String votes = getVotesText(true);
-		SendMessage completionMsg = new SendMessage(chatId, votes);
-		completionMsg.setParseMode("Markdown");
 		Integer messageId = topicMessage.getMessageId();
-		completionMsg.setReplyToMessageId(messageId);
 		EventLogger logger = EventLogger.getInstance();
+
 		try {
-			bot.execute(completionMsg);
-			if (votesNotApplicable.size() < naQuorum) {
-				logger.add(
-						new EventItem(BotCommand.VoteTopicComplete, ranter, null, chat, messageId, votes, messageId));
-				logger.add(new EventItem(BotCommand.VoteActivatorComplete, activater, null, chat, messageId, "",
-						messageId));
-			}
+			List<ResultFragment> votes = getVotesText(true);
+			TextCommandResult completionMsg = new TextCommandResult(BotCommand.VoteTopicComplete, votes);
+			completionMsg.setReplyTo(messageId);
+			SendResult result = completionMsg.sendInternal(bot, chatId);
+
+			logger.add(new EventItem(BotCommand.VoteTopicComplete, ranter, result.outgoingMsg.getDate(), chat,
+					result.outgoingMsg.getMessageId(), result.outgoingMsg.getText(), messageId));
 		} catch (TelegramApiException e) {
 			logger.add(new EventItem(e.getLocalizedMessage()));
 		}
-	}
-
-	public boolean attemptMessageEdit(Message msg, String newMsg, String previousMsg) {
-		if (newMsg == null || newMsg.equalsIgnoreCase(previousMsg))
-			return false;
-
-		EditMessageText update = new EditMessageText();
-		update.setChatId(chatId);
-		if (msg == bannerMessage && !completed)
-			update.setReplyMarkup(getKeyboard());
-		update.setMessageId(msg.getMessageId());
-		update.setText(newMsg);
-		update.setParseMode("Markdown");
-		try {
-			bot.execute(update);
-		} catch (TelegramApiException e) {
-			return false;
-		}
-		return true;
 	}
 
 	protected String getVote(CampingUser user) {
@@ -268,28 +271,31 @@ public abstract class VoteTracker<T> {
 			return votes.get(user);
 	}
 
-	public String getBannerText() {
-		StringBuilder sb = new StringBuilder();
+	public List<ResultFragment> getBannerString() {
+		List<ResultFragment> sb = new ArrayList<>();
 		String bannerTitle = getBannerTitle();
-		sb.append(bannerTitle);
-		sb.append(" (");
-		sb.append(formatter.toPrettyString(completionTime));
-		sb.append(" left)");
+		sb.add(new TextFragment(bannerTitle));
+
+		sb.add(new TextFragment(" ("));
+		sb.add(new TextFragment(formatter.toPrettyString(completionTime)));
+		sb.add(new TextFragment(" left)"));
 		for (int i = 0; i < shortButtons.length && i < longDescriptions.length; i++) {
 			String shorter = shortButtons[i];
 			String longer = longDescriptions[i];
 
-			sb.append("\n*");
-			sb.append(shorter);
-			sb.append("*: ");
-			sb.append(longer);
+			sb.add(new TextFragment("\n"));
+			sb.add(new TextFragment(shorter, TextStyle.Bold));
+			sb.add(new TextFragment(": "));
+			sb.add(new TextFragment(longer));
 		}
-		return sb.toString();
+		return sb;
 	}
 
 	public abstract String getBannerTitle();
 
-	protected String getVotesText(boolean completed) {
+	protected List<ResultFragment> getVotesText(boolean completed) {
+		List<ResultFragment> sb = new ArrayList<>();
+
 		int notApplicable = votesNotApplicable.size();
 		int naturalVotes = votes.size();
 		int count = naturalVotes + notApplicable;
@@ -304,7 +310,7 @@ public abstract class VoteTracker<T> {
 			scoreStr = "(n/a)";
 		}
 
-		StringBuilder sb = new StringBuilder();
+//		StringBuilder sb = new StringBuilder();
 		addVotesTextPrefix(completed, sb);
 
 		if (shouldShowVotesInCategories()) {
@@ -324,37 +330,36 @@ public abstract class VoteTracker<T> {
 
 			for (int i = 0; i < shortButtons.length; i++) {
 				String txt = shortButtons[i];
-				sb.append("\n*");
-				sb.append(txt);
-				sb.append("*: ");
-				sb.append(votes[i]);
+				sb.add(new TextFragment("\n"));
+				sb.add(new TextFragment(txt, TextStyle.Bold));
+				sb.add(new TextFragment(": "));
+				sb.add(new TextFragment(Integer.toString(votes[i])));
 			}
 		}
 
-		sb.append("\n--------\nTotal Votes: *");
-		sb.append(count);
+		sb.add(new TextFragment("\n--------\nTotal Votes: "));
+		sb.add(new TextFragment(Integer.toString(count), TextStyle.Bold));
 
-		sb.append("*\n");
+		sb.add(new TextFragment("\n"));
 		if (completed)
-			sb.append("Final");
+			sb.add(new TextFragment("Final"));
 		else
-			sb.append("Current");
-		sb.append(" Score: *");
-		sb.append(scoreStr);
-		sb.append("*");
+			sb.add(new TextFragment("Current"));
+		sb.add(new TextFragment(" Score: "));
+		sb.add(new TextFragment(scoreStr, TextStyle.Bold));
 		addVotesTextSuffix(sb, completed, score);
 
-		return sb.toString();
+		return sb;
 	}
 
 	protected abstract boolean shouldShowVotesInCategories();
 
-	public void addVotesTextPrefix(boolean completed, StringBuilder sb) {
+	public void addVotesTextPrefix(boolean completed, List<ResultFragment> sb) {
 		if (completed)
-			sb.append(VOTING_COMPLETED);
+			sb.add(VOTING_COMPLETED);
 	}
 
-	public void addVotesTextSuffix(StringBuilder sb, boolean completed, float score) {
+	public void addVotesTextSuffix(List<ResultFragment> sb, boolean completed, float score) {
 	}
 
 	protected abstract String getScoreSuffix();
@@ -381,6 +386,10 @@ public abstract class VoteTracker<T> {
 
 	public boolean isCompleted() {
 		return completed;
+	}
+
+	public TextCommandResult getBannerText() {
+		return bannerText;
 	}
 
 }

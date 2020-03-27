@@ -35,4 +35,9 @@ public class TextFragment extends ResultFragment {
 		return markup(p);
 	}
 
+	@Override
+	public String toString() {
+		return "TextFragment [" + value + "]";
+	}
+
 }

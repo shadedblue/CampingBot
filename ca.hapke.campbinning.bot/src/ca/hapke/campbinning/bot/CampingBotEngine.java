@@ -10,7 +10,6 @@ import java.util.Set;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
@@ -331,18 +330,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	protected abstract CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
-
-	public Message sendMsg(Long chatId, String msg) throws TelegramApiException {
-		return sendMsg(chatId, (Message) null, msg);
-	}
-
-	public Message sendMsg(Long chatId, Message replyTo, String msg) throws TelegramApiException {
-		SendMessage send = new SendMessage(chatId, msg);
-		if (replyTo != null)
-			send.setReplyToMessageId(replyTo.getMessageId());
-		send.setParseMode(MARKDOWN);
-		return execute(send);
-	}
 
 	public CampingUser findTarget(List<MessageEntity> entities) {
 		CampingUser targetUser = null;

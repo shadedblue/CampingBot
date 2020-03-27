@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +21,9 @@ import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -95,8 +99,6 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		int day = ld.getDayOfWeek().getValue();
 		int hour = lt.getHour();
 
-		String partying = generateParrrty(message);
-
 		List<ImageLink> images;
 		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hour >= SFW_START_HOUR
 				&& hour < SFW_END_HOUR) {
@@ -104,14 +106,15 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 		} else {
 			images = imagesNsfw;
 		}
+		ImageLink img = CampingUtil.getRandom(images);
 
-		TextFragment captionFrag = new TextFragment(partying);
-
-		ImageLink random = CampingUtil.getRandom(images);
-		return new ImageCommandResult(BotCommand.PartyEveryday, random, captionFrag);
+		List<ResultFragment> captionFrags = generateParrrty(message);
+		ImageCommandResult result = new ImageCommandResult(BotCommand.PartyEveryday, img, captionFrags);
+//		result.setReplyTo(message.getMessageId());
+		return result;
 	}
 
-	public String generateParrrty(Message message) {
+	public List<ResultFragment> generateParrrty(Message message) {
 
 		String lowerCase = message.getText().toLowerCase();
 		Matcher m = p.matcher(lowerCase);
@@ -128,13 +131,17 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 			sb.append('r');
 		}
 		sb.append(PARTY_END);
+		TextFragment partyFrag = new TextFragment(sb.toString(), TextStyle.Bold);
 
 		if (count >= 5) {
-			sb.append("\n\n");
-			sb.append(CampingUtil.getRandom(excessives));
+			List<ResultFragment> list = new ArrayList<>(3);
+			list.add(partyFrag);
+			list.add(new TextFragment("\n\n"));
+			list.add(new TextFragment(CampingUtil.getRandom(excessives)));
+			return list;
+		} else {
+			return Collections.singletonList(partyFrag);
 		}
-
-		return sb.toString();
 	}
 
 	@Override

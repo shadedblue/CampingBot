@@ -34,7 +34,9 @@ public class IunnoCommand implements TextCommand, HasCategories<ImageLink> {
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		ImageLink img = CampingUtil.getRandom(images);
-		return new ImageCommandResult(BotCommand.IunnoGoogleIt, img);
+		ImageCommandResult result = new ImageCommandResult(BotCommand.IunnoGoogleIt, img);
+		result.replyToOriginalMessageIfPossible(message);
+		return result;
 	}
 
 	@Override
