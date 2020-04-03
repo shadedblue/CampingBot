@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
@@ -19,6 +20,10 @@ import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.afd.AfdMatrixPictures;
+import ca.hapke.campbinning.bot.commands.response.afd.AfdTextCommand;
+import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayEnabler;
+import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayProcessor;
 import ca.hapke.campbinning.bot.commands.response.darkmode.DarkModeMessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
@@ -53,6 +58,10 @@ public class CampingBot extends CampingBotEngine {
 
 	private CalendarMonitor calMonitor;
 
+	private AfdTextCommand afdText;
+	private AfdMatrixPictures afdMatrix;
+	private AprilFoolsDayEnabler afdEnabler;
+
 	public CampingBot() {
 		voting = new VotingManager(this);
 		spellCommand = new SpellGenerator(this);
@@ -72,6 +81,19 @@ public class CampingBot extends CampingBotEngine {
 		res.loadAllEmoji();
 		serializer.load();
 
+		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
+		afdp.addAtEnd(processor);
+
+		DarkModeMessageProcessor dmp = new DarkModeMessageProcessor();
+		dmp.addAtEnd(afdp);
+
+		processor = dmp;
+
+		CampingChat chat = chatManager.get(system.getAnnounceChat(), this);
+		afdText = new AfdTextCommand(this, afdp, chat);
+		afdMatrix = new AfdMatrixPictures(this, chat);
+		afdEnabler = new AprilFoolsDayEnabler(afdText, afdMatrix, afdp);
+
 		ballsCommand.init();
 
 		textCommands.add(ballsCommand);
@@ -79,6 +101,7 @@ public class CampingBot extends CampingBotEngine {
 		textCommands.add(pleasureCommand);
 		textCommands.add(iunnoCommand);
 		textCommands.add(partyCommand);
+		textCommands.add(afdText);
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameCommand);
 		callbackCommands.add(voting);
@@ -88,9 +111,9 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
 		calMonitor.add(voting);
-		DarkModeMessageProcessor dmp = new DarkModeMessageProcessor();
-		dmp.pushNext(processor);
-		processor = dmp;
+		calMonitor.add(afdMatrix);
+		calMonitor.add(afdEnabler);
+
 		calMonitor.add(dmp);
 
 		hasCategories.add(spellCommand);
@@ -189,6 +212,10 @@ public class CampingBot extends CampingBotEngine {
 			result.add(": Access Denied!");
 		}
 		return result;
+	}
+
+	public Resources getRes() {
+		return res;
 	}
 
 }

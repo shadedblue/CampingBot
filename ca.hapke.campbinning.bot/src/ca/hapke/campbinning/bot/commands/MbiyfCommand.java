@@ -102,6 +102,14 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		CampingUser targetUser = bot.findTarget(entities);
+
+		if (targetUser == null) {
+			Message replyTo = message.getReplyToMessage();
+			if (replyTo != null) {
+				targetUser = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
+			}
+		}
+
 		if (userRestriction != null && !userRestriction.contains(targetUser))
 			return null;
 

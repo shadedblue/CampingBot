@@ -14,31 +14,31 @@ public abstract class MessageProcessor {
 
 	protected MessageProcessor next;
 
-	private ResultFragment[] beforeStringAssembled(ResultFragment[] fragments) {
+	public final ResultFragment[] beforeStringAssembled(ResultFragment[] fragments) {
 		fragments = internalBeforeStringAssembled(fragments);
 		if (next != null)
-			fragments = next.internalBeforeStringAssembled(fragments);
+			fragments = next.beforeStringAssembled(fragments);
 		return fragments;
 	}
 
 	public final String processString(String value) {
 		String result = internalProcessStringFragment(value);
 		if (next != null)
-			result = next.internalProcessStringFragment(result);
+			result = next.processString(result);
 		return result;
 	}
 
 	public final String afterStringAssembled(String value) {
 		String result = internalAfterStringAssembled(value);
 		if (next != null)
-			result = next.internalAfterStringAssembled(result);
+			result = next.afterStringAssembled(result);
 		return result;
 	}
 
 	public final String processImageUrl(String url) {
 		String result = internalProcessImageUrl(url);
 		if (next != null)
-			result = next.internalProcessImageUrl(url);
+			result = next.processImageUrl(url);
 		return result;
 	}
 
@@ -52,12 +52,6 @@ public abstract class MessageProcessor {
 
 	public MessageProcessor getNext() {
 		return next;
-	}
-
-	public MessageProcessor pushNext(MessageProcessor add) {
-		add.next = next;
-		next = add;
-		return this;
 	}
 
 	public MessageProcessor addAtEnd(MessageProcessor add) {

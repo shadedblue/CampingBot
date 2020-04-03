@@ -25,6 +25,12 @@ public class CampingChat {
 		return chatname;
 	}
 
+	public void setChatname(String chatname) {
+		if (chatname == null || chatname.equalsIgnoreCase(CampingChatManager.UNKNOWN)) {
+			this.chatname = chatname;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "Chat[" + chatname + " #" + chatId + "]";

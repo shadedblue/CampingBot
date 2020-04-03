@@ -17,6 +17,7 @@ import ca.odell.glazedlists.GlazedLists;
  */
 public class CampingChatManager {
 
+	public static final String UNKNOWN = "unknown";
 	private static CampingChatManager instance = new CampingChatManager();
 
 	public static CampingChatManager getInstance() {
@@ -32,22 +33,30 @@ public class CampingChatManager {
 	public CampingChat get(Long chatId, CampingBotEngine bot) {
 		CampingChat chat = chats.get(chatId);
 		if (chat == null) {
-			Chat tChat;
-			String chatname = "unknown";
-			try {
-				tChat = bot.execute(new GetChat(chatId));
-				if (tChat.isGroupChat() || tChat.isSuperGroupChat())
-					chatname = tChat.getTitle();
-				else
-					chatname = tChat.getFirstName();
-
-			} catch (TelegramApiException e1) {
-			}
+			String chatname = UNKNOWN;
+			chatname = findChatName(chatId, bot);
 			chat = new CampingChat(chatId, chatname);
 			chatEvents.add(chat);
 			chats.put(chatId, chat);
+		} else if (chat.getChatname().equalsIgnoreCase(UNKNOWN)) {
+			chat.setChatname(findChatName(chatId, bot));
 		}
 		return chat;
+	}
+
+	public String findChatName(Long chatId, CampingBotEngine bot) {
+		Chat tChat;
+		String chatname = UNKNOWN;
+		try {
+			tChat = bot.execute(new GetChat(chatId));
+			if (tChat.isGroupChat() || tChat.isSuperGroupChat())
+				chatname = tChat.getTitle();
+			else
+				chatname = tChat.getFirstName();
+
+		} catch (TelegramApiException e1) {
+		}
+		return chatname;
 	}
 
 	public EventList<CampingChat> getChatList() {
