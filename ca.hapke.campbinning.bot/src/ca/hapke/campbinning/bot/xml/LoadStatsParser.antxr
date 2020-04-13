@@ -3,6 +3,7 @@ header {
     
     import ca.hapke.campbinning.bot.*;
     import ca.hapke.campbinning.bot.users.*;
+    import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
     import ca.hapke.campbinning.bot.commands.voting.*;
     import java.util.*;
@@ -10,17 +11,18 @@ header {
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingUserMonitor um]
-    :   <camping>[ cs, sg, countdownGen, voting, pc, um] EOF
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
+    :   <camping>[ cs, sg, countdownGen, voting, pc, cm, um] EOF
     ;
     
-<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingUserMonitor um]
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
 	(<countdown>[countdownGen])?
 	(<voting>[voting]) ?
 	(<party>[pc]) ?
+	(<chats>[cm]) ?
 	(<users>[um])?
 	;
 <party>[PartyEverydayCommand pc]
@@ -158,6 +160,33 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 			{vals.add(val);}
 		) *
 	;
+<chats> [CampingChatManager cm]
+	:  
+		(<chat>[cm] ) *
+	;
+	
+<chat> [CampingChatManager cm]
+	{
+		CampingChat chat;
+		long chatId = 0;
+		String idStr, type, allowed;
+	}
+	:
+		idStr=<id>
+		type=<type>
+		allowed=<allowed>
+	{
+		if (idStr != null && !"null".equalsIgnoreCase(idStr)) {
+			chatId = Long.parseLong(idStr);
+		} 
+		if (chatId == 0)
+			return;
+		chat = cm.get(chatId);
+		chat.setType(type);
+		chat.setAllowed(allowed);
+	}
+	;
+
 <users> [CampingUserMonitor um]
 	{String campingId = null; }
 	: 
@@ -271,5 +300,11 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <lastUpdate> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<type> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<allowed> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;

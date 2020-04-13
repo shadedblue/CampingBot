@@ -76,7 +76,8 @@ public class CampingBot extends CampingBotEngine {
 
 		spellInline = new SpellInlineCommand(spellCommand);
 
-		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, voting, partyCommand, userMonitor);
+		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, voting, partyCommand, chatManager,
+				userMonitor);
 
 		res.loadAllEmoji();
 		serializer.load();
@@ -89,7 +90,7 @@ public class CampingBot extends CampingBotEngine {
 
 		processor = dmp;
 
-		CampingChat chat = chatManager.get(system.getAnnounceChat(), this);
+		CampingChat chat = chatManager.get(system.getAnnounceChat());
 		afdText = new AfdTextCommand(this, afdp, chat);
 		afdMatrix = new AfdMatrixPictures(this, chat);
 		afdEnabler = new AprilFoolsDayEnabler(afdText, afdMatrix, afdp);

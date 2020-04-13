@@ -80,7 +80,7 @@ public abstract class VoteTracker<T> {
 
 		this.naQuorum = naQuorum;
 		this.bot = bot;
-		this.chat = CampingChatManager.getInstance().get(chatId, bot);
+		this.chat = CampingChatManager.getInstance(bot).get(chatId);
 		this.nf = NumberFormat.getInstance();
 
 		nf.setMinimumFractionDigits(0);

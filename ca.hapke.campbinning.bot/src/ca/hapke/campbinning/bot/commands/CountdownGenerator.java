@@ -81,7 +81,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 			targetEvent = countdownTarget;
 		} else {
-			result.add("MBIY\\[F]RIDAY COUNTDOWN\n");
+			result.add("MBIYFRIDAY COUNTDOWN\n");
 			targetEvent = ballsCommand.getNearestFutureEnablement();
 		}
 

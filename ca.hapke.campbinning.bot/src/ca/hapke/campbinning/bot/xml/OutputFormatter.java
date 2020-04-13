@@ -20,9 +20,9 @@ public class OutputFormatter {
 	}
 
 	public void start(String tag, boolean line) {
-		indent++;
 		indent();
 		sb.append("<" + tag + ">");
+		indent++;
 		if (line)
 			newLine();
 	}
@@ -32,9 +32,9 @@ public class OutputFormatter {
 	}
 
 	public void finish(String tag, boolean line) {
+		indent--;
 		if (line)
 			indent();
-		indent--;
 
 		sb.append("</" + tag + ">");
 		newLine();

@@ -238,7 +238,7 @@ public class CampingBotUi extends JFrame {
 		});
 		btnConnect.setBounds(10, 7, 120, 23);
 		contentPane.add(btnConnect);
-		CampingChatManager chatMgr = CampingChatManager.getInstance();
+		CampingChatManager chatMgr = CampingChatManager.getInstance(bot);
 		DefaultEventComboBoxModel<CampingChat> chatModel = new DefaultEventComboBoxModel<>(
 				GlazedListsSwing.swingThreadProxyList(chatMgr.getChatList()));
 

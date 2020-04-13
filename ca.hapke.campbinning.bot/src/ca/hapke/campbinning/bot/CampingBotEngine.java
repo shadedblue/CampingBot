@@ -55,7 +55,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	private Set<IStatus> statusMonitors = new HashSet<>();
 
 	protected EventLogger eventLogger = EventLogger.getInstance();
-	protected CampingChatManager chatManager = CampingChatManager.getInstance();
+	protected CampingChatManager chatManager = CampingChatManager.getInstance(this);
 	protected CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 	protected CampingSystem system = CampingSystem.getInstance();
 
@@ -211,7 +211,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 			campingFromUser = userMonitor.monitor(message.getFrom(), entities);
 			chatId = message.getChatId();
-			chat = chatManager.get(chatId, this);
+			chat = chatManager.get(chatId);
 		}
 
 		Object inputExtraData = null;

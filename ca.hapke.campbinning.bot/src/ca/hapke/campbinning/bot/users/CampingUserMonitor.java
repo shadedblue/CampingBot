@@ -46,8 +46,8 @@ public class CampingUserMonitor extends CampingSerializable {
 
 	private final ObservableElementList.Connector<CampingUser> userConnector = GlazedLists
 			.beanConnector(CampingUser.class);
-	private final EventList<CampingUser> users = new ObservableElementList<>(
-			GlazedLists.threadSafeList(new BasicEventList<CampingUser>()), userConnector);
+	private final EventList<CampingUser> users = GlazedLists
+			.threadSafeList(new ObservableElementList<>(new BasicEventList<CampingUser>(), userConnector));
 
 	private int nextCampingId = 1;
 	private Set<Integer> usedCampingIds = new HashSet<>();

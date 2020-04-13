@@ -157,9 +157,8 @@ public class CampingUser {
 	public void setNickname(String value) {
 		String oldVal = nickname;
 		nickname = value;
-		String newVal = nickname;
 
-		support.firePropertyChange("nickname", oldVal, newVal);
+		support.firePropertyChange("nickname", oldVal, nickname);
 	}
 
 	public void setLastUpdate(Long lastUpdate) {
