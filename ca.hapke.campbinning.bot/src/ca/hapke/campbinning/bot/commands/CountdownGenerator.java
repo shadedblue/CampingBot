@@ -12,9 +12,6 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
-import ca.hapke.campbinning.bot.commands.response.fragments.MentionDisplay;
-import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
-import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.util.TimeFormatter;
@@ -27,7 +24,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 	private static final String HYPE_CATEGORY = "hype";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 3, 9, 18, 20, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 3, 10, 20, 0, 00).toZonedDateTime();
 	private List<String> hypes;
 	private Resources res;
 	private MbiyfCommand ballsCommand;
@@ -75,12 +72,12 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 //			int rtv = 558638791;
 			int andrew = 642767839;
 //			int jamieson = 708570894;
-			CampingUser target = userMonitor.monitor(andrew, null, null, null);
+//			CampingUser target = userMonitor.monitor(andrew, null, null, null);
 
-			result.add("Covid-19 probably ruined ", CaseChoice.Upper);
-			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
+			result.add("GETTING JACKED", CaseChoice.Upper);
+//			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
 
-			result.add(" EASTER COUNTDOWN\n");
+			result.add(" COUNTDOWN\n");
 
 			targetEvent = countdownTarget;
 		} else {

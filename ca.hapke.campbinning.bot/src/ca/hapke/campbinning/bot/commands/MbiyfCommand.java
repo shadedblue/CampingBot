@@ -101,6 +101,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
+
 		CampingUser targetUser = bot.findTarget(entities);
 
 		if (targetUser == null) {

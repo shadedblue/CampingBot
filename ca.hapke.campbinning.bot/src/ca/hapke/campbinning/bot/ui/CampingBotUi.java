@@ -361,6 +361,16 @@ public class CampingBotUi extends JFrame {
 		btnAddToCategory.setBounds(958, 5, 70, 23);
 		contentPane.add(btnAddToCategory);
 
+		JButton btnUpdateRunTimes = new JButton("Update Run Times");
+		btnUpdateRunTimes.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalendarMonitor.getInstance().updateAllNextTimes();
+			}
+		});
+		btnUpdateRunTimes.setBounds(875, 331, 153, 23);
+		contentPane.add(btnUpdateRunTimes);
+
 		Image app = null;
 		try {
 			File f = CampingXmlSerializer.getFileNotInBinFolder("assets/app.png");

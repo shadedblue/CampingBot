@@ -43,6 +43,13 @@ public class CalendarMonitor extends TimerThreadWithKill {
 		}
 	}
 
+	public void updateAllNextTimes() {
+		for (CalendaredEvent event : calendaredEvents) {
+			TimesProvider timeProvider = event.getTimeProvider();
+			timeProvider.generateNearestEvents(ZonedDateTime.now());
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private void invoke(CalendaredEvent event, TimesProvider timeProvider, ByCalendar calendarPoint) {
 		ZonedDateTime now = ZonedDateTime.now();
