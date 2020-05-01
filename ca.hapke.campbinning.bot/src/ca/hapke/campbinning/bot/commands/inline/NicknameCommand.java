@@ -30,10 +30,14 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
 public class NicknameCommand extends InlineCommand {
 
 	private static final String INLINE_NICKS = "nicks";
-	public static final String CANT_GIVE_YOURSELF_A_NICKNAME = "No fuckin' way.\n#1 rule of nicknames... you can't give yourself a nickname";
-	public static final String USER_NOT_FOUND = "Dunno who you're trying to nickname";
-	public static final String INVALID_SYNTAX = "Invalid syntax, DUMB ASS.";
 	private static final char[] invalidCharacters = new char[] { '*', '_', '[', ']', '`', '\\', '~' };
+
+	public static final TextFragment INVALID_CHARACTER = new TextFragment(
+			"Nickname rejected... Invalid character in nickname.");
+	public static final TextFragment CANT_GIVE_YOURSELF_A_NICKNAME = new TextFragment(
+			"No fuckin' way.\n#1 rule of nicknames... you can't give yourself a nickname");
+	public static final TextFragment USER_NOT_FOUND = new TextFragment("Dunno who you're trying to nickname");
+	public static final TextFragment INVALID_SYNTAX = new TextFragment("Invalid syntax, DUMB ASS.");
 
 	@Override
 	public InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor) {
@@ -61,8 +65,8 @@ public class NicknameCommand extends InlineCommand {
 			if (frag == null)
 				frag = new TextFragment(word);
 
-			if (out.size() > 0)
-				out.add(new TextFragment(" "));
+			if (i > 0)
+				out.add(ResultFragment.SPACE);
 			out.add(frag);
 		}
 		String output = processor.process(out);
@@ -91,7 +95,8 @@ public class NicknameCommand extends InlineCommand {
 		String[] targets = new String[words.length - 2];
 		for (int i = 0; i < targets.length; i++) {
 			CampingUser target = userMonitor.getUser(Integer.parseInt(words[i + 2]));
-			targets[i] = target.getFirstOrUserName();
+			if (target != null)
+				targets[i] = target.getFirstOrUserName();
 		}
 
 		String rest = String.join(", ", targets);
@@ -123,18 +128,18 @@ public class NicknameCommand extends InlineCommand {
 				CampingUser targetUser = userMonitor.getUser(targeting);
 
 				if (targetUser != null) {
-					char c;
 					if (targetUser == campingFromUser) {
-						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
-								.add(NicknameCommand.CANT_GIVE_YOURSELF_A_NICKNAME);
-					} else if ((c = rejectNickname(newNickname)) != 0) {
 						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
-								.add(": Nickname rejected... Invalid character in nickname.");
+								.add(ResultFragment.COLON_SPACE).add(CANT_GIVE_YOURSELF_A_NICKNAME);
+					} else if (rejectNickname(newNickname)) {
+						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+								.add(ResultFragment.COLON_SPACE).add(INVALID_CHARACTER);
 					} else {
+						targetUser.setNickname(newNickname);
+
 						CommandResult sb = new TextCommandResult(BotCommand.SetNickname);
 						sb.add(campingFromUser);
-						sb.add(": ");
-						targetUser.setNickname(newNickname);
+						sb.add(ResultFragment.COLON_SPACE);
 						sb.add(targetUser.getFirstOrUserName());
 						sb.add("'s nickname changed to: ");
 						sb.add(targetUser);
@@ -143,20 +148,20 @@ public class NicknameCommand extends InlineCommand {
 					}
 				}
 			} else {
-				return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
-						.add(NicknameCommand.USER_NOT_FOUND);
+				return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+						.add(ResultFragment.COLON_SPACE).add(USER_NOT_FOUND);
 			}
 		}
-		return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser).add(": ")
-				.add(NicknameCommand.INVALID_SYNTAX);
+		return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+				.add(ResultFragment.COLON_SPACE).add(INVALID_SYNTAX);
 	}
 
-	private char rejectNickname(String nickname) {
+	private boolean rejectNickname(String nickname) {
 		for (char c : invalidCharacters) {
 			if (nickname.indexOf(c) >= 0)
-				return c;
+				return true;
 		}
-		return 0;
+		return false;
 	}
 
 	public CommandResult allNicknamesCommand() {
@@ -167,9 +172,9 @@ public class NicknameCommand extends InlineCommand {
 			if (CampingUtil.notEmptyOrNull(nick) && CampingUtil.notEmptyOrNull(first)) {
 
 				sb.add(first, TextStyle.Bold);
-				sb.add(": ");
+				sb.add(ResultFragment.COLON_SPACE);
 				sb.add(nick);
-				sb.add("\n");
+				sb.add(ResultFragment.NEWLINE);
 			}
 
 		}

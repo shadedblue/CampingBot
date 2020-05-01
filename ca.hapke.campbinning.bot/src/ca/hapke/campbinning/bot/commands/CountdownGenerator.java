@@ -12,6 +12,7 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
+import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.util.TimeFormatter;
@@ -88,15 +89,15 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		for (int i = 0; i < 5; i++) {
 			result.add(res.getRandomFaceEmoji());
 		}
-		result.add("\n");
+		result.add(ResultFragment.NEWLINE);
 		result.add(res.getRandomBallEmoji());
-		result.add(" ");
+		result.add(ResultFragment.SPACE);
 		result.add(tf.toPrettyString(targetEvent));
 
-		result.add("\n");
+		result.add(ResultFragment.NEWLINE);
 
 		result.add(res.getRandomBallEmoji());
-		result.add(" ");
+		result.add(ResultFragment.SPACE);
 		String hypeMsg = CampingUtil.getRandom(hypes);
 
 		result.add(hypeMsg);

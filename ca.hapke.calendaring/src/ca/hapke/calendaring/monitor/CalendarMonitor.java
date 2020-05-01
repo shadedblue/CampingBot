@@ -54,7 +54,12 @@ public class CalendarMonitor extends TimerThreadWithKill {
 	private void invoke(CalendaredEvent event, TimesProvider timeProvider, ByCalendar calendarPoint) {
 		ZonedDateTime now = ZonedDateTime.now();
 		if (event.shouldRun()) {
-			event.doWork(calendarPoint.value);
+			try {
+				event.doWork(calendarPoint.value);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			timeProvider.setLastExecTime();
 		}
 		timeProvider.generateNearestEvents(now);

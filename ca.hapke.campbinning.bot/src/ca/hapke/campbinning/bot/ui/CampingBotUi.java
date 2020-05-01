@@ -46,6 +46,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
+import ca.hapke.calendaring.monitor.TimerThreadWithKill;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
@@ -85,7 +86,6 @@ public class CampingBotUi extends JFrame {
 		public void doWork(Void value) {
 			userModel.fireTableDataChanged();
 			calendaredModel.fireTableDataChanged();
-//			eventLogger.add(new EventItem("Update: " + ZonedDateTime.now().toLocalTime().toString()));
 		}
 
 		@Override
@@ -158,6 +158,12 @@ public class CampingBotUi extends JFrame {
 
 		setTitle(CAMPING_BOT);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent evt) {
+				TimerThreadWithKill.shutdownThreads();
+			}
+		});
 		setBounds(100, 100, 1066, 654);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

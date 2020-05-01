@@ -2,12 +2,8 @@ package ca.hapke.campbinning.bot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
@@ -18,8 +14,6 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class Resources {
-	private final Map<Emoji, List<Sticker>> emojiStickerMap = new HashMap<>();
-	private final Set<Emoji> respondTo = new HashSet<>();
 	private final List<Emoji> faces = new ArrayList<>();
 	private final Map<String, Emoji> facesMap = new HashMap<>();
 	private final List<Emoji> balls = new ArrayList<>();

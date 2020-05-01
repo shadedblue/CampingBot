@@ -77,6 +77,8 @@ public class EventItem {
 		if (chat != null) {
 			builder.append("~");
 			builder.append(chat.getChatname());
+			builder.append(": ");
+			builder.append(chat.getChatId());
 		}
 		if (rest != null && rest.length() > 0) {
 			builder.append(": ");

@@ -29,6 +29,23 @@ public class MentionFragment extends ResultFragment {
 	@Override
 	public String getValue(MessageProcessor processor) {
 		String display;
+		display = getDisplayText();
+		if (prefix != null)
+			display = prefix + display;
+		if (suffix != null)
+			display = display + suffix;
+
+		display = casify(display);
+		display = processor.processString(display);
+		display = markup(display);
+
+		int telegramId = target.getTelegramId();
+
+		return "[" + display + "](tg://user?id=" + telegramId + ")";
+	}
+
+	public String getDisplayText() {
+		String display;
 		switch (displayMode) {
 		case Nickname:
 			display = target.getDisplayName();
@@ -42,18 +59,18 @@ public class MentionFragment extends ResultFragment {
 			break;
 
 		}
-		if (prefix != null)
-			display = prefix + display;
-		if (suffix != null)
-			display = display + suffix;
+		return display;
+	}
 
-		display = casify(display);
-		display = processor.processString(display);
-		display = markup(display);
-
-		int telegramId = target.getTelegramId();
-
-		return "[" + display + "](tg://user?id=" + telegramId + ")";
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Mention[");
+		builder.append(target.getUsername());
+		builder.append(" => ");
+		builder.append(getDisplayText());
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

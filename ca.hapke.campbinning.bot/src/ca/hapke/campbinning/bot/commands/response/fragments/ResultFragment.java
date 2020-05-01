@@ -6,6 +6,9 @@ import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
  * @author Nathan Hapke
  */
 public abstract class ResultFragment {
+	public static final TextFragment SPACE = new TextFragment(" ");
+	public static final TextFragment COLON_SPACE = new TextFragment(": ");
+	public static final TextFragment NEWLINE = new TextFragment("\n");
 
 	protected CaseChoice caseChoice;
 	protected TextStyle style;

@@ -40,6 +40,11 @@ import ca.hapke.campbinning.bot.users.CampingUserMonitor;
  * @author Nathan Hapke
  */
 public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
+	private static final TextFragment EXCLAMATION = new TextFragment("!");
+	private static final TextFragment APOSTROPHE_S = new TextFragment("'s ");
+	private static final TextFragment IN = new TextFragment(" in ");
+	private static final TextFragment MY = new TextFragment("My ");
+	private static final TextFragment NOT_BALLSING_MYSELF = new TextFragment(": Fuck you, I'm not ballsing myself!");
 	private static final int ENABLE_LENGTH_HOURS = 17;
 	private static final int ENABLE_HOUR = 7;
 	private static final int ENABLE_MIN = 0;
@@ -116,7 +121,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 		if (targetUser == bot.getMeCamping()) {
 			return new TextCommandResult(BotCommand.MbiyfDipshit, new MentionFragment(campingFromUser),
-					new TextFragment(": Fuck you, I'm not ballsing myself!"));
+					NOT_BALLSING_MYSELF);
 		}
 
 		Emoji ball = res.getRandomBallEmoji();
@@ -126,12 +131,12 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			return null;
 
 		campingFromUser.increment(BotCommand.Mbiyf);
-		CommandResult result = new TextCommandResult(BotCommand.Mbiyf).add("My ");
-		result.add(ball).add(" in ").add(targetUser).add("'s ");
+		CommandResult result = new TextCommandResult(BotCommand.Mbiyf, MY).add(ball).add(IN).add(targetUser)
+				.add(APOSTROPHE_S);
 		if (mode == MbiyfType.Birthday) {
 			result.add(res.getCake());
 		}
-		result.add(face).add("!");
+		result.add(face).add(EXCLAMATION);
 		return result;
 	}
 

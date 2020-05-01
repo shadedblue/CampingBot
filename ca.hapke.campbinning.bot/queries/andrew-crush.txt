@@ -1,0 +1,4 @@
+SELECT "campingUserId", to_timestamp("timestamp"), message
+	FROM public.activity
+	WHERE "campingUserId" = 3
+	AND message ILIKE '%crush%';

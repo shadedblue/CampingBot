@@ -14,12 +14,17 @@ import ca.hapke.campbinning.bot.users.CampingUser;
  * @author Nathan Hapke
  */
 public class SpellResult {
-	public static final String NO_VICTIM_COMMAND = "Spells must be cast upon a victim, ya dipshit.";
-	public static final String NO_VICTIM_INLINE = "I'm a dipshit, and didn't pick a victim to cast a spell on!";
+	public static final TextFragment NO_VICTIM_COMMAND = new TextFragment(
+			"Spells must be cast upon a victim, ya dipshit.");
+	public static final TextFragment NO_VICTIM_INLINE = new TextFragment(
+			"I'm a dipshit, and didn't pick a victim to cast a spell on!");
 
-	public static final String NOT_BOT_COMMAND = "Foolish infidel. Spells are only to be cast upon mere mortals.";
-	public static final String NOT_BOT_INLINE = "I should know better than trying to cast a spell on our supreme overlord!";
-	public static final String UNKNOWN_FAIL = "Something went wrong in the bit-bucket... and the spell fizzled!?";
+	public static final TextFragment NOT_BOT_COMMAND = new TextFragment(
+			"Foolish infidel. Spells are only to be cast upon mere mortals.");
+	public static final TextFragment NOT_BOT_INLINE = new TextFragment(
+			"I should know better than trying to cast a spell on our supreme overlord!");
+	public static final TextFragment UNKNOWN_FAIL = new TextFragment(
+			"Something went wrong in the bit-bucket... and the spell fizzled!?");
 
 	private SpellFailure failure;
 	private List<ResultFragment> spell;
@@ -50,15 +55,15 @@ public class SpellResult {
 			switch (failure) {
 			case Dipshit:
 				out = new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(fromUser),
-						new TextFragment(": "), new TextFragment(NO_VICTIM_COMMAND));
+						ResultFragment.COLON_SPACE, NO_VICTIM_COMMAND);
 				break;
 			case NotMe:
 				out = new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(fromUser),
-						new TextFragment(": "), new TextFragment(NOT_BOT_COMMAND));
+						ResultFragment.COLON_SPACE, NOT_BOT_COMMAND);
 				break;
 			default:
 				out = new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(fromUser),
-						new TextFragment(": "), new TextFragment(UNKNOWN_FAIL));
+						ResultFragment.COLON_SPACE, UNKNOWN_FAIL);
 				break;
 			}
 		}
@@ -72,13 +77,13 @@ public class SpellResult {
 		} else {
 			switch (failure) {
 			case Dipshit:
-				out = Collections.singletonList(new TextFragment(NO_VICTIM_INLINE));
+				out = Collections.singletonList(NO_VICTIM_INLINE);
 				break;
 			case NotMe:
-				out = Collections.singletonList(new TextFragment(NOT_BOT_INLINE));
+				out = Collections.singletonList(NOT_BOT_INLINE);
 				break;
 			default:
-				out = Collections.singletonList(new TextFragment(UNKNOWN_FAIL));
+				out = Collections.singletonList(UNKNOWN_FAIL);
 				break;
 			}
 		}

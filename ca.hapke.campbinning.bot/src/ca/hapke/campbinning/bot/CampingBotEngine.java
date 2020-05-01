@@ -117,7 +117,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		EventItem outputEvent = null;
 		Integer eventTime = null;
 
-		// res.getCampbinningStickerPack(this);
 		if (me == null) {
 			try {
 				me = getMe();

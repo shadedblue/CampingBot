@@ -22,6 +22,11 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  */
 public class SpellGenerator extends CampingSerializable implements HasCategories<String> {
 
+	private static final TextFragment CAST_THE = new TextFragment("I cast the ");
+	private static final TextFragment OF = new TextFragment(" of ");
+	private static final TextFragment ON = new TextFragment(" on ");
+	private static final TextFragment AND_YELL = new TextFragment(" and yell \"");
+	private static final TextFragment END_QUOTE = new TextFragment("\"");
 	private static final String ADJECTIVE_CATEGORY = "adjective";
 	private static final String EXCLAMATION_CATEGORY = "exclamation";
 	private static final String ITEM_CATEGORY = "item";
@@ -67,19 +72,21 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 		String adj = CampingUtil.getRandom(adjectives);
 		String item = CampingUtil.getRandom(items);
 		String excl = CampingUtil.getRandom(exclamations);
-
-		String punc = hasPunc(excl) ? "" : "!";
+		if (!hasPunc(excl)) {
+			excl += "!";
+		}
 
 		List<ResultFragment> out = new ArrayList<ResultFragment>();
-		out.add(new TextFragment("I cast the "));
+		out.add(CAST_THE);
 		out.add(new TextFragment(adj, TextStyle.Bold));
-		out.add(new TextFragment(" of "));
+		out.add(OF);
 		out.add(new TextFragment(item, TextStyle.Bold));
-		out.add(new TextFragment(" on "));
+		out.add(ON);
 		out.add(new MentionFragment(target));
-		out.add(new TextFragment(" and yell \""));
-		out.add(new TextFragment(excl + punc, TextStyle.Bold));
-		out.add(new TextFragment("\""));
+		out.add(AND_YELL);
+		out.add(new TextFragment(excl, TextStyle.Bold));
+
+		out.add(END_QUOTE);
 		return out;
 	}
 

@@ -236,7 +236,7 @@ public class CampingUser {
 		if (firstname != null)
 			return firstname;
 		if (username != null)
-			return username;
+			return CampingUtil.prefixAt(username);
 		return CampingUser.UNKNOWN_TARGET;
 	}
 

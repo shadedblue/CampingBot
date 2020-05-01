@@ -12,6 +12,7 @@ import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.CampingSystem;
+import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.odell.glazedlists.EventList;
 
 /**
@@ -88,7 +89,14 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 						PreparedStatement ps = connection.prepareStatement(sql);
 						ps.setLong(1, timestamp);
 						ps.setInt(2, item.user.getCampingId());
-						ps.setLong(3, item.chat.chatId);
+						long chatId = -1;
+						CampingChat chat = item.chat;
+						if (chat != null)
+							chatId = chat.chatId;
+						else {
+							System.out.println(item);
+						}
+						ps.setLong(3, chatId);
 						ps.setInt(4, item.telegramId);
 						ps.setLong(5, item.command.getId());
 						ps.setString(6, item.rest);
