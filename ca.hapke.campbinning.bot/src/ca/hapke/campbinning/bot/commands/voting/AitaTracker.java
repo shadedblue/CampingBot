@@ -5,8 +5,12 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
+import ca.hapke.campbinning.bot.commands.ImageLink;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -16,15 +20,27 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class AitaTracker extends VoteTracker<Float> {
+	private static final String ASSHOLE_IMAGES = "assholeImages";
+	private static final int ESH_THRESHOLD = 40;
+	private static final int YTA_THRESHOLD = 66;
 	static final int NOT_QUORUM = 2;
 	public static final String[] assholeLevels = new String[] { "asshole", "mediocre", "nice" };
-	private CategoriedItems<String> resultCategories;
+	private CategoriedItems<String> resultTexts;
+	private CategoriedItems<ImageLink> resultImages;
+	private List<ImageLink> assholeImages;
 
 	public AitaTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
 			Message topic, CategoriedItems<String> resultCategories) throws TelegramApiException {
 		super(bot, ranter, activater, chatId, activation, topic, NOT_QUORUM);
 
-		this.resultCategories = resultCategories;
+		this.resultTexts = resultCategories;
+		this.resultImages = new CategoriedItems<ImageLink>(ASSHOLE_IMAGES);
+		assholeImages = resultImages.getList(ASSHOLE_IMAGES);
+		for (int i = 1; i <= 7; i++) {
+			String url = "http://www.hapke.ca/images/asshole" + i + ".mp4";
+			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
+			assholeImages.add(lnk);
+		}
 	}
 
 	@Override
@@ -69,20 +85,32 @@ public class AitaTracker extends VoteTracker<Float> {
 		if (completed) {
 			List<String> category;
 			int i;
-			if (score >= 66) {
+			if (score >= YTA_THRESHOLD) {
 				i = 0;
-			} else if (score >= 40) {
+			} else if (score >= ESH_THRESHOLD) {
 				i = 1;
 			} else {
 				i = 2;
 			}
-			category = resultCategories.getList(assholeLevels[i]);
+			category = resultTexts.getList(assholeLevels[i]);
 			String response = CampingUtil.getRandom(category);
 			if (response != null && response.length() > 0) {
 				sb.add(new TextFragment("\n\n"));
 				sb.add(new TextFragment(response));
 			}
 		}
+	}
+
+	@Override
+	public CommandResult createCompletionResult() {
+		if (getScore() >= YTA_THRESHOLD) {
+			List<ResultFragment> votes = getVotesText(true);
+			ImageCommandResult icr = new ImageCommandResult(BotCommand.VoteTopicComplete,
+					CampingUtil.getRandom(assholeImages), votes);
+
+			return icr;
+		}
+		return super.createCompletionResult();
 	}
 
 	@Override

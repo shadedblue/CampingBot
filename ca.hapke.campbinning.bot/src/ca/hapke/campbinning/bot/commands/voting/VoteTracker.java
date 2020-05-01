@@ -22,6 +22,7 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.EditTextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -226,11 +227,7 @@ public abstract class VoteTracker<T> {
 		}
 	}
 
-	public void complete() {
-		if (completed)
-			return;
-
-		completed = true;
+	public void updateBannerFinished() {
 		try {
 			EditTextCommandResult edit = new EditTextCommandResult(BotCommand.VoteTopicComplete, bannerMessage,
 					VOTING_COMPLETED);
@@ -238,7 +235,9 @@ public abstract class VoteTracker<T> {
 		} catch (TelegramApiException e2) {
 			// HACK ignoring exceptions that come back for unchanged messages
 		}
+	}
 
+	public void unpinBanner() {
 		try {
 			Message pinnedMsg = bot.execute(new GetChat(chatId)).getPinnedMessage();
 			if (pinnedMsg != null && bannerMessage.getMessageId().equals(pinnedMsg.getMessageId())) {
@@ -247,13 +246,19 @@ public abstract class VoteTracker<T> {
 			}
 		} catch (TelegramApiException e1) {
 		}
+	}
 
+	public CommandResult createCompletionResult() {
+		List<ResultFragment> votes = getVotesText(true);
+		return new TextCommandResult(BotCommand.VoteTopicComplete, votes);
+	}
+
+	public void sendFinishedVotingMessage() {
 		Integer messageId = topicMessage.getMessageId();
 		EventLogger logger = EventLogger.getInstance();
 
 		try {
-			List<ResultFragment> votes = getVotesText(true);
-			TextCommandResult completionMsg = new TextCommandResult(BotCommand.VoteTopicComplete, votes);
+			CommandResult completionMsg = createCompletionResult();
 			completionMsg.setReplyTo(messageId);
 			SendResult result = completionMsg.sendInternal(bot, chatId);
 
@@ -262,6 +267,17 @@ public abstract class VoteTracker<T> {
 		} catch (TelegramApiException e) {
 			logger.add(new EventItem(e.getLocalizedMessage()));
 		}
+	}
+
+	public void complete() {
+		if (completed)
+			return;
+
+		completed = true;
+		updateBannerFinished();
+		unpinBanner();
+
+		sendFinishedVotingMessage();
 	}
 
 	protected String getVote(CampingUser user) {

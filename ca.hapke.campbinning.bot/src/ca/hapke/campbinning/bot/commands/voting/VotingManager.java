@@ -75,7 +75,6 @@ public class VotingManager extends CampingSerializable
 			long now = System.currentTimeMillis();
 			if (now > r.getCompletionTime() || r.isCompleted()) {
 				r.complete();
-//				float score = r.getScore();
 				r.getActivater().increment(BotCommand.VoteActivatorComplete);
 				inProgress.remove(r);
 				continue;
@@ -87,7 +86,6 @@ public class VotingManager extends CampingSerializable
 
 	public CommandResult startVoting(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
 			CampingUser activater) {
-//		String rest;
 		CommandResult result;
 
 		try {
@@ -106,11 +104,9 @@ public class VotingManager extends CampingSerializable
 
 	private CommandResult startVotingInternal(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
 			CampingUser activater, Message topic) throws TelegramApiException {
-//		String rest;
 		VoteTracker tracker = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
-//			throw new VoteCreationFailedException(VoteCreationFailedException.ALREADY_BEING_VOTED_ON);
 			return new TextCommandResult(BotCommand.VoteInitiationFailed,
 					new TextFragment(VotingManager.ALREADY_BEING_VOTED_ON));
 		} else {
@@ -130,12 +126,9 @@ public class VotingManager extends CampingSerializable
 			inProgress.add(tracker);
 			voteOnMessages.put(rantMessageId, tracker);
 			voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
-//			rest = topic.getText();
 			ranter.increment(BotCommand.RantActivatorInitiation);
 		}
 		return tracker.getBannerText();
-//		return new NoopCommandResult(BotCommand.VoteTopicInitiation, tracker.getBanner(),
-//				new TextFragment(tracker.getBannerTitle()), new TextFragment(tracker.previousBanner));
 	}
 
 	@Override
