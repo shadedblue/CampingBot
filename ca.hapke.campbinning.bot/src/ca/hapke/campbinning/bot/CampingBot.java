@@ -175,7 +175,7 @@ public class CampingBot extends CampingBotEngine {
 		case IunnoGoogleIt:
 			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
 		case Spell:
-			result = spellCommand.spellCommand(campingFromUser, findTarget(message.getEntities()));
+			result = spellCommand.spellCommand(campingFromUser, findTarget(message.getEntities()), message);
 			break;
 
 		case RantActivatorInitiation:

@@ -3,6 +3,8 @@ package ca.hapke.campbinning.bot.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
+
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
@@ -14,6 +16,7 @@ import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
@@ -50,7 +53,14 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 	private List<String> items;
 	private List<String> exclamations;
 
-	public CommandResult spellCommand(CampingUser campingFromUser, CampingUser targetUser) {
+	public CommandResult spellCommand(CampingUser campingFromUser, CampingUser targetUser, Message message) {
+		if (targetUser == null) {
+			Message replyTo = message.getReplyToMessage();
+			if (replyTo != null) {
+				targetUser = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
+			}
+		}
+
 		SpellResult result = createSpell(campingFromUser, targetUser);
 		countSpellActivation(campingFromUser, targetUser);
 		return result.provideCommandResult();
