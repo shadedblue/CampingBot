@@ -78,7 +78,7 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	}
 
 	@Override
-	public boolean isMatch(String msg, List<MessageEntity> entities) {
+	public boolean isMatch(String msg, Message message) {
 		if (!cooldown.isReady())
 			return false;
 

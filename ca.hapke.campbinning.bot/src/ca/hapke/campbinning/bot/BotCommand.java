@@ -17,6 +17,7 @@ public enum BotCommand implements CommandType {
 	AllFaces("allfaces", true, BotCommandIds.BALLS | BotCommandIds.USE),
 	AllBalls("allballs", true, BotCommandIds.BALLS | BotCommandIds.USE),
 	Countdown("countdown", false),
+	Hype("hype", true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.TEXT | BotCommandIds.USE),
 
 	// Activator is the user who invokes /rant
 	RantActivatorInitiation("rant", true, BotCommandIds.RANT | BotCommandIds.VOTING | BotCommandIds.SET),

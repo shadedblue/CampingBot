@@ -36,8 +36,8 @@ public class PleasureModelCommand implements TextCommand {
 	 * FIXME only detects if @CampingBot is last entity
 	 */
 	@Override
-	public boolean isMatch(String msg, List<MessageEntity> entities) {
-		CampingUser targetUser = bot.findTarget(entities);
+	public boolean isMatch(String msg, Message message) {
+		CampingUser targetUser = bot.findTarget(message);
 		CampingUser meCamping = bot.getMeCamping();
 		return targetUser == meCamping && msg.contains(PLEASURE_MODEL) && msg.endsWith("?");
 	}

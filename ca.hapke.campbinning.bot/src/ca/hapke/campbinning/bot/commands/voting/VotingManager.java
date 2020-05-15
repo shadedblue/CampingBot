@@ -190,7 +190,7 @@ public class VotingManager extends CampingSerializable
 	}
 
 	@Override
-	public boolean isMatch(String msg, List<MessageEntity> entities) {
+	public boolean isMatch(String msg, Message message) {
 		msg = msg.toLowerCase().trim();
 		if (msg.endsWith("/" + BotCommand.AitaActivatorInitiation.command))
 			return true;

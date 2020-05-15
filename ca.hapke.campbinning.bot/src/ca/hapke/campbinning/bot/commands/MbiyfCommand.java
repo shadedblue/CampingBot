@@ -25,7 +25,9 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.Resources;
+import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionDisplay;
@@ -35,6 +37,7 @@ import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 
 /**
  * @author Nathan Hapke
@@ -59,12 +62,23 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	private TimesProvider<MbiyfMode> times;
 	private List<CampingUser> userRestriction;
 	private MbiyfType mode = MbiyfType.Off;
+	private CategoriedItems<ImageLink> mbiyFridayImages;
+	private List<ImageLink> fridayImages;
 
 	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
+	private static final String FRIDAY_IMAGES = "mbiyfImages";
 
 	public MbiyfCommand(CampingBot campingBot, Resources res) {
 		this.bot = campingBot;
 		this.res = res;
+
+		this.mbiyFridayImages = new CategoriedItems<ImageLink>(FRIDAY_IMAGES);
+		fridayImages = mbiyFridayImages.getList(FRIDAY_IMAGES);
+		for (int i = 1; i <= 4; i++) {
+			String url = "http://www.hapke.ca/images/mbiyf" + i + ".mp4";
+			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
+			fridayImages.add(lnk);
+		}
 	}
 
 	public void init() {
@@ -107,14 +121,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 
-		CampingUser targetUser = bot.findTarget(entities);
-
-		if (targetUser == null) {
-			Message replyTo = message.getReplyToMessage();
-			if (replyTo != null) {
-				targetUser = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
-			}
-		}
+		CampingUser targetUser = bot.findTarget(message);
 
 		if (userRestriction != null && !userRestriction.contains(targetUser))
 			return null;
@@ -141,7 +148,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	}
 
 	@Override
-	public boolean isMatch(String msg, List<MessageEntity> entities) {
+	public boolean isMatch(String msg, Message message) {
 		if (!enabled)
 			return false;
 
@@ -181,7 +188,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		if (chatId == -1)
 			return;
 		MbiyfType type = value.getType();
-		TextCommandResult result = null;
+		CommandResult result = null;
 		switch (type) {
 		case Birthday:
 			result = announceBirthday(value);
@@ -198,7 +205,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		}
 	}
 
-	public TextCommandResult announceBirthday(MbiyfMode value) throws TelegramApiException {
+	public CommandResult announceBirthday(MbiyfMode value) throws TelegramApiException {
 		Emoji cake = res.getCake();
 
 //		StringBuilder sb = new StringBuilder();
@@ -256,58 +263,16 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		return sb;
 	}
 
-	public TextCommandResult announceFriday(MbiyfMode value) throws TelegramApiException {
-		TextCommandResult sb = new TextCommandResult(BotCommand.MbiyfAnnouncement);
+	public CommandResult announceFriday(MbiyfMode value) throws TelegramApiException {
+		ImageLink image = CampingUtil.getRandom(fridayImages);
+		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		result.add("It's M");
+		result.add(res.getRandomBallEmoji());
+		result.add("IY");
+		result.add(res.getRandomFaceEmoji());
+		result.add("riday motha'uckas!");
 
-		List<Emoji> bar = new ArrayList<>();
-		Emoji add = res.getFace("smirk");
-		if (add != null)
-			bar.add(add);
-		add = res.getBall("boom");
-		if (add != null)
-			bar.add(add);
-		add = res.getBall("fire");
-		if (add != null)
-			bar.add(add);
-
-		for (int i = 0; i < bar.size(); i++) {
-			Emoji emoji = bar.get(i);
-			for (int j = 0; j < REPEATS; j++) {
-				sb.add(emoji);
-			}
-		}
-		sb.add("\n");
-		String poopUni = res.getBall("poop").getUnicode();
-		sb.add(poopUni);
-		sb.add("OHHHHH SHITTTT");
-		sb.add(poopUni);
-		sb.add("\nIt's MBIYFriday motha'uckas!\n");
-
-		for (int i = bar.size() - 1; i >= 0; i--) {
-			Emoji emoji = bar.get(i);
-			for (int j = 0; j < REPEATS; j++) {
-				sb.add(emoji);
-			}
-		}
-
-		sb.add("\n\n");
-
-		sb.add("PREPARE YOUR\n");
-		List<Emoji> emojis = new ArrayList<Emoji>(COUNT);
-
-		getQty(res::getRandomFaceEmoji, emojis, COUNT);
-		for (Emoji emoji : emojis) {
-			sb.add(emoji);
-		}
-		sb.add("\nFOR\n");
-		emojis.clear();
-
-		getQty(res::getRandomBallEmoji, emojis, COUNT);
-		for (Emoji emoji : emojis) {
-			sb.add(emoji);
-		}
-
-		return sb;
+		return result;
 	}
 
 	private void appendBirthdayNames(TextCommandResult sb) {

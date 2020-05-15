@@ -40,7 +40,7 @@ public class IunnoCommand implements TextCommand, HasCategories<ImageLink> {
 	}
 
 	@Override
-	public boolean isMatch(String msg, List<MessageEntity> entities) {
+	public boolean isMatch(String msg, Message message) {
 		String msgLower = msg.toLowerCase().trim();
 		return msgLower.endsWith("/" + BotCommand.IunnoGoogleIt.command);
 	}

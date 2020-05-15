@@ -37,6 +37,6 @@ public abstract class ResultFragment {
 	}
 
 	public String markup(String p) {
-		return style.markup + p + style.markup;
+		return style.getPre() + p + style.getPost();
 	}
 }

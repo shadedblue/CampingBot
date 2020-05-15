@@ -23,7 +23,8 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  */
 public class CountdownGenerator extends CampingSerializable implements HasCategories<String> {
 
-	private static final String HYPE_CATEGORY = "hype";
+	public static final String COUNTDOWN_CONTAINER = "Countdown";
+	public static final String HYPE_CATEGORY = "hype";
 	// Month is 0-indexed for some stupid inconsistent reason...
 	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 3, 10, 20, 0, 00).toZonedDateTime();
 	private List<String> hypes;
@@ -42,7 +43,7 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 
 	@Override
 	public String getContainerName() {
-		return "Countdown";
+		return COUNTDOWN_CONTAINER;
 	}
 
 	public void setHypes(List<String> h) {
@@ -103,6 +104,10 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		result.add(hypeMsg);
 
 		return result;
+	}
+
+	protected List<String> getHypes() {
+		return hypes;
 	}
 
 	@Override

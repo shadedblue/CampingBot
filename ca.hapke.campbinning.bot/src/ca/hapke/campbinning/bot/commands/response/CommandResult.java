@@ -82,6 +82,11 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult add(String msg, CaseChoice c, TextStyle t) {
+		fragments.add(new TextFragment(msg, c, t));
+		return this;
+	}
+
 	public CommandResult add(CampingUser cu) {
 		fragments.add(new MentionFragment(cu));
 		return this;
@@ -120,6 +125,10 @@ public abstract class CommandResult {
 	}
 
 	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;
+
+	public SendResult getResult() {
+		return result;
+	}
 
 	@Override
 	public String toString() {

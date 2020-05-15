@@ -17,5 +17,5 @@ public interface TextCommand {
 	public abstract CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message);
 
-	public abstract boolean isMatch(String msg, List<MessageEntity> entities);
+	public abstract boolean isMatch(String msg, Message message);
 }

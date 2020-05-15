@@ -8,8 +8,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
-import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
+import ca.hapke.campbinning.bot.commands.HypeCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
@@ -20,11 +20,6 @@ import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.afd.AfdMatrixPictures;
-import ca.hapke.campbinning.bot.commands.response.afd.AfdTextCommand;
-import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayEnabler;
-import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayProcessor;
-import ca.hapke.campbinning.bot.commands.response.darkmode.DarkModeMessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.voting.VotingManager;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
@@ -46,6 +41,7 @@ public class CampingBot extends CampingBotEngine {
 	private PartyEverydayCommand partyCommand;
 
 	private CountdownGenerator countdownGen;
+	private HypeCommand hypeCommand;
 	private DatabaseConsumer databaseConsumer;
 	private SpellGenerator spellCommand;
 
@@ -58,9 +54,9 @@ public class CampingBot extends CampingBotEngine {
 
 	private CalendarMonitor calMonitor;
 
-	private AfdTextCommand afdText;
-	private AfdMatrixPictures afdMatrix;
-	private AprilFoolsDayEnabler afdEnabler;
+//	private AfdTextCommand afdText;
+//	private AfdMatrixPictures afdMatrix;
+//	private AprilFoolsDayEnabler afdEnabler;
 
 	public CampingBot() {
 		voting = new VotingManager(this);
@@ -73,6 +69,7 @@ public class CampingBot extends CampingBotEngine {
 
 		ballsCommand = new MbiyfCommand(this, res);
 		countdownGen = new CountdownGenerator(res, ballsCommand);
+		hypeCommand = new HypeCommand(this, countdownGen);
 
 		spellInline = new SpellInlineCommand(spellCommand);
 
@@ -82,18 +79,18 @@ public class CampingBot extends CampingBotEngine {
 		res.loadAllEmoji();
 		serializer.load();
 
-		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
-		afdp.addAtEnd(processor);
+//		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
+//		afdp.addAtEnd(processor);
 
-		DarkModeMessageProcessor dmp = new DarkModeMessageProcessor();
-		dmp.addAtEnd(afdp);
+//		DarkModeMessageProcessor dmp = new DarkModeMessageProcessor();
+//		dmp.addAtEnd(afdp);
 
-		processor = dmp;
+//		processor = dmp;
 
-		CampingChat chat = chatManager.get(system.getAnnounceChat());
-		afdText = new AfdTextCommand(this, afdp, chat);
-		afdMatrix = new AfdMatrixPictures(this, chat);
-		afdEnabler = new AprilFoolsDayEnabler(afdText, afdMatrix, afdp);
+//		CampingChat chat = chatManager.get(system.getAnnounceChat());
+//		afdText = new AfdTextCommand(this, afdp, chat);
+//		afdMatrix = new AfdMatrixPictures(this, chat);
+//		afdEnabler = new AprilFoolsDayEnabler(afdText, afdMatrix, afdp);
 
 		ballsCommand.init();
 
@@ -102,7 +99,7 @@ public class CampingBot extends CampingBotEngine {
 		textCommands.add(pleasureCommand);
 		textCommands.add(iunnoCommand);
 		textCommands.add(partyCommand);
-		textCommands.add(afdText);
+//		textCommands.add(afdText);
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameCommand);
 		callbackCommands.add(voting);
@@ -112,13 +109,14 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
 		calMonitor.add(voting);
-		calMonitor.add(afdMatrix);
-		calMonitor.add(afdEnabler);
+//		calMonitor.add(afdMatrix);
+//		calMonitor.add(afdEnabler);
 
-		calMonitor.add(dmp);
+//		calMonitor.add(dmp);
 
 		hasCategories.add(spellCommand);
 		hasCategories.add(countdownGen);
+		hasCategories.add(hypeCommand);
 		hasCategories.add(voting);
 		hasCategories.add(partyCommand);
 	}
@@ -159,6 +157,7 @@ public class CampingBot extends CampingBotEngine {
 		case VoteActivatorComplete:
 		case VoteTopicInitiation:
 		case VoteInitiationFailed:
+		case Talk:
 			// NOOP : internal events, not responses
 			break;
 		case SpellDipshit:
@@ -175,7 +174,7 @@ public class CampingBot extends CampingBotEngine {
 		case IunnoGoogleIt:
 			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
 		case Spell:
-			result = spellCommand.spellCommand(campingFromUser, findTarget(message.getEntities()), message);
+			result = spellCommand.spellCommand(campingFromUser, message);
 			break;
 
 		case RantActivatorInitiation:
@@ -185,6 +184,10 @@ public class CampingBot extends CampingBotEngine {
 
 		case Countdown:
 			result = countdownGen.countdownCommand(userMonitor, chatId);
+			break;
+
+		case Hype:
+			result = hypeCommand.hypeCommand(campingFromUser);
 			break;
 
 		case AllNicknames:
@@ -197,6 +200,8 @@ public class CampingBot extends CampingBotEngine {
 			result = reloadCommand(campingFromUser);
 			break;
 		case UiString:
+			break;
+		default:
 			break;
 		}
 

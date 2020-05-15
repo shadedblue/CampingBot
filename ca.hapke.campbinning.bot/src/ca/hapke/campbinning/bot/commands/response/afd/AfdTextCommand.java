@@ -94,7 +94,7 @@ public class AfdTextCommand implements TextCommand {
 	}
 
 	@Override
-	public boolean isMatch(String msg, List<MessageEntity> entities) {
+	public boolean isMatch(String msg, Message message) {
 		return enabled;
 	}
 
