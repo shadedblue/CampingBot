@@ -352,22 +352,20 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		CampingUser targetUser = null;
 		List<MessageEntity> entities = message.getEntities();
 		int minOffset = -1;
-		if (entities == null)
-			return null;
-		for (MessageEntity msgEnt : entities) {
-			String type = msgEnt.getType();
-			int offset = msgEnt.getOffset();
-			if (minOffset == -1 || offset < minOffset) {
-				if (MENTION.equalsIgnoreCase(type)) {
-					// usernamed victim: the text is their
-					// @username
-					targetUser = userMonitor.monitor(msgEnt);
-				} else if (TEXT_MENTION.equalsIgnoreCase(type)) {
-					// non-usernamed victim: we get the User
-					// struct
-					targetUser = userMonitor.getUser(msgEnt.getUser());
-				} else {
-					continue;
+		if (entities != null) {
+			for (MessageEntity msgEnt : entities) {
+				String type = msgEnt.getType();
+				int offset = msgEnt.getOffset();
+				if (minOffset == -1 || offset < minOffset) {
+					if (MENTION.equalsIgnoreCase(type)) {
+						// usernamed victim: the text is their @username
+						targetUser = userMonitor.monitor(msgEnt);
+					} else if (TEXT_MENTION.equalsIgnoreCase(type)) {
+						// non-usernamed victim: we get the User struct
+						targetUser = userMonitor.getUser(msgEnt.getUser());
+					} else {
+						continue;
+					}
 				}
 			}
 		}
