@@ -36,6 +36,7 @@ import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 
@@ -89,8 +90,9 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 		Map<String, List<CampingUser>> birthdayMap = new HashMap<>();
 		for (CampingUser u : monitor.getUsers()) {
-			if (u.hasBirthday()) {
-				String key = u.getBirthdayMonth() + "$" + u.getBirthdayDay();
+			Birthday b = u.getBirthday();
+			if (b != null) {
+				String key = b.getKey();
 				List<CampingUser> lst = birthdayMap.get(key);
 				if (lst == null) {
 					lst = new ArrayList<>();
@@ -101,9 +103,9 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		}
 
 		for (List<CampingUser> usersByDay : birthdayMap.values()) {
-			CampingUser u = usersByDay.get(0);
-			ByTimeOfYear<MbiyfMode> enable = new ByTimeOfYear<MbiyfMode>(u.getBirthdayMonth(), u.getBirthdayDay(),
-					ENABLE_HOUR, ENABLE_MIN, new MbiyfMode(MbiyfType.Birthday, usersByDay));
+			Birthday birthday = usersByDay.get(0).getBirthday();
+			ByTimeOfYear<MbiyfMode> enable = new ByTimeOfYear<MbiyfMode>(birthday.getMonth(),
+					birthday.getDay(), ENABLE_HOUR, ENABLE_MIN, new MbiyfMode(MbiyfType.Birthday, usersByDay));
 			targets.add(enable);
 
 			ZonedDateTime disableTime = enable.generateATargetTime().plus(ENABLE_LENGTH_HOURS, ChronoUnit.HOURS);

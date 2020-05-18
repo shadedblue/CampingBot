@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
+import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
@@ -253,11 +254,10 @@ public class CampingUserMonitor extends CampingSerializable {
 			of.tagAndValue("first", u.getFirstname());
 			of.tagAndValue("last", u.getLastname());
 			of.tagAndValue("nickname", u.getNickname());
-			int day = u.getBirthdayDay();
-			int month = u.getBirthdayMonth();
-			if (month != -1 && day != -1) {
-				of.tagAndValue("birthdayMonth", month);
-				of.tagAndValue("birthdayDay", day);
+			Birthday bday = u.getBirthday();
+			if (bday != null) {
+				of.tagAndValue("birthdayMonth", bday.getMonth());
+				of.tagAndValue("birthdayDay", bday.getDay());
 			}
 			of.tagAndValue("lastUpdate", u.getLastUpdate());
 

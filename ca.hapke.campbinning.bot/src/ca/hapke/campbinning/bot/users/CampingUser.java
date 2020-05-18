@@ -2,6 +2,9 @@ package ca.hapke.campbinning.bot.users;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.util.CampingUtil;
@@ -10,6 +13,50 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class CampingUser {
+	public class Birthday implements Comparable<Birthday> {
+
+		public Birthday(int month, int day) {
+			this.month = month;
+			this.day = day;
+			birthdayString = Month.of(month).getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()) + " "
+					+ CampingUtil.ordinal(day);
+		}
+
+		private int month;
+		private int day;
+		private String birthdayString;
+
+		public int getMonth() {
+			return month;
+		}
+
+		public int getDay() {
+			return day;
+		}
+
+		public String getKey() {
+			return month + "$" + day;
+		}
+
+		@Override
+		public int compareTo(Birthday that) {
+			if (that == null)
+				return 1;
+
+			if (this.month != that.month)
+				return this.month - that.month;
+			if (this.day != that.day)
+				return this.day - that.day;
+			return 0;
+		}
+
+		@Override
+		public String toString() {
+			return birthdayString;
+		}
+
+	}
+
 	private int telegramId = -1;
 	private final int campingId;
 	private String username;
@@ -18,8 +65,7 @@ public class CampingUser {
 	private String nickname;
 
 	private long lastUpdate;
-	private int birthdayMonth = -1;
-	private int birthdayDay = -1;
+	private Birthday birthday;
 
 	// For GlazedLists to autosort
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -78,38 +124,25 @@ public class CampingUser {
 	}
 
 	public void setBirthday(int month, int day) {
-		if (birthdayMonth != -1 || birthdayDay != -1)
+		if (birthday != null)
 			return;
 
-		if (month == -1 || day == -1)
+		if (month == -1 || day == -1 || month > 12 || day > 31)
 			return;
 
-		int oldMonth = birthdayMonth;
-		float oldDay = birthdayDay;
-		birthdayMonth = month;
-		birthdayDay = day;
+		birthday = new Birthday(month, day);
 
-		support.firePropertyChange("birthdayMonth", oldMonth, birthdayMonth);
-		support.firePropertyChange("birthdayDay", oldDay, birthdayDay);
+		support.firePropertyChange("birthdayMonth", -1, month);
+		support.firePropertyChange("birthdayDay", -1, day);
 	}
 
-	public int getBirthdayMonth() {
-		return birthdayMonth;
-	}
-
-	public int getBirthdayDay() {
-		return birthdayDay;
-	}
 
 	public boolean hasBirthday() {
-		return birthdayMonth != -1 && birthdayDay != -1;
+		return birthday != null;
 	}
 
-	public String getBirthday() {
-		String result = "";
-		if (birthdayMonth != -1 && birthdayDay != -1)
-			result = birthdayMonth + "/" + birthdayDay;
-		return result;
+	public Birthday getBirthday() {
+		return birthday;
 	}
 
 	public void mergeFrom(CampingUser other) {

@@ -10,8 +10,8 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 public class TableFormatCampingUser extends CampingTableFormat implements AdvancedTableFormat<CampingUser> {
 
 	public TableFormatCampingUser() {
-		super(new String[] { "C-ID", "T-ID", "Username", "First", "Last", "Nickname", "B-Day", "Last Update" },
-				new int[] { 50, 75, 150, 100, 100, 250, 75, 200 });
+		super(new String[] { "C-ID", "T-ID", "Username", "First", "Last", "Nickname", "B-Day", "Last" },
+				new int[] { 50, 100, 150, 100, 100, 250, 75, 125 });
 	}
 
 	@Override
@@ -48,8 +48,9 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 		case 3:
 		case 4:
 		case 5:
-		case 6:
 			return String.class;
+		case 6:
+			return CampingUser.Birthday.class;
 		case 7:
 			return Long.class;
 		}

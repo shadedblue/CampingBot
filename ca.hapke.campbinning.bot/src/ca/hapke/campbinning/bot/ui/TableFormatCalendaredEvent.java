@@ -11,7 +11,7 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 public class TableFormatCalendaredEvent extends CampingTableFormat implements AdvancedTableFormat<CalendaredEvent> {
 
 	public TableFormatCalendaredEvent() {
-		super(new String[] { "Thread", "Next", "Prev Run", "Should Run" }, new int[] { 100, 50, 100, 50 });
+		super(new String[] { "Thread", "Next", "Prev", "Run?" }, new int[] { 125, 75, 75, 25 });
 	}
 
 	@Override

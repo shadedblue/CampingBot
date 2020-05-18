@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot.ui;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.SystemTray;
@@ -122,7 +123,6 @@ public class CampingBotUi extends JFrame {
 	private JTextField txtChat;
 	private JList<CampingChat> lstChats;
 	private JScrollPane sclChats;
-	private JLabel lblChats;
 	private JTextArea txtCategoryValue;
 	private JComboBox<String> cmbCategories;
 	private Map<String, HasCategories> categoriesMap = new HashMap<>();
@@ -164,7 +164,7 @@ public class CampingBotUi extends JFrame {
 				TimerThreadWithKill.shutdownThreads();
 			}
 		});
-		setBounds(100, 100, 1066, 654);
+		setBounds(100, 100, 1284, 654);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -181,7 +181,7 @@ public class CampingBotUi extends JFrame {
 		sclUsers = new JScrollPane();
 		sclUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclUsers.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sclUsers.setBounds(10, 103, 1018, 217);
+		sclUsers.setBounds(20, 103, 841, 217);
 		contentPane.add(sclUsers);
 		tblUsers = new JTable(userModel);
 		sclUsers.setViewportView(tblUsers);
@@ -210,7 +210,7 @@ public class CampingBotUi extends JFrame {
 
 		JScrollPane sclSec = new JScrollPane();
 		sclSec.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		sclSec.setBounds(683, 363, 345, 243);
+		sclSec.setBounds(882, 103, 376, 217);
 		contentPane.add(sclSec);
 
 		tblSeconds = new JTable(calendaredModel);
@@ -225,7 +225,7 @@ public class CampingBotUi extends JFrame {
 
 		lblStatus = new JLabel("Offline");
 		lblStatus.setVerticalAlignment(SwingConstants.TOP);
-		lblStatus.setBounds(10, 32, 120, 60);
+		lblStatus.setBounds(22, 36, 116, 54);
 		contentPane.add(lblStatus);
 
 		btnConnect = new JButton("Connect");
@@ -242,7 +242,7 @@ public class CampingBotUi extends JFrame {
 				}
 			}
 		});
-		btnConnect.setBounds(10, 7, 120, 23);
+		btnConnect.setBounds(20, 7, 120, 23);
 		contentPane.add(btnConnect);
 		CampingChatManager chatMgr = CampingChatManager.getInstance(bot);
 		DefaultEventComboBoxModel<CampingChat> chatModel = new DefaultEventComboBoxModel<>(
@@ -251,7 +251,7 @@ public class CampingBotUi extends JFrame {
 		sclChats = new JScrollPane();
 		sclChats.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclChats.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sclChats.setBounds(140, 33, 419, 59);
+		sclChats.setBounds(161, 33, 474, 59);
 		contentPane.add(sclChats);
 		lstChats = new JList<CampingChat>();
 		sclChats.setViewportView(lstChats);
@@ -267,23 +267,24 @@ public class CampingBotUi extends JFrame {
 		txtChat = new JTextField();
 		txtChat.addActionListener(sendChatListener);
 		txtChat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		txtChat.setBounds(190, 5, 270, 26);
+		txtChat.setBounds(161, 5, 370, 26);
 		contentPane.add(txtChat);
 		txtChat.setColumns(10);
 
 		JButton btnSay = new JButton("Say");
 		btnSay.addActionListener(sendChatListener);
-		btnSay.setBounds(465, 5, 94, 26);
+		btnSay.setBounds(541, 5, 94, 26);
 		contentPane.add(btnSay);
 
-		lblChats = new JLabel("Chat");
-		lblChats.setBounds(140, 11, 46, 17);
+		JLabel lblChats = new CategoryLabel("Chat", Color.cyan);
+		lblChats.setHorizontalAlignment(SwingConstants.CENTER);
+		lblChats.setBounds(140, 7, 19, 85);
 		contentPane.add(lblChats);
 
 		JScrollPane sclLog = new JScrollPane();
 		sclLog.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclLog.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		sclLog.setBounds(10, 362, 663, 244);
+		sclLog.setBounds(20, 331, 1238, 275);
 		contentPane.add(sclLog);
 
 		EventList<EventItem> recentLog = eventLogger.getUiLog();
@@ -295,27 +296,17 @@ public class CampingBotUi extends JFrame {
 		lstLog.setModel(logModel);
 		lstLog.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		JLabel lblLog = new JLabel("Log");
-		lblLog.setBounds(10, 331, 120, 20);
+		CategoryLabel lblLog = new CategoryLabel("Log", Color.MAGENTA);
+		lblLog.setBounds(0, 331, 19, 275);
 		contentPane.add(lblLog);
 
-		JButton btnLoadMore = new JButton("Load More");
-		btnLoadMore.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnLoadMore.setBounds(53, 331, 123, 23);
-		contentPane.add(btnLoadMore);
-
-		JLabel lblBySeconds = new JLabel("Calendared Events");
-		lblBySeconds.setBounds(683, 334, 123, 14);
+		CategoryLabel lblBySeconds = new CategoryLabel("Calendared", Color.green);
+		lblBySeconds.setBounds(859, 103, 22, 217);
 		contentPane.add(lblBySeconds);
 
-		JLabel lblNewLabel = new JLabel("Category");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.TRAILING);
-		lblNewLabel.setBounds(569, 5, 61, 20);
-		contentPane.add(lblNewLabel);
+		CategoryLabel lblCategory = new CategoryLabel("Categories", Color.orange);
+		lblCategory.setBounds(640, 7, 19, 85);
+		contentPane.add(lblCategory);
 
 		cmbCategories = new JComboBox<String>();
 		List<HasCategories<String>> hasCategoriess = bot.getCategories();
@@ -335,11 +326,11 @@ public class CampingBotUi extends JFrame {
 		}
 		ComboBoxModel<String> aModel = new DefaultComboBoxModel<String>(categoriesList);
 		cmbCategories.setModel(aModel);
-		cmbCategories.setBounds(635, 5, 313, 20);
+		cmbCategories.setBounds(660, 7, 525, 20);
 		contentPane.add(cmbCategories);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(569, 31, 459, 61);
+		scrollPane.setBounds(660, 31, 598, 61);
 		contentPane.add(scrollPane);
 
 		txtCategoryValue = new JTextArea();
@@ -364,18 +355,16 @@ public class CampingBotUi extends JFrame {
 				}
 			}
 		});
-		btnAddToCategory.setBounds(958, 5, 70, 23);
+		btnAddToCategory.setBounds(1188, 7, 70, 23);
 		contentPane.add(btnAddToCategory);
 
-		JButton btnUpdateRunTimes = new JButton("Update Run Times");
-		btnUpdateRunTimes.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CalendarMonitor.getInstance().updateAllNextTimes();
-			}
-		});
-		btnUpdateRunTimes.setBounds(875, 331, 153, 23);
-		contentPane.add(btnUpdateRunTimes);
+		CategoryLabel lblUsers = new CategoryLabel("Users", Color.blue);
+		lblUsers.setBounds(0, 103, 19, 217);
+		contentPane.add(lblUsers);
+
+		CategoryLabel lblConnection = new CategoryLabel("Connection", Color.red);
+		lblConnection.setBounds(0, 7, 19, 85);
+		contentPane.add(lblConnection);
 
 		Image app = null;
 		try {

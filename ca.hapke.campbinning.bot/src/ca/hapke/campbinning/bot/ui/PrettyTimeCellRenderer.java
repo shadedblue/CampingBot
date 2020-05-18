@@ -12,7 +12,7 @@ import ca.hapke.campbinning.bot.util.TimeFormatter;
 public class PrettyTimeCellRenderer extends DefaultTableCellRenderer {
 
 	private static final long serialVersionUID = -1713959501255857947L;
-	private TimeFormatter formatter = new TimeFormatter(2, ", ", true, true);
+	private TimeFormatter formatter = new TimeFormatter(1, ", ", true, true);
 
 	@Override
 	public void setValue(Object value) {
