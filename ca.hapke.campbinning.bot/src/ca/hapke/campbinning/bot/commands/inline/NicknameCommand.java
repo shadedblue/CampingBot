@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
@@ -135,15 +136,22 @@ public class NicknameCommand extends InlineCommand {
 						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
 								.add(ResultFragment.COLON_SPACE).add(INVALID_CHARACTER);
 					} else {
+						String oldNick = targetUser.getNickname();
 						targetUser.setNickname(newNickname);
 
-						CommandResult sb = new TextCommandResult(BotCommand.SetNickname);
-						sb.add(campingFromUser);
-						sb.add(ResultFragment.COLON_SPACE);
-						sb.add(targetUser.getFirstOrUserName());
-						sb.add("'s nickname changed to: ");
-						sb.add(targetUser);
-						return sb;
+						CommandResult result = new TextCommandResult(BotCommand.SetNickname);
+						result.add(campingFromUser);
+						result.add(ResultFragment.COLON_SPACE);
+						result.add(targetUser.getFirstOrUserName(), TextStyle.Bold);
+						result.add("'s nickname changed.");
+						if (oldNick != null && oldNick.length() > 0
+								&& !CampingBot.STRING_NULL.equalsIgnoreCase(oldNick)) {
+							result.add("\nFrom: ");
+							result.add(oldNick);
+						}
+						result.add("\nTo: ");
+						result.add(targetUser);
+						return result;
 
 					}
 				}
