@@ -24,6 +24,7 @@ import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -48,8 +49,10 @@ public class VotingManager extends CampingSerializable
 	private CategoriedItems<String> resultCategories;
 	private CampingBot bot;
 	private TimesProvider<Void> times;
-	public static final String ALREADY_BEING_VOTED_ON = "Topic already being voted on";
-	public static final String NO_TOPIC_PROVIDED = "Reply to the topic you would like to vote on!";
+	private static final TextFragment SOMEONE_ELSE_ACTIVATED = new TextFragment(" is the asshole!");
+	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on");
+	private static final TextFragment NO_TOPIC_PROVIDED = new TextFragment(
+			"Reply to the topic you would like to vote on!");
 
 	public VotingManager(CampingBot campingBot) {
 		this.bot = campingBot;
@@ -93,8 +96,7 @@ public class VotingManager extends CampingSerializable
 			if (topic != null) {
 				result = startVotingInternal(type, bot, activation, chatId, activater, topic);
 			} else {
-				result = new TextCommandResult(BotCommand.VoteInitiationFailed,
-						new TextFragment(VotingManager.NO_TOPIC_PROVIDED));
+				result = new TextCommandResult(BotCommand.VoteInitiationFailed, NO_TOPIC_PROVIDED);
 			}
 		} catch (Exception e) {
 			result = new TextCommandResult(BotCommand.VoteInitiationFailed, new TextFragment(e.getMessage()));
@@ -105,16 +107,22 @@ public class VotingManager extends CampingSerializable
 	private CommandResult startVotingInternal(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
 			CampingUser activater, Message topic) throws TelegramApiException {
 		VoteTracker tracker = null;
+		TextCommandResult output = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
-			return new TextCommandResult(BotCommand.VoteInitiationFailed,
-					new TextFragment(VotingManager.ALREADY_BEING_VOTED_ON));
+			return new TextCommandResult(BotCommand.VoteInitiationFailed, ALREADY_BEING_VOTED_ON);
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
 			CampingUser ranter = uM.monitor(topic.getFrom());
 			switch (type) {
 			case AitaActivatorInitiation:
-				tracker = new AitaTracker(bot, ranter, activater, chatId, activation, topic, resultCategories);
+				if (ranter != activater) {
+					output = new TextCommandResult(BotCommand.VoteInitiationFailed, new MentionFragment(activater),
+							SOMEONE_ELSE_ACTIVATED);
+					output.setReplyTo(activation.getMessageId());
+				} else {
+					tracker = new AitaTracker(bot, ranter, activater, chatId, activation, topic, resultCategories);
+				}
 				break;
 			case RantActivatorInitiation:
 				tracker = new RantTracker(bot, ranter, activater, chatId, activation, topic);
@@ -123,12 +131,16 @@ public class VotingManager extends CampingSerializable
 				return null;
 			}
 
-			inProgress.add(tracker);
-			voteOnMessages.put(rantMessageId, tracker);
-			voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
-			ranter.increment(BotCommand.RantActivatorInitiation);
+			if (tracker != null) {
+				inProgress.add(tracker);
+				voteOnMessages.put(rantMessageId, tracker);
+				voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
+			}
 		}
-		return tracker.getBannerText();
+		if (output == null && tracker != null) {
+			output = tracker.getBannerText();
+		}
+		return output;
 	}
 
 	@Override
