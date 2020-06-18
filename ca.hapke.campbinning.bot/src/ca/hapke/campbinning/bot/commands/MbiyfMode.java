@@ -15,6 +15,11 @@ public class MbiyfMode {
 		this(enablement, null);
 	}
 
+	public MbiyfMode(MbiyfType type, List<CampingUser> restrictedToUsers) {
+		this.type = type;
+		this.restrictedToUsers = restrictedToUsers;
+	}
+
 	public MbiyfType getType() {
 		return type;
 	}
@@ -23,6 +28,7 @@ public class MbiyfMode {
 		switch (type) {
 		case Birthday:
 		case Friday:
+		case Asshole:
 			return true;
 		case Off:
 		}
@@ -31,11 +37,6 @@ public class MbiyfMode {
 
 	public List<CampingUser> getRestrictedToUsers() {
 		return restrictedToUsers;
-	}
-
-	public MbiyfMode(MbiyfType type, List<CampingUser> restrictedToUsers) {
-		this.type = type;
-		this.restrictedToUsers = restrictedToUsers;
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CallbackCommand;
+import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -53,9 +54,11 @@ public class VotingManager extends CampingSerializable
 	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on");
 	private static final TextFragment NO_TOPIC_PROVIDED = new TextFragment(
 			"Reply to the topic you would like to vote on!");
+	private MbiyfCommand ballsCommand;
 
-	public VotingManager(CampingBot campingBot) {
+	public VotingManager(CampingBot campingBot, MbiyfCommand ballsCommand) {
 		this.bot = campingBot;
+		this.ballsCommand = ballsCommand;
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
 		resultCategories = new CategoriedItems<>(AitaTracker.assholeLevels);
 	}
@@ -121,7 +124,7 @@ public class VotingManager extends CampingSerializable
 							SOMEONE_ELSE_ACTIVATED);
 					output.setReplyTo(activation.getMessageId());
 				} else {
-					tracker = new AitaTracker(bot, ranter, activater, chatId, activation, topic, resultCategories);
+					tracker = new AitaTracker(bot, ranter, chatId, activation, topic, resultCategories, ballsCommand);
 				}
 				break;
 			case RantActivatorInitiation:

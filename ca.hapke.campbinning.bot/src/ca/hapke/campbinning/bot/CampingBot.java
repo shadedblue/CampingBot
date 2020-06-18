@@ -59,7 +59,6 @@ public class CampingBot extends CampingBotEngine {
 //	private AprilFoolsDayEnabler afdEnabler;
 
 	public CampingBot() {
-		voting = new VotingManager(this);
 		spellCommand = new SpellGenerator(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
@@ -68,6 +67,7 @@ public class CampingBot extends CampingBotEngine {
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
+		voting = new VotingManager(this, ballsCommand);
 		countdownGen = new CountdownGenerator(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
 

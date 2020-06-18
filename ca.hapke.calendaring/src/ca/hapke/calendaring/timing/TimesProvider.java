@@ -40,8 +40,16 @@ public class TimesProvider<T> {
 	}
 
 	public TimesProvider(ByCalendar<T> input) {
+		add(input);
+	}
+
+	public void add(ByCalendar<T> input) {
 		times.add(input);
 		generateNearestEvents();
+	}
+
+	public boolean remove(ByCalendar<T> x) {
+		return times.remove(x);
 	}
 
 	public void generateNearestEvents() {

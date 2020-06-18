@@ -1,14 +1,21 @@
 package ca.hapke.campbinning.bot.commands.voting;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.commands.ImageLink;
+import ca.hapke.campbinning.bot.commands.MbiyfCommand;
+import ca.hapke.campbinning.bot.commands.MbiyfMode;
+import ca.hapke.campbinning.bot.commands.MbiyfType;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
@@ -28,12 +35,14 @@ public class AitaTracker extends VoteTracker<Float> {
 	private CategoriedItems<String> resultTexts;
 	private CategoriedItems<ImageLink> resultImages;
 	private List<ImageLink> assholeImages;
+	private MbiyfCommand ballsCommand;
 
-	public AitaTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic, CategoriedItems<String> resultCategories) throws TelegramApiException {
-		super(bot, ranter, activater, chatId, activation, topic, NOT_QUORUM);
+	public AitaTracker(CampingBotEngine bot, CampingUser ranter, Long chatId, Message activation, Message topic,
+			CategoriedItems<String> resultCategories, MbiyfCommand ballsCommand) throws TelegramApiException {
+		super(bot, ranter, ranter, chatId, activation, topic, NOT_QUORUM);
 
 		this.resultTexts = resultCategories;
+		this.ballsCommand = ballsCommand;
 		this.resultImages = new CategoriedItems<ImageLink>(ASSHOLE_IMAGES);
 		assholeImages = resultImages.getList(ASSHOLE_IMAGES);
 		for (int i = 1; i <= 7; i++) {
@@ -108,6 +117,12 @@ public class AitaTracker extends VoteTracker<Float> {
 			ImageCommandResult icr = new ImageCommandResult(BotCommand.VoteTopicComplete,
 					CampingUtil.getRandom(assholeImages), votes);
 
+			MbiyfMode enable = new MbiyfMode(MbiyfType.Asshole, Collections.singletonList(ranter));
+			ballsCommand.doWork(enable);
+			ZonedDateTime enableTime = ZonedDateTime.now();
+			ByTimeOfYear<MbiyfMode> disableEvent = ballsCommand.createDisableAfter(enableTime, 1, ChronoUnit.HOURS); 
+			disableEvent.setRepeats(1);
+			ballsCommand.getTimeProvider().add(disableEvent);
 			return icr;
 		}
 		return super.createCompletionResult();

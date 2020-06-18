@@ -12,6 +12,7 @@ public abstract class ByCalendar<T> {
 	protected ZonedDateTime past;
 
 	public final T value;
+	protected int repeats = -1;
 	protected final int qty;
 	protected final ChronoUnit unit;
 
@@ -64,4 +65,23 @@ public abstract class ByCalendar<T> {
 		}
 	}
 
+	public int getRepeats() {
+		return repeats;
+	}
+
+	public void setRepeats(int repeats) {
+		this.repeats = repeats;
+	}
+
+	/**
+	 * @return if this has expired at repeats == 0
+	 */
+	public boolean activate() {
+		if (repeats < 0) {
+			return false;
+		} else {
+			repeats--;
+			return repeats == 0;
+		}
+	}
 }

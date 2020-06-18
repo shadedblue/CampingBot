@@ -49,7 +49,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	private static final TextFragment IN = new TextFragment(" in ");
 	private static final TextFragment MY = new TextFragment("My ");
 	private static final TextFragment NOT_BALLSING_MYSELF = new TextFragment(": Fuck you, I'm not ballsing myself!");
-	private static final int ENABLE_LENGTH_HOURS = 17;
+	private static final int BIRTHDAY_ENABLE_LENGTH_HOURS = 17;
 	private static final int ENABLE_HOUR = 7;
 	private static final int ENABLE_MIN = 0;
 	private static final int DISABLE_HOUR = 0;
@@ -102,21 +102,28 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			}
 		}
 
+		int len = BIRTHDAY_ENABLE_LENGTH_HOURS;
+		ChronoUnit unit = ChronoUnit.HOURS;
 		for (List<CampingUser> usersByDay : birthdayMap.values()) {
 			Birthday birthday = usersByDay.get(0).getBirthday();
-			ByTimeOfYear<MbiyfMode> enable = new ByTimeOfYear<MbiyfMode>(birthday.getMonth(),
-					birthday.getDay(), ENABLE_HOUR, ENABLE_MIN, new MbiyfMode(MbiyfType.Birthday, usersByDay));
+			ByTimeOfYear<MbiyfMode> enable = new ByTimeOfYear<MbiyfMode>(birthday.getMonth(), birthday.getDay(),
+					ENABLE_HOUR, ENABLE_MIN, new MbiyfMode(MbiyfType.Birthday, usersByDay));
 			targets.add(enable);
-
-			ZonedDateTime disableTime = enable.generateATargetTime().plus(ENABLE_LENGTH_HOURS, ChronoUnit.HOURS);
-
-			ByTimeOfYear<MbiyfMode> disable = new ByTimeOfYear<MbiyfMode>(disableTime.getMonthValue(),
-					disableTime.getDayOfMonth(), disableTime.getHour(), disableTime.getMinute(),
-					new MbiyfMode(MbiyfType.Off));
+			ZonedDateTime enableTime = enable.generateATargetTime();
+			ByTimeOfYear<MbiyfMode> disable = createDisableAfter(enableTime, len, unit);
 			targets.add(disable);
 		}
 		times = new TimesProvider<MbiyfMode>(targets);
 		shouldAnnounce = true;
+	}
+
+	public ByTimeOfYear<MbiyfMode> createDisableAfter(ZonedDateTime enableTime, int len, ChronoUnit unit) {
+		ZonedDateTime disableTime = enableTime.plus(len, unit);
+
+		ByTimeOfYear<MbiyfMode> disable = new ByTimeOfYear<MbiyfMode>(disableTime.getMonthValue(),
+				disableTime.getDayOfMonth(), disableTime.getHour(), disableTime.getMinute(),
+				new MbiyfMode(MbiyfType.Off));
+		return disable;
 	}
 
 	@Override

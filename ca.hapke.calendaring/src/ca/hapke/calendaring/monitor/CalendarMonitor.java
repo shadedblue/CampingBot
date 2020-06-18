@@ -56,6 +56,11 @@ public class CalendarMonitor extends TimerThreadWithKill {
 		if (event.shouldRun()) {
 			try {
 				event.doWork(calendarPoint.value);
+
+				boolean expired = calendarPoint.activate();
+				if (expired) {
+					timeProvider.remove(calendarPoint);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
