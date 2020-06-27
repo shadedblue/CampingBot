@@ -1,8 +1,11 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -44,4 +47,17 @@ public abstract class InlineCommand {
 		return createQueryId(inputs);
 	}
 
+	public static InlineKeyboardMarkup createKeyboard(String[] buttons, String[] values) {
+		InlineKeyboardMarkup board = new InlineKeyboardMarkup();
+		List<InlineKeyboardButton> row = new ArrayList<>();
+		for (int i = 0; i < buttons.length; i++) {
+			String text = buttons[i];
+			String value = values[i];
+			row.add(new InlineKeyboardButton(text).setCallbackData(value));
+		}
+		List<List<InlineKeyboardButton>> fullKeyboard = new ArrayList<List<InlineKeyboardButton>>();
+		fullKeyboard.add(row);
+		board.setKeyboard(fullKeyboard);
+		return board;
+	}
 }

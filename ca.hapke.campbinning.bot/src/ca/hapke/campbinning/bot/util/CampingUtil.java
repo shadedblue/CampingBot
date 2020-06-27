@@ -112,6 +112,18 @@ public abstract class CampingUtil {
 		return buffer.toString();
 	}
 
+	/**
+	 * Stolen from jdk.internal.joptsimple.internal.Strings
+	 */
+	public static String repeat(char ch, int count) {
+		StringBuilder buffer = new StringBuilder();
+
+		for (int i = 0; i < count; ++i)
+			buffer.append(ch);
+
+		return buffer.toString();
+	}
+
 	public static String[] suffixes = new String[] { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
 
 	public static String ordinal(int i) {

@@ -15,6 +15,7 @@ import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.inline.HideItInlineCommand;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
@@ -45,6 +46,7 @@ public class CampingBot extends CampingBotEngine {
 	private DatabaseConsumer databaseConsumer;
 	private SpellGenerator spellCommand;
 
+	private HideItInlineCommand hideItInline;
 	private InlineCommand spellInline;
 	private NicknameCommand nicknameCommand;
 
@@ -71,6 +73,7 @@ public class CampingBot extends CampingBotEngine {
 		countdownGen = new CountdownGenerator(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
 
+		hideItInline = new HideItInlineCommand(this);
 		spellInline = new SpellInlineCommand(spellCommand);
 
 		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, voting, partyCommand, chatManager,
@@ -102,6 +105,9 @@ public class CampingBot extends CampingBotEngine {
 //		textCommands.add(afdText);
 		inlineCommands.add(spellInline);
 		inlineCommands.add(nicknameCommand);
+		inlineCommands.add(hideItInline);
+
+		callbackCommands.add(hideItInline);
 		callbackCommands.add(voting);
 
 		calMonitor = CalendarMonitor.getInstance();

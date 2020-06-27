@@ -15,13 +15,13 @@ import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessag
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.EditTextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
@@ -202,16 +202,7 @@ public abstract class VoteTracker<T> {
 	}
 
 	protected InlineKeyboardMarkup getKeyboard() {
-		InlineKeyboardMarkup board = new InlineKeyboardMarkup();
-		List<InlineKeyboardButton> row = new ArrayList<>();
-		for (int i = 0; i < shortButtons.length; i++) {
-			String text = shortButtons[i];
-			row.add(new InlineKeyboardButton(text).setCallbackData(text));
-		}
-		List<List<InlineKeyboardButton>> fullKeyboard = new ArrayList<List<InlineKeyboardButton>>();
-		fullKeyboard.add(row);
-		board.setKeyboard(fullKeyboard);
-		return board;
+		return InlineCommand.createKeyboard(shortButtons, shortButtons);
 	}
 
 	public void update() {
