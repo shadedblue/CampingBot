@@ -2,6 +2,7 @@ package ca.hapke.campbinning.bot.commands.inline;
 
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
@@ -35,13 +36,13 @@ public class SpellInlineCommand extends InlineCommand {
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
-			String resultText) {
-		if (words.length < 4)
+	public EventItem chosenInlineQuery(Update update, String fullId, String[] splitId, CampingUser campingFromUser,
+			Integer inlineMessageId, String resultText) {
+		if (splitId.length < 4)
 			return null;
 
-		int targetUserId = Integer.parseInt(words[2]);
-		boolean success = Integer.parseInt(words[3]) > 0;
+		int targetUserId = Integer.parseInt(splitId[2]);
+		boolean success = Integer.parseInt(splitId[3]) > 0;
 
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
 		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
@@ -54,7 +55,8 @@ public class SpellInlineCommand extends InlineCommand {
 	}
 
 	@Override
-	public InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor) {
+	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+			MessageProcessor processor) {
 		String[] words = input.split(" ");
 		if (words.length == 0)
 			return null;
@@ -87,7 +89,7 @@ public class SpellInlineCommand extends InlineCommand {
 		// TODO FIX
 		articleSpell.setId(createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0));
 		articleSpell.setInputMessageContent(mcSpell);
-		return articleSpell;
+		return new InlineQueryResult[] { articleSpell };
 	}
 
 }

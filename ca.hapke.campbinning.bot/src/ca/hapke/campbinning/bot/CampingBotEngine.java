@@ -59,9 +59,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 	protected CampingSystem system = CampingSystem.getInstance();
 
-	protected List<CallbackCommand> callbackCommands = new ArrayList<>();
-	protected List<TextCommand> textCommands = new ArrayList<>();
-	protected List<InlineCommand> inlineCommands = new ArrayList<>();
+	private List<CallbackCommand> callbackCommands = new ArrayList<>();
+	private List<TextCommand> textCommands = new ArrayList<>();
+	private List<InlineCommand> inlineCommands = new ArrayList<>();
+	private Map<String, InlineCommand> inlineMap = new HashMap<>();
 
 	protected MessageProcessor processor = new DefaultMessageProcessor();
 
@@ -139,6 +140,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			}
 		}
 		if (update.hasInlineQuery()) {
+//			System.out.println(update);
 			InlineQuery inlineQuery = update.getInlineQuery();
 			if (inlineQuery.hasQuery()) {
 
@@ -148,9 +150,13 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				String input = inlineQuery.getQuery();
 
 				for (InlineCommand inline : inlineCommands) {
-					InlineQueryResult r = inline.provideInlineQuery(input, updateId, processor);
-					if (r != null)
-						results.add(r);
+					InlineQueryResult[] r = inline.provideInlineQuery(update, input, updateId, processor);
+					if (r != null) {
+						for (int i = 0; i < r.length; i++) {
+							InlineQueryResult result = r[i];
+							results.add(result);
+						}
+					}
 				}
 
 				// send options to client
@@ -169,30 +175,25 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			}
 		}
 		if (update.hasChosenInlineQuery()) {
-			// User chose an inline spell or @username conversion
+			// User chose an inline spell, @username conversion, or HideIt
 			inputType = InputType.InlineChatUpdate;
 			ChosenInlineQuery inlineChosen = update.getChosenInlineQuery();
-			String fullInput = inlineChosen.getResultId();
-			String[] words = fullInput.split(InlineCommand.INLINE_DELIMITER);
-			telegramId = Integer.parseInt(words[1]);
+			String fullId = inlineChosen.getResultId();
+			String[] splitId = fullId.split(InlineCommand.INLINE_DELIMITER);
+			telegramId = Integer.parseInt(splitId[1]);
 
 			campingFromUser = userMonitor.getUser(inlineChosen.getFrom());
-			if (words.length >= 1) {
+			if (splitId.length >= 1) {
+				InlineCommand command = inlineMap.get(splitId[0]);
+				if (command != null) {
+					inputRest = inlineChosen.getQuery();
+					EventItem outputEvent = command.chosenInlineQuery(update, fullId, splitId, campingFromUser,
+							telegramId, inputRest);
 
-				inputRest = inlineChosen.getQuery();
-
-				for (InlineCommand inline : inlineCommands) {
-					String commandName = inline.getCommandName();
-					if (commandName.equalsIgnoreCase(words[0])) {
-						EventItem outputEvent = inline.chosenInlineQuery(words, campingFromUser, telegramId, inputRest);
-
-						if (outputEvent != null) {
-							eventLogger.add(outputEvent);
-							break;
-						}
+					if (outputEvent != null) {
+						eventLogger.add(outputEvent);
 					}
 				}
-
 			}
 		}
 
@@ -381,6 +382,19 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public void addStatusUpdate(IStatus status) {
 		this.statusMonitors.add(status);
+	}
+
+	protected final void addInlineCommand(InlineCommand ic) {
+		inlineCommands.add(ic);
+		inlineMap.put(ic.getCommandName(), ic);
+	}
+
+	protected final void addTextCommand(TextCommand tc) {
+		textCommands.add(tc);
+	}
+
+	protected final void addCallbackCommand(CallbackCommand cc) {
+		callbackCommands.add(cc);
 	}
 
 	public boolean isOnline() {

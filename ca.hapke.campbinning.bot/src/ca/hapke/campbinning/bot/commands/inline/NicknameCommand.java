@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
@@ -41,7 +42,8 @@ public class NicknameCommand extends InlineCommand {
 	public static final TextFragment INVALID_SYNTAX = new TextFragment("Invalid syntax, DUMB ASS.");
 
 	@Override
-	public InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor) {
+	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+			MessageProcessor processor) {
 		String[] words = input.split(" ");
 		List<ResultFragment> out = new ArrayList<>(2 * words.length - 1);
 		String converted = null;
@@ -84,18 +86,18 @@ public class NicknameCommand extends InlineCommand {
 		articleUsernameConversion.setId(createQueryId(updateId, convertedIds));
 		articleUsernameConversion.setInputMessageContent(mc);
 
-		return articleUsernameConversion;
+		return new InlineQueryResult[] { articleUsernameConversion };
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
-			String resultText) {
-		if (words.length < 2)
+	public EventItem chosenInlineQuery(Update update, String fullId, String[] splitId, CampingUser campingFromUser,
+			Integer inlineMessageId, String resultText) {
+		if (splitId.length < 2)
 			return null;
 
-		String[] targets = new String[words.length - 2];
+		String[] targets = new String[splitId.length - 2];
 		for (int i = 0; i < targets.length; i++) {
-			CampingUser target = userMonitor.getUser(Integer.parseInt(words[i + 2]));
+			CampingUser target = userMonitor.getUser(Integer.parseInt(splitId[i + 2]));
 			if (target != null)
 				targets[i] = target.getFirstOrUserName();
 		}

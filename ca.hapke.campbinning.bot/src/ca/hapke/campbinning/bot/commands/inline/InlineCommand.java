@@ -3,6 +3,7 @@ package ca.hapke.campbinning.bot.commands.inline;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -23,10 +24,11 @@ public abstract class InlineCommand {
 
 	public abstract String getCommandName();
 
-	public abstract EventItem chosenInlineQuery(String[] words, CampingUser campingFromUser, Integer inlineMessageId,
-			String resultText);
+	public abstract EventItem chosenInlineQuery(Update update, String fullId, String[] splitId,
+			CampingUser campingFromUser, Integer inlineMessageId, String resultText);
 
-	public abstract InlineQueryResult provideInlineQuery(String input, int updateId, MessageProcessor processor);
+	public abstract InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+			MessageProcessor processor);
 
 	public String createQueryId(int... ids) {
 		String[] inputs = new String[ids.length + 1];

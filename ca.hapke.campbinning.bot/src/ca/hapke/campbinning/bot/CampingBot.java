@@ -97,18 +97,22 @@ public class CampingBot extends CampingBotEngine {
 
 		ballsCommand.init();
 
-		textCommands.add(ballsCommand);
-		textCommands.add(voting);
-		textCommands.add(pleasureCommand);
-		textCommands.add(iunnoCommand);
-		textCommands.add(partyCommand);
-//		textCommands.add(afdText);
-		inlineCommands.add(spellInline);
-		inlineCommands.add(nicknameCommand);
-		inlineCommands.add(hideItInline);
+		addTextCommand(ballsCommand);
+		addTextCommand(voting);
+		addTextCommand(pleasureCommand);
+		addTextCommand(iunnoCommand);
+		addTextCommand(partyCommand);
+//		addTextCommand(afdText);
 
-		callbackCommands.add(hideItInline);
-		callbackCommands.add(voting);
+		addInlineCommand(spellInline);
+		addInlineCommand(nicknameCommand);
+		addInlineCommand(hideItInline);
+//		inlineCommands.add(spellInline);
+//		inlineCommands.add(nicknameCommand);
+//		inlineCommands.add(hideItInline);
+
+		addCallbackCommand(hideItInline);
+		addCallbackCommand(voting);
 
 		calMonitor = CalendarMonitor.getInstance();
 		calMonitor.add(serializer);
