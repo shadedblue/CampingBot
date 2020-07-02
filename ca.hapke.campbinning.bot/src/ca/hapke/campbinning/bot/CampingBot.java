@@ -15,6 +15,7 @@ import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.StatusCommand;
 import ca.hapke.campbinning.bot.commands.inline.HideItInlineCommand;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
@@ -36,6 +37,7 @@ public class CampingBot extends CampingBotEngine {
 	private Resources res = new Resources();
 	private VotingManager voting;
 
+	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
 	private PleasureModelCommand pleasureCommand;
 	private IunnoCommand iunnoCommand;
@@ -61,6 +63,8 @@ public class CampingBot extends CampingBotEngine {
 //	private AprilFoolsDayEnabler afdEnabler;
 
 	public CampingBot() {
+		statusCommand = new StatusCommand();
+		addStatusUpdate(statusCommand);
 		spellCommand = new SpellGenerator(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
@@ -210,6 +214,9 @@ public class CampingBot extends CampingBotEngine {
 			result = reloadCommand(campingFromUser);
 			break;
 		case UiString:
+			break;
+		case Status:
+			result = statusCommand.statusCommand();
 			break;
 		default:
 			break;
