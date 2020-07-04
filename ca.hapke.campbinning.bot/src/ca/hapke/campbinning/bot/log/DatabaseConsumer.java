@@ -12,7 +12,7 @@ import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.CampingSystem;
-import ca.hapke.campbinning.bot.channels.CampingChat;
+import ca.hapke.campbinning.bot.log.DatabaseQuery.ColumnType;
 import ca.odell.glazedlists.EventList;
 
 /**
@@ -78,32 +78,36 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 					EventItem item = dbLog.get(0);
 					try {
 						long timestamp = item.d.getTime() / 1000;
-						Object extraData = item.extraData;
-						String columns = "\"timestamp\", \"campingUserId\", \"chatId\", \"telegramId\", \"campingType\", message";
-						String values = "?,?,?,?,?,?";
-						if (extraData != null) {
-							columns = columns + ", \"extraData\"";
-							values = values + ",?";
-						}
-						String sql = "INSERT INTO public.activity(" + columns + ") VALUES (" + values + ");";
-						PreparedStatement ps = connection.prepareStatement(sql);
-						ps.setLong(1, timestamp);
-						ps.setInt(2, item.user.getCampingId());
+						DatabaseQuery query = new DatabaseQuery("public.activity");
+						int campingId = -1;
 						long chatId = -1;
-						CampingChat chat = item.chat;
-						if (chat != null)
-							chatId = chat.chatId;
-						else {
-							System.out.println(item);
+						long commandTypeId = -1;
+						int tId = -1;
+						if (item.user != null) {
+							campingId = item.user.getCampingId();
 						}
-						ps.setLong(3, chatId);
-						ps.setInt(4, item.telegramId);
-						ps.setLong(5, item.command.getId());
-						ps.setString(6, item.rest);
-						if (extraData != null)
-							setExtraData(ps, 7, extraData);
+						if (item.chat != null) {
+							chatId = item.chat.chatId;
+						}
+						if (item.telegramId != null) {
+							tId = item.telegramId;
+						}
+						if (item.command != null) {
+							commandTypeId = item.command.getId();
+						}
+						query.add("timestamp", ColumnType.Long, timestamp);
+						query.add("campingUserId", ColumnType.Integer, campingId);
+						query.add("chatId", ColumnType.Long, chatId);
+						query.add("telegramId", ColumnType.Integer, tId);
+						query.add("campingType", ColumnType.Long, commandTypeId);
+						query.add("message", ColumnType.String, item.rest);
+						query.add("extraData", item.extraData);
+
+						PreparedStatement ps = query.createPreparedStatement(connection);
+
 						ps.executeUpdate();
 					} catch (SQLException e) {
+						EventLogger.getInstance().add(new EventItem(e.toString()));
 					}
 					dbLog.remove(0);
 				}
@@ -113,15 +117,15 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 		}
 	}
 
-	private void setExtraData(PreparedStatement ps, int i, Object extraData) throws SQLException {
-		if (extraData instanceof String) {
-			String val = (String) extraData;
-			ps.setString(i, val);
-		} else if (extraData instanceof Integer) {
-			Integer val = (Integer) extraData;
-			ps.setInt(i, val);
-		}
-	}
+//	private void setExtraData(PreparedStatement ps, int i, Object extraData) throws SQLException {
+//		if (extraData instanceof String) {
+//			String val = (String) extraData;
+//			ps.setString(i, val);
+//		} else if (extraData instanceof Integer) {
+//			Integer val = (Integer) extraData;
+//			ps.setInt(i, val);
+//		}
+//	}
 
 	@Override
 	public void close() throws Exception {
