@@ -42,9 +42,9 @@ public class StatusCommand implements IStatus {
 
 	public CommandResult statusCommand() {
 		TextCommandResult r = new TextCommandResult(BotCommand.Status);
+		r.add("Online Since", TextStyle.Bold);
+		r.add(": ");
 		if (onlineTime != null) {
-			r.add("Online Since", TextStyle.Bold);
-			r.add(": ");
 			r.add(onlineTime.format(formatter));
 			r.add("\nDuration", TextStyle.Bold);
 			r.add(": ");
