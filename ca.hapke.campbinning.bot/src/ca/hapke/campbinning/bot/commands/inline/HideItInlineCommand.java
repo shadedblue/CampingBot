@@ -49,7 +49,7 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 						return null;
 					}
 				});
-		clearTextMap = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+		clearTextMap = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
 				.build(new CacheLoader<String, HiddenText>() {
 					@Override
 					public HiddenText load(String key) throws Exception {
@@ -77,7 +77,7 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 			details = null;
 		}
 		if (details == null)
-			return null;
+			return new EventItem("Could not Choose HideIt: " + fullId);
 
 		String topic = details.getTopic();
 		if (topic != null)
@@ -186,7 +186,7 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 			details = null;
 		}
 		if (details == null) {
-			return null;
+			return new EventItem("Could not process HideIt callback: " + callbackQueryId);
 		}
 		String displayToUser = details.getClearText();
 
