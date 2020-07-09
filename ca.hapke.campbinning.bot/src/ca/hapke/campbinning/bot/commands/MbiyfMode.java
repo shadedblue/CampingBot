@@ -29,6 +29,7 @@ public class MbiyfMode {
 		case Birthday:
 		case Friday:
 		case Asshole:
+		case Special:
 			return true;
 		case Off:
 		}

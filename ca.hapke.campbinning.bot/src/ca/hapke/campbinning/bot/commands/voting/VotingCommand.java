@@ -17,12 +17,9 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.CampingSerializable;
-import ca.hapke.campbinning.bot.category.CategoriedItems;
-import ca.hapke.campbinning.bot.category.HasCategories;
-import ca.hapke.campbinning.bot.commands.CallbackCommand;
-import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
+import ca.hapke.campbinning.bot.commands.callback.CallbackCommandBase;
+import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
@@ -30,7 +27,6 @@ import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
-import ca.hapke.campbinning.bot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -39,28 +35,24 @@ import ca.odell.glazedlists.GlazedLists;
  * @author Nathan Hapke
  */
 @SuppressWarnings("rawtypes")
-public class VotingManager extends CampingSerializable
-		implements CalendaredEvent<Void>, CallbackCommand, TextCommand, HasCategories<String> {
+public abstract class VotingCommand extends CallbackCommandBase implements CalendaredEvent<Void>, TextCommand {
 
-	private Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
-	private Map<Integer, VoteTracker> voteOnBanners = new HashMap<Integer, VoteTracker>();
+	protected final Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
+	protected final Map<Integer, VoteTracker> voteOnBanners = new HashMap<Integer, VoteTracker>();
 
-	private EventList<VoteTracker> inProgress = GlazedLists.threadSafeList(new BasicEventList<VoteTracker>());
+	protected final EventList<VoteTracker> inProgress = GlazedLists.threadSafeList(new BasicEventList<VoteTracker>());
 
-	private CategoriedItems<String> resultCategories;
-	private CampingBot bot;
+	protected final CampingBot bot;
 	private TimesProvider<Void> times;
-	private static final TextFragment SOMEONE_ELSE_ACTIVATED = new TextFragment(" is the asshole!");
+	protected final BotCommand respondsTo;
 	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on");
 	private static final TextFragment NO_TOPIC_PROVIDED = new TextFragment(
 			"Reply to the topic you would like to vote on!");
-	private MbiyfCommand ballsCommand;
 
-	public VotingManager(CampingBot campingBot, MbiyfCommand ballsCommand) {
+	public VotingCommand(CampingBot campingBot, BotCommand respondsTo) {
+		this.respondsTo = respondsTo;
 		this.bot = campingBot;
-		this.ballsCommand = ballsCommand;
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
-		resultCategories = new CategoriedItems<>(AitaTracker.assholeLevels);
 	}
 
 	@Override
@@ -117,21 +109,12 @@ public class VotingManager extends CampingSerializable
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
 			CampingUser ranter = uM.monitor(topic.getFrom());
-			switch (type) {
-			case AitaActivatorInitiation:
-				if (ranter != activater) {
-					output = new TextCommandResult(BotCommand.VoteInitiationFailed, new MentionFragment(activater),
-							SOMEONE_ELSE_ACTIVATED);
-					output.setReplyTo(activation.getMessageId());
-				} else {
-					tracker = new AitaTracker(bot, ranter, chatId, activation, topic, resultCategories, ballsCommand);
-				}
-				break;
-			case RantActivatorInitiation:
-				tracker = new RantTracker(bot, ranter, activater, chatId, activation, topic);
-				break;
-			default:
-				return null;
+
+			try {
+				tracker = initiateVote(ranter, activater, chatId, activation, topic);
+			} catch (VoteInitiationException e) {
+				output = new TextCommandResult(BotCommand.VoteInitiationFailed, new MentionFragment(activater));
+				output.add(e.getMessage());
 			}
 
 			if (tracker != null) {
@@ -146,14 +129,17 @@ public class VotingManager extends CampingSerializable
 		return output;
 	}
 
+	protected abstract VoteTracker initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
+			Message activation, Message topic) throws VoteInitiationException, TelegramApiException;
+
 	@Override
-	public EventItem reactToCallback(CallbackQuery callbackQuery) {
-		Integer callbackMessageId = callbackQuery.getMessage().getMessageId();
-		VoteTracker rant = voteOnBanners.get(callbackMessageId);
+	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
+		int callbackMessageId = id.getUpdateId();
+		VoteTracker rant = voteOnMessages.get(callbackMessageId);
 
 		try {
 			if (rant != null) {
-				EventItem react = rant.react(callbackQuery);
+				EventItem react = rant.react(id, callbackQuery);
 				return react;
 			}
 		} catch (TelegramApiException e) {
@@ -175,25 +161,13 @@ public class VotingManager extends CampingSerializable
 	}
 
 	@Override
-	public List<String> getCategoryNames() {
-		return resultCategories.getCategoryNames();
-	}
-
-	@Override
-	public void addItem(String category, String value) {
-		resultCategories.put(category, value);
-	}
-
-	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 
 		BotCommand type = null;
 		String msgLower = message.getText().toLowerCase().trim();
-		if (msgLower.endsWith("/" + BotCommand.AitaActivatorInitiation.command))
-			type = BotCommand.AitaActivatorInitiation;
-		else if (msgLower.endsWith("/" + BotCommand.RantActivatorInitiation.command))
-			type = BotCommand.RantActivatorInitiation;
+		if (msgLower.endsWith("/" + respondsTo.command))
+			type = respondsTo;
 
 		if (type != null) {
 			try {
@@ -207,24 +181,9 @@ public class VotingManager extends CampingSerializable
 	@Override
 	public boolean isMatch(String msg, Message message) {
 		msg = msg.toLowerCase().trim();
-		if (msg.endsWith("/" + BotCommand.AitaActivatorInitiation.command))
-			return true;
-		if (msg.endsWith("/" + BotCommand.RantActivatorInitiation.command))
+		if (msg.endsWith("/" + respondsTo.command))
 			return true;
 		return false;
-	}
-
-	@Override
-	public String getContainerName() {
-		return "Voting";
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		String tag = "voting";
-		of.start(tag);
-		of.tagCategories(resultCategories);
-		of.finish(tag);
 	}
 
 }

@@ -7,7 +7,7 @@
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
-    import ca.hapke.campbinning.bot.commands.voting.*;
+    import ca.hapke.campbinning.bot.commands.voting.aita.*;
     import java.util.*;
 
 import com.javadude.antxr.TokenBuffer;
@@ -68,12 +68,12 @@ public LoadStatsParser(ParserSharedInputState state) {
 }
 
 	public final void document(
-		 CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um
+		 CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um
 	) throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
-			__xml_camping( cs, sg, countdownGen, voting, pc, cm, um);
+			__xml_camping( cs, sg, countdownGen, aita, pc, cm, um);
 			match(Token.EOF_TYPE);
 		}
 		catch (RecognitionException ex) {
@@ -83,7 +83,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_camping(
-		CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um
+		CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -140,7 +140,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 			switch ( LA(1)) {
 			case 7:
 			{
-				__xml_voting(voting);
+				__xml_voting(aita);
 				break;
 			}
 			case XML_END_TAG:
@@ -362,7 +362,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_voting(
-		VotingManager voting
+		AitaCommand aita
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -371,9 +371,9 @@ public LoadStatsParser(ParserSharedInputState state) {
 			__xml_startTag = LT(1);
 			match(7);
 			{
-			__xml_assholes(voting);
-			__xml_mediocres(voting);
-			__xml_nices(voting);
+			__xml_assholes(aita);
+			__xml_mediocres(aita);
+			__xml_nices(aita);
 			}
 			match(XML_END_TAG);
 		}
@@ -414,13 +414,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			match(20);
 			{
 			{
-			_loop60:
+			_loop399:
 			do {
 				if ((LA(1)==21)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop60;
+					break _loop399;
 				}
 				
 			} while (true);
@@ -464,13 +464,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop67:
+			_loop406:
 			do {
 				if ((LA(1)==23)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop67;
+					break _loop406;
 				}
 				
 			} while (true);
@@ -502,14 +502,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop17:
+			_loop356:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop17;
+					break _loop356;
 				}
 				
 			} while (true);
@@ -524,7 +524,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_assholes(
-		VotingManager voting
+		AitaCommand aita
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -535,14 +535,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop21:
+			_loop360:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
-					voting.addItem("asshole", val);
+					aita.addItem("asshole", val);
 				}
 				else {
-					break _loop21;
+					break _loop360;
 				}
 				
 			} while (true);
@@ -557,7 +557,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_mediocres(
-		VotingManager voting
+		AitaCommand aita
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -568,14 +568,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop25:
+			_loop364:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
-					voting.addItem("mediocre", val);
+					aita.addItem("mediocre", val);
 				}
 				else {
-					break _loop25;
+					break _loop364;
 				}
 				
 			} while (true);
@@ -590,7 +590,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_nices(
-		VotingManager voting
+		AitaCommand aita
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -601,14 +601,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop29:
+			_loop368:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
-					voting.addItem("nice", val);
+					aita.addItem("nice", val);
 				}
 				else {
-					break _loop29;
+					break _loop368;
 				}
 				
 			} while (true);
@@ -873,14 +873,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop48:
+			_loop387:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop48;
+					break _loop387;
 				}
 				
 			} while (true);
@@ -906,14 +906,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop44:
+			_loop383:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop44;
+					break _loop383;
 				}
 				
 			} while (true);
@@ -939,14 +939,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop52:
+			_loop391:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop52;
+					break _loop391;
 				}
 				
 			} while (true);
@@ -972,14 +972,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop56:
+			_loop395:
 			do {
 				if ((LA(1)==36)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop56;
+					break _loop395;
 				}
 				
 			} while (true);

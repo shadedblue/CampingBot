@@ -21,7 +21,8 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
-import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
+import ca.hapke.campbinning.bot.commands.callback.CallbackId;
+import ca.hapke.campbinning.bot.commands.inline.InlineCommandBase;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.EditTextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
@@ -48,7 +49,7 @@ public abstract class VoteTracker<T> {
 	protected final CampingUser activater;
 	protected final Long chatId;
 	protected CampingChat chat;
-	protected Map<CampingUser, String> votes = new HashMap<>();
+	protected Map<CampingUser, Integer> votes = new HashMap<>();
 	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
 	protected boolean completed = false;
 	protected NumberFormat nf;
@@ -61,9 +62,11 @@ public abstract class VoteTracker<T> {
 	protected final long completionTime = System.currentTimeMillis() + getVotingTime();
 	protected TimeFormatter formatter = new TimeFormatter(1, "", false, true);
 	protected final String[] shortButtons;
+	protected final String[] buttonCallbackIds;
 	protected final String[] longDescriptions;
-	protected final Map<String, T> valueMap;
+	protected final Map<Integer, T> valueMap;
 	protected final boolean addNa;
+	protected final int naIndex;
 
 	protected static final TextFragment VOTING_COMPLETED = new TextFragment("Voting Completed!");
 	protected static final String NOT_APPLICABLE_SHORT = "N/A";
@@ -74,7 +77,7 @@ public abstract class VoteTracker<T> {
 	private TextCommandResult bannerText;
 
 	public VoteTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic, int naQuorum) throws TelegramApiException {
+			Message topic, int naQuorum, String command) throws TelegramApiException {
 		this.ranter = ranter;
 		this.activater = activater;
 		this.chatId = chatId;
@@ -93,18 +96,23 @@ public abstract class VoteTracker<T> {
 		int count = optionsList.size() + (addNa ? 1 : 0);
 		shortButtons = new String[count];
 		longDescriptions = new String[count];
-		valueMap = new HashMap<String, T>(count);
+		buttonCallbackIds = new String[count];
+		valueMap = new HashMap<Integer, T>(count);
+		int updateId = topic.getMessageId();
 		for (int i = 0; i < optionsList.size(); i++) {
 			VotingOption<T> opt = optionsList.get(i);
-			String key = opt.shortButton;
-			shortButtons[i] = key;
-			longDescriptions[i] = opt.longDescription;
-			valueMap.put(key, opt.value);
+			String shortStr = opt.shortButton;
+			String longStr = opt.longDescription;
+			T value = opt.value;
+
+			setOption(command, updateId, i, shortStr, longStr, value);
 		}
 
 		if (addNa) {
-			shortButtons[count - 1] = NOT_APPLICABLE_SHORT;
-			longDescriptions[count - 1] = NOT_APPLICABLE_LONG;
+			naIndex = count - 1;
+			setOption(command, updateId, naIndex, NOT_APPLICABLE_SHORT, NOT_APPLICABLE_LONG, null);
+		} else {
+			naIndex = -1;
 		}
 		List<ResultFragment> bannerFrags = getBannerString();
 		bannerText = new TextCommandResult(BotCommand.VoteTopicInitiation, bannerFrags);
@@ -126,6 +134,16 @@ public abstract class VoteTracker<T> {
 		this.topicMessage = topic;
 	}
 
+	public void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
+		CallbackId id = new CallbackId(command, updateId, i);
+		String callbackId = id.getId();
+
+		shortButtons[i] = shortStr;
+		longDescriptions[i] = longStr;
+		buttonCallbackIds[i] = callbackId;
+		valueMap.put(i, value);
+	}
+
 	/**
 	 * @return add Not Applicable?
 	 */
@@ -136,73 +154,76 @@ public abstract class VoteTracker<T> {
 	 */
 	protected abstract long getVotingTime();
 
-	public EventItem react(CallbackQuery callbackQuery) throws TelegramApiException {
+	public EventItem react(CallbackId id, CallbackQuery callbackQuery) throws TelegramApiException {
 		if (completed)
 			return null;
 
 		String data = callbackQuery.getData();
 		String callbackQueryId = callbackQuery.getId();
 
-		String vote = null, display = null;
-		for (int i = 0; i < shortButtons.length; i++) {
-			String value = shortButtons[i];
-			if (value.equalsIgnoreCase(data)) {
-				vote = value;
-				display = longDescriptions[i];
-				break;
-			}
+		String display = longDescriptions[id.getIds()[0]];
+
+		int vote = id.getIds()[0];
+
+		CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
+		Integer previousVote = votes.get(user);
+		boolean prevVoteNA = votesNotApplicable.contains(user);
+
+		boolean voteChanged = false;
+		if (previousVote == null && !prevVoteNA) {
+			// first vote
+			voteChanged = true;
+		} else if (previousVote != null && vote != previousVote) {
+			// had a non-n/a vote, and new vote is different
+			voteChanged = true;
+		} else if (vote == naIndex && !prevVoteNA) {
+			// new vote is n/a, and wasn't before
+			voteChanged = true;
+		} else if (vote != naIndex && prevVoteNA) {
+			// new vote is not n/a, and was before
+			voteChanged = true;
 		}
-		if (vote != null) {
-			CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
-			String previousVote = votes.get(user);
-			if (previousVote == null && votesNotApplicable.contains(user))
-				previousVote = NOT_APPLICABLE_SHORT;
 
-			boolean voteChanged = !vote.equals(previousVote);
-			if (NOT_APPLICABLE_SHORT.equalsIgnoreCase(vote)) {
-				votes.remove(user);
-				votesNotApplicable.add(user);
-				if (votesNotApplicable.size() >= naQuorum)
-					complete();
-			} else {
-				votes.put(user, vote);
-				votesNotApplicable.remove(user);
-			}
-			if (voteChanged) {
-				try {
-					EditTextCommandResult editCmd = new EditTextCommandResult(BotCommand.Vote, voteTrackingMessage,
-							getVotesText(completed));
-					editCmd.send(bot, chatId);
-
-				} catch (TelegramApiException e) {
-					// HACK ignoring exceptions that come back for unchanged messages
-				}
-			}
-
-			AnswerCallbackQuery answer = new AnswerCallbackQuery();
-			String voteDisplayToUser;
-			if (voteChanged)
-				voteDisplayToUser = "Received your vote of: " + display + "!";
-			else
-				voteDisplayToUser = "Your vote was already: " + display + "!";
-			answer.setText(voteDisplayToUser);
-			answer.setCallbackQueryId(callbackQueryId);
+		if (vote == naIndex) {
+			votes.remove(user);
+			votesNotApplicable.add(user);
+			if (votesNotApplicable.size() >= naQuorum)
+				complete();
+		} else {
+			votes.put(user, vote);
+			votesNotApplicable.remove(user);
+		}
+		if (voteChanged) {
 			try {
-				bot.execute(answer);
-				user.increment(BotCommand.Vote);
-				return new EventItem(BotCommand.Vote, user, null, chat, topicMessage.getMessageId(), display,
-						topicMessage.getMessageId());
-			} catch (Exception e) {
-				return new EventItem(e.getLocalizedMessage());
-			}
+				EditTextCommandResult editCmd = new EditTextCommandResult(BotCommand.Vote, voteTrackingMessage,
+						getVotesText(completed));
+				editCmd.send(bot, chatId);
 
+			} catch (TelegramApiException e) {
+				// HACK ignoring exceptions that come back for unchanged messages
+			}
 		}
 
-		return null;
+		AnswerCallbackQuery answer = new AnswerCallbackQuery();
+		String voteDisplayToUser;
+		if (voteChanged)
+			voteDisplayToUser = "Received your vote of: " + display + "!";
+		else
+			voteDisplayToUser = "Your vote was already: " + display + "!";
+		answer.setText(voteDisplayToUser);
+		answer.setCallbackQueryId(callbackQueryId);
+		try {
+			bot.execute(answer);
+			user.increment(BotCommand.Vote);
+			return new EventItem(BotCommand.Vote, user, null, chat, topicMessage.getMessageId(), display,
+					topicMessage.getMessageId());
+		} catch (Exception e) {
+			return new EventItem(e.getLocalizedMessage());
+		}
 	}
 
 	protected InlineKeyboardMarkup getKeyboard() {
-		return InlineCommand.createKeyboard(shortButtons, shortButtons);
+		return InlineCommandBase.createKeyboard(shortButtons, buttonCallbackIds);
 	}
 
 	public void update() {
@@ -271,13 +292,6 @@ public abstract class VoteTracker<T> {
 		sendFinishedVotingMessage();
 	}
 
-	protected String getVote(CampingUser user) {
-		if (votesNotApplicable.contains(user))
-			return NOT_APPLICABLE_SHORT;
-		else
-			return votes.get(user);
-	}
-
 	public List<ResultFragment> getBannerString() {
 		List<ResultFragment> sb = new ArrayList<>();
 		String bannerTitle = getBannerTitle();
@@ -322,17 +336,11 @@ public abstract class VoteTracker<T> {
 
 		if (shouldShowVotesInCategories()) {
 			int[] votes = new int[shortButtons.length];
-			for (String vote : this.votes.values()) {
-				for (int i = 0; i < shortButtons.length; i++) {
-					String txt = shortButtons[i];
-					if (txt.equalsIgnoreCase(vote)) {
-						votes[i]++;
-						break;
-					}
-				}
+			for (int vote : this.votes.values()) {
+				votes[vote]++;
 			}
 			if (addNa) {
-				votes[shortButtons.length - 1] = votesNotApplicable.size();
+				votes[naIndex] = votesNotApplicable.size();
 			}
 
 			for (int i = 0; i < shortButtons.length; i++) {

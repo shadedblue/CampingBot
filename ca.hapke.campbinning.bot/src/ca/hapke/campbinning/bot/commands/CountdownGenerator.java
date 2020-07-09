@@ -21,7 +21,8 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class CountdownGenerator extends CampingSerializable implements HasCategories<String> {
+public class CountdownGenerator implements HasCategories<String>, CampingSerializable {
+	private boolean shouldSave = false;
 
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
 	public static final String HYPE_CATEGORY = "hype";
@@ -60,10 +61,6 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 		if (categories.put(category, value))
 			shouldSave = true;
 	}
-
-	// public List<String> getHypes() {
-	// return hypes;
-	// }
 
 	public CommandResult countdownCommand(CampingUserMonitor userMonitor, Long chatId) {
 		ZonedDateTime now = new GregorianCalendar().toZonedDateTime();
@@ -111,11 +108,18 @@ public class CountdownGenerator extends CampingSerializable implements HasCatego
 	}
 
 	@Override
+	public boolean shouldSave() {
+		return shouldSave;
+	}
+
+	@Override
 	public void getXml(OutputFormatter of) {
 		String tag = "countdown";
 		of.start(tag);
 		of.tagAndValue(HYPE_CATEGORY, hypes);
 		of.finish(tag);
+
+		shouldSave = false;
 	}
 
 }

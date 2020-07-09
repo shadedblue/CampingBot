@@ -12,6 +12,7 @@ import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.CommandType;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.SpellResult;
+import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -21,7 +22,7 @@ import ca.hapke.campbinning.bot.users.CampingUser;
  * @author Nathan Hapke
  *
  */
-public class SpellInlineCommand extends InlineCommand {
+public class SpellInlineCommand extends InlineCommandBase {
 
 	private static final String INLINE_SPELL = "spell";
 	private SpellGenerator spellGen;
@@ -36,20 +37,18 @@ public class SpellInlineCommand extends InlineCommand {
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(Update update, String fullId, String[] splitId, CampingUser campingFromUser,
-			Integer inlineMessageId, String resultText) {
-		if (splitId.length < 4)
-			return null;
+	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText) {
+		int[] ids = id.getIds();
 
-		int targetUserId = Integer.parseInt(splitId[2]);
-		boolean success = Integer.parseInt(splitId[3]) > 0;
+		int targetUserId = ids[0];
+		boolean success = ids[1] > 0;
 
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
 		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
 
 		CommandType cmd = success ? BotCommand.Spell : BotCommand.SpellDipshit;
 
-		EventItem event = new EventItem(cmd, campingFromUser, null, null, inlineMessageId, resultText,
+		EventItem event = new EventItem(cmd, campingFromUser, null, null, id.getUpdateId(), resultText,
 				targetUser.getCampingId());
 		return event;
 	}
@@ -86,8 +85,8 @@ public class SpellInlineCommand extends InlineCommand {
 
 		InlineQueryResultArticle articleSpell = new InlineQueryResultArticle();
 		articleSpell.setTitle("spell on " + targetFirst);
-		// TODO FIX
-		articleSpell.setId(createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0));
+		CallbackId fullId = createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0);
+		articleSpell.setId(fullId.getId());
 		articleSpell.setInputMessageContent(mcSpell);
 		return new InlineQueryResult[] { articleSpell };
 	}

@@ -7,7 +7,7 @@
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
-    import ca.hapke.campbinning.bot.commands.voting.*;
+    import ca.hapke.campbinning.bot.commands.voting.aita.*;
     import java.util.*;
 
 @SuppressWarnings("all")

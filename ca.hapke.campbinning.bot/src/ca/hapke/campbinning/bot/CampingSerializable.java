@@ -5,9 +5,9 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public abstract class CampingSerializable {
-	protected boolean shouldSave = false;
+public interface CampingSerializable {
+	public boolean shouldSave();
 
-	public abstract void getXml(OutputFormatter of);
+	public void getXml(OutputFormatter of);
 
 }

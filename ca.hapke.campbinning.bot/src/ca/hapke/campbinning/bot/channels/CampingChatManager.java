@@ -20,8 +20,8 @@ import ca.odell.glazedlists.ObservableElementList;
  * 
  * @author Nathan Hapke
  */
-public class CampingChatManager extends CampingSerializable {
-
+public class CampingChatManager implements CampingSerializable {
+	private boolean shouldSave = false;
 	private static CampingChatManager instance;
 	private CampingBotEngine bot;
 
@@ -77,6 +77,11 @@ public class CampingChatManager extends CampingSerializable {
 
 	public EventList<CampingChat> getChatList() {
 		return chatEvents;
+	}
+
+	@Override
+	public boolean shouldSave() {
+		return shouldSave;
 	}
 
 	@Override

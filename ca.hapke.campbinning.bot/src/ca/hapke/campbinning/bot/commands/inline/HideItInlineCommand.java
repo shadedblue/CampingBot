@@ -17,7 +17,8 @@ import com.google.common.cache.LoadingCache;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.commands.CallbackCommand;
+import ca.hapke.campbinning.bot.commands.callback.CallbackCommand;
+import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -27,7 +28,7 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
 /**
  * @author Nathan Hapke
  */
-public class HideItInlineCommand extends InlineCommand implements CallbackCommand {
+public class HideItInlineCommand extends InlineCommandBase implements CallbackCommand {
 
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
@@ -64,13 +65,11 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(Update update, String fullId, String[] splitId, CampingUser campingFromUser,
-			Integer inlineMessageId, String resultText) {
-		if (splitId.length < 2)
-			return null;
+	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText) {
 
-		Integer queryId = Integer.parseInt(splitId[1]);
+		Integer queryId = id.getUpdateId();
 		HiddenText details;
+		String fullId = id.getId();
 		try {
 			details = clearTextMap.get(fullId);
 		} catch (ExecutionException e) {
@@ -84,7 +83,7 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 			topicCache.put(nextTopicId, topic);
 
 		String text = details.getClearText();
-		EventItem item = new EventItem(BotCommand.HideIt, campingFromUser, null, null, inlineMessageId, text, queryId);
+		EventItem item = new EventItem(BotCommand.HideIt, campingFromUser, null, null, queryId, text, null);
 		return item;
 	}
 
@@ -118,7 +117,8 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 	}
 
 	public InlineQueryResultArticle createInlineOption(int updateId, String topic, String textToHide, int i) {
-		String queryId = createQueryId(updateId, i);
+		CallbackId callbackId = new CallbackId(getCommandName(), updateId, i);
+		String queryId = callbackId.getId();
 		String blotText = createBlotText(textToHide, topic);
 		HiddenText item = new HiddenText(topic, textToHide, blotText);
 		clearTextMap.put(queryId, item);
@@ -129,7 +129,7 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 
 		InlineQueryResultArticle article = new InlineQueryResultArticle();
 
-		article.setReplyMarkup(InlineCommand.createKeyboard(new String[] { "Show" }, new String[] { queryId }));
+		article.setReplyMarkup(InlineCommandBase.createKeyboard(new String[] { "Show" }, new String[] { queryId }));
 		String label;
 		if (topic != null) {
 			label = topic;
@@ -168,17 +168,11 @@ public class HideItInlineCommand extends InlineCommand implements CallbackComman
 	}
 
 	@Override
-	public EventItem reactToCallback(CallbackQuery callbackQuery) {
+	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
 
 		String callbackQueryId = callbackQuery.getId();
-		String hideId = callbackQuery.getData();
+		String hideId = id.getId();
 
-//		String[] split = hideId.split(INLINE_DELIMITER);
-//		if (split.length < 2)
-//			return null;
-
-//		// TODO convert hideIt using the de-serialize.
-//		Integer updateId = Integer.parseInt(split[1]);
 		HiddenText details;
 		try {
 			details = clearTextMap.get(hideId);

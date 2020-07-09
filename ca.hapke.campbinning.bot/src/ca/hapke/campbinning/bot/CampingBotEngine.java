@@ -27,8 +27,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
-import ca.hapke.campbinning.bot.commands.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
+import ca.hapke.campbinning.bot.commands.callback.CallbackCommand;
+import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.DefaultMessageProcessor;
@@ -60,6 +61,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected CampingSystem system = CampingSystem.getInstance();
 
 	private List<CallbackCommand> callbackCommands = new ArrayList<>();
+	private Map<String, CallbackCommand> callbackMap = new HashMap<>();
 	private List<TextCommand> textCommands = new ArrayList<>();
 	private List<InlineCommand> inlineCommands = new ArrayList<>();
 	private Map<String, InlineCommand> inlineMap = new HashMap<>();
@@ -131,16 +133,18 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		if (update.hasCallbackQuery()) {
 			CallbackQuery callbackQuery = update.getCallbackQuery();
 			EventItem outputEvent = null;
-			for (CallbackCommand callback : callbackCommands) {
-				outputEvent = callback.reactToCallback(callbackQuery);
+
+			String fullId = callbackQuery.getData();
+			CallbackId id = CallbackId.fromString(fullId);
+			CallbackCommand command = callbackMap.get(id.getCommand());
+			if (command != null) {
+				outputEvent = command.reactToCallback(id, callbackQuery);
 				if (outputEvent != null) {
 					eventLogger.add(outputEvent);
-					break;
 				}
 			}
 		}
 		if (update.hasInlineQuery()) {
-//			System.out.println(update);
 			InlineQuery inlineQuery = update.getInlineQuery();
 			if (inlineQuery.hasQuery()) {
 
@@ -179,16 +183,15 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			inputType = InputType.InlineChatUpdate;
 			ChosenInlineQuery inlineChosen = update.getChosenInlineQuery();
 			String fullId = inlineChosen.getResultId();
-			String[] splitId = fullId.split(InlineCommand.INLINE_DELIMITER);
-			telegramId = Integer.parseInt(splitId[1]);
+			CallbackId id = CallbackId.fromString(fullId);
 
 			campingFromUser = userMonitor.getUser(inlineChosen.getFrom());
-			if (splitId.length >= 1) {
-				InlineCommand command = inlineMap.get(splitId[0]);
+			if (id != null) {
+				InlineCommand command = inlineMap.get(id.getCommand());
 				if (command != null) {
 					inputRest = inlineChosen.getQuery();
-					EventItem outputEvent = command.chosenInlineQuery(update, fullId, splitId, campingFromUser,
-							telegramId, inputRest);
+
+					EventItem outputEvent = command.chosenInlineQuery(update, id, campingFromUser, inputRest);
 
 					if (outputEvent != null) {
 						eventLogger.add(outputEvent);
@@ -395,6 +398,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	protected final void addCallbackCommand(CallbackCommand cc) {
 		callbackCommands.add(cc);
+		callbackMap.put(cc.getCommandName(), cc);
 	}
 
 	public boolean isOnline() {

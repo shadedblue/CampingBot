@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -29,7 +30,7 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * 
  * @author Nathan Hapke
  */
-public class NicknameCommand extends InlineCommand {
+public class NicknameCommand extends InlineCommandBase {
 
 	private static final String INLINE_NICKS = "nicks";
 	private static final char[] invalidCharacters = new char[] { '*', '_', '[', ']', '`', '\\', '~' };
@@ -72,6 +73,7 @@ public class NicknameCommand extends InlineCommand {
 				out.add(ResultFragment.SPACE);
 			out.add(frag);
 		}
+
 		String output = processor.process(out);
 
 		InputTextMessageContent mc = new InputTextMessageContent();
@@ -83,27 +85,25 @@ public class NicknameCommand extends InlineCommand {
 		if (converted == null)
 			converted = "None";
 		articleUsernameConversion.setTitle("@usernames converted: " + converted);
-		articleUsernameConversion.setId(createQueryId(updateId, convertedIds));
+		CallbackId fullId = createQueryId(updateId, convertedIds);
+		articleUsernameConversion.setId(fullId.getId());
 		articleUsernameConversion.setInputMessageContent(mc);
 
 		return new InlineQueryResult[] { articleUsernameConversion };
 	}
 
 	@Override
-	public EventItem chosenInlineQuery(Update update, String fullId, String[] splitId, CampingUser campingFromUser,
-			Integer inlineMessageId, String resultText) {
-		if (splitId.length < 2)
-			return null;
-
-		String[] targets = new String[splitId.length - 2];
-		for (int i = 0; i < targets.length; i++) {
-			CampingUser target = userMonitor.getUser(Integer.parseInt(splitId[i + 2]));
+	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText) {
+		int[] ids = id.getIds();
+		List<String> targets = new ArrayList<>(ids.length);
+		for (int i = 0; i < ids.length; i++) {
+			CampingUser target = userMonitor.getUser(ids[i]);
 			if (target != null)
-				targets[i] = target.getFirstOrUserName();
+				targets.add(target.getFirstOrUserName());
 		}
 
-		String rest = String.join(", ", targets);
-		EventItem event = new EventItem(BotCommand.NicknameConversion, campingFromUser, null, null, inlineMessageId,
+		String rest = CampingUtil.join(targets, ", ");
+		EventItem event = new EventItem(BotCommand.NicknameConversion, campingFromUser, null, null, id.getUpdateId(),
 				resultText, rest);
 		return event;
 	}
@@ -154,7 +154,6 @@ public class NicknameCommand extends InlineCommand {
 						result.add("\nTo: ");
 						result.add(targetUser);
 						return result;
-
 					}
 				}
 			} else {

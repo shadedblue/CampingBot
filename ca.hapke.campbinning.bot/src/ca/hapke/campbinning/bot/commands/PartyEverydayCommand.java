@@ -31,7 +31,8 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class PartyEverydayCommand extends CampingSerializable implements HasCategories<String>, TextCommand {
+public class PartyEverydayCommand implements HasCategories<String>, TextCommand, CampingSerializable {
+	private boolean shouldSave = false;
 
 	private static final int SFW_START_HOUR = 8;
 	private static final int SFW_END_HOUR = 16;
@@ -161,10 +162,17 @@ public class PartyEverydayCommand extends CampingSerializable implements HasCate
 	}
 
 	@Override
+	public boolean shouldSave() {
+		return shouldSave;
+	}
+
+	@Override
 	public void getXml(OutputFormatter of) {
 		String tag = "party";
 		of.start(tag);
 		of.tagCategories(categories);
 		of.finish(tag);
+
+		shouldSave = false;
 	}
 }

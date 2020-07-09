@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.voting;
+package ca.hapke.campbinning.bot.commands.voting.aita;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -20,6 +20,8 @@ import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
+import ca.hapke.campbinning.bot.commands.voting.VotingOption;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 
@@ -39,7 +41,7 @@ public class AitaTracker extends VoteTracker<Float> {
 
 	public AitaTracker(CampingBotEngine bot, CampingUser ranter, Long chatId, Message activation, Message topic,
 			CategoriedItems<String> resultCategories, MbiyfCommand ballsCommand) throws TelegramApiException {
-		super(bot, ranter, ranter, chatId, activation, topic, NOT_QUORUM);
+		super(bot, ranter, ranter, chatId, activation, topic, NOT_QUORUM, AitaCommand.AITA);
 
 		this.resultTexts = resultCategories;
 		this.ballsCommand = ballsCommand;
@@ -66,7 +68,7 @@ public class AitaTracker extends VoteTracker<Float> {
 		int count = votes.size() + notApplicable;
 
 		float score = 0;
-		for (String v : votes.values()) {
+		for (Integer v : votes.values()) {
 			Float pts = valueMap.get(v);
 			if (pts != null)
 				score += pts.floatValue();
@@ -120,7 +122,7 @@ public class AitaTracker extends VoteTracker<Float> {
 			MbiyfMode enable = new MbiyfMode(MbiyfType.Asshole, Collections.singletonList(ranter));
 			ballsCommand.doWork(enable);
 			ZonedDateTime enableTime = ZonedDateTime.now();
-			ByTimeOfYear<MbiyfMode> disableEvent = ballsCommand.createDisableAfter(enableTime, 1, ChronoUnit.HOURS); 
+			ByTimeOfYear<MbiyfMode> disableEvent = ballsCommand.createDisableAfter(enableTime, 1, ChronoUnit.HOURS);
 			disableEvent.setRepeats(1);
 			ballsCommand.getTimeProvider().add(disableEvent);
 			return icr;

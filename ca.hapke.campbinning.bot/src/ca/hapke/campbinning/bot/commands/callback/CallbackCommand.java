@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands;
+package ca.hapke.campbinning.bot.commands.callback;
 
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
@@ -9,7 +9,8 @@ import ca.hapke.campbinning.bot.log.EventItem;
  *
  */
 public interface CallbackCommand {
+	public String getCommandName();
 
-	public EventItem reactToCallback(CallbackQuery callbackQuery);
+	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery);
 
 }

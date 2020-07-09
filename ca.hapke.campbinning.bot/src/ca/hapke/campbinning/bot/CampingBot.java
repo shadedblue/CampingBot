@@ -17,13 +17,14 @@ import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.StatusCommand;
 import ca.hapke.campbinning.bot.commands.inline.HideItInlineCommand;
-import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
+import ca.hapke.campbinning.bot.commands.inline.InlineCommandBase;
 import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
-import ca.hapke.campbinning.bot.commands.voting.VotingManager;
+import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
+import ca.hapke.campbinning.bot.commands.voting.rant.RantCommand;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
@@ -35,7 +36,9 @@ public class CampingBot extends CampingBotEngine {
 	public static final String STRING_NULL = "null";
 
 	private Resources res = new Resources();
-	private VotingManager voting;
+//	private VotingManager voting;
+	private AitaCommand aitaCommand;
+	private RantCommand rantCommand;
 
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
@@ -49,7 +52,7 @@ public class CampingBot extends CampingBotEngine {
 	private SpellGenerator spellCommand;
 
 	private HideItInlineCommand hideItInline;
-	private InlineCommand spellInline;
+	private InlineCommandBase spellInline;
 	private NicknameCommand nicknameCommand;
 
 	private CampingXmlSerializer serializer;
@@ -73,15 +76,16 @@ public class CampingBot extends CampingBotEngine {
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
-		voting = new VotingManager(this, ballsCommand);
+		rantCommand = new RantCommand(this);
+		aitaCommand = new AitaCommand(this, ballsCommand);
 		countdownGen = new CountdownGenerator(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
 
 		hideItInline = new HideItInlineCommand(this);
 		spellInline = new SpellInlineCommand(spellCommand);
 
-		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, voting, partyCommand, chatManager,
-				userMonitor);
+		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
+				chatManager, userMonitor);
 
 		res.loadAllEmoji();
 		serializer.load();
@@ -102,7 +106,8 @@ public class CampingBot extends CampingBotEngine {
 		ballsCommand.init();
 
 		addTextCommand(ballsCommand);
-		addTextCommand(voting);
+		addTextCommand(aitaCommand);
+		addTextCommand(rantCommand);
 		addTextCommand(pleasureCommand);
 		addTextCommand(iunnoCommand);
 		addTextCommand(partyCommand);
@@ -116,13 +121,15 @@ public class CampingBot extends CampingBotEngine {
 //		inlineCommands.add(hideItInline);
 
 		addCallbackCommand(hideItInline);
-		addCallbackCommand(voting);
+		addCallbackCommand(aitaCommand);
+		addCallbackCommand(rantCommand);
 
 		calMonitor = CalendarMonitor.getInstance();
 		calMonitor.add(serializer);
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
-		calMonitor.add(voting);
+		calMonitor.add(aitaCommand);
+		calMonitor.add(rantCommand);
 //		calMonitor.add(afdMatrix);
 //		calMonitor.add(afdEnabler);
 
@@ -131,7 +138,7 @@ public class CampingBot extends CampingBotEngine {
 		hasCategories.add(spellCommand);
 		hasCategories.add(countdownGen);
 		hasCategories.add(hypeCommand);
-		hasCategories.add(voting);
+		hasCategories.add(aitaCommand);
 		hasCategories.add(partyCommand);
 	}
 
@@ -192,8 +199,10 @@ public class CampingBot extends CampingBotEngine {
 			break;
 
 		case RantActivatorInitiation:
+			result = rantCommand.startVoting(command, this, message, chatId, campingFromUser);
+			break;
 		case AitaActivatorInitiation:
-			result = voting.startVoting(command, this, message, chatId, campingFromUser);
+			result = aitaCommand.startVoting(command, this, message, chatId, campingFromUser);
 			break;
 
 		case Countdown:

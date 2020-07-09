@@ -5,22 +5,22 @@ header {
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
-    import ca.hapke.campbinning.bot.commands.voting.*;
+    import ca.hapke.campbinning.bot.commands.voting.aita.*;
     import java.util.*;
 }
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
-    :   <camping>[ cs, sg, countdownGen, voting, pc, cm, um] EOF
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
+    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um] EOF
     ;
     
-<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, VotingManager voting, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
 	(<countdown>[countdownGen])?
-	(<voting>[voting]) ?
+	(<voting>[aita]) ?
 	(<party>[pc]) ?
 	(<chats>[cm]) ?
 	(<users>[um])?
@@ -29,11 +29,11 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	:
 	<excessives>[pc]
 	;
-<voting>[VotingManager voting]
+<voting>[AitaCommand aita]
 	:
-	<assholes>[voting]
-	<mediocres>[voting]
-	<nices>[voting]
+	<assholes>[aita]
+	<mediocres>[aita]
+	<nices>[aita]
 	;
 	
 <excessives>[PartyEverydayCommand pc]
@@ -44,28 +44,28 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 			{pc.addItem("excessive", val);}
 		) *
 	;
-<assholes>[VotingManager voting]
+<assholes>[AitaCommand aita]
 	{ String val; }
 	:	
 		(
 			val=<item>
-			{voting.addItem("asshole", val);}
+			{aita.addItem("asshole", val);}
 		) *
 	;
-<mediocres>[VotingManager voting]
+<mediocres>[AitaCommand aita]
 	{ String val; }
 	:	
 		(
 			val=<item>
-			{voting.addItem("mediocre", val);}
+			{aita.addItem("mediocre", val);}
 		) *
 	;
-<nices>[VotingManager voting]
+<nices>[AitaCommand aita]
 	{ String val; }
 	:	
 		(
 			val=<item>
-			{voting.addItem("nice", val);}
+			{aita.addItem("nice", val);}
 		) *
 	;
 <system> [CampingSystem cs]

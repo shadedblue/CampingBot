@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.voting;
+package ca.hapke.campbinning.bot.commands.voting.rant;
 
 import java.util.List;
 
@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
+import ca.hapke.campbinning.bot.commands.voting.VotingOption;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**
@@ -16,7 +18,7 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	public RantTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
 			Message rant) throws TelegramApiException {
-		super(bot, ranter, activater, chatId, activation, rant, NOT_QUORUM);
+		super(bot, ranter, activater, chatId, activation, rant, NOT_QUORUM, RantCommand.RANT);
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class RantTracker extends VoteTracker<Integer> {
 			return 0;
 
 		int sum = 0;
-		for (String v : votes.values()) {
+		for (Integer v : votes.values()) {
 			Integer pts = valueMap.get(v);
 			sum += pts.intValue();
 		}
@@ -60,6 +62,6 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	@Override
 	protected boolean shouldShowVotesInCategories() {
-		return false;
+		return true;
 	}
 }

@@ -22,7 +22,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class SpellGenerator extends CampingSerializable implements HasCategories<String> {
+public class SpellGenerator implements HasCategories<String>, CampingSerializable {
 
 	private static final TextFragment CAST_THE = new TextFragment("I cast the ");
 	private static final TextFragment OF = new TextFragment(" of ");
@@ -33,6 +33,7 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 	private static final String EXCLAMATION_CATEGORY = "exclamation";
 	private static final String ITEM_CATEGORY = "item";
 	private CampingBot bot;
+	private boolean shouldSave = false;
 
 	public SpellGenerator(CampingBot bot) {
 		this.bot = bot;
@@ -125,11 +126,18 @@ public class SpellGenerator extends CampingSerializable implements HasCategories
 	}
 
 	@Override
+	public boolean shouldSave() {
+		return shouldSave;
+	}
+
+	@Override
 	public void getXml(OutputFormatter of) {
 		String outerTag = "spell";
 		of.start(outerTag);
 		of.tagCategories(categories);
 		of.finish(outerTag);
+
+		shouldSave = false;
 	}
 
 	public static void countSpellActivation(CampingUser fromUser, CampingUser targetUser) {

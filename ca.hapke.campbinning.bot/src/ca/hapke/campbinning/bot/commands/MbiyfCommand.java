@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,6 +114,15 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			ByTimeOfYear<MbiyfMode> disable = createDisableAfter(enableTime, len, unit);
 			targets.add(disable);
 		}
+
+		List<CampingUser> specialUsers = Collections.singletonList(CampingUserMonitor.getInstance().getUser(708570894));
+		ByTimeOfYear<MbiyfMode> enableSpecial = new ByTimeOfYear<MbiyfMode>(7, 9, ENABLE_HOUR, ENABLE_MIN,
+				new MbiyfMode(MbiyfType.Special, specialUsers));
+		targets.add(enableSpecial);
+		ZonedDateTime enableSpecialTime = enableSpecial.generateATargetTime();
+		ByTimeOfYear<MbiyfMode> disableSpecial = createDisableAfter(enableSpecialTime, len, unit);
+		targets.add(disableSpecial);
+
 		times = new TimesProvider<MbiyfMode>(targets);
 		shouldAnnounce = true;
 	}
@@ -204,6 +214,12 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		case Friday:
 			result = announceFriday(value);
 			break;
+		case Asshole:
+			result = announceAsshole(value);
+			break;
+		case Special:
+			result = announceSpecial(value);
+			break;
 		case Off:
 			break;
 		}
@@ -269,6 +285,35 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		sb.add("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
 
 		return sb;
+	}
+
+	private CommandResult announceSpecial(MbiyfMode value) {
+		ImageLink image = CampingUtil.getRandom(fridayImages);
+		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+
+		result.add("APPARANTLY TODAY IS SPECIAL FOR ");
+		result.add(userRestriction.get(0));
+		result.add(" SO M");
+		result.add(res.getRandomBallEmoji());
+		result.add("IY");
+		result.add(res.getRandomFaceEmoji());
+		result.add("!");
+
+		return result;
+
+	}
+
+	public CommandResult announceAsshole(MbiyfMode value) throws TelegramApiException {
+		ImageLink image = CampingUtil.getRandom(fridayImages);
+		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		result.add(userRestriction.get(0));
+		result.add(": M");
+		result.add(res.getRandomBallEmoji());
+		result.add("IYAssh");
+		result.add(res.getRandomFaceEmoji());
+		result.add("le!");
+
+		return result;
 	}
 
 	public CommandResult announceFriday(MbiyfMode value) throws TelegramApiException {

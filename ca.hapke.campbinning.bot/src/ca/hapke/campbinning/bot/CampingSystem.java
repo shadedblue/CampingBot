@@ -8,7 +8,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  * 
  * @author Nathan Hapke
  */
-public class CampingSystem extends CampingSerializable {
+public class CampingSystem implements CampingSerializable {
 
 	private static CampingSystem instance = new CampingSystem();
 
@@ -123,6 +123,11 @@ public class CampingSystem extends CampingSerializable {
 
 	public boolean canConnect() {
 		return botUsername != null && token != null;
+	}
+
+	@Override
+	public boolean shouldSave() {
+		return false;
 	}
 
 }

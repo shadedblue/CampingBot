@@ -26,8 +26,9 @@ import ca.odell.glazedlists.event.ListEventListener;
  * 
  * @author Nathan Hapke
  */
-public class CampingUserMonitor extends CampingSerializable {
+public class CampingUserMonitor implements CampingSerializable {
 
+	private boolean shouldSave = false;
 	public static final int UNKNOWN_USER_ID = -1;
 	private static CampingUserMonitor instance = new CampingUserMonitor();
 
@@ -265,5 +266,10 @@ public class CampingUserMonitor extends CampingSerializable {
 		}
 		of.finish(usersTag);
 		shouldSave = false;
+	}
+
+	@Override
+	public boolean shouldSave() {
+		return shouldSave;
 	}
 }

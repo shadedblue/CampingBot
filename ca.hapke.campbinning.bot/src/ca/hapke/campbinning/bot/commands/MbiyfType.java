@@ -4,5 +4,6 @@ public enum MbiyfType {
 	Friday,
 	Birthday,
 	Asshole,
+	Special,
 	Off;
 }

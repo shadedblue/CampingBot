@@ -19,7 +19,7 @@ import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
-import ca.hapke.campbinning.bot.commands.voting.VotingManager;
+import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.xml.LoadStatsParser;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -43,7 +43,7 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 	@Override
 	public boolean shouldRun() {
 		for (CampingSerializable s : serializables) {
-			if (s.shouldSave) {
+			if (s.shouldSave()) {
 				shouldSave = true;
 				break;
 			}
@@ -54,25 +54,24 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 	private static final String CHARSET_TO_USE = "UTF-16";
 	private static final String FILENAME = "camping.xml";
 	private CampingSerializable[] serializables;
-	// private SundayStatsReset sundayStats;
 	private CampingSystem cs;
 	private SpellGenerator sg;
 	private CountdownGenerator countdownGen;
-	private VotingManager voting;
+	private AitaCommand aita;
 	private CampingUserMonitor um;
 	private PartyEverydayCommand pc;
 	private CampingChatManager cm;
 
-	public CampingXmlSerializer(CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen,
-			VotingManager voting, PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um) {
+	public CampingXmlSerializer(CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita,
+			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um) {
 		this.cs = cs;
 		this.sg = sg;
 		this.countdownGen = countdownGen;
-		this.voting = voting;
+		this.aita = aita;
 		this.pc = partyCommand;
 		this.cm = cm;
 		this.um = um;
-		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, voting, pc, cm, um };
+		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, aita, pc, cm, um };
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
@@ -150,7 +149,7 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), LoadStatsParser.class, false, false);
 		LoadStatsParser parser = new LoadStatsParser(stream);
 		try {
-			parser.document(cs, sg, countdownGen, voting, pc, cm, um);
+			parser.document(cs, sg, countdownGen, aita, pc, cm, um);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
