@@ -117,16 +117,6 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 		}
 	}
 
-//	private void setExtraData(PreparedStatement ps, int i, Object extraData) throws SQLException {
-//		if (extraData instanceof String) {
-//			String val = (String) extraData;
-//			ps.setString(i, val);
-//		} else if (extraData instanceof Integer) {
-//			Integer val = (Integer) extraData;
-//			ps.setInt(i, val);
-//		}
-//	}
-
 	@Override
 	public void close() throws Exception {
 		if (connection != null) {

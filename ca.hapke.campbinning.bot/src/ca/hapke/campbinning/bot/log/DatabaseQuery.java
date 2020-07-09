@@ -51,7 +51,6 @@ public class DatabaseQuery {
 	}
 
 	public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-
 		String c = null;
 		String questionMarks = null;
 		for (int i = 0; i < columns.size(); i++) {
