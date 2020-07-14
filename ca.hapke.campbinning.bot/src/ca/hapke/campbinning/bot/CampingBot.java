@@ -21,6 +21,7 @@ import ca.hapke.campbinning.bot.commands.inline.InlineCommandBase;
 import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
@@ -61,6 +62,8 @@ public class CampingBot extends CampingBotEngine {
 
 	private CalendarMonitor calMonitor;
 
+	private InsultGenerator insultGenerator;
+
 //	private AfdTextCommand afdText;
 //	private AfdMatrixPictures afdMatrix;
 //	private AprilFoolsDayEnabler afdEnabler;
@@ -83,9 +86,9 @@ public class CampingBot extends CampingBotEngine {
 
 		hideItInline = new HideItInlineCommand(this);
 		spellInline = new SpellInlineCommand(spellCommand);
-
+		insultGenerator = InsultGenerator.getInstance();
 		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
-				chatManager, userMonitor);
+				chatManager, userMonitor, insultGenerator);
 
 		res.loadAllEmoji();
 		serializer.load();
@@ -140,6 +143,7 @@ public class CampingBot extends CampingBotEngine {
 		hasCategories.add(hypeCommand);
 		hasCategories.add(aitaCommand);
 		hasCategories.add(partyCommand);
+		hasCategories.add(insultGenerator);
 	}
 
 	@Override

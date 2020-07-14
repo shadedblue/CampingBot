@@ -5,23 +5,25 @@ header {
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
+    import ca.hapke.campbinning.bot.commands.response.*;
     import ca.hapke.campbinning.bot.commands.voting.aita.*;
     import java.util.*;
 }
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
-    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um] EOF
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig]
+    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um, ig] EOF
     ;
     
-<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um]
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
 	(<countdown>[countdownGen])?
 	(<voting>[aita]) ?
 	(<party>[pc]) ?
+	(<insults>[ig]) ?
 	(<chats>[cm]) ?
 	(<users>[um])?
 	;
@@ -50,6 +52,14 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		(
 			val=<item>
 			{aita.addItem("asshole", val);}
+		) *
+	;
+<insults>[InsultGenerator ig]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{ig.addItem("insult", val);}
 		) *
 	;
 <mediocres>[AitaCommand aita]

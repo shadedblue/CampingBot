@@ -23,6 +23,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  */
 public class SpellGenerator implements HasCategories<String>, CampingSerializable {
 
+	private static final String SPELL_CONTAINER = "Spell";
 	private static final TextFragment CAST_THE = new TextFragment("I cast the ");
 	private static final TextFragment OF = new TextFragment(" of ");
 	private static final TextFragment ON = new TextFragment(" on ");
@@ -44,7 +45,7 @@ public class SpellGenerator implements HasCategories<String>, CampingSerializabl
 
 	@Override
 	public String getContainerName() {
-		return "Spell";
+		return SPELL_CONTAINER;
 	}
 
 	private CategoriedItems<String> categories;

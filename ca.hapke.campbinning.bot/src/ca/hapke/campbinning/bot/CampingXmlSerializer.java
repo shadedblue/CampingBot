@@ -19,6 +19,7 @@ import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
 import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.xml.LoadStatsParser;
@@ -61,9 +62,10 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 	private CampingUserMonitor um;
 	private PartyEverydayCommand pc;
 	private CampingChatManager cm;
+	private InsultGenerator ig;
 
 	public CampingXmlSerializer(CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita,
-			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um) {
+			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig) {
 		this.cs = cs;
 		this.sg = sg;
 		this.countdownGen = countdownGen;
@@ -71,7 +73,8 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 		this.pc = partyCommand;
 		this.cm = cm;
 		this.um = um;
-		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, aita, pc, cm, um };
+		this.ig = ig;
+		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, aita, pc, ig, cm, um };
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
@@ -149,7 +152,7 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), LoadStatsParser.class, false, false);
 		LoadStatsParser parser = new LoadStatsParser(stream);
 		try {
-			parser.document(cs, sg, countdownGen, aita, pc, cm, um);
+			parser.document(cs, sg, countdownGen, aita, pc, cm, um, ig);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

@@ -7,6 +7,7 @@
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
+    import ca.hapke.campbinning.bot.commands.response.*;
     import ca.hapke.campbinning.bot.commands.voting.aita.*;
     import java.util.*;
 
@@ -20,39 +21,40 @@ public interface LoadStatsParserTokenTypes {
 	// "<voting>" = 7
 	// "<excessives>" = 8
 	// "<assholes>" = 9
-	// "<mediocres>" = 10
-	// "<nices>" = 11
-	// "<system>" = 12
-	// "<db>" = 13
-	// "<countdown>" = 14
-	// "<spell>" = 15
-	// "<adjectives>" = 16
-	// "<hypes>" = 17
-	// "<items>" = 18
-	// "<exclamations>" = 19
-	// "<chats>" = 20
-	// "<chat>" = 21
-	// "<users>" = 22
-	// "<user>" = 23
-	// "<birthdayMonth>" = 24
-	int PCDATA = 25;
-	// "<birthdayDay>" = 26
-	// "<nextCampingId>" = 27
-	// "<token>" = 28
-	// "<botUsername>" = 29
-	// "<announceChat>" = 30
-	// "<adminUser>" = 31
-	// "<dbHost>" = 32
-	// "<dbPort>" = 33
-	// "<dbUser>" = 34
-	// "<dbPass>" = 35
-	// "<item>" = 36
-	// "<campingId>" = 37
-	// "<id>" = 38
-	// "<username>" = 39
-	// "<nickname>" = 40
-	// "<first>" = 41
-	// "<last>" = 42
-	// "<type>" = 43
-	// "<allowed>" = 44
+	// "<insults>" = 10
+	// "<mediocres>" = 11
+	// "<nices>" = 12
+	// "<system>" = 13
+	// "<db>" = 14
+	// "<countdown>" = 15
+	// "<spell>" = 16
+	// "<adjectives>" = 17
+	// "<hypes>" = 18
+	// "<items>" = 19
+	// "<exclamations>" = 20
+	// "<chats>" = 21
+	// "<chat>" = 22
+	// "<users>" = 23
+	// "<user>" = 24
+	// "<birthdayMonth>" = 25
+	int PCDATA = 26;
+	// "<birthdayDay>" = 27
+	// "<nextCampingId>" = 28
+	// "<token>" = 29
+	// "<botUsername>" = 30
+	// "<announceChat>" = 31
+	// "<adminUser>" = 32
+	// "<dbHost>" = 33
+	// "<dbPort>" = 34
+	// "<dbUser>" = 35
+	// "<dbPass>" = 36
+	// "<item>" = 37
+	// "<campingId>" = 38
+	// "<id>" = 39
+	// "<username>" = 40
+	// "<nickname>" = 41
+	// "<first>" = 42
+	// "<last>" = 43
+	// "<type>" = 44
+	// "<allowed>" = 45
 }

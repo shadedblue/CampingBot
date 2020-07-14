@@ -158,7 +158,6 @@ public abstract class VoteTracker<T> {
 		if (completed)
 			return null;
 
-		String data = callbackQuery.getData();
 		String callbackQueryId = callbackQuery.getId();
 
 		String display = longDescriptions[id.getIds()[0]];
@@ -214,7 +213,7 @@ public abstract class VoteTracker<T> {
 		answer.setCallbackQueryId(callbackQueryId);
 		try {
 			bot.execute(answer);
-			return new EventItem(BotCommand.Vote, user, null, chat, topicMessage.getMessageId(), display,
+			return new EventItem(BotCommand.Vote, user, null, chat, bannerMessage.getMessageId(), display,
 					topicMessage.getMessageId());
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
@@ -314,7 +313,7 @@ public abstract class VoteTracker<T> {
 	public abstract String getBannerTitle();
 
 	protected List<ResultFragment> getVotesText(boolean completed) {
-		List<ResultFragment> sb = new ArrayList<>();
+		List<ResultFragment> output = new ArrayList<>();
 
 		int notApplicable = votesNotApplicable.size();
 		int naturalVotes = votes.size();
@@ -330,8 +329,7 @@ public abstract class VoteTracker<T> {
 			scoreStr = "(n/a)";
 		}
 
-//		StringBuilder sb = new StringBuilder();
-		addVotesTextPrefix(completed, sb);
+		addVotesTextPrefix(completed, output);
 
 		if (shouldShowVotesInCategories()) {
 			int[] votes = new int[shortButtons.length];
@@ -344,26 +342,26 @@ public abstract class VoteTracker<T> {
 
 			for (int i = 0; i < shortButtons.length; i++) {
 				String txt = shortButtons[i];
-				sb.add(new TextFragment("\n"));
-				sb.add(new TextFragment(txt, TextStyle.Bold));
-				sb.add(new TextFragment(": "));
-				sb.add(new TextFragment(Integer.toString(votes[i])));
+				output.add(new TextFragment("\n"));
+				output.add(new TextFragment(txt, TextStyle.Bold));
+				output.add(new TextFragment(": "));
+				output.add(new TextFragment(Integer.toString(votes[i])));
 			}
 		}
 
-		sb.add(new TextFragment("\n--------\nTotal Votes: "));
-		sb.add(new TextFragment(Integer.toString(count), TextStyle.Bold));
+		output.add(new TextFragment("\n--------\nTotal Votes: "));
+		output.add(new TextFragment(Integer.toString(count), TextStyle.Bold));
 
-		sb.add(new TextFragment("\n"));
+		output.add(new TextFragment("\n"));
 		if (completed)
-			sb.add(new TextFragment("Final"));
+			output.add(new TextFragment("Final"));
 		else
-			sb.add(new TextFragment("Current"));
-		sb.add(new TextFragment(" Score: "));
-		sb.add(new TextFragment(scoreStr, TextStyle.Bold));
-		addVotesTextSuffix(sb, completed, score);
+			output.add(new TextFragment("Current"));
+		output.add(new TextFragment(" Score: "));
+		output.add(new TextFragment(scoreStr, TextStyle.Bold));
+		addVotesTextSuffix(output, completed, score);
 
-		return sb;
+		return output;
 	}
 
 	protected abstract boolean shouldShowVotesInCategories();

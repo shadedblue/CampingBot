@@ -47,8 +47,8 @@ public class SpellInlineCommand extends InlineCommandBase {
 
 		CommandType cmd = success ? BotCommand.Spell : BotCommand.SpellDipshit;
 
-		EventItem event = new EventItem(cmd, campingFromUser, null, null, id.getUpdateId(), resultText,
-				targetUser.getCampingId());
+		int campingId = targetUser != null ? targetUser.getCampingId() : -1;
+		EventItem event = new EventItem(cmd, campingFromUser, null, null, id.getUpdateId(), resultText, campingId);
 		return event;
 	}
 

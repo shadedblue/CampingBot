@@ -11,11 +11,23 @@ public abstract class ResultFragment {
 	public static final TextFragment NEWLINE = new TextFragment("\n");
 
 	protected CaseChoice caseChoice;
-	protected TextStyle style;
+	protected TextStyle textStyle;
 
-	public ResultFragment(CaseChoice caseChoice, TextStyle style) {
+	public ResultFragment() {
+		this(CaseChoice.Normal, TextStyle.Normal);
+	}
+
+	public ResultFragment(CaseChoice caseChoice) {
+		this(caseChoice, TextStyle.Normal);
+	}
+
+	public ResultFragment(TextStyle textStyle) {
+		this(CaseChoice.Normal, textStyle);
+	}
+
+	public ResultFragment(CaseChoice caseChoice, TextStyle textStyle) {
 		this.caseChoice = caseChoice;
-		this.style = style;
+		this.textStyle = textStyle;
 	}
 
 	public abstract String getValue(MessageProcessor processor);
@@ -37,6 +49,6 @@ public abstract class ResultFragment {
 	}
 
 	public String markup(String p) {
-		return style.getPre() + p + style.getPost();
+		return textStyle.getPre() + p + textStyle.getPost();
 	}
 }
