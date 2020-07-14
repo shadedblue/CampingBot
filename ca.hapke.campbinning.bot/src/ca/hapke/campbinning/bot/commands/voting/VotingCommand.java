@@ -22,6 +22,8 @@ import ca.hapke.campbinning.bot.commands.callback.CallbackCommandBase;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -45,9 +47,9 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 	protected final CampingBot bot;
 	private TimesProvider<Void> times;
 	protected final BotCommand respondsTo;
-	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on");
+	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on, ");
 	private static final TextFragment NO_TOPIC_PROVIDED = new TextFragment(
-			"Reply to the topic you would like to vote on!");
+			"Reply to the topic you would like to vote on, ");
 
 	public VotingCommand(CampingBot campingBot, BotCommand respondsTo) {
 		this.respondsTo = respondsTo;
@@ -90,7 +92,8 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 			if (topic != null) {
 				result = startVotingInternal(type, bot, activation, chatId, activater, topic);
 			} else {
-				result = new TextCommandResult(BotCommand.VoteInitiationFailed, NO_TOPIC_PROVIDED);
+				result = new TextCommandResult(BotCommand.VoteInitiationFailed, NO_TOPIC_PROVIDED,
+						new InsultFragment(Perspective.You));
 			}
 		} catch (Exception e) {
 			result = new TextCommandResult(BotCommand.VoteInitiationFailed, new TextFragment(e.getMessage()));
@@ -104,7 +107,8 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 		TextCommandResult output = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
-			return new TextCommandResult(BotCommand.VoteInitiationFailed, ALREADY_BEING_VOTED_ON);
+			return new TextCommandResult(BotCommand.VoteInitiationFailed, ALREADY_BEING_VOTED_ON,
+					new InsultFragment(Perspective.You));
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
 			CampingUser ranter = uM.monitor(topic.getFrom());
