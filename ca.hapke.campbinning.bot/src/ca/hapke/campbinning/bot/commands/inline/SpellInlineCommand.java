@@ -44,7 +44,6 @@ public class SpellInlineCommand extends InlineCommandBase {
 		boolean success = ids[1] > 0;
 
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
-		SpellGenerator.countSpellActivation(campingFromUser, targetUser);
 
 		CommandType cmd = success ? BotCommand.Spell : BotCommand.SpellDipshit;
 

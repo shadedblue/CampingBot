@@ -153,14 +153,6 @@ public class CampingUserMonitor implements CampingSerializable {
 		return null;
 	}
 
-	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname,
-			Long lastUpdate) {
-		CampingUser target = monitor(campingIdInt, telegramId, username, firstname, lastname);
-		target.setLastUpdate(lastUpdate);
-
-		return target;
-	}
-
 	public CampingUser monitor(int id, String username, String firstname, String lastname) {
 		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname);
 	}
@@ -221,13 +213,6 @@ public class CampingUserMonitor implements CampingSerializable {
 		return target;
 	}
 
-	public void resetStats() {
-		for (CampingUser u : users) {
-			u.resetStats();
-		}
-		shouldSave = true;
-	}
-
 	public EventList<CampingUser> getUsers() {
 		return users;
 	}
@@ -260,7 +245,6 @@ public class CampingUserMonitor implements CampingSerializable {
 				of.tagAndValue("birthdayMonth", bday.getMonth());
 				of.tagAndValue("birthdayDay", bday.getDay());
 			}
-			of.tagAndValue("lastUpdate", u.getLastUpdate());
 
 			of.finish(userTag);
 		}

@@ -155,7 +155,6 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		if (targetUser == null)
 			return null;
 
-		campingFromUser.increment(BotCommand.Mbiyf);
 		CommandResult result = new TextCommandResult(BotCommand.Mbiyf, MY).add(ball).add(IN).add(targetUser)
 				.add(APOSTROPHE_S);
 		if (mode == MbiyfType.Birthday) {

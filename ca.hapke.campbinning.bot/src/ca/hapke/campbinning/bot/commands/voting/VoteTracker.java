@@ -214,7 +214,6 @@ public abstract class VoteTracker<T> {
 		answer.setCallbackQueryId(callbackQueryId);
 		try {
 			bot.execute(answer);
-			user.increment(BotCommand.Vote);
 			return new EventItem(BotCommand.Vote, user, null, chat, topicMessage.getMessageId(), display,
 					topicMessage.getMessageId());
 		} catch (Exception e) {

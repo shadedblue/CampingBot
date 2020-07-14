@@ -73,7 +73,6 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 			long now = System.currentTimeMillis();
 			if (now > r.getCompletionTime() || r.isCompleted()) {
 				r.complete();
-				r.getActivater().increment(BotCommand.VoteActivatorComplete);
 				inProgress.remove(r);
 				continue;
 			} else {

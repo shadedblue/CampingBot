@@ -6,7 +6,6 @@ import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 
 /**
@@ -64,7 +63,6 @@ public class CampingUser {
 	private String lastname;
 	private String nickname;
 
-	private long lastUpdate;
 	private Birthday birthday;
 
 	// For GlazedLists to autosort
@@ -115,10 +113,6 @@ public class CampingUser {
 		return lastname;
 	}
 
-	public long getLastUpdate() {
-		return lastUpdate;
-	}
-
 	public String getNickname() {
 		return nickname;
 	}
@@ -135,7 +129,6 @@ public class CampingUser {
 		support.firePropertyChange("birthdayMonth", -1, month);
 		support.firePropertyChange("birthdayDay", -1, day);
 	}
-
 
 	public boolean hasBirthday() {
 		return birthday != null;
@@ -154,9 +147,6 @@ public class CampingUser {
 			setUsername(other.lastname);
 		if (nickname == null)
 			setNickname(other.nickname);
-
-		setLastUpdate(Math.max(other.lastUpdate, this.lastUpdate));
-
 	}
 
 	public void setId(Integer id) {
@@ -192,54 +182,6 @@ public class CampingUser {
 		nickname = value;
 
 		support.firePropertyChange("nickname", oldVal, nickname);
-	}
-
-	public void setLastUpdate(Long lastUpdate) {
-		long oldLastUpdate = this.lastUpdate;
-		this.lastUpdate = lastUpdate;
-		support.firePropertyChange("lastUpdate", oldLastUpdate, lastUpdate);
-	}
-
-	public void increment(BotCommand spell) {
-		long now = System.currentTimeMillis();
-
-		switch (spell) {
-		case Mbiyf:
-		case MbiyfDipshit:
-		case MbiyfAnnouncement:
-		case Spell:
-		case SpellDipshit:
-		case RantActivatorInitiation:
-		case AitaActivatorInitiation:
-		case PleasureModel:
-		case PartyEveryday:
-		case IunnoGoogleIt:
-			setLastUpdate(now);
-			break;
-		case VoteActivatorComplete:
-		case AllBalls:
-		case AllFaces:
-		case AllNicknames:
-		case Countdown:
-		case NicknameConversion:
-
-		case VoteTopicInitiation:
-		case VoteTopicComplete:
-		case VoteInitiationFailed:
-		case Vote:
-		case Reload:
-		case SetNickname:
-			// case Stats:
-			// case StatsEndOfWeek:
-			// case Test:
-		case SetNicknameRejected:
-		case UiString:
-			break;
-		}
-	}
-
-	public void resetStats() {
-		// setLastUpdate(0l);
 	}
 
 	public boolean equals(CampingUser that) {

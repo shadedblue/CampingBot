@@ -70,7 +70,6 @@ public class DatabaseQuery {
 		}
 
 		String sql = "INSERT INTO " + table + "(" + c + ") VALUES (" + questionMarks + ");";
-		System.out.println("sql");
 		PreparedStatement ps = connection.prepareStatement(sql);
 
 		for (int i = 0; i < types.size(); i++) {
@@ -89,7 +88,6 @@ public class DatabaseQuery {
 				break;
 			}
 		}
-		System.out.println(ps.toString());
 		return ps;
 	}
 

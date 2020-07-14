@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
@@ -56,7 +55,6 @@ public class SpellGenerator implements HasCategories<String>, CampingSerializabl
 	public CommandResult spellCommand(CampingUser campingFromUser, Message message) {
 		CampingUser targetUser = bot.findTarget(message);
 		SpellResult result = createSpell(campingFromUser, targetUser);
-		countSpellActivation(campingFromUser, targetUser);
 		return result.provideCommandResult();
 	}
 
@@ -138,10 +136,6 @@ public class SpellGenerator implements HasCategories<String>, CampingSerializabl
 		of.finish(outerTag);
 
 		shouldSave = false;
-	}
-
-	public static void countSpellActivation(CampingUser fromUser, CampingUser targetUser) {
-		fromUser.increment(BotCommand.Spell);
 	}
 
 }
