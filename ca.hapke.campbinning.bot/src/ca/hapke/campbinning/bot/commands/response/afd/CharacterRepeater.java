@@ -10,8 +10,12 @@ public class CharacterRepeater extends MessageProcessor {
 	private int total;
 	private int[] t, s;
 
-	public CharacterRepeater() {
-		t = new int[] { 3, 83, 9, 4, 2, 1 };
+	public CharacterRepeater(boolean highPower) {
+		if (highPower)
+			t = new int[] { 5, 73, 12, 6, 3, 1 };
+		else
+			t = new int[] { 3, 83, 9, 4, 2, 1 };
+
 		s = new int[t.length];
 		for (int i = 0; i < t.length; i++) {
 			total += t[i];

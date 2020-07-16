@@ -10,7 +10,7 @@ import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.HypeCommand;
-import ca.hapke.campbinning.bot.commands.ImageEnhanceCommand;
+import ca.hapke.campbinning.bot.commands.EnhanceCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
@@ -46,7 +46,7 @@ public class CampingBot extends CampingBotEngine {
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
 	private PleasureModelCommand pleasureCommand;
-	private ImageEnhanceCommand enhanceCommand;
+	private EnhanceCommand enhanceCommand;
 	private IunnoCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
 
@@ -75,7 +75,7 @@ public class CampingBot extends CampingBotEngine {
 		spellCommand = new SpellGenerator(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
-		enhanceCommand = new ImageEnhanceCommand(this);
+		enhanceCommand = new EnhanceCommand(this);
 		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);

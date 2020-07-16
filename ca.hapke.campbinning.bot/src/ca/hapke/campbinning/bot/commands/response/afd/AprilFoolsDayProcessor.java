@@ -15,8 +15,8 @@ public class AprilFoolsDayProcessor extends MessageProcessor {
 		return sillyPipe;
 	}
 
-	public AprilFoolsDayProcessor() {
-		sillyPipe = new CharacterRepeater().addAtEnd(new FontGarbler());
+	public AprilFoolsDayProcessor(boolean highPower) {
+		sillyPipe = new CharacterRepeater(highPower).addAtEnd(new FontGarbler(highPower));
 	}
 
 	@Override

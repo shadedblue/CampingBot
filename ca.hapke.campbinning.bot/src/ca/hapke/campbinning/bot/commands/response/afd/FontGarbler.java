@@ -10,10 +10,15 @@ public class FontGarbler extends MessageProcessor {
 
 	private static final char MIN = ' ';
 	private static final char MAX = 'z';
-	private static final double P_REPLACEMENT = 0.2;
+	private final double pReplacement;
 	private char[][] font;
 
-	public FontGarbler() {
+	public FontGarbler(boolean highPower) {
+		if (highPower)
+			pReplacement = 0.4;
+		else
+			pReplacement = 0.2;
+
 		font = new char[MAX - MIN + 1][];
 		add(' ', "Œ ֍↔⊞");
 //		add('', "");
@@ -147,7 +152,7 @@ public class FontGarbler extends MessageProcessor {
 	private char f(char in) {
 		int i = in - MIN;
 		char[] vals;
-		if (Math.random() < P_REPLACEMENT && i >= 0 && i < font.length) {
+		if (Math.random() < pReplacement && i >= 0 && i < font.length) {
 			vals = font[i];
 			if (vals != null && vals.length > 0) {
 				int j = (int) (Math.random() * vals.length);
