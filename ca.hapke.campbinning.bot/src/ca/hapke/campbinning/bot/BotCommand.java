@@ -22,11 +22,13 @@ public enum BotCommand implements CommandType {
 	// Activator is the user who invokes /rant
 	RantActivatorInitiation("rant", true, BotCommandIds.RANT | BotCommandIds.VOTING | BotCommandIds.SET),
 	AitaActivatorInitiation("aita", true, BotCommandIds.AITA | BotCommandIds.VOTING | BotCommandIds.SET),
-	VoteInitiationFailed(null, true, BotCommandIds.VOTING | BotCommandIds.FAILURE),
+	VoteCommandFailed(null, true, BotCommandIds.VOTING | BotCommandIds.FAILURE),
 	// Ranter is the person who did the complaining
 	VoteTopicInitiation(null, true, BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.SET),
 	VoteActivatorComplete(null, true, BotCommandIds.VOTING | BotCommandIds.FINISH),
 	VoteTopicComplete(null, true, BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.FINISH),
+	VoteForceComplete("complete", true, BotCommandIds.VOTING | BotCommandIds.FINISH),
+	VoteExtend("extend", true, BotCommandIds.VOTING | BotCommandIds.USE),
 
 	// TODO add Rant events for Completion as non-rant?
 

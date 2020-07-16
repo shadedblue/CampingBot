@@ -82,11 +82,6 @@ public class AitaTracker extends VoteTracker<Float> {
 	}
 
 	@Override
-	protected long getVotingTime() {
-		return 45 * 60 * 1000;
-	}
-
-	@Override
 	protected String getScoreSuffix() {
 		return "%";
 	}

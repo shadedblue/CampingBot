@@ -51,11 +51,6 @@ public class RantTracker extends VoteTracker<Integer> {
 	}
 
 	@Override
-	protected long getVotingTime() {
-		return 45 * 60 * 1000;
-	}
-
-	@Override
 	protected String getScoreSuffix() {
 		return "/2";
 	}

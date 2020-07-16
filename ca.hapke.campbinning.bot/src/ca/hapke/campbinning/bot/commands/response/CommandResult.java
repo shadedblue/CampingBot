@@ -101,20 +101,23 @@ public abstract class CommandResult {
 		return cmd;
 	}
 
-	public void replyToOriginalMessageIfPossible(Message message) {
+	public CommandResult setReplyToOriginalMessageIfPossible(Message message) {
 		Message replyTo = message.getReplyToMessage();
 		if (replyTo != null)
 			setReplyTo(replyTo.getMessageId());
+		return this;
 	}
 
-	public void setReplyTo(Integer replyTo) {
+	public CommandResult setReplyTo(Integer replyTo) {
 		if (this.replyTo == null)
 			this.replyTo = replyTo;
+		return this;
 	}
 
-	public void setKeyboard(ReplyKeyboard keyboard) {
+	public CommandResult setKeyboard(ReplyKeyboard keyboard) {
 		if (this.keyboard == null)
 			this.keyboard = keyboard;
+		return this;
 	}
 
 	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {

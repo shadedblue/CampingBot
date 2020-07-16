@@ -59,7 +59,7 @@ public abstract class VoteTracker<T> {
 	protected String previousBanner;
 	protected Message topicMessage;
 	protected final long creationTime = System.currentTimeMillis();
-	protected final long completionTime = System.currentTimeMillis() + getVotingTime();
+	protected long completionTime = System.currentTimeMillis() + getVotingTime();
 	protected TimeFormatter formatter = new TimeFormatter(1, "", false, true);
 	protected final String[] shortButtons;
 	protected final String[] buttonCallbackIds;
@@ -152,7 +152,9 @@ public abstract class VoteTracker<T> {
 	/**
 	 * @return milliseconds
 	 */
-	protected abstract long getVotingTime();
+	protected long getVotingTime() {
+		return 45 * 60 * 1000;
+	}
 
 	public EventItem react(CallbackId id, CallbackQuery callbackQuery) throws TelegramApiException {
 		if (completed)
@@ -307,6 +309,9 @@ public abstract class VoteTracker<T> {
 			sb.add(new TextFragment(": "));
 			sb.add(new TextFragment(longer));
 		}
+
+		sb.add(new TextFragment("\nOriginal speaker, or activater may reply to this with /complete or /extend.",
+				TextStyle.Italic));
 		return sb;
 	}
 
@@ -390,6 +395,10 @@ public abstract class VoteTracker<T> {
 
 	public long getCreationTime() {
 		return creationTime;
+	}
+
+	public void extend() {
+		completionTime += 10 * 60 * 1000;
 	}
 
 	public long getCompletionTime() {

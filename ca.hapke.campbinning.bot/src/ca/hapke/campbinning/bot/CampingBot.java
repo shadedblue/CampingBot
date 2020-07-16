@@ -24,6 +24,7 @@ import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.commands.voting.VoteManagementCommands;
 import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.commands.voting.rant.RantCommand;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
@@ -39,6 +40,7 @@ public class CampingBot extends CampingBotEngine {
 	private Resources res = new Resources();
 	private AitaCommand aitaCommand;
 	private RantCommand rantCommand;
+	private VoteManagementCommands voteManagementCommands;
 
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
@@ -78,14 +80,15 @@ public class CampingBot extends CampingBotEngine {
 		ballsCommand = new MbiyfCommand(this, res);
 		rantCommand = new RantCommand(this);
 		aitaCommand = new AitaCommand(this, ballsCommand);
+		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);
 		countdownGen = new CountdownGenerator(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
 
 		hideItInline = new HideItInlineCommand(this);
 		spellInline = new SpellInlineCommand(spellCommand);
 		insultGenerator = InsultGenerator.getInstance();
-		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand,
-				partyCommand, chatManager, userMonitor, insultGenerator);
+		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
+				chatManager, userMonitor, insultGenerator);
 
 //		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
 //		afdp.addAtEnd(processor);
@@ -170,7 +173,7 @@ public class CampingBot extends CampingBotEngine {
 		case Vote:
 		case VoteActivatorComplete:
 		case VoteTopicInitiation:
-		case VoteInitiationFailed:
+		case VoteCommandFailed:
 		case Talk:
 			// NOOP : internal events, not responses
 			break;
@@ -196,6 +199,12 @@ public class CampingBot extends CampingBotEngine {
 			break;
 		case AitaActivatorInitiation:
 			result = aitaCommand.startVoting(command, this, message, chatId, campingFromUser);
+			break;
+		case VoteForceComplete:
+			result = voteManagementCommands.completeVoting(message, campingFromUser);
+			break;
+		case VoteExtend:
+			result = voteManagementCommands.extendVoting(message, campingFromUser);
 			break;
 
 		case Countdown:

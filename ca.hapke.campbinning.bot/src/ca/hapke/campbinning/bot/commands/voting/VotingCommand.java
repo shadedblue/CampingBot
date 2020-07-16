@@ -92,11 +92,11 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 			if (topic != null) {
 				result = startVotingInternal(type, bot, activation, chatId, activater, topic);
 			} else {
-				result = new TextCommandResult(BotCommand.VoteInitiationFailed, NO_TOPIC_PROVIDED,
+				result = new TextCommandResult(BotCommand.VoteCommandFailed, NO_TOPIC_PROVIDED,
 						new InsultFragment(Perspective.You));
 			}
 		} catch (Exception e) {
-			result = new TextCommandResult(BotCommand.VoteInitiationFailed, new TextFragment(e.getMessage()));
+			result = new TextCommandResult(BotCommand.VoteCommandFailed, new TextFragment(e.getMessage()));
 		}
 		return result;
 	}
@@ -107,7 +107,7 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 		TextCommandResult output = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
-			return new TextCommandResult(BotCommand.VoteInitiationFailed, ALREADY_BEING_VOTED_ON,
+			return new TextCommandResult(BotCommand.VoteCommandFailed, ALREADY_BEING_VOTED_ON,
 					new InsultFragment(Perspective.You));
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
@@ -116,7 +116,7 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 			try {
 				tracker = initiateVote(ranter, activater, chatId, activation, topic);
 			} catch (VoteInitiationException e) {
-				output = new TextCommandResult(BotCommand.VoteInitiationFailed, new MentionFragment(activater));
+				output = new TextCommandResult(BotCommand.VoteCommandFailed, new MentionFragment(activater));
 				output.add(e.getMessage());
 			}
 
