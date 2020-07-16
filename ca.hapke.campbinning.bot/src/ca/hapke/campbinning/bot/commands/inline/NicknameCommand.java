@@ -17,6 +17,8 @@ import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
@@ -36,11 +38,11 @@ public class NicknameCommand extends InlineCommandBase {
 	private static final char[] invalidCharacters = new char[] { '*', '_', '[', ']', '`', '\\', '~' };
 
 	public static final TextFragment INVALID_CHARACTER = new TextFragment(
-			"Nickname rejected... Invalid character in nickname.");
+			"Nickname rejected. Invalid character in nickname.");
 	public static final TextFragment CANT_GIVE_YOURSELF_A_NICKNAME = new TextFragment(
 			"No fuckin' way.\n#1 rule of nicknames... you can't give yourself a nickname");
 	public static final TextFragment USER_NOT_FOUND = new TextFragment("Dunno who you're trying to nickname");
-	public static final TextFragment INVALID_SYNTAX = new TextFragment("Invalid syntax, DUMB ASS.");
+	public static final TextFragment INVALID_SYNTAX = new TextFragment("Invalid syntax, ");
 
 	@Override
 	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
@@ -162,7 +164,7 @@ public class NicknameCommand extends InlineCommandBase {
 			}
 		}
 		return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
-				.add(ResultFragment.COLON_SPACE).add(INVALID_SYNTAX);
+				.add(ResultFragment.COLON_SPACE).add(INVALID_SYNTAX).add(new InsultFragment(Perspective.You));
 	}
 
 	private boolean rejectNickname(String nickname) {

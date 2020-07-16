@@ -27,6 +27,7 @@ public class CampingSystem implements CampingSerializable {
 	private String token;
 	private String botUsername;
 	private boolean dbEnabled = false;
+	private boolean connectOnStartup = false;
 
 	public String getDbHost() {
 		return dbHost;
@@ -100,6 +101,14 @@ public class CampingSystem implements CampingSerializable {
 		return dbPass;
 	}
 
+	public boolean isConnectOnStartup() {
+		return connectOnStartup;
+	}
+
+	public void setConnectOnStartup(boolean connectOnStartup) {
+		this.connectOnStartup = connectOnStartup;
+	}
+
 	@Override
 	public void getXml(OutputFormatter of) {
 
@@ -109,6 +118,7 @@ public class CampingSystem implements CampingSerializable {
 		of.tagAndValue("botUsername", botUsername);
 		of.tagAndValue("adminUser", adminUser);
 		of.tagAndValue("announceChat", announceChat);
+		of.tagAndValue("connectOnStartup", connectOnStartup);
 		if (dbEnabled) {
 			String dbTag = "db";
 			of.start(dbTag);

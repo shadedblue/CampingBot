@@ -87,6 +87,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	 botUsername=<botUsername>
 	(adminUser=<adminUser>)?
 	(announceChat=<announceChat>)?
+	(<connectOnStartup>[cs])?
 	(<db>[cs]) ?
 	{
 		cs.setToken(token);
@@ -247,6 +248,17 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		
 		if (bM > 0 && bD > 0) {
 			user.setBirthday(bM, bD);
+		}
+	}
+	;
+<connectOnStartup>[CampingSystem cs]
+	:	pcdata:PCDATA 
+	{
+		try {
+			String value = pcdata.getText();
+			boolean tf = Boolean.parseBoolean(value);
+			cs.setConnectOnStartup(tf);
+		} catch (Exception e) {
 		}
 	}
 	;

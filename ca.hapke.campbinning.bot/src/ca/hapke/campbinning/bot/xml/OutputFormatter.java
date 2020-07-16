@@ -76,6 +76,10 @@ public class OutputFormatter {
 		tagAndValue(tag, Integer.toString(value));
 	}
 
+	public void tagAndValue(String tag, boolean value) {
+		tagAndValue(tag, Boolean.toString(value));
+	}
+
 	public void tagAndValue(String tag, float value) {
 		tagAndValue(tag, Float.toString(value));
 	}

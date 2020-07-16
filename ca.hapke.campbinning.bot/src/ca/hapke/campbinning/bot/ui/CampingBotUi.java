@@ -153,8 +153,11 @@ public class CampingBotUi extends JFrame {
 	 * Create the frame.
 	 */
 	public CampingBotUi() {
+
 		ApiContextInitializer.init();
 		bot = new CampingBot();
+		bot.init();
+		bot.addStatusUpdate(statusUpdater);
 
 		setTitle(CAMPING_BOT);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -227,7 +230,6 @@ public class CampingBotUi extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CampingSystem.getInstance().canConnect()) {
-					bot.addStatusUpdate(statusUpdater);
 					bot.connect();
 				} else {
 					JOptionPane.showMessageDialog(CampingBotUi.this,
@@ -403,9 +405,9 @@ public class CampingBotUi extends JFrame {
 			} catch (Exception e1) {
 			}
 		}
-		intervalThread.add(new UiTableRefresher());
-		statusUpdater.statusOffline();
+
 		statusUpdater.updateUserInfo(bot.getBotUsername(), -1);
+		intervalThread.add(new UiTableRefresher());
 	}
 
 	public void chat() {

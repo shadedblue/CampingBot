@@ -28,7 +28,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class CampingXmlSerializer implements CalendaredEvent<Void> {
+public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerializer {
 	private TimesProvider<Void> times;
 	private boolean shouldSave = false;
 
@@ -78,8 +78,8 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
+	@Override
 	public File save() {
-
 		return save(FILENAME);
 	}
 
@@ -130,6 +130,7 @@ public class CampingXmlSerializer implements CalendaredEvent<Void> {
 		return f;
 	}
 
+	@Override
 	public boolean load() {
 		boolean result = load(FILENAME);
 		if (!result)

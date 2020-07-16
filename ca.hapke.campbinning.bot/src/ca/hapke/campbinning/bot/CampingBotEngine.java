@@ -68,6 +68,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	protected MessageProcessor processor = new DefaultMessageProcessor();
 
+	protected ConfigSerializer serializer;
+
 	private class ConnectionMonitor implements IStatus {
 
 		@Override
@@ -94,7 +96,23 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public CampingBotEngine() {
 		statusMonitors.add(new ConnectionMonitor());
+
 	}
+
+	public final void init() {
+		serializer.load();
+		postConfigInit();
+		if (system.isConnectOnStartup()) {
+			new Thread("ConnectOnStartup") {
+				@Override
+				public void run() {
+					connect();
+				}
+			}.start();
+		}
+	}
+
+	protected abstract void postConfigInit();
 
 	public void connect() {
 		try {
@@ -407,5 +425,15 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public MessageProcessor getProcessor() {
 		return processor;
+	}
+
+	@Override
+	public String getBotToken() {
+		return system.getToken();
+	}
+
+	@Override
+	public String getBotUsername() {
+		return system.getBotUsername();
 	}
 }

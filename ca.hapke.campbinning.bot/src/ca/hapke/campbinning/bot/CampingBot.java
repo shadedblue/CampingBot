@@ -37,7 +37,6 @@ public class CampingBot extends CampingBotEngine {
 	public static final String STRING_NULL = "null";
 
 	private Resources res = new Resources();
-//	private VotingManager voting;
 	private AitaCommand aitaCommand;
 	private RantCommand rantCommand;
 
@@ -55,8 +54,6 @@ public class CampingBot extends CampingBotEngine {
 	private HideItInlineCommand hideItInline;
 	private InlineCommandBase spellInline;
 	private NicknameCommand nicknameCommand;
-
-	private CampingXmlSerializer serializer;
 
 	private List<HasCategories<String>> hasCategories = new ArrayList<>();
 
@@ -87,11 +84,8 @@ public class CampingBot extends CampingBotEngine {
 		hideItInline = new HideItInlineCommand(this);
 		spellInline = new SpellInlineCommand(spellCommand);
 		insultGenerator = InsultGenerator.getInstance();
-		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
-				chatManager, userMonitor, insultGenerator);
-
-		res.loadAllEmoji();
-		serializer.load();
+		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand,
+				partyCommand, chatManager, userMonitor, insultGenerator);
 
 //		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
 //		afdp.addAtEnd(processor);
@@ -105,8 +99,6 @@ public class CampingBot extends CampingBotEngine {
 //		afdText = new AfdTextCommand(this, afdp, chat);
 //		afdMatrix = new AfdMatrixPictures(this, chat);
 //		afdEnabler = new AprilFoolsDayEnabler(afdText, afdMatrix, afdp);
-
-		ballsCommand.init();
 
 		addTextCommand(ballsCommand);
 		addTextCommand(aitaCommand);
@@ -127,17 +119,6 @@ public class CampingBot extends CampingBotEngine {
 		addCallbackCommand(aitaCommand);
 		addCallbackCommand(rantCommand);
 
-		calMonitor = CalendarMonitor.getInstance();
-		calMonitor.add(serializer);
-		calMonitor.add(databaseConsumer);
-		calMonitor.add(ballsCommand);
-		calMonitor.add(aitaCommand);
-		calMonitor.add(rantCommand);
-//		calMonitor.add(afdMatrix);
-//		calMonitor.add(afdEnabler);
-
-//		calMonitor.add(dmp);
-
 		hasCategories.add(spellCommand);
 		hasCategories.add(countdownGen);
 		hasCategories.add(hypeCommand);
@@ -147,13 +128,20 @@ public class CampingBot extends CampingBotEngine {
 	}
 
 	@Override
-	public String getBotToken() {
-		return system.getToken();
-	}
+	protected void postConfigInit() {
+		res.loadAllEmoji();
+		ballsCommand.init();
 
-	@Override
-	public String getBotUsername() {
-		return system.getBotUsername();
+		calMonitor = CalendarMonitor.getInstance();
+		calMonitor.add((CampingXmlSerializer) serializer);
+		calMonitor.add(databaseConsumer);
+		calMonitor.add(ballsCommand);
+		calMonitor.add(aitaCommand);
+		calMonitor.add(rantCommand);
+//		calMonitor.add(afdMatrix);
+//		calMonitor.add(afdEnabler);
+
+//		calMonitor.add(dmp);
 	}
 
 	public CampingUser getMeCamping() {
@@ -175,6 +163,7 @@ public class CampingBot extends CampingBotEngine {
 		case MbiyfAnnouncement:
 		case PleasureModel:
 		case PartyEveryday:
+		case HideIt:
 			// NOOP
 			break;
 		case VoteTopicComplete:
@@ -230,8 +219,6 @@ public class CampingBot extends CampingBotEngine {
 			break;
 		case Status:
 			result = statusCommand.statusCommand();
-			break;
-		default:
 			break;
 		}
 
