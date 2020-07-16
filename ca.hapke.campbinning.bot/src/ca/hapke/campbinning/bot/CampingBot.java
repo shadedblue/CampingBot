@@ -10,6 +10,7 @@ import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
 import ca.hapke.campbinning.bot.commands.HypeCommand;
+import ca.hapke.campbinning.bot.commands.ImageEnhanceCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
@@ -45,6 +46,7 @@ public class CampingBot extends CampingBotEngine {
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
 	private PleasureModelCommand pleasureCommand;
+	private ImageEnhanceCommand enhanceCommand;
 	private IunnoCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
 
@@ -73,6 +75,7 @@ public class CampingBot extends CampingBotEngine {
 		spellCommand = new SpellGenerator(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
+		enhanceCommand = new ImageEnhanceCommand(this);
 		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
@@ -158,7 +161,6 @@ public class CampingBot extends CampingBotEngine {
 	@Override
 	protected CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		CommandResult result = null;
 		switch (command) {
 		case NicknameConversion:
 		case Mbiyf:
@@ -175,6 +177,7 @@ public class CampingBot extends CampingBotEngine {
 		case VoteTopicInitiation:
 		case VoteCommandFailed:
 		case Talk:
+		case UiString:
 			// NOOP : internal events, not responses
 			break;
 		case SpellDipshit:
@@ -183,55 +186,51 @@ public class CampingBot extends CampingBotEngine {
 			break;
 
 		case AllBalls:
-			result = new TextCommandResult(command, new TextFragment(res.listBalls()));
-			break;
+			return new TextCommandResult(command, new TextFragment(res.listBalls()));
+
 		case AllFaces:
-			result = new TextCommandResult(command, new TextFragment(res.listFaces()));
-			break;
+			return new TextCommandResult(command, new TextFragment(res.listFaces()));
+
 		case IunnoGoogleIt:
 			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
 		case Spell:
-			result = spellCommand.spellCommand(campingFromUser, message);
-			break;
+			return spellCommand.spellCommand(campingFromUser, message);
 
 		case RantActivatorInitiation:
-			result = rantCommand.startVoting(command, this, message, chatId, campingFromUser);
-			break;
+			return rantCommand.startVoting(command, this, message, chatId, campingFromUser);
+
 		case AitaActivatorInitiation:
-			result = aitaCommand.startVoting(command, this, message, chatId, campingFromUser);
-			break;
+			return aitaCommand.startVoting(command, this, message, chatId, campingFromUser);
+
 		case VoteForceComplete:
-			result = voteManagementCommands.completeVoting(message, campingFromUser);
-			break;
+			return voteManagementCommands.completeVoting(message, campingFromUser);
+
 		case VoteExtend:
-			result = voteManagementCommands.extendVoting(message, campingFromUser);
-			break;
+			return voteManagementCommands.extendVoting(message, campingFromUser);
 
 		case Countdown:
-			result = countdownGen.countdownCommand(userMonitor, chatId);
-			break;
+			return countdownGen.countdownCommand(userMonitor, chatId);
 
 		case Hype:
-			result = hypeCommand.hypeCommand(campingFromUser);
-			break;
+			return hypeCommand.hypeCommand(campingFromUser);
 
 		case AllNicknames:
-			result = nicknameCommand.allNicknamesCommand();
-			break;
-		case SetNickname:
-			result = nicknameCommand.setNicknameCommand(campingFromUser, message);
-			break;
-		case Reload:
-			result = reloadCommand(campingFromUser);
-			break;
-		case UiString:
-			break;
-		case Status:
-			result = statusCommand.statusCommand();
-			break;
-		}
+			return nicknameCommand.allNicknamesCommand();
 
-		return result;
+		case SetNickname:
+			return nicknameCommand.setNicknameCommand(campingFromUser, message);
+
+		case Reload:
+			return reloadCommand(campingFromUser);
+
+		case Status:
+			return statusCommand.statusCommand();
+		case ImageEnhance:
+			return enhanceCommand.enhanceCommand(message);
+
+		}
+		return null;
+
 	}
 
 	private CommandResult reloadCommand(CampingUser fromUser) {
