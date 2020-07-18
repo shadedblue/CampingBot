@@ -1,5 +1,7 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -33,8 +35,9 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
 	// TODO convert to Cache, because it creates a shitload of Updates as you type.
-	private LoadingCache<String, HiddenText> clearTextMap;
-	private LoadingCache<Integer, String> topicCache;
+	private LoadingCache<String, HiddenText> providedQueries;
+	private Map<String, HiddenText> confirmedMessages;
+	private LoadingCache<Integer, String> confirmedTopics;
 	private CampingBotEngine bot;
 	static final Character[] blots = new Character[] { '░', '▀', '█', '▄', '▒', '▙', '▟', '▛', '▜', '▀', '▔', '▖', '▗',
 			'▘', '▝' };
@@ -43,20 +46,21 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 	public HideItInlineCommand(CampingBotEngine bot) {
 		this.bot = bot;
 
-		topicCache = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS).maximumSize(10)
+		confirmedTopics = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
 				.build(new CacheLoader<Integer, String>() {
 					@Override
 					public String load(Integer key) throws Exception {
 						return null;
 					}
 				});
-		clearTextMap = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
+		providedQueries = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).maximumSize(1000)
 				.build(new CacheLoader<String, HiddenText>() {
 					@Override
 					public HiddenText load(String key) throws Exception {
 						return null;
 					}
 				});
+		confirmedMessages = new HashMap<>(100);
 	}
 
 	@Override
@@ -69,21 +73,25 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 
 		Integer queryId = id.getUpdateId();
 		HiddenText details;
-		String fullId = id.getId();
+		String fullId = id.getResult();
 		try {
-			details = clearTextMap.get(fullId);
+			details = providedQueries.get(fullId);
 		} catch (ExecutionException e) {
 			details = null;
 		}
 		if (details == null)
 			return new EventItem("Could not Choose HideIt: " + fullId);
 
-		String topic = details.getTopic();
-		if (topic != null)
-			topicCache.put(nextTopicId, topic);
+		String topic = details.getTopic().trim();
+		if (topic != null && !confirmedTopics.asMap().containsValue(topic)) {
+			confirmedTopics.put(nextTopicId, topic);
+			nextTopicId++;
+		}
 
-		String text = details.getClearText();
-		EventItem item = new EventItem(BotCommand.HideIt, campingFromUser, null, null, queryId, text, null);
+		confirmedMessages.put(fullId, details);
+
+		EventItem item = new EventItem(BotCommand.HideIt, campingFromUser, null, null, queryId, details.getClearText(),
+				null);
 		return item;
 	}
 
@@ -91,23 +99,29 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
 			MessageProcessor processor) {
 		boolean containsDash = input.contains("-");
-		int prefixQty = containsDash ? 2 : 1;
+		String typedTopic = null, spoiler;
+		if (containsDash) {
+			String[] topicAndSpoiler = input.split("-");
+			typedTopic = topicAndSpoiler[0];
+			spoiler = input.substring(typedTopic.length() + 1).trim();
+			typedTopic = typedTopic.trim();
+		} else {
+			spoiler = input;
+		}
+		boolean duplicateTopic = typedTopic != null && confirmedTopics.asMap().containsValue(typedTopic);
+		int prefixQty = (containsDash && !duplicateTopic) ? 2 : 1;
 
-		int qty = prefixQty + (int) (topicCache.size());
+		int qty = prefixQty + (int) (confirmedTopics.size());
 		InlineQueryResult[] output = new InlineQueryResult[qty];
 
 		output[0] = createInlineOption(updateId, null, input, 0);
 		if (containsDash) {
-			String[] topicAndSpoiler = input.split("-");
-			String t = topicAndSpoiler[0];
-
-			String clearText = input.substring(t.length() + 1).trim();
-			t = t.trim();
-
-			output[1] = createInlineOption(updateId, t, clearText, 1);
+			output[1] = createInlineOption(updateId, typedTopic, spoiler, 1);
 		}
-		int i = prefixQty;
-		for (String topic : topicCache.asMap().values()) {
+		int i = containsDash ? 2 : 1;
+		for (String topic : confirmedTopics.asMap().values()) {
+			if (topic.equalsIgnoreCase(typedTopic))
+				continue;
 			output[i] = createInlineOption(updateId, topic, input, i);
 			i++;
 		}
@@ -118,10 +132,10 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 
 	public InlineQueryResultArticle createInlineOption(int updateId, String topic, String textToHide, int i) {
 		CallbackId callbackId = new CallbackId(getCommandName(), updateId, i);
-		String queryId = callbackId.getId();
+		String queryId = callbackId.getResult();
 		String blotText = createBlotText(textToHide, topic);
 		HiddenText item = new HiddenText(topic, textToHide, blotText);
-		clearTextMap.put(queryId, item);
+		providedQueries.put(queryId, item);
 
 		InputTextMessageContent content = new InputTextMessageContent();
 		content.setDisableWebPagePreview(true);
@@ -154,7 +168,7 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 		String[] out = new String[outLen + adjust];
 
 		if (topic != null) {
-			out[0] = "[" + topic + "]";
+			out[0] = topic + " -";
 		}
 		for (int i = 0; i < outLen; i++) {
 			int length = words[i].length();
@@ -169,16 +183,10 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
-
 		String callbackQueryId = callbackQuery.getId();
-		String hideId = id.getId();
+		String hideId = id.getResult();
 
-		HiddenText details;
-		try {
-			details = clearTextMap.get(hideId);
-		} catch (ExecutionException e1) {
-			details = null;
-		}
+		HiddenText details = confirmedMessages.get(hideId);
 		if (details == null) {
 			return new EventItem("Could not process HideIt callback: " + callbackQueryId);
 		}
@@ -197,6 +205,22 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
 		}
+	}
+
+	/**
+	 * HACK only for bug-testing
+	 */
+	@Deprecated
+	public Map<String, HiddenText> getConfirmedMessages() {
+		return confirmedMessages;
+	}
+
+	/**
+	 * HACK only for bug-testing
+	 */
+	@Deprecated
+	public LoadingCache<Integer, String> getConfirmedTopics() {
+		return confirmedTopics;
 	}
 
 }

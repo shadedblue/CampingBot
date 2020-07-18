@@ -85,7 +85,7 @@ public class SpellInlineCommand extends InlineCommandBase {
 		InlineQueryResultArticle articleSpell = new InlineQueryResultArticle();
 		articleSpell.setTitle("spell on " + targetFirst);
 		CallbackId fullId = createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0);
-		articleSpell.setId(fullId.getId());
+		articleSpell.setId(fullId.getResult());
 		articleSpell.setInputMessageContent(mcSpell);
 		return new InlineQueryResult[] { articleSpell };
 	}

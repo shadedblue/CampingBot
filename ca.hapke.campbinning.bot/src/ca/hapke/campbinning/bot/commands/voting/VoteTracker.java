@@ -136,7 +136,7 @@ public abstract class VoteTracker<T> {
 
 	public void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
 		CallbackId id = new CallbackId(command, updateId, i);
-		String callbackId = id.getId();
+		String callbackId = id.getResult();
 
 		shortButtons[i] = shortStr;
 		longDescriptions[i] = longStr;

@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
-import ca.hapke.campbinning.bot.commands.HypeCommand;
 import ca.hapke.campbinning.bot.commands.EnhanceCommand;
+import ca.hapke.campbinning.bot.commands.HypeCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
@@ -70,8 +70,6 @@ public class CampingBot extends CampingBotEngine {
 //	private AprilFoolsDayEnabler afdEnabler;
 
 	public CampingBot() {
-		statusCommand = new StatusCommand();
-		addStatusUpdate(statusCommand);
 		spellCommand = new SpellGenerator(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
@@ -90,6 +88,10 @@ public class CampingBot extends CampingBotEngine {
 		hideItInline = new HideItInlineCommand(this);
 		spellInline = new SpellInlineCommand(spellCommand);
 		insultGenerator = InsultGenerator.getInstance();
+
+		statusCommand = new StatusCommand(hideItInline);
+		addStatusUpdate(statusCommand);
+
 		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
 				chatManager, userMonitor, insultGenerator);
 
@@ -224,13 +226,21 @@ public class CampingBot extends CampingBotEngine {
 			return reloadCommand(campingFromUser);
 
 		case Status:
-			return statusCommand.statusCommand();
+			return statusCommand(campingFromUser);
 		case ImageEnhance:
 			return enhanceCommand.enhanceCommand(message);
 
 		}
 		return null;
 
+	}
+
+	public CommandResult statusCommand(CampingUser fromUser) {
+		if (system.isAdmin(fromUser)) {
+			return statusCommand.statusCommand();
+		} else {
+			return new TextCommandResult(BotCommand.Status).add(fromUser).add(": Access Denied!");
+		}
 	}
 
 	private CommandResult reloadCommand(CampingUser fromUser) {

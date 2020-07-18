@@ -72,6 +72,11 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult add(Integer msg) {
+		fragments.add(new TextFragment(Integer.toString(msg)));
+		return this;
+	}
+
 	public CommandResult add(String msg, CaseChoice style) {
 		fragments.add(new TextFragment(msg, style));
 		return this;

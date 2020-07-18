@@ -88,7 +88,7 @@ public class NicknameCommand extends InlineCommandBase {
 			converted = "None";
 		articleUsernameConversion.setTitle("@usernames converted: " + converted);
 		CallbackId fullId = createQueryId(updateId, convertedIds);
-		articleUsernameConversion.setId(fullId.getId());
+		articleUsernameConversion.setId(fullId.getResult());
 		articleUsernameConversion.setInputMessageContent(mc);
 
 		return new InlineQueryResult[] { articleUsernameConversion };

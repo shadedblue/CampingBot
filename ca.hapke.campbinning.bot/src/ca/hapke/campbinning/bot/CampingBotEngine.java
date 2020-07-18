@@ -176,7 +176,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					if (r != null) {
 						for (int i = 0; i < r.length; i++) {
 							InlineQueryResult result = r[i];
-							results.add(result);
+							if (result != null)
+								results.add(result);
 						}
 					}
 				}

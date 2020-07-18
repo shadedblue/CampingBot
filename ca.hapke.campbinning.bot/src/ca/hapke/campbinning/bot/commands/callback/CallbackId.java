@@ -12,7 +12,7 @@ public class CallbackId {
 	private final String command;
 	private final int updateId;
 	private final int[] ids;
-	private String id;
+	private String result;
 
 	public CallbackId(String command, int updateId, List<Integer> ids) {
 		this(command, updateId, unbox(ids));
@@ -33,7 +33,7 @@ public class CallbackId {
 		this.command = command;
 		this.updateId = updateId;
 		this.ids = ids;
-		id = createId();
+		result = createId();
 	}
 
 	public static CallbackId fromString(String input) {
@@ -61,8 +61,8 @@ public class CallbackId {
 		return CampingUtil.join(inputs, AbstractCommand.DELIMITER);
 	}
 
-	public String getId() {
-		return id;
+	public String getResult() {
+		return result;
 	}
 
 	public String getCommand() {
