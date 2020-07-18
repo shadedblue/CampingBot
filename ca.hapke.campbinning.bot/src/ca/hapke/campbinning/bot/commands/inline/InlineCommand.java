@@ -1,5 +1,7 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
+import java.util.List;
+
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 
@@ -16,7 +18,7 @@ public interface InlineCommand {
 
 	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText);
 
-	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+	public List<InlineQueryResult> provideInlineQuery(Update update, String input, int updateId,
 			MessageProcessor processor);
 
 }

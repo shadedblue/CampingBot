@@ -1,6 +1,8 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +72,6 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 
 	@Override
 	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText) {
-
 		Integer queryId = id.getUpdateId();
 		HiddenText details;
 		String fullId = id.getResult();
@@ -82,10 +83,13 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 		if (details == null)
 			return new EventItem("Could not Choose HideIt: " + fullId);
 
-		String topic = details.getTopic().trim();
-		if (topic != null && !confirmedTopics.asMap().containsValue(topic)) {
-			confirmedTopics.put(nextTopicId, topic);
-			nextTopicId++;
+		String topic = details.getTopic();
+		if (topic != null) {
+			topic = details.getTopic().trim();
+			if (!confirmedTopics.asMap().containsValue(topic)) {
+				confirmedTopics.put(nextTopicId, topic);
+				nextTopicId++;
+			}
 		}
 
 		confirmedMessages.put(fullId, details);
@@ -96,7 +100,7 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 	}
 
 	@Override
-	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+	public List<InlineQueryResult> provideInlineQuery(Update update, String input, int updateId,
 			MessageProcessor processor) {
 		boolean containsDash = input.contains("-");
 		String typedTopic = null, spoiler;
@@ -108,30 +112,26 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 		} else {
 			spoiler = input;
 		}
-		boolean duplicateTopic = typedTopic != null && confirmedTopics.asMap().containsValue(typedTopic);
-		int prefixQty = (containsDash && !duplicateTopic) ? 2 : 1;
 
-		int qty = prefixQty + (int) (confirmedTopics.size());
-		InlineQueryResult[] output = new InlineQueryResult[qty];
+		int qty = 2 + (int) (confirmedTopics.size());
+		List<InlineQueryResult> output = new ArrayList<>(qty);
 
-		output[0] = createInlineOption(updateId, null, input, 0);
+		createInlineOption(output, updateId, null, input);
 		if (containsDash) {
-			output[1] = createInlineOption(updateId, typedTopic, spoiler, 1);
+			createInlineOption(output, updateId, typedTopic, spoiler);
 		}
-		int i = containsDash ? 2 : 1;
 		for (String topic : confirmedTopics.asMap().values()) {
 			if (topic.equalsIgnoreCase(typedTopic))
 				continue;
-			output[i] = createInlineOption(updateId, topic, input, i);
-			i++;
+			createInlineOption(output, updateId, topic, input);
 		}
 
 		return output;
 
 	}
 
-	public InlineQueryResultArticle createInlineOption(int updateId, String topic, String textToHide, int i) {
-		CallbackId callbackId = new CallbackId(getCommandName(), updateId, i);
+	public void createInlineOption(List<InlineQueryResult> output, int updateId, String topic, String textToHide) {
+		CallbackId callbackId = new CallbackId(getCommandName(), updateId, output.size());
 		String queryId = callbackId.getResult();
 		String blotText = createBlotText(textToHide, topic);
 		HiddenText item = new HiddenText(topic, textToHide, blotText);
@@ -154,7 +154,7 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 
 		article.setId(queryId);
 		article.setInputMessageContent(content);
-		return article;
+		output.add(article);
 	}
 
 	public String createBlotText(String clear, String topic) {

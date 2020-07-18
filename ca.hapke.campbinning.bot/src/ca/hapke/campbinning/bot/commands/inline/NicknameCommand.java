@@ -1,6 +1,7 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -45,7 +46,7 @@ public class NicknameCommand extends InlineCommandBase {
 	public static final TextFragment INVALID_SYNTAX = new TextFragment("Invalid syntax, ");
 
 	@Override
-	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+	public List<InlineQueryResult> provideInlineQuery(Update update, String input, int updateId,
 			MessageProcessor processor) {
 		String[] words = input.split(" ");
 		List<ResultFragment> out = new ArrayList<>(2 * words.length - 1);
@@ -75,6 +76,8 @@ public class NicknameCommand extends InlineCommandBase {
 				out.add(ResultFragment.SPACE);
 			out.add(frag);
 		}
+		if (converted == null)
+			return null;
 
 		String output = processor.process(out);
 
@@ -84,14 +87,12 @@ public class NicknameCommand extends InlineCommandBase {
 		mc.setParseMode(CampingBotEngine.MARKDOWN);
 
 		InlineQueryResultArticle articleUsernameConversion = new InlineQueryResultArticle();
-		if (converted == null)
-			converted = "None";
 		articleUsernameConversion.setTitle("@usernames converted: " + converted);
 		CallbackId fullId = createQueryId(updateId, convertedIds);
 		articleUsernameConversion.setId(fullId.getResult());
 		articleUsernameConversion.setInputMessageContent(mc);
 
-		return new InlineQueryResult[] { articleUsernameConversion };
+		return Collections.singletonList(articleUsernameConversion);
 	}
 
 	@Override

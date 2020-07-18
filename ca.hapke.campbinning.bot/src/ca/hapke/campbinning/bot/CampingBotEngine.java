@@ -172,10 +172,9 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				String input = inlineQuery.getQuery();
 
 				for (InlineCommand inline : inlineCommands) {
-					InlineQueryResult[] r = inline.provideInlineQuery(update, input, updateId, processor);
+					List<InlineQueryResult> r = inline.provideInlineQuery(update, input, updateId, processor);
 					if (r != null) {
-						for (int i = 0; i < r.length; i++) {
-							InlineQueryResult result = r[i];
+						for (InlineQueryResult result : r) {
 							if (result != null)
 								results.add(result);
 						}

@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -53,7 +54,7 @@ public class SpellInlineCommand extends InlineCommandBase {
 	}
 
 	@Override
-	public InlineQueryResult[] provideInlineQuery(Update update, String input, int updateId,
+	public List<InlineQueryResult> provideInlineQuery(Update update, String input, int updateId,
 			MessageProcessor processor) {
 		String[] words = input.split(" ");
 		if (words.length == 0)
@@ -67,7 +68,7 @@ public class SpellInlineCommand extends InlineCommandBase {
 		if (targetUser != null) {
 			targetFirst = targetUser.getFirstname();
 		} else {
-			targetFirst = CampingUser.UNKNOWN_TARGET;
+			return null;
 		}
 
 		int targetId = -1;
@@ -87,7 +88,7 @@ public class SpellInlineCommand extends InlineCommandBase {
 		CallbackId fullId = createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0);
 		articleSpell.setId(fullId.getResult());
 		articleSpell.setInputMessageContent(mcSpell);
-		return new InlineQueryResult[] { articleSpell };
+		return Collections.singletonList(articleSpell);
 	}
 
 }
