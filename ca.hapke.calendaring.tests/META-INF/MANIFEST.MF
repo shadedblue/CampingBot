@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Calendaring.Tests
+Bundle-SymbolicName: ca.hapke.calendaring.tests
+Bundle-Version: 1.0.0.qualifier
+Export-Package: ca.hapke.calendaring.timing.tests
+Bundle-Vendor: Hapke.ca
+Bundle-RequiredExecutionEnvironment: JavaSE-14
+Require-Bundle: ca.hapke.calendaring;bundle-version="1.0.0",
+ org.junit;bundle-version="4.0.0"
