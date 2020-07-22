@@ -64,6 +64,7 @@ public class CampingUser {
 	private String nickname;
 
 	private Birthday birthday;
+	private boolean seenInteraction = false;
 
 	// For GlazedLists to autosort
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -139,6 +140,8 @@ public class CampingUser {
 	}
 
 	public void mergeFrom(CampingUser other) {
+		if (telegramId < 0)
+			setId(other.telegramId);
 		if (username == null)
 			setUsername(other.username);
 		if (firstname == null)
@@ -146,7 +149,10 @@ public class CampingUser {
 		if (lastname == null)
 			setUsername(other.lastname);
 		if (nickname == null)
-			setNickname(other.nickname);
+			setNickname(other.nickname, false);
+		if (birthday == null && other.birthday != null)
+			setBirthday(other.birthday.month, other.birthday.day);
+		setSeenInteraction(other.seenInteraction);
 	}
 
 	public void setId(Integer id) {
@@ -177,11 +183,13 @@ public class CampingUser {
 		}
 	}
 
-	public void setNickname(String value) {
+	public void setNickname(String value, boolean inChat) {
 		String oldVal = nickname;
 		nickname = value;
 
 		support.firePropertyChange("nickname", oldVal, nickname);
+		if (inChat)
+			setSeenInteraction(true);
 	}
 
 	public boolean equals(CampingUser that) {
@@ -219,6 +227,17 @@ public class CampingUser {
 		if (CampingUtil.isNonNull(firstname))
 			return firstname;
 		return CampingUtil.prefixAt(username);
+	}
+
+	public boolean isSeenInteraction() {
+		return seenInteraction;
+	}
+
+	public void setSeenInteraction(boolean seenInteraction) {
+		if (this.seenInteraction == false && seenInteraction) {
+			this.seenInteraction = true;
+			support.firePropertyChange("seenInteraction", false, true);
+		}
 	}
 
 	public String getNameForLog() {

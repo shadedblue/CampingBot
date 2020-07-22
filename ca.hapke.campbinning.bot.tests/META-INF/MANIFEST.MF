@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CampingBotTests
+Bundle-SymbolicName: ca.hapke.campbinning.bot.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Hapke.ca
+Automatic-Module-Name: ca.hapke.campbinning.bot.tests
+Bundle-RequiredExecutionEnvironment: JavaSE-14
+Require-Bundle: ca.hapke.camping.bot;bundle-version="1.0.0",
+ org.junit.jupiter.api,
+ ca.odell.glazedlists;bundle-version="1.11.0"

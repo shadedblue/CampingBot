@@ -125,7 +125,7 @@ public class CampingUserMonitor implements CampingSerializable {
 
 		String lastname = fromUser.getLastName();
 		String firstname = fromUser.getFirstName();
-		return monitor(telegramId, username, firstname, lastname);
+		return monitor(telegramId, username, firstname, lastname, true);
 	}
 
 	public CampingUser monitor(User fromUser, List<MessageEntity> entities) {
@@ -147,17 +147,18 @@ public class CampingUserMonitor implements CampingSerializable {
 			return monitor(msgEnt.getUser());
 		}
 		if (CampingBot.MENTION.equalsIgnoreCase(type)) {
-			return monitor(UNKNOWN_USER_ID, msgEnt.getText(), null, null);
+			return monitor(UNKNOWN_USER_ID, msgEnt.getText(), null, null, false);
 		}
 
 		return null;
 	}
 
-	public CampingUser monitor(int id, String username, String firstname, String lastname) {
-		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname);
+	public CampingUser monitor(int id, String username, String firstname, String lastname, boolean interacting) {
+		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname, interacting);
 	}
 
-	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname) {
+	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname,
+			boolean interacting) {
 		String usernameKey = CampingUtil.generateUsernameKey(username);
 
 		CampingUser target = telegramIdMap.get(telegramId);
@@ -169,6 +170,7 @@ public class CampingUserMonitor implements CampingSerializable {
 		if (target == null && usernameTarget == null) {
 			// never seen this guy before
 			target = new CampingUser(campingIdInt, telegramId, username, firstname, lastname);
+			target.setSeenInteraction(interacting);
 			users.add(target);
 			if (telegramId != UNKNOWN_USER_ID)
 				telegramIdMap.put(telegramId, target);
@@ -177,12 +179,11 @@ public class CampingUserMonitor implements CampingSerializable {
 
 			shouldSave = true;
 
-			return target;
-
 		} else if (target == null && usernameTarget != null) {
 			if (telegramId != UNKNOWN_USER_ID) {
 				// learned the id
 				usernameTarget.setId(telegramId);
+				usernameTarget.setSeenInteraction(interacting);
 				telegramIdMap.put(telegramId, usernameTarget);
 
 				shouldSave = true;
@@ -201,13 +202,14 @@ public class CampingUserMonitor implements CampingSerializable {
 			target.mergeFrom(usernameTarget);
 			usernameMap.put(usernameKey, target);
 			users.remove(usernameTarget);
+			target.setSeenInteraction(usernameTarget.isSeenInteraction());
 
 			shouldSave = true;
 		}
 		if (target != null) {
 			target.setFirstname(firstname);
 			target.setLastname(lastname);
-
+			target.setSeenInteraction(interacting);
 			shouldSave = true;
 		}
 		return target;
@@ -222,7 +224,6 @@ public class CampingUserMonitor implements CampingSerializable {
 		String usersTag = "users";
 		of.start(usersTag);
 		of.tagAndValue("nextCampingId", nextCampingId);
-		// sb.append("<" + usersTag + ">");
 
 		for (CampingUser u : users) {
 			String userTag = "user";
@@ -240,6 +241,7 @@ public class CampingUserMonitor implements CampingSerializable {
 			of.tagAndValue("first", u.getFirstname());
 			of.tagAndValue("last", u.getLastname());
 			of.tagAndValue("nickname", u.getNickname());
+			of.tagAndValue("interaction", u.isSeenInteraction());
 			Birthday bday = u.getBirthday();
 			if (bday != null) {
 				of.tagAndValue("birthdayMonth", bday.getMonth());

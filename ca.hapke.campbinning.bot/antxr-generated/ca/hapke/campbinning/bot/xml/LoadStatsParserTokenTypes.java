@@ -56,6 +56,7 @@ public interface LoadStatsParserTokenTypes {
 	// "<nickname>" = 42
 	// "<first>" = 43
 	// "<last>" = 44
-	// "<type>" = 45
-	// "<allowed>" = 46
+	// "<interaction>" = 45
+	// "<type>" = 46
+	// "<allowed>" = 47
 }

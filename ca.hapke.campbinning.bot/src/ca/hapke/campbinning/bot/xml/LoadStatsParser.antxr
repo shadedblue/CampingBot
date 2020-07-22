@@ -212,14 +212,16 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	;
 
 <user> [CampingUserMonitor um]
-{	String campingId = "null", id, username, first, last, nickname, birthdayMonth = null, birthdayDay = null, lastUpdate;
-	CampingUser user;}
+{	String campingId = "null", id, username, first, last, nickname, birthdayMonth = null, birthdayDay = null, lastUpdate, interaction = null;
+	CampingUser user;
+}
 	:	( campingId=<campingId> ) ?
 		id=<id>
 		username=<username>
 		first=<first>
 		last=<last>
 		nickname=<nickname>
+		( interaction=<interaction> ) ?
 		(   birthdayMonth=<birthdayMonth>
 			birthdayDay=<birthdayDay>
 		) ?
@@ -236,16 +238,22 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		} 
 		if ("null".equalsIgnoreCase(username))
 			username = null;
+		boolean inter = false;
+		if (interaction != null) {
+			try {
+				inter = Boolean.parseBoolean(interaction);
+			} catch (Exception e) {
+			}
+		}
+			
+		user = um.monitor(campingIdInt, idInt, username, first, last, inter);
+		user.setNickname(nickname, false);
 		
 		int bM = -1, bD=-1;
 		if (birthdayMonth != null)
 			bM = Integer.parseInt(birthdayMonth);
 		if (birthdayDay != null)
 			bD = Integer.parseInt(birthdayDay);
-			
-		user = um.monitor(campingIdInt, idInt, username, first, last);
-		user.setNickname(nickname);
-		
 		if (bM > 0 && bD > 0) {
 			user.setBirthday(bM, bD);
 		}
@@ -314,6 +322,9 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <last> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<interaction> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <type> returns [String value = null]

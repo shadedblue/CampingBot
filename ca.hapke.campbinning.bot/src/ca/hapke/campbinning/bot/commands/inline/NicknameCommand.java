@@ -142,7 +142,7 @@ public class NicknameCommand extends InlineCommandBase {
 								.add(ResultFragment.COLON_SPACE).add(INVALID_CHARACTER);
 					} else {
 						String oldNick = targetUser.getNickname();
-						targetUser.setNickname(newNickname);
+						targetUser.setNickname(newNickname, true);
 
 						CommandResult result = new TextCommandResult(BotCommand.SetNickname);
 						result.add(campingFromUser);

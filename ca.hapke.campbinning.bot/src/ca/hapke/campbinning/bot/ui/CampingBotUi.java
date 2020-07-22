@@ -21,6 +21,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -66,7 +67,9 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserDefaultComparator;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.TransformedList;
 import ca.odell.glazedlists.swing.DefaultEventComboBoxModel;
 import ca.odell.glazedlists.swing.DefaultEventListModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
@@ -131,6 +134,7 @@ public class CampingBotUi extends JFrame {
 
 	private StatusUpdate statusUpdater = new StatusUpdate();
 	private JScrollPane scrollPane;
+	private JCheckBox chkFilterUsers;
 
 	/**
 	 * Launch the application.
@@ -174,12 +178,18 @@ public class CampingBotUi extends JFrame {
 		contentPane.setLayout(null);
 
 		///
+		chkFilterUsers = new JCheckBox("Filter Inactive Users");
+		chkFilterUsers.setSelected(true);
+		chkFilterUsers.setBounds(641, 73, 217, 23);
+		contentPane.add(chkFilterUsers);
 
 		TableFormatCampingUser usersFormat = new TableFormatCampingUser();
 		EventList<CampingUser> usersEvents = CampingUserMonitor.getInstance().getUsers();
 		SortedList<CampingUser> usersSorted = new SortedList<>(usersEvents, new CampingUserDefaultComparator());
-		userModel = new DefaultEventTableModel<CampingUser>(GlazedListsSwing.swingThreadProxyList(usersSorted),
-				usersFormat);
+		ActiveUserMatcherEditor filterMatcher = new ActiveUserMatcherEditor(true, chkFilterUsers);
+		FilterList<CampingUser> usersFiltered = new FilterList<>(usersSorted, filterMatcher);
+		TransformedList<CampingUser, CampingUser> userListForUi = GlazedListsSwing.swingThreadProxyList(usersFiltered);
+		userModel = new DefaultEventTableModel<CampingUser>(userListForUi, usersFormat);
 
 		sclUsers = new JScrollPane();
 		sclUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -301,7 +311,7 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(lblBySeconds);
 
 		CategoryLabel lblCategory = new CategoryLabel("Categories", Color.orange);
-		lblCategory.setBounds(640, 7, 19, 85);
+		lblCategory.setBounds(640, 7, 19, 64);
 		contentPane.add(lblCategory);
 
 		cmbCategories = new JComboBox<String>();
@@ -326,7 +336,7 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(cmbCategories);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(660, 31, 598, 61);
+		scrollPane.setBounds(659, 31, 599, 39);
 		contentPane.add(scrollPane);
 
 		txtCategoryValue = new JTextArea();
