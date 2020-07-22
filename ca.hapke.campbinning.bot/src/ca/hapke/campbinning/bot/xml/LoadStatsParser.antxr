@@ -80,13 +80,12 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	;
 <system> [CampingSystem cs]
 	{ 
-		String token,botUsername,adminUser = null,announceChat=null; 
+		String token,botUsername,adminUser = null; 
 	}
 	:
 	 token=<token>
 	 botUsername=<botUsername>
 	(adminUser=<adminUser>)?
-	(announceChat=<announceChat>)?
 	(<connectOnStartup>[cs])?
 	(<db>[cs]) ?
 	{
@@ -95,10 +94,6 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
 			int adminUser2 = Integer.parseInt(adminUser);
 			cs.setAdminUser(adminUser2);
-		} 
-		if (announceChat != null && !"null".equalsIgnoreCase(announceChat)) {
-			long ac = Long.parseLong(announceChat);
-			cs.setAnnounceChat(ac);
 		} 
 	}
 	;
@@ -180,11 +175,12 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	{
 		CampingChat chat;
 		long chatId = 0;
-		String idStr, type, allowed;
+		String idStr, name, type, allowed;
 	}
 	:
 		idStr=<id>
 		type=<type>
+		name=<name>
 		allowed=<allowed>
 	{
 		if (idStr != null && !"null".equalsIgnoreCase(idStr)) {
@@ -193,9 +189,11 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		if (chatId == 0)
 			return;
 		chat = cm.get(chatId);
+		chat.setChatname(name);
 		chat.setType(type);
 		chat.setAllowed(allowed);
 	}
+	(<announce>[chat]) ?
 	;
 
 <users> [CampingUserMonitor um]
@@ -270,6 +268,17 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 		}
 	}
 	;
+<announce>[CampingChat chat]
+	:	pcdata:PCDATA 
+	{
+		try {
+			String value = pcdata.getText();
+			boolean tf = Boolean.parseBoolean(value);
+			chat.setAnnounce(tf);
+		} catch (Exception e) {
+		}
+	}
+	;
 <birthdayMonth> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
@@ -283,9 +292,6 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <botUsername> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<announceChat> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <adminUser> returns [String value = null]
@@ -322,6 +328,9 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <last> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<name> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <interaction> returns [String value = null]

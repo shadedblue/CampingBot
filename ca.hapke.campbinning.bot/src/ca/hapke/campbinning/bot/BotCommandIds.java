@@ -13,6 +13,7 @@ public abstract class BotCommandIds {
 	public static final long PIC = 2 << 4;
 	public static final long VID = 2 << 5;
 	public static final long STICKER = 2 << 6;
+	public static final long THREAD = 2 << 7;
 
 	public static final long INLINE = 2 << 15;
 

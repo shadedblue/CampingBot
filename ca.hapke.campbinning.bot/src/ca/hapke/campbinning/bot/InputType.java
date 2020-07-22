@@ -5,6 +5,7 @@ package ca.hapke.campbinning.bot;
  */
 public enum InputType implements CommandType {
 
+	ChatUpdate(false, BotCommandIds.THREAD | BotCommandIds.SET),
 	RegularChatUpdate(true, BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT),
 	RegularChatReply(true, BotCommandIds.REGULAR_CHAT | BotCommandIds.REPLY),
 	RegularChatEdit(true, BotCommandIds.REGULAR_CHAT | BotCommandIds.EDIT),

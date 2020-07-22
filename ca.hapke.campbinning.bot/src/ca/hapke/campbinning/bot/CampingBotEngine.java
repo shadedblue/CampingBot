@@ -282,6 +282,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				Sticker stick = message.getSticker();
 				inputRest = stick.getEmoji();
 				inputExtraData = stick.getSetName();
+			} else if (message.getNewChatTitle() != null) {
+				// title changed
+				inputType = InputType.ChatUpdate;
+				chatManager.updateChat(chatId, chat);
 			} else {
 				/*- figure out what type of message it is...
 				 *  ie: regular message/edit/delete

@@ -12,16 +12,10 @@ public class CampingChat {
 	private String chatname = UNKNOWN;
 	private ChatType type = ChatType.Unknown;
 	private ChatAllowed allowed = ChatAllowed.New;
-
-	// private Map<CampingUser, ParticularChatUserOptions> userToOptions = new
-	// HashMap<CampingUser, ParticularChatUserOptions>();
-	// private final EventList<ParticularChatUserOptions> allUserOptions =
-	// GlazedLists
-	// .threadSafeList(new BasicEventList<ParticularChatUserOptions>());
+	private boolean announce = false;
 
 	// For GlazedLists to autosort
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
-	public static final String UNKNOWN_TARGET = "unknown target";
 
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
 		support.addPropertyChangeListener(pcl);
@@ -44,13 +38,18 @@ public class CampingChat {
 	}
 
 	public void setChatname(String chatname) {
-		if (this.chatname == null || this.chatname == UNKNOWN) {
+		String oldVal = this.chatname;
+		this.chatname = chatname;
 
-			String oldVal = this.chatname;
-			this.chatname = chatname;
+		support.firePropertyChange("chatname", oldVal, chatname);
+	}
 
-			support.firePropertyChange("chatname", oldVal, chatname);
-		}
+	public boolean shouldUpdateChatDetails() {
+		String oldName = chatname;
+		if (oldName == null || oldName == CampingChat.UNKNOWN || CampingChat.UNKNOWN.equalsIgnoreCase(oldName))
+			return true;
+
+		return false;
 	}
 
 	public ChatType getType() {
@@ -87,6 +86,16 @@ public class CampingChat {
 		setAllowed(all);
 	}
 
+	public boolean isAnnounce() {
+		return announce;
+	}
+
+	public void setAnnounce(boolean announce) {
+		boolean oldVal = this.announce;
+		this.announce = announce;
+		support.firePropertyChange("announce", oldVal, announce);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -101,13 +110,10 @@ public class CampingChat {
 			builder.append("=");
 			builder.append(allowed);
 		}
+		if (announce) {
+			builder.append(" +Announce");
+		}
 		builder.append("]");
 		return builder.toString();
 	}
-
-//	@Override
-//	public String toString() {
-//		return "Chat[" + chatname + " #" + chatId + "]";
-//	}
-
 }

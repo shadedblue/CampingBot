@@ -22,7 +22,6 @@ public class CampingSystem implements CampingSerializable {
 	private String dbHost, dbUser, dbPass;
 	private int dbPort = -1;
 	private int adminUser = -1;
-	private long announceChat = -1;
 
 	private String token;
 	private String botUsername;
@@ -55,17 +54,6 @@ public class CampingSystem implements CampingSerializable {
 			this.dbUser = user;
 			this.dbPass = pass;
 		}
-	}
-
-	public void setAnnounceChat(long announceChat) {
-		if (announceChat == -1 || this.announceChat != -1)
-			return;
-
-		this.announceChat = announceChat;
-	}
-
-	public long getAnnounceChat() {
-		return announceChat;
 	}
 
 	public void setAdminUser(int adminUser) {
@@ -117,7 +105,6 @@ public class CampingSystem implements CampingSerializable {
 		of.tagAndValue("token", token);
 		of.tagAndValue("botUsername", botUsername);
 		of.tagAndValue("adminUser", adminUser);
-		of.tagAndValue("announceChat", announceChat);
 		of.tagAndValue("connectOnStartup", connectOnStartup);
 		if (dbEnabled) {
 			String dbTag = "db";

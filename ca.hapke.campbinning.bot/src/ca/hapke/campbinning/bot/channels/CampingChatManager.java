@@ -7,13 +7,20 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.CampingSerializable;
+import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * TODO add EventChangeListener to events, so that if a Chat gets added, we add it to the Map also.
@@ -41,42 +48,74 @@ public class CampingChatManager implements CampingSerializable {
 			.beanConnector(CampingChat.class);
 	private final EventList<CampingChat> chatEvents = GlazedLists
 			.threadSafeList(new ObservableElementList<>(new BasicEventList<CampingChat>(), chatConnector));
+	private final FilterList<CampingChat> announceChats = new FilterList<>(chatEvents, new Matcher<CampingChat>() {
+		@Override
+		public boolean matches(CampingChat item) {
+			return item.isAnnounce();
+		}
+	});
 
 	public CampingChat get(Long chatId) {
+		boolean shouldNotify = false;
 		CampingChat chat = chats.get(chatId);
 		if (chat == null) {
 			chat = new CampingChat(chatId);
 			chatEvents.add(chat);
 			chats.put(chatId, chat);
+			shouldNotify = true;
 		}
 
-		if (shouldUpdateChatDetails(chat) && bot != null && bot.isOnline()) {
-			String chatname;
-			try {
-				Chat tChat = bot.execute(new GetChat(chatId));
-				shouldSave = true;
-
-				if (tChat.isGroupChat() || tChat.isSuperGroupChat()) {
-					chatname = tChat.getTitle();
-					chat.setType(ChatType.Group);
-				} else {
-					chatname = tChat.getFirstName();
-					chat.setType(ChatType.SingleUser);
-				}
-				chat.setChatname(chatname);
-			} catch (TelegramApiException e) {
-			}
+		if (chat.shouldUpdateChatDetails() && bot != null && bot.isOnline()) {
+			updateChat(chatId, chat);
 		}
+		if (shouldNotify)
+			notifyNewChat(chat);
 		return chat;
 	}
 
-	public boolean shouldUpdateChatDetails(CampingChat chat) {
-		String chatname = chat.getChatname();
-		return chatname == null || chatname == CampingChat.UNKNOWN;
+	public void updateChat(Long chatId, CampingChat chat) {
+		String chatname = null;
+		try {
+			Chat tChat = bot.execute(new GetChat(chatId));
+			shouldSave = true;
+
+			if (tChat.isGroupChat() || tChat.isSuperGroupChat()) {
+				chatname = tChat.getTitle();
+				chat.setType(ChatType.Group);
+			} else if (tChat.isUserChat()) {
+				chatname = tChat.getFirstName();
+				chat.setType(ChatType.SingleUser);
+			}
+
+			if (chatname != null) {
+				chat.setChatname(chatname);
+			}
+		} catch (TelegramApiException e) {
+		}
+	}
+
+	private void notifyNewChat(CampingChat chat) {
+		FilterList<CampingUser> admins = CampingUserMonitor.getInstance().getAdminUsers();
+		for (CampingUser user : admins) {
+			Long chatId = (long) user.getTelegramId();
+
+			CommandResult msg = new TextCommandResult(BotCommand.JoinThread)
+					.add("Invited to: " + chat.getChatname() + " (" + chat.chatId + ")");
+			try {
+				msg.send(bot, chatId);
+			} catch (TelegramApiException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public EventList<CampingChat> getChatList() {
 		return chatEvents;
+	}
+
+	public FilterList<CampingChat> getAnnounceChats() {
+		return announceChats;
 	}
 
 	@Override
@@ -95,7 +134,9 @@ public class CampingChatManager implements CampingSerializable {
 
 			of.tagAndValue("id", c.getChatId());
 			of.tagAndValue("type", c.getType().toString());
+			of.tagAndValue("name", c.getChatname());
 			of.tagAndValue("allowed", c.getAllowed().toString());
+			of.tagAndValue("announce", c.isAnnounce());
 
 			of.finish(innerTag);
 		}

@@ -38,12 +38,12 @@ public interface LoadStatsParserTokenTypes {
 	// "<user>" = 24
 	// "<connectOnStartup>" = 25
 	int PCDATA = 26;
-	// "<birthdayMonth>" = 27
-	// "<birthdayDay>" = 28
-	// "<nextCampingId>" = 29
-	// "<token>" = 30
-	// "<botUsername>" = 31
-	// "<announceChat>" = 32
+	// "<announce>" = 27
+	// "<birthdayMonth>" = 28
+	// "<birthdayDay>" = 29
+	// "<nextCampingId>" = 30
+	// "<token>" = 31
+	// "<botUsername>" = 32
 	// "<adminUser>" = 33
 	// "<dbHost>" = 34
 	// "<dbPort>" = 35
@@ -56,7 +56,8 @@ public interface LoadStatsParserTokenTypes {
 	// "<nickname>" = 42
 	// "<first>" = 43
 	// "<last>" = 44
-	// "<interaction>" = 45
-	// "<type>" = 46
-	// "<allowed>" = 47
+	// "<name>" = 45
+	// "<interaction>" = 46
+	// "<type>" = 47
+	// "<allowed>" = 48
 }

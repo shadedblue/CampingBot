@@ -11,15 +11,18 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
+import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * Singleton
@@ -55,6 +58,12 @@ public class CampingUserMonitor implements CampingSerializable {
 	private Set<Integer> usedCampingIds = new HashSet<>();
 	private final Map<Integer, CampingUser> telegramIdMap = new HashMap<Integer, CampingUser>();
 	private final Map<String, CampingUser> usernameMap = new HashMap<String, CampingUser>();
+	private final FilterList<CampingUser> adminUsers = new FilterList<>(users, new Matcher<CampingUser>() {
+		@Override
+		public boolean matches(CampingUser item) {
+			return CampingSystem.getInstance().isAdmin(item);
+		}
+	});
 
 	public int getNextCampingId() {
 		usedCampingIds.add(nextCampingId);
@@ -217,6 +226,10 @@ public class CampingUserMonitor implements CampingSerializable {
 
 	public EventList<CampingUser> getUsers() {
 		return users;
+	}
+
+	public FilterList<CampingUser> getAdminUsers() {
+		return adminUsers;
 	}
 
 	@Override

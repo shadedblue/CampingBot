@@ -24,9 +24,10 @@ import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
-import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
+import ca.hapke.campbinning.bot.channels.CampingChat;
+import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -40,6 +41,7 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.odell.glazedlists.FilterList;
 
 /**
  * @author Nathan Hapke
@@ -201,30 +203,33 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	}
 
 	public void announce(MbiyfMode value) throws TelegramApiException {
-		long chatId = CampingSystem.getInstance().getAnnounceChat();
-		if (chatId == -1)
-			return;
-		MbiyfType type = value.getType();
-		CommandResult result = null;
-		switch (type) {
-		case Birthday:
-			result = announceBirthday(value);
-			break;
-		case Friday:
-			result = announceFriday(value);
-			break;
-		case Asshole:
-			result = announceAsshole(value);
-			break;
-		case Special:
-			result = announceSpecial(value);
-			break;
-		case Off:
-			break;
-		}
+		FilterList<CampingChat> announceChats = CampingChatManager.getInstance(bot).getAnnounceChats();
+		for (CampingChat chat : announceChats) {
+			long chatId = chat.getChatId();
+			if (chatId == -1)
+				return;
+			MbiyfType type = value.getType();
+			CommandResult result = null;
+			switch (type) {
+			case Birthday:
+				result = announceBirthday(value);
+				break;
+			case Friday:
+				result = announceFriday(value);
+				break;
+			case Asshole:
+				result = announceAsshole(value);
+				break;
+			case Special:
+				result = announceSpecial(value);
+				break;
+			case Off:
+				break;
+			}
 
-		if (result != null) {
-			result.send(bot, chatId);
+			if (result != null) {
+				result.send(bot, chatId);
+			}
 		}
 	}
 

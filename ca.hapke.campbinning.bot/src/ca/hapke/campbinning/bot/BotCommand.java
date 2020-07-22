@@ -41,6 +41,8 @@ public enum BotCommand implements CommandType {
 	SpellDipshit(null, true, BotCommandIds.SPELL | BotCommandIds.FAILURE),
 	Reload("reload", false),
 	Status("status", false, BotCommandIds.TEXT | BotCommandIds.USE),
+
+	JoinThread(null, false, BotCommandIds.THREAD | BotCommandIds.SET),
 	// Test("test", false),
 
 	MbiyfAnnouncement(null, true, BotCommandIds.BALLS | BotCommandIds.SET),
