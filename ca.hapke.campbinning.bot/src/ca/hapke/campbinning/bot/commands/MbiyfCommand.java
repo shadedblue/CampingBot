@@ -78,7 +78,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 		this.mbiyFridayImages = new CategoriedItems<ImageLink>(FRIDAY_IMAGES);
 		fridayImages = mbiyFridayImages.getList(FRIDAY_IMAGES);
-		for (int i = 1; i <= 4; i++) {
+		for (int i = 1; i <= 5; i++) {
 			String url = "http://www.hapke.ca/images/mbiyf" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
 			fridayImages.add(lnk);
@@ -212,16 +212,16 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 			CommandResult result = null;
 			switch (type) {
 			case Birthday:
-				result = announceBirthday(value);
+				result = announceBirthday();
 				break;
 			case Friday:
-				result = announceFriday(value);
+				result = announceFriday();
 				break;
 			case Asshole:
-				result = announceAsshole(value);
+				result = announceAsshole();
 				break;
 			case Special:
-				result = announceSpecial(value);
+				result = announceSpecial();
 				break;
 			case Off:
 				break;
@@ -233,7 +233,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		}
 	}
 
-	public CommandResult announceBirthday(MbiyfMode value) throws TelegramApiException {
+	public CommandResult announceBirthday() throws TelegramApiException {
 		Emoji cake = res.getCake();
 
 //		StringBuilder sb = new StringBuilder();
@@ -291,7 +291,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		return sb;
 	}
 
-	private CommandResult announceSpecial(MbiyfMode value) {
+	private CommandResult announceSpecial() {
 		ImageLink image = CampingUtil.getRandom(fridayImages);
 		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
 
@@ -307,7 +307,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 
 	}
 
-	public CommandResult announceAsshole(MbiyfMode value) throws TelegramApiException {
+	public CommandResult announceAsshole() throws TelegramApiException {
 		ImageLink image = CampingUtil.getRandom(fridayImages);
 		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
 		result.add(userRestriction.get(0));
@@ -320,7 +320,7 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		return result;
 	}
 
-	public CommandResult announceFriday(MbiyfMode value) throws TelegramApiException {
+	public CommandResult announceFriday() throws TelegramApiException {
 		ImageLink image = CampingUtil.getRandom(fridayImages);
 		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
 		result.add("It's M");
