@@ -12,11 +12,11 @@ header {
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig]
-    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um, ig] EOF
+document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um, ig, ec] EOF
     ;
     
-<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig]
+<camping> [CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
@@ -24,6 +24,7 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	(<voting>[aita]) ?
 	(<party>[pc]) ?
 	(<insults>[ig]) ?
+	(<enhance>[ec]) ?
 	(<chats>[cm]) ?
 	(<users>[um])?
 	;
@@ -36,6 +37,28 @@ document[ CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, 
 	<assholes>[aita]
 	<mediocres>[aita]
 	<nices>[aita]
+	;
+	
+<enhance>[EnhanceCommand ec]
+	:
+	<rickrolls>[ec]
+	<overs>[ec]
+	;
+<rickrolls>[EnhanceCommand ec]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{ec.addItem("rickroll", val);}
+		) *
+	;
+<overs>[EnhanceCommand ec]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{ec.addItem("over", val);}
+		) *
 	;
 	
 <excessives>[PartyEverydayCommand pc]

@@ -93,7 +93,7 @@ public class CampingBot extends CampingBotEngine {
 		addStatusUpdate(statusCommand);
 
 		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
-				chatManager, userMonitor, insultGenerator);
+				chatManager, userMonitor, insultGenerator, enhanceCommand);
 
 //		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
 //		afdp.addAtEnd(processor);
@@ -133,6 +133,7 @@ public class CampingBot extends CampingBotEngine {
 		hasCategories.add(aitaCommand);
 		hasCategories.add(partyCommand);
 		hasCategories.add(insultGenerator);
+		hasCategories.add(enhanceCommand);
 	}
 
 	@Override

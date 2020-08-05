@@ -17,6 +17,7 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.CountdownGenerator;
+import ca.hapke.campbinning.bot.commands.EnhanceCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.SpellGenerator;
 import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
@@ -63,9 +64,11 @@ public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerial
 	private PartyEverydayCommand pc;
 	private CampingChatManager cm;
 	private InsultGenerator ig;
+	private EnhanceCommand ec;
 
 	public CampingXmlSerializer(CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita,
-			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig) {
+			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig,
+			EnhanceCommand ec) {
 		this.cs = cs;
 		this.sg = sg;
 		this.countdownGen = countdownGen;
@@ -74,7 +77,8 @@ public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerial
 		this.cm = cm;
 		this.um = um;
 		this.ig = ig;
-		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, aita, pc, ig, cm, um };
+		this.ec = ec;
+		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, aita, pc, ig, ec, cm, um };
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
@@ -153,7 +157,7 @@ public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerial
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), LoadStatsParser.class, false, false);
 		LoadStatsParser parser = new LoadStatsParser(stream);
 		try {
-			parser.document(cs, sg, countdownGen, aita, pc, cm, um, ig);
+			parser.document(cs, sg, countdownGen, aita, pc, cm, um, ig, ec);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

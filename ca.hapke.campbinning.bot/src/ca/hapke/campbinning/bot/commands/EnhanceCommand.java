@@ -21,6 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.games.Animation;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
@@ -32,16 +33,17 @@ import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
 /**
  * @author Nathan Hapke
  */
-public class EnhanceCommand extends AbstractCommand implements HasCategories<String> {
+public class EnhanceCommand extends AbstractCommand implements HasCategories<String>, CampingSerializable {
 
-	private static final String ENHANCE_COMMAND = "enhance";
-	private static final String RICK_ROLLS = "RickRolls";
 	private static final String ENHANCE_CONTAINER = "Enhance";
-	private static final String OVER_ENHANCED = "Over";
+	private static final String ENHANCE_COMMAND = "enhance";
+	private static final String RICK_ROLL = "rickroll";
+	private static final String OVER_ENHANCED = "over";
 	private CampingBot bot;
 	private AprilFoolsDayProcessor afdText;
 	private CategoriedItems<String> categories;
@@ -52,33 +54,20 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	private List<String> overEnhanced;
 	private Map<Integer, Integer> tracking = new HashMap<>();
 	private Map<CommandResult, Integer> trackingPending = new HashMap<>();
+	private boolean shouldSave = false;
 
 	public EnhanceCommand(CampingBot bot) {
 		this.bot = bot;
 		res = bot.getRes();
 		this.afdText = new AprilFoolsDayProcessor(true);
 		this.afdText.enable(true);
-		categories = new CategoriedItems<String>(RICK_ROLLS /* , OVER_ENHANCED */);
-		rickText = categories.getList(RICK_ROLLS);
-		rickText.add("We're no strangers to love");
-		rickText.add("Never gonna give you up");
-		rickText.add("Never gonna let you down");
-		rickText.add("Never gonna run around and desert you");
-		rickText.add("Never gonna make you cry");
-		rickText.add("Never gonna say goodbye");
-		rickText.add("Never gonna tell a lie and hurt you");
-		rickText.add("We know the game and we're gonna play it");
-		rickText.add("(Ooh) Never gonna give, never gonna give (Give you up)");
-		rickText.add("Your heart's been aching but you're too shy to say it");
-		rickText.add("Gotta make you understand");
+		categories = new CategoriedItems<String>(RICK_ROLL, OVER_ENHANCED);
+		rickText = categories.getList(RICK_ROLL);
 
 		overEnhanced = categories.getList(OVER_ENHANCED);
-		overEnhanced.add("In the event of an erection lasting more than 4 hours, please seek medical attention");
-		overEnhanced.add("Be careful, prolonged use of steroids makes your balls shrivel");
-		overEnhanced.add("Is your scrotum that huge naturally, or have you been to the botox clinic?");
 
-		this.resultImages = new CategoriedItems<ImageLink>(RICK_ROLLS);
-		rickImages = resultImages.getList(RICK_ROLLS);
+		this.resultImages = new CategoriedItems<ImageLink>(RICK_ROLL);
+		rickImages = resultImages.getList(RICK_ROLL);
 		for (int i = 1; i <= 3; i++) {
 			String url = "http://www.hapke.ca/images/rick" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
@@ -222,11 +211,25 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	@Override
 	public void addItem(String category, String value) {
 		categories.put(category, value);
+		shouldSave = true;
 	}
 
 	@Override
 	public String getContainerName() {
 		return ENHANCE_CONTAINER;
+	}
+
+	@Override
+	public boolean shouldSave() {
+		return shouldSave;
+	}
+
+	@Override
+	public void getXml(OutputFormatter of) {
+		of.start(ENHANCE_COMMAND);
+		of.tagCategories(categories);
+		of.finish(ENHANCE_COMMAND);
+		shouldSave = false;
 	}
 
 }
