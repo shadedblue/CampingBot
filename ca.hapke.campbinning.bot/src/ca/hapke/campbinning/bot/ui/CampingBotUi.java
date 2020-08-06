@@ -57,6 +57,7 @@ import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.CampingXmlSerializer;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.channels.CampingChat;
+import ca.hapke.campbinning.bot.channels.CampingChatDefaultComparator;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -70,7 +71,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TransformedList;
-import ca.odell.glazedlists.swing.DefaultEventComboBoxModel;
 import ca.odell.glazedlists.swing.DefaultEventListModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
@@ -124,7 +124,8 @@ public class CampingBotUi extends JFrame {
 	private JLabel lblStatus;
 	private JButton btnConnect;
 	private JTextField txtChat;
-	private JList<CampingChat> lstChats;
+//	private JList<CampingChat> lstChats;
+	private JTable tblChats;
 	private JScrollPane sclChats;
 	private JTextArea txtCategoryValue;
 	private JComboBox<String> cmbCategories;
@@ -135,6 +136,8 @@ public class CampingBotUi extends JFrame {
 	private StatusUpdate statusUpdater = new StatusUpdate();
 	private JScrollPane scrollPane;
 	private JCheckBox chkFilterUsers;
+	private SortedList<CampingChat> chatsSorted;
+	private DefaultEventTableModel<CampingChat> chatModel;
 
 	/**
 	 * Launch the application.
@@ -171,7 +174,7 @@ public class CampingBotUi extends JFrame {
 				TimerThreadWithKill.shutdownThreads();
 			}
 		});
-		setBounds(100, 100, 1284, 654);
+		setBounds(100, 100, 1284, 720);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -180,7 +183,7 @@ public class CampingBotUi extends JFrame {
 		///
 		chkFilterUsers = new JCheckBox("Filter Inactive Users");
 		chkFilterUsers.setSelected(true);
-		chkFilterUsers.setBounds(641, 73, 217, 23);
+		chkFilterUsers.setBounds(641, 115, 217, 23);
 		contentPane.add(chkFilterUsers);
 
 		TableFormatCampingUser usersFormat = new TableFormatCampingUser();
@@ -194,7 +197,7 @@ public class CampingBotUi extends JFrame {
 		sclUsers = new JScrollPane();
 		sclUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclUsers.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sclUsers.setBounds(20, 103, 841, 217);
+		sclUsers.setBounds(17, 145, 841, 217);
 		contentPane.add(sclUsers);
 		tblUsers = new JTable(userModel);
 		sclUsers.setViewportView(tblUsers);
@@ -204,6 +207,28 @@ public class CampingBotUi extends JFrame {
 		TableColumnModel userColumnModel = tblUsers.getColumnModel();
 		usersFormat.setTableWidths(userColumnModel);
 		tblUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+
+		///
+		CampingChatManager chatMgr = CampingChatManager.getInstance(bot);
+		TableFormatCampingChat chatFormat = new TableFormatCampingChat();
+		EventList<CampingChat> chatEvents = chatMgr.getChatList();
+		chatsSorted = new SortedList<>(chatEvents, new CampingChatDefaultComparator());
+
+		TransformedList<CampingChat, CampingChat> chatListForUi = GlazedListsSwing.swingThreadProxyList(chatsSorted);
+		chatModel = new DefaultEventTableModel<CampingChat>(chatListForUi, chatFormat);
+
+		sclChats = new JScrollPane();
+		sclChats.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		sclChats.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		sclChats.setBounds(161, 33, 474, 101);
+		contentPane.add(sclChats);
+
+		tblChats = new JTable(chatModel);
+		sclChats.setViewportView(tblChats);
+		TableComparatorChooser.install(tblChats, chatsSorted, TableComparatorChooser.SINGLE_COLUMN);
+		chatFormat.setTableWidths(tblChats.getColumnModel());
+//		lstChats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//		lstChats.setModel(chatModel);
 
 		///
 
@@ -217,7 +242,7 @@ public class CampingBotUi extends JFrame {
 
 		JScrollPane sclSec = new JScrollPane();
 		sclSec.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		sclSec.setBounds(882, 103, 376, 217);
+		sclSec.setBounds(882, 145, 376, 217);
 		contentPane.add(sclSec);
 
 		tblSeconds = new JTable(calendaredModel);
@@ -232,7 +257,7 @@ public class CampingBotUi extends JFrame {
 
 		lblStatus = new JLabel("Offline");
 		lblStatus.setVerticalAlignment(SwingConstants.TOP);
-		lblStatus.setBounds(22, 36, 116, 54);
+		lblStatus.setBounds(22, 36, 116, 91);
 		contentPane.add(lblStatus);
 
 		btnConnect = new JButton("Connect");
@@ -250,19 +275,6 @@ public class CampingBotUi extends JFrame {
 		});
 		btnConnect.setBounds(20, 7, 120, 23);
 		contentPane.add(btnConnect);
-		CampingChatManager chatMgr = CampingChatManager.getInstance(bot);
-		DefaultEventComboBoxModel<CampingChat> chatModel = new DefaultEventComboBoxModel<>(
-				GlazedListsSwing.swingThreadProxyList(chatMgr.getChatList()));
-
-		sclChats = new JScrollPane();
-		sclChats.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		sclChats.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sclChats.setBounds(161, 33, 474, 59);
-		contentPane.add(sclChats);
-		lstChats = new JList<CampingChat>();
-		sclChats.setViewportView(lstChats);
-		lstChats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		lstChats.setModel(chatModel);
 
 		ActionListener sendChatListener = new ActionListener() {
 			@Override
@@ -284,13 +296,13 @@ public class CampingBotUi extends JFrame {
 
 		JLabel lblChats = new CategoryLabel("Chat", Color.cyan);
 		lblChats.setHorizontalAlignment(SwingConstants.CENTER);
-		lblChats.setBounds(140, 7, 19, 85);
+		lblChats.setBounds(140, 7, 19, 127);
 		contentPane.add(lblChats);
 
 		JScrollPane sclLog = new JScrollPane();
 		sclLog.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclLog.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		sclLog.setBounds(20, 331, 1238, 275);
+		sclLog.setBounds(20, 373, 1238, 297);
 		contentPane.add(sclLog);
 
 		EventList<EventItem> recentLog = eventLogger.getUiLog();
@@ -303,15 +315,15 @@ public class CampingBotUi extends JFrame {
 		lstLog.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		CategoryLabel lblLog = new CategoryLabel("Log", Color.MAGENTA);
-		lblLog.setBounds(0, 331, 19, 275);
+		lblLog.setBounds(0, 373, 19, 297);
 		contentPane.add(lblLog);
 
 		CategoryLabel lblBySeconds = new CategoryLabel("Calendared", Color.green);
-		lblBySeconds.setBounds(859, 103, 22, 217);
+		lblBySeconds.setBounds(860, 145, 22, 217);
 		contentPane.add(lblBySeconds);
 
 		CategoryLabel lblCategory = new CategoryLabel("Categories", Color.orange);
-		lblCategory.setBounds(640, 7, 19, 64);
+		lblCategory.setBounds(640, 7, 19, 101);
 		contentPane.add(lblCategory);
 
 		cmbCategories = new JComboBox<String>();
@@ -336,7 +348,7 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(cmbCategories);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(659, 31, 599, 39);
+		scrollPane.setBounds(659, 31, 599, 77);
 		contentPane.add(scrollPane);
 
 		txtCategoryValue = new JTextArea();
@@ -365,11 +377,11 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(btnAddToCategory);
 
 		CategoryLabel lblUsers = new CategoryLabel("Users", Color.blue);
-		lblUsers.setBounds(0, 103, 19, 217);
+		lblUsers.setBounds(0, 145, 19, 217);
 		contentPane.add(lblUsers);
 
 		CategoryLabel lblConnection = new CategoryLabel("Connection", Color.red);
-		lblConnection.setBounds(0, 7, 19, 85);
+		lblConnection.setBounds(0, 7, 19, 127);
 		contentPane.add(lblConnection);
 
 		Image app = null;
@@ -421,7 +433,7 @@ public class CampingBotUi extends JFrame {
 	}
 
 	public void chat() {
-		CampingChat chat = lstChats.getSelectedValue();
+		CampingChat chat = chatModel.getElementAt(tblChats.getSelectedRow());
 		String msg = txtChat.getText().trim();
 		if (chat != null && msg.length() > 0) {
 			try {
