@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.commands.AbstractCommand;
+import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment;
@@ -14,7 +15,8 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 /**
  * @author Nathan Hapke
  */
-public class VoteManagementCommands extends AbstractCommand {
+public class VoteManagementCommands extends AbstractCommand implements SlashCommand {
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.VoteExtend, BotCommand.VoteForceComplete };
 	private static final TextFragment ONLY_BROUGHT_UP_OR_ACTIVATED = new TextFragment(
 			"Only the person who started brought it up, or activated voting can use this, ");
 	private static final TextFragment NO_VOTE_PROVIDED = new TextFragment("Reply to the vote, ");
@@ -93,4 +95,20 @@ public class VoteManagementCommands extends AbstractCommand {
 		}
 		return tracker;
 	}
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
+
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId, CampingUser campingFromUser) {
+		if (command == BotCommand.VoteForceComplete) {
+			return completeVoting(message, campingFromUser);
+		} else if (command == BotCommand.VoteExtend) {
+			return extendVoting(message, campingFromUser);
+		}
+		return null;
+	}
+
 }

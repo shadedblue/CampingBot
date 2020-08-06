@@ -6,6 +6,7 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import ca.hapke.campbinning.bot.AccessLevel;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 
 /**
@@ -39,23 +40,10 @@ public abstract class AbstractCommand {
 		return new CallbackId(getCommandName(), updateId, ids);
 	}
 
-//	public String createQueryId(int... ids) {
-//		String[] inputs = new String[ids.length + 1];
-//		inputs[0] = getCommandName();
-//		for (int i = 0; i < ids.length; i++) {
-//			inputs[i + 1] = Integer.toString(ids[i]);
-//		}
-//
-//		return String.join(DELIMITER, inputs);
-//	}
-
-//	public String createQueryId(int updateId, List<Integer> convertedIds) {
-//		int[] inputs = new int[convertedIds.size() + 1];
-//		inputs[0] = updateId;
-//		for (int i = 0; i < convertedIds.size(); i++) {
-//			inputs[i + 1] = convertedIds.get(i);
-//		}
-//		return createQueryId(inputs);
-//	}
-
+	/**
+	 * Default provided for subclasses that implement {@link SlashCommand}
+	 */
+	public AccessLevel accessRequired() {
+		return AccessLevel.User;
+	}
 }

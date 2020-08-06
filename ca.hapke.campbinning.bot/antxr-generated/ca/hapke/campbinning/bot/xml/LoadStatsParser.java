@@ -69,7 +69,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 }
 
 	public final void document(
-		 CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec
+		 CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec
 	) throws RecognitionException, TokenStreamException {
 		
 		
@@ -84,7 +84,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_camping(
-		CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec
+		CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -354,7 +354,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_spell(
-		SpellGenerator sg
+		SpellCommand sg
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -382,7 +382,7 @@ public LoadStatsParser(ParserSharedInputState state) {
 	}
 	
 	public final void __xml_countdown(
-		CountdownGenerator countdownGen
+		CountdownCommand countdownGen
 	) throws RecognitionException, TokenStreamException {
 		
 		Token  __xml_startTag = null;
@@ -459,14 +459,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop420:
+			_loop690:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop420;
+					break _loop690;
 				}
 				
 			} while (true);
@@ -512,13 +512,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			match(24);
 			{
 			{
-			_loop459:
+			_loop729:
 			do {
 				if ((LA(1)==25)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop459;
+					break _loop729;
 				}
 				
 			} while (true);
@@ -562,13 +562,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop467:
+			_loop737:
 			do {
 				if ((LA(1)==27)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop467;
+					break _loop737;
 				}
 				
 			} while (true);
@@ -600,14 +600,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop412:
+			_loop682:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop412;
+					break _loop682;
 				}
 				
 			} while (true);
@@ -633,14 +633,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop416:
+			_loop686:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					aita.addItem("asshole", val);
 				}
 				else {
-					break _loop416;
+					break _loop686;
 				}
 				
 			} while (true);
@@ -666,14 +666,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop424:
+			_loop694:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					aita.addItem("mediocre", val);
 				}
 				else {
-					break _loop424;
+					break _loop694;
 				}
 				
 			} while (true);
@@ -699,14 +699,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop428:
+			_loop698:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					aita.addItem("nice", val);
 				}
 				else {
-					break _loop428;
+					break _loop698;
 				}
 				
 			} while (true);
@@ -732,14 +732,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop404:
+			_loop674:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop404;
+					break _loop674;
 				}
 				
 			} while (true);
@@ -765,14 +765,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop408:
+			_loop678:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop408;
+					break _loop678;
 				}
 				
 			} while (true);
@@ -1044,14 +1044,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop447:
+			_loop717:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop447;
+					break _loop717;
 				}
 				
 			} while (true);
@@ -1077,14 +1077,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop443:
+			_loop713:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop443;
+					break _loop713;
 				}
 				
 			} while (true);
@@ -1110,14 +1110,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop451:
+			_loop721:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop451;
+					break _loop721;
 				}
 				
 			} while (true);
@@ -1143,14 +1143,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop455:
+			_loop725:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop455;
+					break _loop725;
 				}
 				
 			} while (true);

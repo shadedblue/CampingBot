@@ -16,10 +16,10 @@ import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
-import ca.hapke.campbinning.bot.commands.CountdownGenerator;
+import ca.hapke.campbinning.bot.commands.CountdownCommand;
 import ca.hapke.campbinning.bot.commands.EnhanceCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
-import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.SpellCommand;
 import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
 import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
@@ -57,8 +57,8 @@ public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerial
 	private static final String FILENAME = "camping.xml";
 	private CampingSerializable[] serializables;
 	private CampingSystem cs;
-	private SpellGenerator sg;
-	private CountdownGenerator countdownGen;
+	private SpellCommand sg;
+	private CountdownCommand countdownGen;
 	private AitaCommand aita;
 	private CampingUserMonitor um;
 	private PartyEverydayCommand pc;
@@ -66,7 +66,7 @@ public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerial
 	private InsultGenerator ig;
 	private EnhanceCommand ec;
 
-	public CampingXmlSerializer(CampingSystem cs, SpellGenerator sg, CountdownGenerator countdownGen, AitaCommand aita,
+	public CampingXmlSerializer(CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita,
 			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig,
 			EnhanceCommand ec) {
 		this.cs = cs;

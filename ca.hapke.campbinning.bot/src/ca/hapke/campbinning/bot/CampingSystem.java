@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot;
 
+import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
@@ -125,6 +126,10 @@ public class CampingSystem implements CampingSerializable {
 	@Override
 	public boolean shouldSave() {
 		return false;
+	}
+
+	public boolean hasAccess(CampingUser campingFromUser, SlashCommand sc) {
+		return sc.accessRequired() == AccessLevel.User || isAdmin(campingFromUser);
 	}
 
 }

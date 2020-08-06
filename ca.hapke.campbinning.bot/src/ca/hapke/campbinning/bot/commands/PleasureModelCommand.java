@@ -12,11 +12,12 @@ import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.ImageLink;
 
 /**
  * @author Nathan Hapke
  */
-public class PleasureModelCommand implements TextCommand {
+public class PleasureModelCommand extends AbstractCommand implements TextCommand {
 
 	public static final String PLEASURE_MODEL = "pleasure model";
 
@@ -47,6 +48,11 @@ public class PleasureModelCommand implements TextCommand {
 			Message message) {
 		ImageLink img = CampingUtil.getRandom(images);
 		return new ImageCommandResult(BotCommand.PleasureModel, img);
+	}
+
+	@Override
+	public String getCommandName() {
+		return PLEASURE_MODEL;
 	}
 
 }

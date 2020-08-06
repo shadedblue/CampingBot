@@ -12,11 +12,11 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.channels.CampingChat;
-import ca.hapke.campbinning.bot.commands.ImageLink;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
+import ca.hapke.campbinning.bot.util.ImageLink;
 
 /**
  * @author Nathan Hapke

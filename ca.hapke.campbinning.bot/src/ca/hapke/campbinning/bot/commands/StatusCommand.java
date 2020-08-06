@@ -2,16 +2,12 @@ package ca.hapke.campbinning.bot.commands;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import com.google.common.cache.LoadingCache;
-
+import ca.hapke.campbinning.bot.AccessLevel;
 import ca.hapke.campbinning.bot.BotCommand;
-import ca.hapke.campbinning.bot.commands.inline.HiddenText;
-import ca.hapke.campbinning.bot.commands.inline.HideItInlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
@@ -22,14 +18,16 @@ import ca.hapke.campbinning.bot.util.TimeFormatter;
 /**
  * @author Nathan Hapke
  */
-public class StatusCommand implements IStatus {
+public class StatusCommand extends AbstractCommand implements IStatus, SlashCommand {
+	private static final String STATUS = "Status";
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Status };
 	private TimeFormatter tf = new TimeFormatter(2, ", ", false, false);
 	private ZonedDateTime onlineTime;
-	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL d, h:m:s a");
-	private HideItInlineCommand hideIt;
+	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL d, h:mm:ss a");
+//	private HideItInlineCommand hideIt;
 
-	public StatusCommand(HideItInlineCommand hideIt) {
-		this.hideIt = hideIt;
+	public StatusCommand() {
+//		this.hideIt = hideIt;
 	}
 
 	@Override
@@ -51,7 +49,9 @@ public class StatusCommand implements IStatus {
 		onlineTime = null;
 	}
 
-	public CommandResult statusCommand() {
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		TextCommandResult r = new TextCommandResult(BotCommand.Status);
 		r.add("Online Since", TextStyle.Bold);
 		r.add(": ");
@@ -63,26 +63,41 @@ public class StatusCommand implements IStatus {
 		} else {
 			r.add("???");
 		}
-		r.add("\nHide It", TextStyle.Bold);
-
-		LoadingCache<Integer, String> confirmedTopics = hideIt.getConfirmedTopics();
-		r.add("\n");
-		r.add("Topics (" + confirmedTopics.size() + ") ", TextStyle.Italic);
-		for (Map.Entry<Integer, String> e : confirmedTopics.asMap().entrySet()) {
-			r.add(e.getValue());
-			r.add(" ");
-		}
-
-		Map<String, HiddenText> msgs = hideIt.getConfirmedMessages();
-		r.add("\n");
-		r.add("Messages (" + msgs.size() + ") ", TextStyle.Italic);
-		for (Entry<String, HiddenText> e : msgs.entrySet()) {
-			r.add("\n");
-			r.add(e.getKey());
-			r.add(": ");
-			r.add(e.getValue().getClearText());
-		}
+//		r.add("\nHide It", TextStyle.Bold);
+//
+//		LoadingCache<Integer, String> confirmedTopics = hideIt.getConfirmedTopics();
+//		r.add("\n");
+//		r.add("Topics (" + confirmedTopics.size() + ") ", TextStyle.Italic);
+//		for (Map.Entry<Integer, String> e : confirmedTopics.asMap().entrySet()) {
+//			r.add(e.getValue());
+//			r.add(" ");
+//		}
+//
+//		Map<String, HiddenText> msgs = hideIt.getConfirmedMessages();
+//		r.add("\n");
+//		r.add("Messages (" + msgs.size() + ") ", TextStyle.Italic);
+//		for (Entry<String, HiddenText> e : msgs.entrySet()) {
+//			r.add("\n");
+//			r.add(e.getKey());
+//			r.add(": ");
+//			r.add(e.getValue().getClearText());
+//		}
 		return r;
+	}
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
+
+	@Override
+	public String getCommandName() {
+		return STATUS;
+	}
+
+	@Override
+	public AccessLevel accessRequired() {
+		return AccessLevel.Admin;
 	}
 
 }

@@ -12,7 +12,6 @@ import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
-import ca.hapke.campbinning.bot.commands.ImageLink;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfMode;
 import ca.hapke.campbinning.bot.commands.MbiyfType;
@@ -24,6 +23,7 @@ import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
 import ca.hapke.campbinning.bot.commands.voting.VotingOption;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.ImageLink;
 
 /**
  * @author Nathan Hapke

@@ -32,7 +32,7 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
 /**
  * @author Nathan Hapke
  */
-public class HideItInlineCommand extends InlineCommandBase implements CallbackCommand {
+public class HideItCommand extends InlineCommandBase implements CallbackCommand {
 
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
@@ -45,7 +45,7 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 			'▘', '▝' };
 	private int nextTopicId = 1;
 
-	public HideItInlineCommand(CampingBotEngine bot) {
+	public HideItCommand(CampingBotEngine bot) {
 		this.bot = bot;
 
 		confirmedTopics = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
@@ -174,7 +174,7 @@ public class HideItInlineCommand extends InlineCommandBase implements CallbackCo
 			int length = words[i].length();
 			char[] word = new char[length];
 			for (int j = 0; j < length; j++) {
-				word[j] = CampingUtil.getRandom(HideItInlineCommand.blots);
+				word[j] = CampingUtil.getRandom(HideItCommand.blots);
 			}
 			out[i + adjust] = new String(word);
 		}

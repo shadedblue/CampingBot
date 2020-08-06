@@ -26,9 +26,16 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
 /**
  * @author Nathan Hapke
  */
-public class HypeCommand implements HasCategories<String> {
+public class HypeCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
 
 	private static final String TITLE_GENERATING_HYPE = "Generating Hype!";
+
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Hype };
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
 
 	private class EditingMessageThread extends Thread {
 		private static final String TITLE_IM_SO_HYPED = "I'm So Hyped!";
@@ -132,7 +139,7 @@ public class HypeCommand implements HasCategories<String> {
 			+ "A*----|SHAKE| 95050B\r\n" + "E0B752*-----* 3E451C\r\n" + "97CF2A D*----*E54900\r\n"
 			+ "A06CF8 8|THAT|4*---*\r\n" + "508536 E*----*2|ASS|\r\n" + "1CD7B1 B9F194 7*---*";
 
-	public HypeCommand(CampingBotEngine bot, CountdownGenerator cg) {
+	public HypeCommand(CampingBotEngine bot, CountdownCommand cg) {
 		this.bot = bot;
 		chatManager = CampingChatManager.getInstance(bot);
 		categories = new CategoriedItems<String>(DICKS_CATEGORY);
@@ -147,7 +154,10 @@ public class HypeCommand implements HasCategories<String> {
 		categories.put(DICKS_CATEGORY, shakeThatAss);
 	}
 
-	public CommandResult hypeCommand(CampingUser campingFromUser) {
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
+//	public CommandResult hypeCommand(CampingUser campingFromUser) {
 		List<ResultFragment> frags = createNumbers();
 		TextCommandResult result = new TextCommandResult(BotCommand.Hype, frags);
 		if (!DEBUG)
@@ -246,7 +256,11 @@ public class HypeCommand implements HasCategories<String> {
 
 	@Override
 	public String getContainerName() {
+		return HYPE_CONTAINER;
+	}
 
+	@Override
+	public String getCommandName() {
 		return HYPE_CONTAINER;
 	}
 }

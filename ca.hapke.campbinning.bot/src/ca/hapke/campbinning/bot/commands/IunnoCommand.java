@@ -13,11 +13,13 @@ import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.ImageLink;
 
 /**
  * @author Nathan Hapke
  */
-public class IunnoCommand implements TextCommand, HasCategories<ImageLink> {
+public class IunnoCommand extends AbstractCommand implements TextCommand, HasCategories<ImageLink>, SlashCommand {
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.IunnoGoogleIt };
 	private static final String IUNNO_CATEGORY = "Iunno";
 	protected CampingBot bot;
 	private CategoriedItems<ImageLink> categories;
@@ -60,4 +62,19 @@ public class IunnoCommand implements TextCommand, HasCategories<ImageLink> {
 		return IUNNO_CATEGORY;
 	}
 
+	@Override
+	public String getCommandName() {
+		return IUNNO_CATEGORY;
+	}
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
+
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
+		return textCommand(campingFromUser, message.getEntities(), chatId, message);
+	}
 }

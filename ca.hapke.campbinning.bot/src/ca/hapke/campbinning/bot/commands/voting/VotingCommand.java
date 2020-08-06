@@ -17,6 +17,7 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackCommandBase;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
@@ -37,7 +38,8 @@ import ca.odell.glazedlists.GlazedLists;
  * @author Nathan Hapke
  */
 @SuppressWarnings("rawtypes")
-public abstract class VotingCommand extends CallbackCommandBase implements CalendaredEvent<Void>, TextCommand {
+public abstract class VotingCommand extends CallbackCommandBase
+		implements CalendaredEvent<Void>, TextCommand, SlashCommand {
 
 	protected final Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
 	protected final Map<Integer, VoteTracker> voteOnBanners = new HashMap<Integer, VoteTracker>();
@@ -46,15 +48,21 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 
 	protected final CampingBot bot;
 	private TimesProvider<Void> times;
-	protected final BotCommand respondsTo;
+//	protected final BotCommand respondsTo;
+	private BotCommand[] SLASH_COMMANDS;
 	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on, ");
 	private static final TextFragment NO_TOPIC_PROVIDED = new TextFragment(
 			"Reply to the topic you would like to vote on, ");
 
 	public VotingCommand(CampingBot campingBot, BotCommand respondsTo) {
-		this.respondsTo = respondsTo;
+		this.SLASH_COMMANDS = new BotCommand[] { respondsTo };
 		this.bot = campingBot;
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
+	}
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
 	}
 
 	@Override
@@ -83,14 +91,14 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 		}
 	}
 
-	public CommandResult startVoting(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
-			CampingUser activater) {
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId, CampingUser campingFromUser) {
 		CommandResult result;
 
 		try {
-			Message topic = activation.getReplyToMessage();
+			Message topic = message.getReplyToMessage();
 			if (topic != null) {
-				result = startVotingInternal(type, bot, activation, chatId, activater, topic);
+				result = startVotingInternal(command, bot, message, chatId, campingFromUser, topic);
 			} else {
 				result = new TextCommandResult(BotCommand.VoteCommandFailed, NO_TOPIC_PROVIDED,
 						new InsultFragment(Perspective.You));
@@ -169,13 +177,15 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 
 		BotCommand type = null;
 		String msgLower = message.getText().toLowerCase().trim();
-		if (msgLower.endsWith("/" + respondsTo.command))
-			type = respondsTo;
+		for (BotCommand respondsTo : SLASH_COMMANDS) {
+			if (msgLower.endsWith("/" + respondsTo.command))
+				type = respondsTo;
 
-		if (type != null) {
-			try {
-				return startVotingInternal(type, bot, message, chatId, campingFromUser, message);
-			} catch (TelegramApiException e) {
+			if (type != null) {
+				try {
+					return startVotingInternal(type, bot, message, chatId, campingFromUser, message);
+				} catch (TelegramApiException e) {
+				}
 			}
 		}
 		return null;
@@ -184,8 +194,10 @@ public abstract class VotingCommand extends CallbackCommandBase implements Calen
 	@Override
 	public boolean isMatch(String msg, Message message) {
 		msg = msg.toLowerCase().trim();
-		if (msg.endsWith("/" + respondsTo.command))
-			return true;
+		for (BotCommand respondsTo : SLASH_COMMANDS) {
+			if (msg.endsWith("/" + respondsTo.command))
+				return true;
+		}
 		return false;
 	}
 

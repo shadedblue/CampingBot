@@ -32,13 +32,23 @@ import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.ImageLink;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
 /**
  * @author Nathan Hapke
  */
-public class EnhanceCommand extends AbstractCommand implements HasCategories<String>, CampingSerializable {
+public class EnhanceCommand extends AbstractCommand
+		implements HasCategories<String>, CampingSerializable, SlashCommand {
+
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.ImageEnhance };
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
 
 	private static final String ENHANCE_CONTAINER = "Enhance";
 	private static final String ENHANCE_COMMAND = "enhance";
@@ -75,7 +85,11 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 		}
 	}
 
-	public CommandResult enhanceCommand(Message message) {
+//	public CommandResult enhanceCommand(Message message) {
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
+
 		// update previous enhancements chain
 		Set<Entry<CommandResult, Integer>> entrySet = trackingPending.entrySet();
 		Iterator<Entry<CommandResult, Integer>> iter = entrySet.iterator();

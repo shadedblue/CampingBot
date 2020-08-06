@@ -25,16 +25,23 @@ import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.commands.AbstractCommand;
+import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.DefaultMessageProcessor;
+import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
+import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.ui.IStatus;
@@ -65,9 +72,11 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	private List<TextCommand> textCommands = new ArrayList<>();
 	private List<InlineCommand> inlineCommands = new ArrayList<>();
 	private Map<String, InlineCommand> inlineMap = new HashMap<>();
+	private Multimap<BotCommand, SlashCommand> slashCommands = ArrayListMultimap.create();
 
 	protected MessageProcessor processor = new DefaultMessageProcessor();
 
+	protected InsultGenerator insultGenerator = InsultGenerator.getInstance();
 	protected ConfigSerializer serializer;
 
 	private class ConnectionMonitor implements IStatus {
@@ -371,8 +380,20 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		eventLogger.add(outputEvent);
 	}
 
-	protected abstract CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
-			CampingUser campingFromUser) throws TelegramApiException;
+	protected CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) throws TelegramApiException {
+		for (SlashCommand sc : slashCommands.get(command)) {
+			if (!system.hasAccess(campingFromUser, sc)) {
+				return new TextCommandResult(BotCommand.Status).add(campingFromUser).add(": Access denied, you")
+						.add(insultGenerator.getInsult());
+			}
+			CommandResult result = sc.respondToSlashCommand(command, message, chatId, campingFromUser);
+			if (result != null)
+				return result;
+		}
+		return null;
+
+	}
 
 	public CampingUser findTarget(Message message) {
 		CampingUser targetUser = null;
@@ -409,16 +430,40 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		this.statusMonitors.add(status);
 	}
 
-	protected final void addInlineCommand(InlineCommand ic) {
+	public void addCommand(AbstractCommand command) {
+		if (command instanceof InlineCommand) {
+			InlineCommand ic = (InlineCommand) command;
+			addInlineCommand(ic);
+		}
+		if (command instanceof TextCommand) {
+			TextCommand tc = (TextCommand) command;
+			addTextCommand(tc);
+		}
+		if (command instanceof CallbackCommand) {
+			CallbackCommand cc = (CallbackCommand) command;
+			addCallbackCommand(cc);
+		}
+		if (command instanceof SlashCommand) {
+			SlashCommand sc = (SlashCommand) command;
+			BotCommand[] cmds = sc.getSlashCommandsToRespondTo();
+			if (cmds != null) {
+				for (BotCommand key : cmds) {
+					slashCommands.put(key, sc);
+				}
+			}
+		}
+	}
+
+	private final void addInlineCommand(InlineCommand ic) {
 		inlineCommands.add(ic);
 		inlineMap.put(ic.getCommandName(), ic);
 	}
 
-	protected final void addTextCommand(TextCommand tc) {
+	private final void addTextCommand(TextCommand tc) {
 		textCommands.add(tc);
 	}
 
-	protected final void addCallbackCommand(CallbackCommand cc) {
+	private final void addCallbackCommand(CallbackCommand cc) {
 		callbackCommands.add(cc);
 		callbackMap.put(cc.getCommandName(), cc);
 	}

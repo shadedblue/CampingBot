@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands;
+package ca.hapke.campbinning.bot.util;
 
 /**
  * @author Nathan Hapke

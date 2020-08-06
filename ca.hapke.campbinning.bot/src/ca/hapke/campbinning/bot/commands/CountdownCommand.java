@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
+
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
@@ -13,7 +15,7 @@ import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
-import ca.hapke.campbinning.bot.users.CampingUserMonitor;
+import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.util.TimeFormatter;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -21,7 +23,16 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class CountdownGenerator implements HasCategories<String>, CampingSerializable {
+public class CountdownCommand extends AbstractCommand
+		implements HasCategories<String>, CampingSerializable, SlashCommand {
+
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Countdown };
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
+
 	private boolean shouldSave = false;
 
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
@@ -34,8 +45,9 @@ public class CountdownGenerator implements HasCategories<String>, CampingSeriali
 //	private ZoneId zone = TimeZone.getDefault().toZoneId();
 	private CategoriedItems<String> categories;
 	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
+//	private CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 
-	public CountdownGenerator(Resources res, MbiyfCommand ballsCommand) {
+	public CountdownCommand(Resources res, MbiyfCommand ballsCommand) {
 		this.res = res;
 		this.ballsCommand = ballsCommand;
 		categories = new CategoriedItems<String>(HYPE_CATEGORY);
@@ -62,7 +74,10 @@ public class CountdownGenerator implements HasCategories<String>, CampingSeriali
 			shouldSave = true;
 	}
 
-	public CommandResult countdownCommand(CampingUserMonitor userMonitor, Long chatId) {
+//	public CommandResult countdownCommand(Long chatId) {
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		ZonedDateTime now = new GregorianCalendar().toZonedDateTime();
 		CommandResult result = new TextCommandResult(BotCommand.Countdown);
 
@@ -120,6 +135,11 @@ public class CountdownGenerator implements HasCategories<String>, CampingSeriali
 		of.finish(tag);
 
 		shouldSave = false;
+	}
+
+	@Override
+	public String getCommandName() {
+		return COUNTDOWN_CONTAINER;
 	}
 
 }

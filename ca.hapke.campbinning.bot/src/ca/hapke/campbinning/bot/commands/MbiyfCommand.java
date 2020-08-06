@@ -41,12 +41,13 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.ImageLink;
 import ca.odell.glazedlists.FilterList;
 
 /**
  * @author Nathan Hapke
  */
-public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
+public class MbiyfCommand extends AbstractCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 	private static final TextFragment EXCLAMATION = new TextFragment("!");
 	private static final TextFragment APOSTROPHE_S = new TextFragment("'s ");
 	private static final TextFragment IN = new TextFragment(" in ");
@@ -384,5 +385,10 @@ public class MbiyfCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
 		else
 			return StartupMode.Never;
 
+	}
+
+	@Override
+	public String getCommandName() {
+		return "mbiyf";
 	}
 }

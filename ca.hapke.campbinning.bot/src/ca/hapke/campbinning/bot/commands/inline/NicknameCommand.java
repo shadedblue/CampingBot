@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
@@ -33,7 +34,15 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * 
  * @author Nathan Hapke
  */
-public class NicknameCommand extends InlineCommandBase {
+public class NicknameCommand extends InlineCommandBase implements SlashCommand {
+
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.AllNicknames,
+			BotCommand.SetNickname };
+
+	@Override
+	public BotCommand[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
 
 	private static final String INLINE_NICKS = "nicks";
 	private static final char[] invalidCharacters = new char[] { '*', '_', '[', ']', '`', '\\', '~' };
@@ -196,5 +205,15 @@ public class NicknameCommand extends InlineCommandBase {
 	@Override
 	public String getCommandName() {
 		return INLINE_NICKS;
+	}
+
+	@Override
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId, CampingUser campingFromUser) {
+		if (command == BotCommand.AllNicknames)
+			return allNicknamesCommand();
+		if (command == BotCommand.SetNickname)
+			return setNicknameCommand(campingFromUser, message);
+
+		return null;
 	}
 }

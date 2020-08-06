@@ -26,12 +26,16 @@ import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
+import ca.hapke.campbinning.bot.util.ImageLink;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 
 /**
  * @author Nathan Hapke
  */
-public class PartyEverydayCommand implements HasCategories<String>, TextCommand, CampingSerializable {
+public class PartyEverydayCommand extends AbstractCommand
+		implements HasCategories<String>, TextCommand, CampingSerializable {
+	private static final String PARTY = "Party";
+
 	private boolean shouldSave = false;
 
 	private static final int SFW_START_HOUR = 8;
@@ -158,7 +162,7 @@ public class PartyEverydayCommand implements HasCategories<String>, TextCommand,
 
 	@Override
 	public String getContainerName() {
-		return "Party";
+		return PARTY;
 	}
 
 	@Override
@@ -174,5 +178,10 @@ public class PartyEverydayCommand implements HasCategories<String>, TextCommand,
 		of.finish(tag);
 
 		shouldSave = false;
+	}
+
+	@Override
+	public String getCommandName() {
+		return PARTY;
 	}
 }

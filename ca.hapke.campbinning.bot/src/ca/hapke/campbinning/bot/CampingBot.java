@@ -3,28 +3,20 @@ package ca.hapke.campbinning.bot;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
-import ca.hapke.campbinning.bot.commands.CountdownGenerator;
+import ca.hapke.campbinning.bot.commands.AbstractCommand;
+import ca.hapke.campbinning.bot.commands.CountdownCommand;
 import ca.hapke.campbinning.bot.commands.EnhanceCommand;
 import ca.hapke.campbinning.bot.commands.HypeCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
-import ca.hapke.campbinning.bot.commands.SpellGenerator;
+import ca.hapke.campbinning.bot.commands.SpellCommand;
 import ca.hapke.campbinning.bot.commands.StatusCommand;
-import ca.hapke.campbinning.bot.commands.inline.HideItInlineCommand;
-import ca.hapke.campbinning.bot.commands.inline.InlineCommandBase;
+import ca.hapke.campbinning.bot.commands.inline.HideItCommand;
 import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
-import ca.hapke.campbinning.bot.commands.inline.SpellInlineCommand;
-import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
-import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.commands.voting.VoteManagementCommands;
 import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.commands.voting.rant.RantCommand;
@@ -50,27 +42,19 @@ public class CampingBot extends CampingBotEngine {
 	private IunnoCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
 
-	private CountdownGenerator countdownGen;
+	private CountdownCommand countdownGen;
 	private HypeCommand hypeCommand;
 	private DatabaseConsumer databaseConsumer;
-	private SpellGenerator spellCommand;
-
-	private HideItInlineCommand hideItInline;
-	private InlineCommandBase spellInline;
+	private SpellCommand spellCommand;
+	private HideItCommand hideItCommand;
 	private NicknameCommand nicknameCommand;
 
 	private List<HasCategories<String>> hasCategories = new ArrayList<>();
 
 	private CalendarMonitor calMonitor;
 
-	private InsultGenerator insultGenerator;
-
-//	private AfdTextCommand afdText;
-//	private AfdMatrixPictures afdMatrix;
-//	private AprilFoolsDayEnabler afdEnabler;
-
 	public CampingBot() {
-		spellCommand = new SpellGenerator(this);
+		spellCommand = new SpellCommand(this);
 		nicknameCommand = new NicknameCommand();
 		pleasureCommand = new PleasureModelCommand(this);
 		enhanceCommand = new EnhanceCommand(this);
@@ -82,58 +66,45 @@ public class CampingBot extends CampingBotEngine {
 		rantCommand = new RantCommand(this);
 		aitaCommand = new AitaCommand(this, ballsCommand);
 		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);
-		countdownGen = new CountdownGenerator(res, ballsCommand);
+		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
 
-		hideItInline = new HideItInlineCommand(this);
-		spellInline = new SpellInlineCommand(spellCommand);
-		insultGenerator = InsultGenerator.getInstance();
+		hideItCommand = new HideItCommand(this);
 
-		statusCommand = new StatusCommand(hideItInline);
+		statusCommand = new StatusCommand();
 		addStatusUpdate(statusCommand);
 
 		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,
 				chatManager, userMonitor, insultGenerator, enhanceCommand);
 
-//		AprilFoolsDayProcessor afdp = new AprilFoolsDayProcessor();
-//		afdp.addAtEnd(processor);
-
-//		DarkModeMessageProcessor dmp = new DarkModeMessageProcessor();
-//		dmp.addAtEnd(afdp);
-
-//		processor = dmp;
-
-//		CampingChat chat = chatManager.get(system.getAnnounceChat());
-//		afdText = new AfdTextCommand(this, afdp, chat);
-//		afdMatrix = new AfdMatrixPictures(this, chat);
-//		afdEnabler = new AprilFoolsDayEnabler(afdText, afdMatrix, afdp);
-
-		addTextCommand(ballsCommand);
-		addTextCommand(aitaCommand);
-		addTextCommand(rantCommand);
-		addTextCommand(pleasureCommand);
-		addTextCommand(iunnoCommand);
-		addTextCommand(partyCommand);
-//		addTextCommand(afdText);
-
-		addInlineCommand(spellInline);
-		addInlineCommand(nicknameCommand);
-		addInlineCommand(hideItInline);
-//		inlineCommands.add(spellInline);
-//		inlineCommands.add(nicknameCommand);
-//		inlineCommands.add(hideItInline);
-
-		addCallbackCommand(hideItInline);
-		addCallbackCommand(aitaCommand);
-		addCallbackCommand(rantCommand);
-
-		hasCategories.add(spellCommand);
-		hasCategories.add(countdownGen);
-		hasCategories.add(hypeCommand);
-		hasCategories.add(aitaCommand);
-		hasCategories.add(partyCommand);
 		hasCategories.add(insultGenerator);
-		hasCategories.add(enhanceCommand);
+
+		addCommand(spellCommand);
+		addCommand(nicknameCommand);
+		addCommand(hideItCommand);
+		addCommand(ballsCommand);
+		addCommand(aitaCommand);
+		addCommand(rantCommand);
+		addCommand(pleasureCommand);
+		addCommand(iunnoCommand);
+		addCommand(partyCommand);
+		addCommand(countdownGen);
+		addCommand(enhanceCommand);
+		addCommand(hypeCommand);
+		addCommand(statusCommand);
+		addCommand(voteManagementCommands);
+	}
+
+	@Override
+	public void addCommand(AbstractCommand command) {
+		super.addCommand(command);
+		if (command instanceof HasCategories<?>) {
+			try {
+				hasCategories.add((HasCategories<String>) command);
+			} catch (Exception e) {
+				// Ignore if it's not a <String>
+			}
+		}
 	}
 
 	@Override
@@ -147,10 +118,6 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(ballsCommand);
 		calMonitor.add(aitaCommand);
 		calMonitor.add(rantCommand);
-//		calMonitor.add(afdMatrix);
-//		calMonitor.add(afdEnabler);
-
-//		calMonitor.add(dmp);
 	}
 
 	public CampingUser getMeCamping() {
@@ -159,101 +126,6 @@ public class CampingBot extends CampingBotEngine {
 
 	public List<HasCategories<String>> getCategories() {
 		return hasCategories;
-	}
-
-	@Override
-	protected CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
-			CampingUser campingFromUser) throws TelegramApiException {
-		switch (command) {
-		case NicknameConversion:
-		case Mbiyf:
-		case MbiyfDipshit:
-		case MbiyfAnnouncement:
-		case PleasureModel:
-		case PartyEveryday:
-		case HideIt:
-			// NOOP
-			break;
-		case VoteTopicComplete:
-		case Vote:
-		case VoteActivatorComplete:
-		case VoteTopicInitiation:
-		case VoteCommandFailed:
-		case Talk:
-		case UiString:
-			// NOOP : internal events, not responses
-			break;
-		case SpellDipshit:
-		case SetNicknameRejected:
-			// Resultant events. Not Commands
-			break;
-
-		case AllBalls:
-			return new TextCommandResult(command, new TextFragment(res.listBalls()));
-
-		case AllFaces:
-			return new TextCommandResult(command, new TextFragment(res.listFaces()));
-
-		case IunnoGoogleIt:
-			return iunnoCommand.textCommand(campingFromUser, null, chatId, message);
-		case Spell:
-			return spellCommand.spellCommand(campingFromUser, message);
-
-		case RantActivatorInitiation:
-			return rantCommand.startVoting(command, this, message, chatId, campingFromUser);
-
-		case AitaActivatorInitiation:
-			return aitaCommand.startVoting(command, this, message, chatId, campingFromUser);
-
-		case VoteForceComplete:
-			return voteManagementCommands.completeVoting(message, campingFromUser);
-
-		case VoteExtend:
-			return voteManagementCommands.extendVoting(message, campingFromUser);
-
-		case Countdown:
-			return countdownGen.countdownCommand(userMonitor, chatId);
-
-		case Hype:
-			return hypeCommand.hypeCommand(campingFromUser);
-
-		case AllNicknames:
-			return nicknameCommand.allNicknamesCommand();
-
-		case SetNickname:
-			return nicknameCommand.setNicknameCommand(campingFromUser, message);
-
-		case Reload:
-			return reloadCommand(campingFromUser);
-
-		case Status:
-			return statusCommand(campingFromUser);
-		case ImageEnhance:
-			return enhanceCommand.enhanceCommand(message);
-
-		}
-		return null;
-
-	}
-
-	public CommandResult statusCommand(CampingUser fromUser) {
-		if (system.isAdmin(fromUser)) {
-			return statusCommand.statusCommand();
-		} else {
-			return new TextCommandResult(BotCommand.Status).add(fromUser).add(": Access Denied!");
-		}
-	}
-
-	private CommandResult reloadCommand(CampingUser fromUser) {
-		CommandResult result = new TextCommandResult(BotCommand.Reload).add(fromUser);
-		if (system.isAdmin(fromUser)) {
-			res.loadAllEmoji();
-			serializer.load();
-			result.add(": Done!");
-		} else {
-			result.add(": Access Denied!");
-		}
-		return result;
 	}
 
 	public Resources getRes() {
