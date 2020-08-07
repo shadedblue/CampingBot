@@ -44,9 +44,9 @@ public class AprilFoolsDayProcessor extends MessageProcessor {
 	}
 
 	@Override
-	protected String internalProcessStringFragment(String value) {
+	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
 		if (enabled) {
-			value = sillyPipe.processString(value);
+			value = sillyPipe.processString(value, useMarkupV2);
 		}
 		return value;
 	}

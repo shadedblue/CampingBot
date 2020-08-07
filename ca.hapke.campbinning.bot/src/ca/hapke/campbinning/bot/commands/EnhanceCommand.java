@@ -191,7 +191,7 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	public TextFragment garble(String input) {
-		return new TextFragment(afdText.processString(input));
+		return new TextFragment(afdText.processString(input, true));
 	}
 
 	private String getPictureFileId(Message replyTo) {

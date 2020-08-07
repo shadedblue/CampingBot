@@ -164,7 +164,7 @@ public class SpellCommand extends InlineCommandBase
 
 		InputTextMessageContent mcSpell = new InputTextMessageContent();
 		mcSpell.setDisableWebPagePreview(true);
-		String spell = processor.process(outputSpell);
+		String spell = processor.process(outputSpell, true);
 		mcSpell.setMessageText(spell);
 		mcSpell.setParseMode(CampingBotEngine.MARKDOWN);
 

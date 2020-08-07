@@ -16,10 +16,7 @@ public class EmojiFragment extends ResultFragment {
 	}
 
 	@Override
-	/**
-	 * No changes to emoji.. for now?
-	 */
-	public String getValue(MessageProcessor processor) {
+	public String getValue(MessageProcessor processor, boolean useMarkupV2) {
 		return target.getUnicode();
 	}
 

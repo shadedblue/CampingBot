@@ -29,9 +29,9 @@ public class TextFragment extends ResultFragment {
 	}
 
 	@Override
-	public String getValue(MessageProcessor processor) {
+	public String getValue(MessageProcessor processor, boolean useMarkupV2) {
 		String cased = casify(value);
-		String p = processor.processString(cased);
+		String p = processor.processString(cased, useMarkupV2);
 		return markup(p);
 	}
 

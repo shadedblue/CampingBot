@@ -21,10 +21,10 @@ public abstract class MessageProcessor {
 		return fragments;
 	}
 
-	public final String processString(String value) {
-		String result = internalProcessStringFragment(value);
+	public final String processString(String value, boolean useMarkupV2) {
+		String result = internalProcessStringFragment(value, useMarkupV2);
 		if (next != null)
-			result = next.processString(result);
+			result = next.processString(result, useMarkupV2);
 		return result;
 	}
 
@@ -44,7 +44,7 @@ public abstract class MessageProcessor {
 
 	protected abstract ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments);
 
-	protected abstract String internalProcessStringFragment(String value);
+	protected abstract String internalProcessStringFragment(String value, boolean useMarkupV2);
 
 	protected abstract String internalAfterStringAssembled(String value);
 
@@ -63,13 +63,13 @@ public abstract class MessageProcessor {
 		return this;
 	}
 
-	public String process(List<ResultFragment> fragments) {
+	public String process(List<ResultFragment> fragments, boolean useMarkupV2) {
 		ResultFragment[] a = new ResultFragment[fragments.size()];
 		a = fragments.toArray(a);
-		return process(a);
+		return process(a, useMarkupV2);
 	}
 
-	public String process(ResultFragment[] fragments) {
+	public String process(ResultFragment[] fragments, boolean useMarkupV2) {
 		if (fragments == null)
 			return null;
 
@@ -82,7 +82,7 @@ public abstract class MessageProcessor {
 			if (f == null)
 				results[i] = "";
 			else
-				results[i] = f.getValue(this);
+				results[i] = f.getValue(this, useMarkupV2);
 		}
 
 		String result = String.join("", results);

@@ -22,7 +22,7 @@ public class InsultFragment extends ResultFragment {
 	}
 
 	@Override
-	public String getValue(MessageProcessor processor) {
+	public String getValue(MessageProcessor processor, boolean useMarkupV2) {
 		String reference = "";
 		switch (p) {
 		case Me:
@@ -36,7 +36,7 @@ public class InsultFragment extends ResultFragment {
 		String output = reference + insult;
 
 		output = casify(output);
-		output = processor.processString(output);
+		output = processor.processString(output, useMarkupV2);
 		output = markup(output);
 
 		return output;

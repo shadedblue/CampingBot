@@ -31,7 +31,7 @@ public class TextCommandResult extends CommandResult {
 	@Override
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		MessageProcessor processor = bot.getProcessor();
-		String msg = processor.process(this.fragments);
+		String msg = processor.process(this.fragments, true);
 		Message outgoing = sendMsg(bot, chatId, msg);
 		SendResult result = new SendResult(msg, outgoing, null);
 		return result;

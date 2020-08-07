@@ -88,7 +88,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 		if (converted == null)
 			return null;
 
-		String output = processor.process(out);
+		String output = processor.process(out, true);
 
 		InputTextMessageContent mc = new InputTextMessageContent();
 		mc.setDisableWebPagePreview(true);
@@ -208,7 +208,8 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId, CampingUser campingFromUser) {
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		if (command == BotCommand.AllNicknames)
 			return allNicknamesCommand();
 		if (command == BotCommand.SetNickname)

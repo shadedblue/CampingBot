@@ -27,12 +27,14 @@ public class DefaultMessageProcessor extends MessageProcessor {
 	}
 
 	@Override
-	protected String internalProcessStringFragment(String value) {
-		for (int i = 0; i < escapeFrom.length; i++) {
-			String from = escapeFrom[i];
-			String to = escapeTo[i];
+	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
+		if (useMarkupV2) {
+			for (int i = 0; i < escapeFrom.length; i++) {
+				String from = escapeFrom[i];
+				String to = escapeTo[i];
 
-			value = value.replace(from, to);
+				value = value.replace(from, to);
+			}
 		}
 		return value;
 	}

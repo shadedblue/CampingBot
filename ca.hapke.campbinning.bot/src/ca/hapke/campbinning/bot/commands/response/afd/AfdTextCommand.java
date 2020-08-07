@@ -71,7 +71,7 @@ public class AfdTextCommand implements TextCommand {
 				}
 			}
 
-			String processed = processor.processString(longestWord);
+			String processed = processor.processString(longestWord, false);
 			titleCmd.add(processed);
 
 			for (int i = 0; i < 3; i++) {

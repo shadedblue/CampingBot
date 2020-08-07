@@ -30,7 +30,7 @@ public abstract class ResultFragment {
 		this.textStyle = textStyle;
 	}
 
-	public abstract String getValue(MessageProcessor processor);
+	public abstract String getValue(MessageProcessor processor, boolean useMarkupV2);
 
 	public String casify(String s) {
 		switch (caseChoice) {

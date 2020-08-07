@@ -140,7 +140,7 @@ public class FontGarbler extends MessageProcessor {
 	}
 
 	@Override
-	protected String internalProcessStringFragment(String value) {
+	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < value.length(); i++) {
 			char ch = value.charAt(i);

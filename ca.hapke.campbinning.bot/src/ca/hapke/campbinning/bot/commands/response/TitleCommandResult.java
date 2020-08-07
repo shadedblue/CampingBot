@@ -16,7 +16,6 @@ public class TitleCommandResult extends CommandResult {
 
 	public TitleCommandResult(BotCommand cmd) {
 		super(cmd);
-		// TODO Auto-generated constructor stub
 	}
 
 	public TitleCommandResult(BotCommand cmd, ResultFragment... fragments) {
@@ -30,7 +29,7 @@ public class TitleCommandResult extends CommandResult {
 	@Override
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		MessageProcessor processor = bot.getProcessor();
-		String msg = processor.process(this.fragments);
+		String msg = processor.process(this.fragments, false);
 
 		SetChatTitle sct = new SetChatTitle(chatId, msg);
 		Boolean success = bot.execute(sct);

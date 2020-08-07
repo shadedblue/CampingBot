@@ -27,21 +27,23 @@ public class MentionFragment extends ResultFragment {
 	}
 
 	@Override
-	public String getValue(MessageProcessor processor) {
-		String display;
-		display = getDisplayText();
+	public String getValue(MessageProcessor processor, boolean useMarkupV2) {
+		String display = getDisplayText();
 		if (prefix != null)
 			display = prefix + display;
 		if (suffix != null)
 			display = display + suffix;
 
 		display = casify(display);
-		display = processor.processString(display);
+		display = processor.processString(display, useMarkupV2);
 		display = markup(display);
 
-		int telegramId = target.getTelegramId();
-
-		return "[" + display + "](tg://user?id=" + telegramId + ")";
+		if (useMarkupV2) {
+			int telegramId = target.getTelegramId();
+			return "[" + display + "](tg://user?id=" + telegramId + ")";
+		} else {
+			return display;
+		}
 	}
 
 	public String getDisplayText() {
