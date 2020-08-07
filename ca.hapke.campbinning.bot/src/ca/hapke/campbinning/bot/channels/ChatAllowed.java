@@ -5,6 +5,7 @@ package ca.hapke.campbinning.bot.channels;
  */
 public enum ChatAllowed {
 	New,
+	NewAnnounced,
 	Allowed,
 	Disallowed;
 }

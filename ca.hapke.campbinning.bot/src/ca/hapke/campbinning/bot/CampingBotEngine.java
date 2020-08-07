@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
 
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.channels.ChatAllowed;
 import ca.hapke.campbinning.bot.commands.AbstractCommand;
 import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
@@ -42,11 +43,13 @@ import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
 import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
+import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.ui.IStatus;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
+import ca.odell.glazedlists.FilterList;
 
 /**
  * @author Nathan Hapke
@@ -110,6 +113,20 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public final void init() {
 		serializer.load();
+		FilterList<CampingUser> admins = userMonitor.getAdminUsers();
+		for (CampingUser admin : admins) {
+			CampingChat chat = chatManager.get((long) admin.getTelegramId());
+			ChatAllowed current = chat.getAllowed();
+			switch (current) {
+			case Allowed:
+			case Disallowed:
+				break;
+			case New:
+			case NewAnnounced:
+				chat.setAllowed(ChatAllowed.Allowed);
+				break;
+			}
+		}
 		postConfigInit();
 		if (system.isConnectOnStartup()) {
 			new Thread("ConnectOnStartup") {
@@ -327,29 +344,43 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				outputCommand = BotCommand.findCommand(update, me);
 
 				try {
-					if (outputCommand != null) {
-						outputResult = reactToSlashCommandInText(outputCommand, message, chatId, campingFromUser);
+					switch (chat.getAllowed()) {
+					case Disallowed:
+					case NewAnnounced:
+						break;
+					case New:
+						outputResult = new TextCommandResult(BotCommand.JoinThread, new TextFragment(
+								"An administrator must approve this channel before commands are enabled."));
+						chat.setAllowed(ChatAllowed.NewAnnounced);
+						break;
+					case Allowed:
+						if (outputCommand != null) {
+							outputResult = reactToSlashCommandInText(outputCommand, message, chatId, campingFromUser);
 
-					} else {
-						String msg = originalMsg.toLowerCase().trim();
+						} else {
+							String msg = originalMsg.toLowerCase().trim();
 
-						// react to non /commands that occur in regular text
+							// react to non /commands that occur in regular text
 //						CommandResult result = null;
-						for (TextCommand textCommand : textCommands) {
-							if (textCommand.isMatch(msg, message)) {
-								outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
-								if (outputResult != null) {
-									break;
+							for (TextCommand textCommand : textCommands) {
+								if (textCommand.isMatch(msg, message)) {
+									outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
+									if (outputResult != null) {
+										break;
+									}
 								}
 							}
 						}
-					}
 
+						break;
+
+					}
 					if (outputResult != null) {
 						SendResult sendResult = outputResult.send(this, chatId);
 						logSendResult(telegramId, campingFromUser, eventTime, chat, outputCommand, outputResult,
 								sendResult);
 					}
+
 				} catch (TelegramApiException e) {
 					logFailure(telegramId, campingFromUser, eventTime, chat, outputCommand, e);
 				}
@@ -429,7 +460,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					continue;
 				}
 
-				if (betterSelection(frontToBack, offset, currentOffset, currentChoice, possibleChoice, priority)) {
+				if (isBetterSelection(frontToBack, offset, currentOffset, currentChoice, possibleChoice, priority)) {
 					if (MENTION.equalsIgnoreCase(type)) {
 						currentChoice = possibleChoice;
 						currentOffset = offset;
@@ -450,7 +481,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		return currentChoice;
 	}
 
-	private boolean betterSelection(boolean frontToBack, int offset, int currentOffset, CampingUser currentChoice,
+	private boolean isBetterSelection(boolean frontToBack, int offset, int currentOffset, CampingUser currentChoice,
 			CampingUser possibleChoice, BotChoicePriority priority) {
 		int possibleId = possibleChoice.getTelegramId();
 		int myId = meCamping.getTelegramId();

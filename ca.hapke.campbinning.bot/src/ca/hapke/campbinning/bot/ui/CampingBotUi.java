@@ -7,6 +7,8 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
@@ -59,6 +61,7 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatDefaultComparator;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.channels.ChatAllowed;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
@@ -134,10 +137,11 @@ public class CampingBotUi extends JFrame {
 	private TrayIcon trayIcon;
 
 	private StatusUpdate statusUpdater = new StatusUpdate();
-	private JScrollPane scrollPane;
+	private JScrollPane sclCategories;
 	private JCheckBox chkFilterUsers;
 	private SortedList<CampingChat> chatsSorted;
 	private DefaultEventTableModel<CampingChat> chatModel;
+	private JButton btnStatus;
 
 	/**
 	 * Launch the application.
@@ -181,9 +185,9 @@ public class CampingBotUi extends JFrame {
 		contentPane.setLayout(null);
 
 		///
-		chkFilterUsers = new JCheckBox("Filter Inactive Users");
+		chkFilterUsers = new JCheckBox("Filter Inactive");
 		chkFilterUsers.setSelected(true);
-		chkFilterUsers.setBounds(641, 115, 217, 23);
+		chkFilterUsers.setBounds(20, 115, 131, 23);
 		contentPane.add(chkFilterUsers);
 
 		TableFormatCampingUser usersFormat = new TableFormatCampingUser();
@@ -197,7 +201,7 @@ public class CampingBotUi extends JFrame {
 		sclUsers = new JScrollPane();
 		sclUsers.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		sclUsers.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		sclUsers.setBounds(17, 145, 841, 217);
+		sclUsers.setBounds(20, 145, 838, 217);
 		contentPane.add(sclUsers);
 		tblUsers = new JTable(userModel);
 		sclUsers.setViewportView(tblUsers);
@@ -227,9 +231,14 @@ public class CampingBotUi extends JFrame {
 		sclChats.setViewportView(tblChats);
 		TableComparatorChooser.install(tblChats, chatsSorted, TableComparatorChooser.SINGLE_COLUMN);
 		chatFormat.setTableWidths(tblChats.getColumnModel());
-//		lstChats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		lstChats.setModel(chatModel);
-
+		tblChats.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent mouseEvent) {
+				if (mouseEvent.getClickCount() == 2) {
+					changeChatAccess();
+				}
+			}
+		});
 		///
 
 		CalendarMonitor intervalThread = CalendarMonitor.getInstance();
@@ -257,7 +266,7 @@ public class CampingBotUi extends JFrame {
 
 		lblStatus = new JLabel("Offline");
 		lblStatus.setVerticalAlignment(SwingConstants.TOP);
-		lblStatus.setBounds(22, 36, 116, 91);
+		lblStatus.setBounds(22, 36, 116, 77);
 		contentPane.add(lblStatus);
 
 		btnConnect = new JButton("Connect");
@@ -273,7 +282,7 @@ public class CampingBotUi extends JFrame {
 				}
 			}
 		});
-		btnConnect.setBounds(20, 7, 120, 23);
+		btnConnect.setBounds(20, 5, 120, 23);
 		contentPane.add(btnConnect);
 
 		ActionListener sendChatListener = new ActionListener() {
@@ -285,14 +294,24 @@ public class CampingBotUi extends JFrame {
 		txtChat = new JTextField();
 		txtChat.addActionListener(sendChatListener);
 		txtChat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		txtChat.setBounds(161, 5, 370, 26);
+		txtChat.setBounds(161, 5, 320, 26);
 		contentPane.add(txtChat);
 		txtChat.setColumns(10);
 
 		JButton btnSay = new JButton("Say");
 		btnSay.addActionListener(sendChatListener);
-		btnSay.setBounds(541, 5, 94, 26);
+		btnSay.setBounds(486, 5, 61, 26);
 		contentPane.add(btnSay);
+
+		btnStatus = new JButton("Status...");
+		btnStatus.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeChatAccess();
+			}
+		});
+		btnStatus.setBounds(549, 5, 86, 26);
+		contentPane.add(btnStatus);
 
 		JLabel lblChats = new CategoryLabel("Chat", Color.cyan);
 		lblChats.setHorizontalAlignment(SwingConstants.CENTER);
@@ -323,7 +342,7 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(lblBySeconds);
 
 		CategoryLabel lblCategory = new CategoryLabel("Categories", Color.orange);
-		lblCategory.setBounds(640, 7, 19, 101);
+		lblCategory.setBounds(640, 7, 19, 127);
 		contentPane.add(lblCategory);
 
 		cmbCategories = new JComboBox<String>();
@@ -344,15 +363,15 @@ public class CampingBotUi extends JFrame {
 		}
 		ComboBoxModel<String> aModel = new DefaultComboBoxModel<String>(categoriesList);
 		cmbCategories.setModel(aModel);
-		cmbCategories.setBounds(660, 7, 525, 20);
+		cmbCategories.setBounds(660, 5, 525, 26);
 		contentPane.add(cmbCategories);
 
-		scrollPane = new JScrollPane();
-		scrollPane.setBounds(659, 31, 599, 77);
-		contentPane.add(scrollPane);
+		sclCategories = new JScrollPane();
+		sclCategories.setBounds(660, 33, 599, 101);
+		contentPane.add(sclCategories);
 
 		txtCategoryValue = new JTextArea();
-		scrollPane.setViewportView(txtCategoryValue);
+		sclCategories.setViewportView(txtCategoryValue);
 		txtCategoryValue.setLineWrap(true);
 		txtCategoryValue.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 
@@ -373,15 +392,15 @@ public class CampingBotUi extends JFrame {
 				}
 			}
 		});
-		btnAddToCategory.setBounds(1188, 7, 70, 23);
+		btnAddToCategory.setBounds(1188, 5, 70, 26);
 		contentPane.add(btnAddToCategory);
 
 		CategoryLabel lblUsers = new CategoryLabel("Users", Color.blue);
-		lblUsers.setBounds(0, 145, 19, 217);
+		lblUsers.setBounds(0, 115, 19, 247);
 		contentPane.add(lblUsers);
 
 		CategoryLabel lblConnection = new CategoryLabel("Connection", Color.red);
-		lblConnection.setBounds(0, 7, 19, 127);
+		lblConnection.setBounds(0, 5, 19, 108);
 		contentPane.add(lblConnection);
 
 		Image app = null;
@@ -433,7 +452,7 @@ public class CampingBotUi extends JFrame {
 	}
 
 	public void chat() {
-		CampingChat chat = chatModel.getElementAt(tblChats.getSelectedRow());
+		CampingChat chat = getSelectedChat();
 		String msg = txtChat.getText().trim();
 		if (chat != null && msg.length() > 0) {
 			try {
@@ -447,6 +466,22 @@ public class CampingBotUi extends JFrame {
 				JOptionPane.showMessageDialog(this, e.getMessage());
 			}
 			txtChat.setText("");
+		}
+	}
+
+	private CampingChat getSelectedChat() {
+		return chatModel.getElementAt(tblChats.getSelectedRow());
+	}
+
+	private void changeChatAccess() {
+		CampingChat chat = getSelectedChat();
+		if (chat != null) {
+			String[] possibleValues = { ChatAllowed.Allowed.toString(), ChatAllowed.Disallowed.toString() };
+			String selectedValue = (String) JOptionPane.showInputDialog(CampingBotUi.this,
+					"Choose access level for " + chat.getChatname(), "Input", JOptionPane.INFORMATION_MESSAGE, null,
+					possibleValues, possibleValues[0]);
+			if (selectedValue != null)
+				chat.setAllowed(selectedValue);
 		}
 	}
 

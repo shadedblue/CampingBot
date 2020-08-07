@@ -43,7 +43,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 public class EnhanceCommand extends AbstractCommand
 		implements HasCategories<String>, CampingSerializable, SlashCommand {
 
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.ImageEnhance };
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Enhance };
 
 	@Override
 	public BotCommand[] getSlashCommandsToRespondTo() {
@@ -126,7 +126,7 @@ public class EnhanceCommand extends AbstractCommand
 		}
 		if (enhancementCount >= 3) {
 			String text = CampingUtil.getRandom(overEnhanced);
-			return new TextCommandResult(BotCommand.ImageEnhance, new TextFragment(text, CaseChoice.Upper))
+			return new TextCommandResult(BotCommand.Enhance, new TextFragment(text, CaseChoice.Upper))
 					.setReplyTo(replyTo.getMessageId());
 		}
 
@@ -152,7 +152,7 @@ public class EnhanceCommand extends AbstractCommand
 
 		// else == text only
 		String text = replyTo.getText();
-		return new TextCommandResult(BotCommand.ImageEnhance, garble(text)).setReplyTo(replyTo.getMessageId());
+		return new TextCommandResult(BotCommand.Enhance, garble(text)).setReplyTo(replyTo.getMessageId());
 	}
 
 	private CommandResult createPictureResponse(String picFileId) {
@@ -176,7 +176,7 @@ public class EnhanceCommand extends AbstractCommand
 			outImg = File.createTempFile(bot.getBotUsername(), ".jpg");
 			boolean success = ImageIO.write(centreImg, "jpeg", outImg);
 			if (success)
-				return new ImageCommandResult(BotCommand.ImageEnhance, outImg, garble("ENHANCE"));
+				return new ImageCommandResult(BotCommand.Enhance, outImg, garble("ENHANCE"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -187,7 +187,7 @@ public class EnhanceCommand extends AbstractCommand
 	private CommandResult createVideoResponse(Message replyTo) {
 		ImageLink img = CampingUtil.getRandom(rickImages);
 		String lyric = CampingUtil.getRandom(rickText);
-		return new ImageCommandResult(BotCommand.ImageEnhance, img, garble(lyric)).setReplyTo(replyTo.getMessageId());
+		return new ImageCommandResult(BotCommand.Enhance, img, garble(lyric)).setReplyTo(replyTo.getMessageId());
 	}
 
 	public TextFragment garble(String input) {

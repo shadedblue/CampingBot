@@ -11,7 +11,7 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 public class TableFormatCampingChat extends CampingTableFormat implements AdvancedTableFormat<CampingChat> {
 
 	public TableFormatCampingChat() {
-		super(new String[] { "Name", "ID", "Type", "Status", "Announce?" }, new int[] { 150, 125, 80, 50, 75 });
+		super(new String[] { "Name", "ID", "Type", "Status", "Announce?" }, new int[] { 125, 110, 80, 100, 75 });
 	}
 
 	@Override

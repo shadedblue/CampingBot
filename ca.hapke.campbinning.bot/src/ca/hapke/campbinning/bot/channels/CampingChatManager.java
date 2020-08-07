@@ -20,6 +20,8 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
@@ -41,6 +43,13 @@ public class CampingChatManager implements CampingSerializable {
 
 	private CampingChatManager(CampingBotEngine bot) {
 		this.bot = bot;
+		ListEventListener<CampingChat> listChangeListener = new ListEventListener<CampingChat>() {
+			@Override
+			public void listChanged(ListEvent<CampingChat> listChanges) {
+				shouldSave = true;
+			}
+		};
+		chatEvents.addListEventListener(listChangeListener);
 	}
 
 	private final Map<Long, CampingChat> chats = new HashMap<>();

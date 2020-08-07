@@ -75,6 +75,8 @@ public class CampingChat {
 
 	public void setAllowed(ChatAllowed allowed) {
 		if (allowed != null) {
+			if (allowed == ChatAllowed.NewAnnounced && this.allowed != ChatAllowed.New)
+				return;
 			ChatAllowed oldVal = this.allowed;
 			this.allowed = allowed;
 			support.firePropertyChange("allowed", oldVal, allowed);
@@ -83,7 +85,8 @@ public class CampingChat {
 
 	public void setAllowed(String s) {
 		ChatAllowed all = ChatAllowed.valueOf(s);
-		setAllowed(all);
+		if (all != null)
+			setAllowed(all);
 	}
 
 	public boolean isAnnounce() {

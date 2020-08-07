@@ -14,11 +14,9 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  */
 public enum BotCommand implements CommandType {
 
-	AllFaces("allfaces", true, BotCommandIds.BALLS | BotCommandIds.USE),
-	AllBalls("allballs", true, BotCommandIds.BALLS | BotCommandIds.USE),
 	Countdown("countdown", false),
 	Hype("hype", true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.TEXT | BotCommandIds.USE),
-	ImageEnhance("enhance", true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.PIC | BotCommandIds.USE),
+	Enhance("enhance", true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.PIC | BotCommandIds.USE),
 
 	// Activator is the user who invokes /rant
 	RantActivatorInitiation("rant", true, BotCommandIds.RANT | BotCommandIds.VOTING | BotCommandIds.SET),
@@ -31,19 +29,15 @@ public enum BotCommand implements CommandType {
 	VoteForceComplete("complete", true, BotCommandIds.VOTING | BotCommandIds.FINISH),
 	VoteExtend("extend", true, BotCommandIds.VOTING | BotCommandIds.USE),
 
-	// TODO add Rant events for Completion as non-rant?
-
 	Vote(null, true, BotCommandIds.VOTING | BotCommandIds.USE),
 	AllNicknames("allnicknames", false),
 	SetNickname("setnickname", true, BotCommandIds.NICKNAME | BotCommandIds.SET),
 	SetNicknameRejected(null, true, BotCommandIds.NICKNAME | BotCommandIds.FAILURE),
 	Spell("spell", true, BotCommandIds.SPELL | BotCommandIds.USE),
 	SpellDipshit(null, true, BotCommandIds.SPELL | BotCommandIds.FAILURE),
-	Reload("reload", false),
 	Status("status", false, BotCommandIds.TEXT | BotCommandIds.USE),
 
 	JoinThread(null, false, BotCommandIds.THREAD | BotCommandIds.SET),
-	// Test("test", false),
 
 	MbiyfAnnouncement(null, true, BotCommandIds.BALLS | BotCommandIds.SET),
 	Mbiyf(null, true, BotCommandIds.BALLS | BotCommandIds.USE),
