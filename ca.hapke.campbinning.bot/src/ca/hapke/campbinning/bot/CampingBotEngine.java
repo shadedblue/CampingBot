@@ -395,35 +395,84 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	}
 
-	public CampingUser findTarget(Message message) {
-		CampingUser targetUser = null;
+	public CampingUser findTarget(Message message, boolean replyFirst, boolean frontToBack,
+			BotChoicePriority priority) {
+		CampingUser currentChoice = null;
+		if (replyFirst) {
+			Message replyTo = message.getReplyToMessage();
+			if (replyTo != null) {
+				currentChoice = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
+			}
+		}
+
 		List<MessageEntity> entities = message.getEntities();
-		int minOffset = -1;
+		int currentOffset;
+		if (frontToBack)
+			currentOffset = Integer.MIN_VALUE;
+		else
+			currentOffset = Integer.MAX_VALUE;
+
 		if (entities != null) {
 			for (MessageEntity msgEnt : entities) {
 				String type = msgEnt.getType();
 				int offset = msgEnt.getOffset();
-				if (minOffset == -1 || offset < minOffset) {
+
+				CampingUser possibleChoice = null;
+				if (MENTION.equalsIgnoreCase(type)) {
+					// usernamed victim: the text is their @username
+					possibleChoice = userMonitor.monitor(msgEnt);
+				} else if (TEXT_MENTION.equalsIgnoreCase(type)) {
+					// non-usernamed victim: we get the User struct
+					possibleChoice = userMonitor.getUser(msgEnt.getUser());
+				} else {
+					// other Entity types should be ignored
+					continue;
+				}
+
+				if (betterSelection(frontToBack, offset, currentOffset, currentChoice, possibleChoice, priority)) {
 					if (MENTION.equalsIgnoreCase(type)) {
-						// usernamed victim: the text is their @username
-						targetUser = userMonitor.monitor(msgEnt);
+						currentChoice = possibleChoice;
+						currentOffset = offset;
 					} else if (TEXT_MENTION.equalsIgnoreCase(type)) {
-						// non-usernamed victim: we get the User struct
-						targetUser = userMonitor.getUser(msgEnt.getUser());
-					} else {
-						continue;
+						currentChoice = possibleChoice;
+						currentOffset = offset;
 					}
 				}
 			}
 		}
 
-		if (targetUser == null) {
+		if (currentChoice == null) {
 			Message replyTo = message.getReplyToMessage();
 			if (replyTo != null) {
-				targetUser = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
+				currentChoice = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
 			}
 		}
-		return targetUser;
+		return currentChoice;
+	}
+
+	private boolean betterSelection(boolean frontToBack, int offset, int currentOffset, CampingUser currentChoice,
+			CampingUser possibleChoice, BotChoicePriority priority) {
+		int possibleId = possibleChoice.getTelegramId();
+		int myId = meCamping.getTelegramId();
+		if (possibleId == myId && priority == BotChoicePriority.Never)
+			return false;
+		if (possibleId != myId && priority == BotChoicePriority.Only)
+			return false;
+		if (currentChoice == null)
+			return true;
+		if (priority == BotChoicePriority.First) {
+			if (currentChoice == meCamping)
+				return false;
+			if (possibleChoice == meCamping)
+				return true;
+		}
+		if (possibleId == myId && priority == BotChoicePriority.Last)
+			return false;
+
+		if (frontToBack)
+			return offset < currentOffset;
+		else
+			return offset > currentOffset;
 	}
 
 	public void addStatusUpdate(IStatus status) {

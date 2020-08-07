@@ -22,6 +22,7 @@ import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByTimeOfWeek;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
+import ca.hapke.campbinning.bot.BotChoicePriority;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
@@ -142,7 +143,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
-		CampingUser targetUser = bot.findTarget(message);
+		CampingUser targetUser = bot.findTarget(message, false, true, BotChoicePriority.Last);
 
 		if (userRestriction != null && !userRestriction.contains(targetUser))
 			return null;

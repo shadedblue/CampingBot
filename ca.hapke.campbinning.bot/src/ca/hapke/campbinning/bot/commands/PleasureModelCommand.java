@@ -5,6 +5,7 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
+import ca.hapke.campbinning.bot.BotChoicePriority;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
@@ -38,9 +39,9 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 	 */
 	@Override
 	public boolean isMatch(String msg, Message message) {
-		CampingUser targetUser = bot.findTarget(message);
+		CampingUser targetUser = bot.findTarget(message, true, true, BotChoicePriority.First);
 		CampingUser meCamping = bot.getMeCamping();
-		return targetUser == meCamping && msg.contains(PLEASURE_MODEL) && msg.endsWith("?");
+		return targetUser == meCamping && msg.toLowerCase().contains(PLEASURE_MODEL) && msg.endsWith("?");
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessageconten
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 
+import ca.hapke.campbinning.bot.BotChoicePriority;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
@@ -67,7 +68,7 @@ public class SpellCommand extends InlineCommandBase
 	@Override
 	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) {
-		CampingUser targetUser = bot.findTarget(message);
+		CampingUser targetUser = bot.findTarget(message, false, true, BotChoicePriority.Last);
 		SpellResult result = createSpell(campingFromUser, targetUser);
 		return result.provideCommandResult();
 	}
