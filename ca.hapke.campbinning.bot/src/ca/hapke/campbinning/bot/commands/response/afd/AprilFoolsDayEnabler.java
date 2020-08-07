@@ -4,7 +4,7 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
-import ca.hapke.campbinning.bot.commands.processors.SwitchableProcessor;
+import ca.hapke.campbinning.bot.processors.SwitchableProcessor;
 
 /**
  * @author Nathan Hapke

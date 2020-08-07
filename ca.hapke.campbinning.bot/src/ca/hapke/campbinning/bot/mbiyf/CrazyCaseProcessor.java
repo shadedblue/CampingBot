@@ -1,6 +1,6 @@
 package ca.hapke.campbinning.bot.mbiyf;
 
-import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
+import ca.hapke.campbinning.bot.processors.MessageProcessor;
 
 /**
  * @author Nathan Hapke

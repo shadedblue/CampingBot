@@ -11,13 +11,13 @@ import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.commands.TextCommand;
-import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
-import ca.hapke.campbinning.bot.commands.processors.SwitchableProcessor;
-import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.SendResult;
-import ca.hapke.campbinning.bot.commands.response.TitleCommandResult;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
+import ca.hapke.campbinning.bot.processors.MessageProcessor;
+import ca.hapke.campbinning.bot.processors.SwitchableProcessor;
+import ca.hapke.campbinning.bot.response.CommandResult;
+import ca.hapke.campbinning.bot.response.SendResult;
+import ca.hapke.campbinning.bot.response.TitleCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**

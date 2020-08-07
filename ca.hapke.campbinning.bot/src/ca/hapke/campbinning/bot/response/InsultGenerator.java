@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response;
+package ca.hapke.campbinning.bot.response;
 
 import java.util.List;
 

@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import ca.hapke.campbinning.bot.BotCommand;
-import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment.Perspective;
-import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.response.TextCommandResult;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
+import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**

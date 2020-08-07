@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response;
+package ca.hapke.campbinning.bot.response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +11,12 @@ import com.vdurmont.emoji.Emoji;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
-import ca.hapke.campbinning.bot.commands.response.fragments.EmojiFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.MentionFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
+import ca.hapke.campbinning.bot.response.fragments.CaseChoice;
+import ca.hapke.campbinning.bot.response.fragments.EmojiFragment;
+import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
+import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /*-

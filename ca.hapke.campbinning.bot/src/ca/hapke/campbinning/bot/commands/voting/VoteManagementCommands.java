@@ -5,11 +5,11 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.commands.AbstractCommand;
 import ca.hapke.campbinning.bot.commands.SlashCommand;
-import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment;
-import ca.hapke.campbinning.bot.commands.response.fragments.InsultFragment.Perspective;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.response.CommandResult;
+import ca.hapke.campbinning.bot.response.TextCommandResult;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.response.fragments.TextFragment;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**

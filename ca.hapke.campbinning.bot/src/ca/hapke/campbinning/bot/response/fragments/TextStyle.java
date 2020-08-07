@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response.fragments;
+package ca.hapke.campbinning.bot.response.fragments;
 
 /**
  * @author Nathan Hapke

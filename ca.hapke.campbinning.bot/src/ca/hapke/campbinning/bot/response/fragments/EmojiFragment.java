@@ -1,8 +1,8 @@
-package ca.hapke.campbinning.bot.commands.response.fragments;
+package ca.hapke.campbinning.bot.response.fragments;
 
 import com.vdurmont.emoji.Emoji;
 
-import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
+import ca.hapke.campbinning.bot.processors.MessageProcessor;
 
 /**
  * @author Nathan Hapke

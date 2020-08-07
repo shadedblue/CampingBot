@@ -1,6 +1,6 @@
-package ca.hapke.campbinning.bot.commands.processors;
+package ca.hapke.campbinning.bot.processors;
 
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 
 /**
  * @author Nathan Hapke

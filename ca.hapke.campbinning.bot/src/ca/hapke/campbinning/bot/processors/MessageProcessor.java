@@ -1,8 +1,8 @@
-package ca.hapke.campbinning.bot.commands.processors;
+package ca.hapke.campbinning.bot.processors;
 
 import java.util.List;
 
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 
 /**
  * Visitor pattern? Fragments call back to this with the parts that should be processed... then the fragments

@@ -7,9 +7,10 @@
     import ca.hapke.campbinning.bot.users.*;
     import ca.hapke.campbinning.bot.channels.*;
     import ca.hapke.campbinning.bot.commands.*;
-    import ca.hapke.campbinning.bot.commands.response.*;
-    import ca.hapke.campbinning.bot.commands.voting.aita.*;
-    import java.util.*;
+import ca.hapke.campbinning.bot.commands.voting.aita.*;
+import ca.hapke.campbinning.bot.response.*;
+
+import java.util.*;
 
 @SuppressWarnings("all")
 public interface LoadStatsParserTokenTypes {

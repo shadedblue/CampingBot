@@ -6,8 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
-import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.log.EventItem;
+import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**

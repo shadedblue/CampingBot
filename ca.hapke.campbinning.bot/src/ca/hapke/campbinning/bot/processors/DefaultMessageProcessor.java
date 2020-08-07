@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.processors;
+package ca.hapke.campbinning.bot.processors;
 
 /**
  * Escapes required characters for Telegram MarkupV2 format

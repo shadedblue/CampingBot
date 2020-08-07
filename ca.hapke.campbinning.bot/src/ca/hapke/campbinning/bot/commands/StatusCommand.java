@@ -8,9 +8,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import ca.hapke.campbinning.bot.AccessLevel;
 import ca.hapke.campbinning.bot.BotCommand;
-import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.fragments.TextStyle;
+import ca.hapke.campbinning.bot.response.CommandResult;
+import ca.hapke.campbinning.bot.response.TextCommandResult;
+import ca.hapke.campbinning.bot.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.ui.IStatus;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.TimeFormatter;

@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response;
+package ca.hapke.campbinning.bot.response;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+import ca.hapke.campbinning.bot.processors.MessageProcessor;
+import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 
 /**
  * @author Nathan Hapke

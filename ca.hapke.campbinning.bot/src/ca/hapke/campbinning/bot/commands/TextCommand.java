@@ -5,7 +5,7 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
-import ca.hapke.campbinning.bot.commands.response.CommandResult;
+import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**

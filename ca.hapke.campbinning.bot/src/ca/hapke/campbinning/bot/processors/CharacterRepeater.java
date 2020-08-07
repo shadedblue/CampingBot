@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.processors;
+package ca.hapke.campbinning.bot.processors;
 
 /**
  * @author Nathan Hapke
