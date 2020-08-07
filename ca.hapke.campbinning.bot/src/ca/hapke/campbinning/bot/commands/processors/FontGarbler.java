@@ -1,27 +1,26 @@
-package ca.hapke.campbinning.bot.commands.response.afd;
-
-import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+package ca.hapke.campbinning.bot.commands.processors;
 
 /**
  * @author Nathan Hapke
  */
 public class FontGarbler extends MessageProcessor {
 
+	private static final double P_LOW = 0.2;
+	private static final double P_HIGH = 2 * P_LOW;
 	private static final char MIN = ' ';
 	private static final char MAX = 'z';
 	private final double pReplacement;
 	private char[][] font;
 
 	public FontGarbler(boolean highPower) {
+		super(true);
 		if (highPower)
-			pReplacement = 0.4;
+			pReplacement = P_HIGH;
 		else
-			pReplacement = 0.2;
+			pReplacement = P_LOW;
 
 		font = new char[MAX - MIN + 1][];
 		add(' ', "Œ ֍↔⊞");
-//		add('', "");
 		add('!', "¡ᖎ");
 		add('\"', "");
 		add('#', "ᕯ");
@@ -105,38 +104,12 @@ public class FontGarbler extends MessageProcessor {
 		add('y', "ȳʎ");
 		add('z', "ɀ");
 //		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-//		add('', "");
-
 	}
 
 	private void add(char c, String reps) {
 		int i = c - MIN;
 		char[] vals = reps.toCharArray();
 		font[i] = vals;
-
 	}
 
 	@Override
@@ -161,20 +134,4 @@ public class FontGarbler extends MessageProcessor {
 		}
 		return in;
 	}
-
-	@Override
-	protected ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments) {
-		return fragments;
-	}
-
-	@Override
-	protected String internalAfterStringAssembled(String value) {
-		return value;
-	}
-
-	@Override
-	protected String internalProcessImageUrl(String url) {
-		return url;
-	}
-
 }

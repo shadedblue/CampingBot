@@ -2,6 +2,6 @@ eclipse.preferences.version=1
 encoding//src/ca/hapke/campbinning/bot/CampingBot.java=UTF-8
 encoding//src/ca/hapke/campbinning/bot/commands/HypeCommand.java=UTF-8
 encoding//src/ca/hapke/campbinning/bot/commands/inline/HideItCommand.java=UTF-8
-encoding//src/ca/hapke/campbinning/bot/commands/response/afd/FontGarbler.java=UTF-8
+encoding//src/ca/hapke/campbinning/bot/commands/processors/FontGarbler.java=UTF-8
 encoding/camping.xml=UTF-16
 encoding/camping.xml.backup=UTF-16

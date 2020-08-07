@@ -1,7 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response.afd;
-
-import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+package ca.hapke.campbinning.bot.commands.processors;
 
 /**
  * @author Nathan Hapke
@@ -11,6 +8,7 @@ public class CharacterRepeater extends MessageProcessor {
 	private int[] t, s;
 
 	public CharacterRepeater(boolean highPower) {
+		super(true);
 		if (highPower)
 			t = new int[] { 5, 73, 12, 6, 3, 1 };
 		else
@@ -43,21 +41,6 @@ public class CharacterRepeater extends MessageProcessor {
 			}
 		}
 		return sb.toString();
-	}
-
-	@Override
-	protected ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments) {
-		return fragments;
-	}
-
-	@Override
-	protected String internalAfterStringAssembled(String value) {
-		return value;
-	}
-
-	@Override
-	protected String internalProcessImageUrl(String url) {
-		return url;
 	}
 
 }

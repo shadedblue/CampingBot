@@ -1,6 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response;
-
-import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
+package ca.hapke.campbinning.bot.commands.processors;
 
 /**
  * Escapes required characters for Telegram MarkupV2 format
@@ -8,6 +6,10 @@ import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
  * @author Nathan Hapke
  */
 public class DefaultMessageProcessor extends MessageProcessor {
+
+	public DefaultMessageProcessor() {
+		super(true);
+	}
 
 	private final static String[] escapeFrom = new String[] { "_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+",
 			"-", "=", "|", "{", "}", ".", "!" };
@@ -22,11 +24,6 @@ public class DefaultMessageProcessor extends MessageProcessor {
 	}
 
 	@Override
-	protected ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments) {
-		return fragments;
-	}
-
-	@Override
 	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
 		if (useMarkupV2) {
 			for (int i = 0; i < escapeFrom.length; i++) {
@@ -37,15 +34,5 @@ public class DefaultMessageProcessor extends MessageProcessor {
 			}
 		}
 		return value;
-	}
-
-	@Override
-	protected String internalAfterStringAssembled(String value) {
-		return value;
-	}
-
-	@Override
-	protected String internalProcessImageUrl(String url) {
-		return url;
 	}
 }

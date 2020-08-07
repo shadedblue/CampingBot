@@ -4,6 +4,7 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
+import ca.hapke.campbinning.bot.commands.processors.SwitchableProcessor;
 
 /**
  * @author Nathan Hapke
@@ -13,9 +14,9 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 	private TimesProvider<Boolean> times;
 	private AfdTextCommand afdText;
 	private AfdMatrixPictures afdMatrix;
-	private AprilFoolsDayProcessor afdp;
+	private SwitchableProcessor afdp;
 
-	public AprilFoolsDayEnabler(AfdTextCommand afdText, AfdMatrixPictures afdMatrix, AprilFoolsDayProcessor afdp) {
+	public AprilFoolsDayEnabler(AfdTextCommand afdText, AfdMatrixPictures afdMatrix, SwitchableProcessor afdp) {
 		this.afdText = afdText;
 		this.afdMatrix = afdMatrix;
 		this.afdp = afdp;
@@ -38,7 +39,7 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 	public void doWork(Boolean value) {
 		afdText.enable(value);
 		afdMatrix.enable(value);
-		afdp.enable(value);
+		afdp.setEnabled(value);
 	}
 
 	@Override

@@ -25,11 +25,14 @@ import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.processors.CharacterRepeater;
+import ca.hapke.campbinning.bot.commands.processors.FontGarbler;
+import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.processors.SwitchableProcessor;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
-import ca.hapke.campbinning.bot.commands.response.afd.AprilFoolsDayProcessor;
 import ca.hapke.campbinning.bot.commands.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.commands.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -55,7 +58,7 @@ public class EnhanceCommand extends AbstractCommand
 	private static final String RICK_ROLL = "rickroll";
 	private static final String OVER_ENHANCED = "over";
 	private CampingBot bot;
-	private AprilFoolsDayProcessor afdText;
+	private SwitchableProcessor garbler;
 	private CategoriedItems<String> categories;
 	private Resources res;
 	private CategoriedItems<ImageLink> resultImages;
@@ -69,8 +72,8 @@ public class EnhanceCommand extends AbstractCommand
 	public EnhanceCommand(CampingBot bot) {
 		this.bot = bot;
 		res = bot.getRes();
-		this.afdText = new AprilFoolsDayProcessor(true);
-		this.afdText.enable(true);
+		MessageProcessor garblerPipe = new CharacterRepeater(true).addAtEnd(new FontGarbler(true));
+		this.garbler = new SwitchableProcessor(true, garblerPipe);
 		categories = new CategoriedItems<String>(RICK_ROLL, OVER_ENHANCED);
 		rickText = categories.getList(RICK_ROLL);
 
@@ -85,7 +88,6 @@ public class EnhanceCommand extends AbstractCommand
 		}
 	}
 
-//	public CommandResult enhanceCommand(Message message) {
 	@Override
 	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) {
@@ -124,7 +126,7 @@ public class EnhanceCommand extends AbstractCommand
 		while ((target = tracking.get(target)) != null) {
 			enhancementCount++;
 		}
-		if (enhancementCount >= 3) {
+		if (enhancementCount >= 2) {
 			String text = CampingUtil.getRandom(overEnhanced);
 			return new TextCommandResult(BotCommand.Enhance, new TextFragment(text, CaseChoice.Upper))
 					.setReplyTo(replyTo.getMessageId());
@@ -191,7 +193,7 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	public TextFragment garble(String input) {
-		return new TextFragment(afdText.processString(input, true));
+		return new TextFragment(garbler.processString(input, true));
 	}
 
 	private String getPictureFileId(Message replyTo) {

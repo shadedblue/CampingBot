@@ -10,7 +10,6 @@ import ca.hapke.campbinning.bot.commands.CountdownCommand;
 import ca.hapke.campbinning.bot.commands.EnhanceCommand;
 import ca.hapke.campbinning.bot.commands.HypeCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
-import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellCommand;
@@ -21,6 +20,7 @@ import ca.hapke.campbinning.bot.commands.voting.VoteManagementCommands;
 import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.commands.voting.rant.RantCommand;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
+import ca.hapke.campbinning.bot.mbiyf.MbiyfCommand;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**
@@ -63,6 +63,7 @@ public class CampingBot extends CampingBotEngine {
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
+		processor.addAtEnd(ballsCommand.getCrazyCase());
 		rantCommand = new RantCommand(this);
 		aitaCommand = new AitaCommand(this, ballsCommand);
 		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);

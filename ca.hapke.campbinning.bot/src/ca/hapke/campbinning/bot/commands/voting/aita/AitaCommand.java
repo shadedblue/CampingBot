@@ -10,10 +10,10 @@ import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
-import ca.hapke.campbinning.bot.commands.MbiyfCommand;
 import ca.hapke.campbinning.bot.commands.voting.VoteInitiationException;
 import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
 import ca.hapke.campbinning.bot.commands.voting.VotingCommand;
+import ca.hapke.campbinning.bot.mbiyf.MbiyfCommand;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 

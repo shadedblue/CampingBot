@@ -2,7 +2,7 @@ package ca.hapke.campbinning.bot.commands.response.fragments;
 
 import com.vdurmont.emoji.Emoji;
 
-import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
 
 /**
  * @author Nathan Hapke

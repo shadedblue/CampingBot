@@ -1,7 +1,7 @@
 package ca.hapke.campbinning.bot.commands.response.fragments;
 
+import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.InsultGenerator;
-import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 
 /**
  * @author Nathan Hapke

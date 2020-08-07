@@ -11,8 +11,9 @@ import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.commands.TextCommand;
+import ca.hapke.campbinning.bot.commands.processors.MessageProcessor;
+import ca.hapke.campbinning.bot.commands.processors.SwitchableProcessor;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
-import ca.hapke.campbinning.bot.commands.response.MessageProcessor;
 import ca.hapke.campbinning.bot.commands.response.SendResult;
 import ca.hapke.campbinning.bot.commands.response.TitleCommandResult;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -30,10 +31,10 @@ public class AfdTextCommand implements TextCommand {
 	private boolean enabled = false;
 	private CampingChat chat;
 
-	public AfdTextCommand(CampingBot bot, AprilFoolsDayProcessor aprilFoolsDayProcessor, CampingChat chat) {
+	public AfdTextCommand(CampingBot bot, SwitchableProcessor aprilFoolsDayProcessor, CampingChat chat) {
 		this.bot = bot;
 		this.chat = chat;
-		this.processor = aprilFoolsDayProcessor.getSillyPipe();
+		this.processor = aprilFoolsDayProcessor.getPipe();
 		resources = bot.getRes();
 	}
 

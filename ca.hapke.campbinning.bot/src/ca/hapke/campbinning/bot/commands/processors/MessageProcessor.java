@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands.response;
+package ca.hapke.campbinning.bot.commands.processors;
 
 import java.util.List;
 
@@ -13,53 +13,76 @@ import ca.hapke.campbinning.bot.commands.response.fragments.ResultFragment;
 public abstract class MessageProcessor {
 
 	protected MessageProcessor next;
+	protected boolean enabled = false;
+
+	public MessageProcessor(boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public final ResultFragment[] beforeStringAssembled(ResultFragment[] fragments) {
-		fragments = internalBeforeStringAssembled(fragments);
+		if (enabled)
+			fragments = internalBeforeStringAssembled(fragments);
 		if (next != null)
 			fragments = next.beforeStringAssembled(fragments);
 		return fragments;
 	}
 
 	public final String processString(String value, boolean useMarkupV2) {
-		String result = internalProcessStringFragment(value, useMarkupV2);
+		if (enabled)
+			value = internalProcessStringFragment(value, useMarkupV2);
 		if (next != null)
-			result = next.processString(result, useMarkupV2);
-		return result;
+			value = next.processString(value, useMarkupV2);
+		return value;
 	}
 
 	public final String afterStringAssembled(String value) {
-		String result = internalAfterStringAssembled(value);
+		if (enabled)
+			value = internalAfterStringAssembled(value);
 		if (next != null)
-			result = next.afterStringAssembled(result);
-		return result;
+			value = next.afterStringAssembled(value);
+		return value;
 	}
 
 	public final String processImageUrl(String url) {
-		String result = internalProcessImageUrl(url);
+		if (enabled)
+			url = internalProcessImageUrl(url);
 		if (next != null)
-			result = next.processImageUrl(url);
-		return result;
+			url = next.processImageUrl(url);
+		return url;
 	}
 
-	protected abstract ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments);
+	protected ResultFragment[] internalBeforeStringAssembled(ResultFragment[] fragments) {
+		return fragments;
+	}
 
-	protected abstract String internalProcessStringFragment(String value, boolean useMarkupV2);
+	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
+		return value;
+	}
 
-	protected abstract String internalAfterStringAssembled(String value);
+	protected String internalAfterStringAssembled(String value) {
+		return value;
+	}
 
-	protected abstract String internalProcessImageUrl(String url);
+	protected String internalProcessImageUrl(String url) {
+		return url;
+	}
 
-	public MessageProcessor getNext() {
-		return next;
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public MessageProcessor addAtEnd(MessageProcessor add) {
-		MessageProcessor end = this;
-		while (end.next != null) {
-			end = end.next;
+		if (add != null) {
+			MessageProcessor end = this;
+			while (end.next != null) {
+				end = end.next;
+			}
+			end.next = add;
 		}
-		end.next = add;
 		return this;
 	}
 

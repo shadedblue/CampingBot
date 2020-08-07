@@ -1,4 +1,4 @@
-package ca.hapke.campbinning.bot.commands;
+package ca.hapke.campbinning.bot.mbiyf;
 
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
@@ -29,6 +29,8 @@ import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
+import ca.hapke.campbinning.bot.commands.AbstractCommand;
+import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.commands.response.CommandResult;
 import ca.hapke.campbinning.bot.commands.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.commands.response.TextCommandResult;
@@ -49,6 +51,7 @@ import ca.odell.glazedlists.FilterList;
  * @author Nathan Hapke
  */
 public class MbiyfCommand extends AbstractCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
+	private static final String MBIYF = "mbiyf";
 	private static final TextFragment EXCLAMATION = new TextFragment("!");
 	private static final TextFragment APOSTROPHE_S = new TextFragment("'s ");
 	private static final TextFragment IN = new TextFragment(" in ");
@@ -71,8 +74,9 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	private CategoriedItems<ImageLink> mbiyFridayImages;
 	private List<ImageLink> fridayImages;
 
-	public final static String[] ballsTriggers = new String[] { "balls", "mbiyf" };
+	public final static String[] ballsTriggers = new String[] { "balls", MBIYF };
 	private static final String FRIDAY_IMAGES = "mbiyfImages";
+	private CrazyCaseProcessor crazyCase = new CrazyCaseProcessor();
 
 	public MbiyfCommand(CampingBot campingBot, Resources res) {
 		this.bot = campingBot;
@@ -185,6 +189,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public void doWork(MbiyfMode value) {
 		mode = value.getType();
 		enabled = value != null && value.isEnablement();
+		crazyCase.setEnabled(enabled);
 		userRestriction = value.getRestrictedToUsers();
 		boolean makeAnnouncement = shouldAnnounce && bot.isOnline();
 		StringBuilder sb = new StringBuilder();
@@ -238,7 +243,6 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public CommandResult announceBirthday() throws TelegramApiException {
 		Emoji cake = res.getCake();
 
-//		StringBuilder sb = new StringBuilder();
 		TextCommandResult sb = new TextCommandResult(BotCommand.MbiyfAnnouncement);
 		List<Emoji> bar = new ArrayList<>();
 		Emoji add = res.getFace("smirk");
@@ -390,6 +394,10 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 	@Override
 	public String getCommandName() {
-		return "mbiyf";
+		return MBIYF;
+	}
+
+	public CrazyCaseProcessor getCrazyCase() {
+		return crazyCase;
 	}
 }
