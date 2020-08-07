@@ -12,11 +12,11 @@ header {
 
 class LoadStatsParser extends Parser;
 
-document[ CampingSystem cs, SpellCommand sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
     :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um, ig, ec] EOF
     ;
     
-<camping> [CampingSystem cs, SpellCommand sg, CountdownGenerator countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+<camping> [CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
@@ -137,7 +137,7 @@ document[ CampingSystem cs, SpellCommand sg, CountdownGenerator countdownGen, Ai
 		cs.enableDb(host,port2,user,pass);
 	}
 	;
-<countdown>[CountdownGenerator countdownGen]
+<countdown>[CountdownCommand countdownGen]
 	{ List<String> h; }
 	:
 	h=<hypes>

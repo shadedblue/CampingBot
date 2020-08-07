@@ -459,14 +459,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop690:
+			_loop442:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop690;
+					break _loop442;
 				}
 				
 			} while (true);
@@ -512,13 +512,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			match(24);
 			{
 			{
-			_loop729:
+			_loop481:
 			do {
 				if ((LA(1)==25)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop729;
+					break _loop481;
 				}
 				
 			} while (true);
@@ -562,13 +562,13 @@ public LoadStatsParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop737:
+			_loop489:
 			do {
 				if ((LA(1)==27)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop737;
+					break _loop489;
 				}
 				
 			} while (true);
@@ -600,14 +600,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop682:
+			_loop434:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop682;
+					break _loop434;
 				}
 				
 			} while (true);
@@ -633,14 +633,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop686:
+			_loop438:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					aita.addItem("asshole", val);
 				}
 				else {
-					break _loop686;
+					break _loop438;
 				}
 				
 			} while (true);
@@ -666,14 +666,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop694:
+			_loop446:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					aita.addItem("mediocre", val);
 				}
 				else {
-					break _loop694;
+					break _loop446;
 				}
 				
 			} while (true);
@@ -699,14 +699,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop698:
+			_loop450:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					aita.addItem("nice", val);
 				}
 				else {
-					break _loop698;
+					break _loop450;
 				}
 				
 			} while (true);
@@ -732,14 +732,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop674:
+			_loop426:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop674;
+					break _loop426;
 				}
 				
 			} while (true);
@@ -765,14 +765,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop678:
+			_loop430:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop678;
+					break _loop430;
 				}
 				
 			} while (true);
@@ -1044,14 +1044,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop717:
+			_loop469:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop717;
+					break _loop469;
 				}
 				
 			} while (true);
@@ -1077,14 +1077,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop713:
+			_loop465:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop713;
+					break _loop465;
 				}
 				
 			} while (true);
@@ -1110,14 +1110,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop721:
+			_loop473:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop721;
+					break _loop473;
 				}
 				
 			} while (true);
@@ -1143,14 +1143,14 @@ public LoadStatsParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop725:
+			_loop477:
 			do {
 				if ((LA(1)==41)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop725;
+					break _loop477;
 				}
 				
 			} while (true);
