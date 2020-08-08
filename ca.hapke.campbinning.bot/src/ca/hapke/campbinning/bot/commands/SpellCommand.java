@@ -12,8 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 
 import ca.hapke.campbinning.bot.BotChoicePriority;
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBot;
-import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.CommandType;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
@@ -39,8 +39,7 @@ public class SpellCommand extends InlineCommandBase
 
 	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Spell };
 
-	private static final String INLINE_SPELL = "spell";
-	private static final String SPELL_CONTAINER = "Spell";
+	private static final String SPELL = "Spell";
 	private static final TextFragment CAST_THE = new TextFragment("I cast the ");
 	private static final TextFragment OF = new TextFragment(" of ");
 	private static final TextFragment ON = new TextFragment(" on ");
@@ -89,7 +88,7 @@ public class SpellCommand extends InlineCommandBase
 		String adj = CampingUtil.getRandom(adjectives);
 		String item = CampingUtil.getRandom(items);
 		String excl = CampingUtil.getRandom(exclamations);
-		if (!hasPunc(excl)) {
+		if (!CampingUtil.endsWithPunctuation(excl)) {
 			excl += "!";
 		}
 
@@ -109,12 +108,12 @@ public class SpellCommand extends InlineCommandBase
 
 	@Override
 	public String getContainerName() {
-		return SPELL_CONTAINER;
+		return SPELL;
 	}
 
 	@Override
 	public String getCommandName() {
-		return INLINE_SPELL;
+		return SPELL;
 	}
 
 	@Override
@@ -166,10 +165,10 @@ public class SpellCommand extends InlineCommandBase
 		mcSpell.setDisableWebPagePreview(true);
 		String spell = processor.process(outputSpell, true);
 		mcSpell.setMessageText(spell);
-		mcSpell.setParseMode(CampingBotEngine.MARKDOWN);
+		mcSpell.setParseMode(BotConstants.MARKDOWN);
 
 		InlineQueryResultArticle articleSpell = new InlineQueryResultArticle();
-		articleSpell.setTitle("spell on " + targetFirst);
+		articleSpell.setTitle("Spell on " + targetFirst);
 		CallbackId fullId = createQueryId(updateId, targetId, spellResult.isSuccess() ? 1 : 0);
 		articleSpell.setId(fullId.getResult());
 		articleSpell.setInputMessageContent(mcSpell);
@@ -200,11 +199,6 @@ public class SpellCommand extends InlineCommandBase
 	public void addItem(String category, String value) {
 		if (categories.put(category, value))
 			shouldSave = true;
-	}
-
-	private boolean hasPunc(String excl) {
-		char last = excl.charAt(excl.length() - 1);
-		return last == '.' || last == '!' || last == '?';
 	}
 
 	@Override

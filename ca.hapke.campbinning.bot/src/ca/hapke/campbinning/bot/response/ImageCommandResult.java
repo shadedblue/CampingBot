@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
@@ -85,7 +86,7 @@ public class ImageCommandResult extends CommandResult {
 					ani.setAnimation(url);
 					if (caption != null && caption.length() > 0) {
 						ani.setCaption(caption);
-						ani.setParseMode(CampingBotEngine.MARKDOWN);
+						ani.setParseMode(BotConstants.MARKDOWN);
 					}
 					if (replyTo != null)
 						ani.setReplyToMessageId(replyTo);
@@ -116,7 +117,7 @@ public class ImageCommandResult extends CommandResult {
 		p.setChatId(chatId);
 		if (caption != null && caption.length() > 0) {
 			p.setCaption(caption);
-			p.setParseMode(CampingBotEngine.MARKDOWN);
+			p.setParseMode(BotConstants.MARKDOWN);
 			if (replyTo != null)
 				p.setReplyToMessageId(replyTo);
 			if (keyboard != null)

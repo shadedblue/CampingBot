@@ -28,8 +28,6 @@ import ca.hapke.campbinning.bot.users.CampingUser;
  */
 public class CampingBot extends CampingBotEngine {
 
-	public static final String STRING_NULL = "null";
-
 	private Resources res = new Resources();
 	private AitaCommand aitaCommand;
 	private RantCommand rantCommand;
@@ -96,10 +94,11 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(voteManagementCommands);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void addCommand(AbstractCommand command) {
 		super.addCommand(command);
-		if (command instanceof HasCategories<?>) {
+		if (command instanceof HasCategories) {
 			try {
 				hasCategories.add((HasCategories<String>) command);
 			} catch (Exception e) {

@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
@@ -45,7 +44,7 @@ import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.util.ImageLink;
-import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.EventList;
 
 /**
  * @author Nathan Hapke
@@ -61,8 +60,6 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	private static final int ENABLE_HOUR = 7;
 	private static final int ENABLE_MIN = 0;
 	private static final int DISABLE_HOUR = 0;
-	private static final int COUNT = 6;
-	private static final int REPEATS = 2;
 
 	private CampingBot bot;
 	private Resources res;
@@ -210,7 +207,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	}
 
 	public void announce(MbiyfMode value) throws TelegramApiException {
-		FilterList<CampingChat> announceChats = CampingChatManager.getInstance(bot).getAnnounceChats();
+		EventList<CampingChat> announceChats = CampingChatManager.getInstance(bot).getAnnounceChats();
 		for (CampingChat chat : announceChats) {
 			long chatId = chat.getChatId();
 			if (chatId == -1)
@@ -243,58 +240,18 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public CommandResult announceBirthday() throws TelegramApiException {
 		Emoji cake = res.getCake();
 
-		TextCommandResult sb = new TextCommandResult(BotCommand.MbiyfAnnouncement);
-		List<Emoji> bar = new ArrayList<>();
-		Emoji add = res.getFace("smirk");
-		if (add != null)
-			bar.add(add);
-		add = res.getBall("boom");
-		if (add != null)
-			bar.add(add);
-		add = res.getBall("fire");
-		if (add != null)
-			bar.add(add);
+		int i = ((int) Math.random() * 3) + 1;
+		ImageLink image = new ImageLink("http://www.hapke.ca/images/birthday" + i + ".mp4", ImageLink.GIF);
+		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		result.add("M");
+		result.add(res.getRandomBallEmoji());
+		result.add("I ");
+		appendNames(result, true);
+		result.add(" ");
+		result.add(cake);
+		result.add(res.getRandomFaceEmoji());
 
-		for (int i = 0; i < bar.size(); i++) {
-			String emoji = bar.get(i).getUnicode();
-			for (int j = 0; j < REPEATS; j++) {
-				sb.add(emoji);
-			}
-		}
-		sb.add("\n");
-		Emoji poopUni = res.getBall("poop");
-		sb.add(poopUni);
-		sb.add("OHHHHH SHITTTT");
-		sb.add(poopUni);
-
-		sb.add("\nHEY ");
-		appendBirthdayNames(sb);
-		sb.add("...\n");
-
-		for (int i = bar.size() - 1; i >= 0; i--) {
-			Emoji emoji = bar.get(i);
-			for (int j = 0; j < REPEATS; j++) {
-				sb.add(emoji);
-			}
-		}
-
-		sb.add("\n\nWATCH OUT FOR MY\n");
-
-		int qty = 6;
-		List<Emoji> emojis = new ArrayList<Emoji>(qty);
-		getQty(res::getRandomBallEmoji, emojis, qty);
-		for (Emoji emoji : emojis) {
-			sb.add(emoji);
-		}
-
-		sb.add("\nIN YOUR\n");
-		for (int i = 0; i < qty; i++) {
-			sb.add(cake);
-		}
-
-		sb.add("\n\nHAPPY BIRTHDAY\n...AND KISS MY ASS");
-
-		return sb;
+		return result;
 	}
 
 	private CommandResult announceSpecial() {
@@ -302,7 +259,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
 
 		result.add("APPARANTLY TODAY IS SPECIAL FOR ");
-		result.add(userRestriction.get(0));
+		appendNames(result, false);
 		result.add(" SO M");
 		result.add(res.getRandomBallEmoji());
 		result.add("IY");
@@ -338,7 +295,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		return result;
 	}
 
-	private void appendBirthdayNames(TextCommandResult sb) {
+	private void appendNames(CommandResult cr, boolean addApostropheS) {
 		if (userRestriction != null) {
 			int size = userRestriction.size();
 			for (int i = 0; i < size; i++) {
@@ -346,22 +303,16 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 				if (i > 0) {
 					int last = size - 1;
 					if (i < last) {
-						sb.add(", ");
+						cr.add(", ");
 
 					} else if (i == last) {
-						sb.add(" AND ");
+						cr.add(" AND ");
 					}
 				}
-				sb.add(new MentionFragment(u, MentionDisplay.First, CaseChoice.Upper, null, null));
+				cr.add(new MentionFragment(u, MentionDisplay.First, CaseChoice.Upper, null, null));
 			}
-		}
-	}
-
-	private void getQty(Supplier<Emoji> s, List<Emoji> emojis, int count) {
-		while (emojis.size() < count) {
-			Emoji val = s.get();
-			if (!emojis.contains(val))
-				emojis.add(val);
+			if (addApostropheS)
+				cr.add("'S");
 		}
 	}
 

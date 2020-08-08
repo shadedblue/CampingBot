@@ -34,14 +34,10 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 		images.add(new ImageLink("http://www.hapke.ca/images/business-time.gif", ImageLink.GIF));
 	}
 
-	/**
-	 * FIXME only detects if @CampingBot is last entity
-	 */
 	@Override
 	public boolean isMatch(String msg, Message message) {
-		CampingUser targetUser = bot.findTarget(message, true, true, BotChoicePriority.First);
-		CampingUser meCamping = bot.getMeCamping();
-		return targetUser == meCamping && msg.toLowerCase().contains(PLEASURE_MODEL) && msg.endsWith("?");
+		CampingUser targetUser = bot.findTarget(message, true, true, BotChoicePriority.Only);
+		return targetUser != null && msg.toLowerCase().contains(PLEASURE_MODEL);
 	}
 
 	@Override

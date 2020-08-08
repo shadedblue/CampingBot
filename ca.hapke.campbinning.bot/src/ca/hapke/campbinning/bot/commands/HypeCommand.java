@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
@@ -75,7 +76,7 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 				}
 			}
 
-			if (!DEBUG) {
+			if (!BotConstants.DEBUG) {
 				String txt = CampingUtil.getRandom(hypes);
 				List<ResultFragment> frags = createText(TITLE_IM_SO_HYPED, txt);
 				sendEdit(message, chat, frags);
@@ -98,14 +99,11 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 
 	}
 
-//	private static final boolean DEBUG = true;
-	private static final boolean DEBUG = false;
-
 	private static final int DIGITS = 6;
 	private static final int LINES = 8;
 	private static final int QTY = 3;
 	private static final int TITLE_BAR_WIDTH = (DIGITS + 1) * QTY - 1;
-	private static final int EDIT_COUNT = DEBUG ? 0 : 5;
+	private static final int EDIT_COUNT = BotConstants.DEBUG ? 0 : 5;
 
 	private static final String HYPE_CONTAINER = "Hype";
 	private static final String DICKS_CATEGORY = "Dicks";
@@ -160,7 +158,7 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 //	public CommandResult hypeCommand(CampingUser campingFromUser) {
 		List<ResultFragment> frags = createNumbers();
 		TextCommandResult result = new TextCommandResult(BotCommand.Hype, frags);
-		if (!DEBUG)
+		if (!BotConstants.DEBUG)
 			new EditingMessageThread(result, campingFromUser).start();
 		return result;
 	}
@@ -168,7 +166,7 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 	public List<ResultFragment> createNumbers() {
 		String title = TITLE_GENERATING_HYPE;
 		String txt;
-		if (DEBUG) {
+		if (BotConstants.DEBUG) {
 			txt = shakeThatAss;
 		} else {
 			if (Math.random() < 0.1) {

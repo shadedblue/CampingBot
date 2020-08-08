@@ -201,7 +201,6 @@ public abstract class VoteTracker<T> {
 				editCmd.send(bot, chatId);
 
 			} catch (TelegramApiException e) {
-				// HACK ignoring exceptions that come back for unchanged messages
 			}
 		}
 
@@ -235,7 +234,6 @@ public abstract class VoteTracker<T> {
 		try {
 			editCmd.send(bot, chatId);
 		} catch (TelegramApiException e) {
-			// HACK ignoring exceptions that come back for unchanged messages
 		}
 	}
 
@@ -245,7 +243,6 @@ public abstract class VoteTracker<T> {
 					VOTING_COMPLETED);
 			edit.send(bot, chatId);
 		} catch (TelegramApiException e2) {
-			// HACK ignoring exceptions that come back for unchanged messages
 		}
 	}
 

@@ -36,7 +36,6 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
-	// TODO convert to Cache, because it creates a shitload of Updates as you type.
 	private LoadingCache<String, HiddenText> providedQueries;
 	private Map<String, HiddenText> confirmedMessages;
 	private LoadingCache<Integer, String> confirmedTopics;
@@ -206,21 +205,4 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 			return new EventItem(e.getLocalizedMessage());
 		}
 	}
-
-	/**
-	 * HACK only for bug-testing
-	 */
-	@Deprecated
-	public Map<String, HiddenText> getConfirmedMessages() {
-		return confirmedMessages;
-	}
-
-	/**
-	 * HACK only for bug-testing
-	 */
-	@Deprecated
-	public LoadingCache<Integer, String> getConfirmedTopics() {
-		return confirmedTopics;
-	}
-
 }

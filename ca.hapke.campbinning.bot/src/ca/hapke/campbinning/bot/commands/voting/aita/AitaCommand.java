@@ -20,7 +20,7 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 /**
  * @author Nathan Hapke
  */
-public class AitaCommand extends VotingCommand implements CampingSerializable, HasCategories<String> {
+public class AitaCommand extends VotingCommand<Float> implements CampingSerializable, HasCategories<String> {
 
 	static final String AITA = "aita";
 	private MbiyfCommand ballsCommand;
@@ -72,8 +72,8 @@ public class AitaCommand extends VotingCommand implements CampingSerializable, H
 	}
 
 	@Override
-	protected VoteTracker initiateVote(CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic) throws VoteInitiationException, TelegramApiException {
+	protected VoteTracker<Float> initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
+			Message activation, Message topic) throws VoteInitiationException, TelegramApiException {
 		if (ranter != activater) {
 			throw new VoteInitiationException(SOMEONE_ELSE_ACTIVATED);
 		} else {

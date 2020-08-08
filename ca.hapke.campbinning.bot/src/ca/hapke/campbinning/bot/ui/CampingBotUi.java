@@ -118,8 +118,7 @@ public class CampingBotUi extends JFrame {
 	private JTable tblUsers;
 	private DefaultEventTableModel<CampingUser> userModel;
 	private JTable tblSeconds;
-	@SuppressWarnings("rawtypes")
-	private DefaultEventTableModel<CalendaredEvent> calendaredModel;
+	private DefaultEventTableModel<CalendaredEvent<?>> calendaredModel;
 
 	private EventLogger eventLogger = EventLogger.getInstance();
 	private CampingBot bot;
@@ -132,7 +131,7 @@ public class CampingBotUi extends JFrame {
 	private JScrollPane sclChats;
 	private JTextArea txtCategoryValue;
 	private JComboBox<String> cmbCategories;
-	private Map<String, HasCategories> categoriesMap = new HashMap<>();
+	private Map<String, HasCategories<String>> categoriesMap = new HashMap<>();
 	private Map<String, String> categoryMap = new HashMap<>();
 	private TrayIcon trayIcon;
 
@@ -244,9 +243,8 @@ public class CampingBotUi extends JFrame {
 		CalendarMonitor intervalThread = CalendarMonitor.getInstance();
 
 		TableFormatCalendaredEvent calendaredFormat = new TableFormatCalendaredEvent();
-		@SuppressWarnings("rawtypes")
-		EventList<CalendaredEvent> byCalendared = intervalThread.getEvents();
-		calendaredModel = new DefaultEventTableModel<CalendaredEvent>(
+		EventList<CalendaredEvent<?>> byCalendared = intervalThread.getEvents();
+		calendaredModel = new DefaultEventTableModel<CalendaredEvent<?>>(
 				GlazedListsSwing.swingThreadProxyList(byCalendared), calendaredFormat);
 
 		JScrollPane sclSec = new JScrollPane();
@@ -381,7 +379,7 @@ public class CampingBotUi extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Object s = cmbCategories.getSelectedItem();
 				if (s != null) {
-					HasCategories categories = categoriesMap.get(s);
+					HasCategories<String> categories = categoriesMap.get(s);
 					String category = categoryMap.get(s);
 					if (categories == null || category == null)
 						return;

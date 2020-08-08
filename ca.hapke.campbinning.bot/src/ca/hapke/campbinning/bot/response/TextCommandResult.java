@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
@@ -44,7 +45,7 @@ public class TextCommandResult extends CommandResult {
 			send.setReplyToMessageId(replyTo);
 		if (keyboard != null)
 			send.setReplyMarkup(keyboard);
-		send.setParseMode(CampingBotEngine.MARKDOWN);
+		send.setParseMode(BotConstants.MARKDOWN);
 		return bot.execute(send);
 	}
 

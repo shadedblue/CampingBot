@@ -12,8 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 
 import ca.hapke.campbinning.bot.BotCommand;
-import ca.hapke.campbinning.bot.CampingBot;
-import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -93,7 +92,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 		InputTextMessageContent mc = new InputTextMessageContent();
 		mc.setDisableWebPagePreview(true);
 		mc.setMessageText(output);
-		mc.setParseMode(CampingBotEngine.MARKDOWN);
+		mc.setParseMode(BotConstants.MARKDOWN);
 
 		InlineQueryResultArticle articleUsernameConversion = new InlineQueryResultArticle();
 		articleUsernameConversion.setTitle("@usernames converted: " + converted);
@@ -134,8 +133,8 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 			for (MessageEntity msgEnt : entities) {
 				int offset = msgEnt.getOffset();
 				String type = msgEnt.getType();
-				if (offset == targetOffset && (CampingBotEngine.MENTION.equalsIgnoreCase(type)
-						|| CampingBotEngine.TEXT_MENTION.equalsIgnoreCase(type))) {
+				if (offset == targetOffset && (BotConstants.MENTION.equalsIgnoreCase(type)
+						|| BotConstants.TEXT_MENTION.equalsIgnoreCase(type))) {
 					targeting = msgEnt;
 				}
 			}
@@ -159,7 +158,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 						result.add(targetUser.getFirstOrUserName(), TextStyle.Bold);
 						result.add("'s nickname changed.");
 						if (oldNick != null && oldNick.length() > 0
-								&& !CampingBot.STRING_NULL.equalsIgnoreCase(oldNick)) {
+								&& !BotConstants.STRING_NULL.equalsIgnoreCase(oldNick)) {
 							result.add("\nFrom: ");
 							result.add(oldNick);
 						}

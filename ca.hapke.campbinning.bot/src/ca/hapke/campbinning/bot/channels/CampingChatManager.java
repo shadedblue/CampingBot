@@ -45,7 +45,7 @@ public class CampingChatManager implements CampingSerializable {
 		this.bot = bot;
 		ListEventListener<CampingChat> listChangeListener = new ListEventListener<CampingChat>() {
 			@Override
-			public void listChanged(ListEvent<CampingChat> listChanges) {
+			public void listChanged(ListEvent<CampingChat> changes) {
 				shouldSave = true;
 			}
 		};
@@ -53,23 +53,23 @@ public class CampingChatManager implements CampingSerializable {
 	}
 
 	private final Map<Long, CampingChat> chats = new HashMap<>();
-	private final ObservableElementList.Connector<CampingChat> chatConnector = GlazedLists
-			.beanConnector(CampingChat.class);
-	private final EventList<CampingChat> chatEvents = GlazedLists
-			.threadSafeList(new ObservableElementList<>(new BasicEventList<CampingChat>(), chatConnector));
-	private final FilterList<CampingChat> announceChats = new FilterList<>(chatEvents, new Matcher<CampingChat>() {
-		@Override
-		public boolean matches(CampingChat item) {
-			return item.isAnnounce();
-		}
-	});
+	private EventList<CampingChat> baseList = new ObservableElementList<>(new BasicEventList<CampingChat>(),
+			GlazedLists.beanConnector(CampingChat.class));
+	private final EventList<CampingChat> chatEvents = GlazedLists.threadSafeList(GlazedLists.readOnlyList(baseList));
+	private final EventList<CampingChat> announceChats = GlazedLists
+			.readOnlyList(new FilterList<>(baseList, new Matcher<CampingChat>() {
+				@Override
+				public boolean matches(CampingChat item) {
+					return item.isAnnounce();
+				}
+			}));
 
 	public CampingChat get(Long chatId) {
 		boolean shouldNotify = false;
 		CampingChat chat = chats.get(chatId);
 		if (chat == null) {
 			chat = new CampingChat(chatId);
-			chatEvents.add(chat);
+			baseList.add(chat);
 			chats.put(chatId, chat);
 			shouldNotify = true;
 		}
@@ -123,7 +123,7 @@ public class CampingChatManager implements CampingSerializable {
 		return chatEvents;
 	}
 
-	public FilterList<CampingChat> getAnnounceChats() {
+	public EventList<CampingChat> getAnnounceChats() {
 		return announceChats;
 	}
 

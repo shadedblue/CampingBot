@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.BotConstants;
 
 /**
  * @author Nathan Hapke
@@ -73,11 +73,11 @@ public abstract class CampingUtil {
 	}
 
 	public static boolean isNonNull(String nickname) {
-		return nickname != null && !CampingBot.STRING_NULL.equalsIgnoreCase(removePrefixAt(nickname));
+		return nickname != null && !BotConstants.STRING_NULL.equalsIgnoreCase(removePrefixAt(nickname));
 	}
 
 	public static boolean notEmptyOrNull(String x) {
-		return x != null && x.length() > 0 && !CampingBot.STRING_NULL.equalsIgnoreCase(x);
+		return x != null && x.length() > 0 && !BotConstants.STRING_NULL.equalsIgnoreCase(x);
 	}
 
 	public static boolean matchOne(String target, String... accepts) {
@@ -136,5 +136,10 @@ public abstract class CampingUtil {
 			return i + suffixes[i % 10];
 
 		}
+	}
+
+	public static boolean endsWithPunctuation(String excl) {
+		char last = excl.charAt(excl.length() - 1);
+		return last == '.' || last == '!' || last == '?';
 	}
 }

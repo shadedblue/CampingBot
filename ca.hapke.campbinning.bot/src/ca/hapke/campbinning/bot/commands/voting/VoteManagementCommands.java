@@ -8,23 +8,24 @@ import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
 import ca.hapke.campbinning.bot.response.fragments.InsultFragment;
-import ca.hapke.campbinning.bot.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
+import ca.hapke.campbinning.bot.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**
  * @author Nathan Hapke
  */
 public class VoteManagementCommands extends AbstractCommand implements SlashCommand {
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.VoteExtend, BotCommand.VoteForceComplete };
+	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.VoteExtend,
+			BotCommand.VoteForceComplete };
 	private static final TextFragment ONLY_BROUGHT_UP_OR_ACTIVATED = new TextFragment(
 			"Only the person who started brought it up, or activated voting can use this, ");
 	private static final TextFragment NO_VOTE_PROVIDED = new TextFragment("Reply to the vote, ");
 	private static final TextFragment NOT_VOTING_ON_THAT = new TextFragment("We aren't voting on that, ");
 
-	private VotingCommand[] commands;
+	private VotingCommand<?>[] commands;
 
-	public VoteManagementCommands(VotingCommand... commands) {
+	public VoteManagementCommands(VotingCommand<?>... commands) {
 		this.commands = commands;
 	}
 
@@ -41,7 +42,7 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 					new InsultFragment(Perspective.You)).setReplyTo(messageId);
 		}
 
-		VoteTracker tracker = findTracker(replyTo);
+		VoteTracker<?> tracker = findTracker(replyTo);
 		if (tracker == null) {
 			return new TextCommandResult(BotCommand.VoteCommandFailed, NOT_VOTING_ON_THAT,
 					new InsultFragment(Perspective.You)).setReplyTo(messageId);
@@ -64,7 +65,7 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 					new InsultFragment(Perspective.You)).setReplyTo(messageId);
 		}
 
-		VoteTracker tracker = findTracker(replyTo);
+		VoteTracker<?> tracker = findTracker(replyTo);
 		if (tracker == null) {
 			return new TextCommandResult(BotCommand.VoteCommandFailed, NOT_VOTING_ON_THAT,
 					new InsultFragment(Perspective.You)).setReplyTo(messageId);
@@ -81,10 +82,10 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 		}
 	}
 
-	public VoteTracker findTracker(Message replyTo) {
-		VoteTracker tracker = null;
+	public VoteTracker<?> findTracker(Message replyTo) {
+		VoteTracker<?> tracker = null;
 		Integer key = replyTo.getMessageId();
-		for (VotingCommand command : commands) {
+		for (VotingCommand<?> command : commands) {
 			tracker = command.voteOnMessages.get(key);
 			if (tracker != null)
 				break;
@@ -102,13 +103,16 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId, CampingUser campingFromUser) {
-		if (command == BotCommand.VoteForceComplete) {
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
+		switch (command) {
+		case VoteForceComplete:
 			return completeVoting(message, campingFromUser);
-		} else if (command == BotCommand.VoteExtend) {
+		case VoteExtend:
 			return extendVoting(message, campingFromUser);
+		default:
+			return null;
 		}
-		return null;
 	}
 
 }

@@ -25,9 +25,9 @@ import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
 import ca.hapke.campbinning.bot.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.response.fragments.TextFragment;
-import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.odell.glazedlists.BasicEventList;
@@ -37,14 +37,14 @@ import ca.odell.glazedlists.GlazedLists;
 /**
  * @author Nathan Hapke
  */
-@SuppressWarnings("rawtypes")
-public abstract class VotingCommand extends CallbackCommandBase
+public abstract class VotingCommand<T> extends CallbackCommandBase
 		implements CalendaredEvent<Void>, TextCommand, SlashCommand {
 
-	protected final Map<Integer, VoteTracker> voteOnMessages = new HashMap<Integer, VoteTracker>();
-	protected final Map<Integer, VoteTracker> voteOnBanners = new HashMap<Integer, VoteTracker>();
+	protected final Map<Integer, VoteTracker<T>> voteOnMessages = new HashMap<Integer, VoteTracker<T>>();
+	protected final Map<Integer, VoteTracker<T>> voteOnBanners = new HashMap<Integer, VoteTracker<T>>();
 
-	protected final EventList<VoteTracker> inProgress = GlazedLists.threadSafeList(new BasicEventList<VoteTracker>());
+	protected final EventList<VoteTracker<T>> inProgress = GlazedLists
+			.threadSafeList(new BasicEventList<VoteTracker<T>>());
 
 	protected final CampingBot bot;
 	private TimesProvider<Void> times;
@@ -78,7 +78,7 @@ public abstract class VotingCommand extends CallbackCommandBase
 	@Override
 	public void doWork(Void value) {
 		for (int i = 0; i < inProgress.size(); i++) {
-			VoteTracker r = inProgress.get(i);
+			VoteTracker<T> r = inProgress.get(i);
 
 			long now = System.currentTimeMillis();
 			if (now > r.getCompletionTime() || r.isCompleted()) {
@@ -92,7 +92,8 @@ public abstract class VotingCommand extends CallbackCommandBase
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId, CampingUser campingFromUser) {
+	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		CommandResult result;
 
 		try {
@@ -111,7 +112,7 @@ public abstract class VotingCommand extends CallbackCommandBase
 
 	private CommandResult startVotingInternal(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
 			CampingUser activater, Message topic) throws TelegramApiException {
-		VoteTracker tracker = null;
+		VoteTracker<T> tracker = null;
 		TextCommandResult output = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
@@ -140,17 +141,17 @@ public abstract class VotingCommand extends CallbackCommandBase
 		return output;
 	}
 
-	protected abstract VoteTracker initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
+	protected abstract VoteTracker<T> initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
 			Message activation, Message topic) throws VoteInitiationException, TelegramApiException;
 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
 		int callbackMessageId = id.getUpdateId();
-		VoteTracker rant = voteOnMessages.get(callbackMessageId);
+		VoteTracker<T> v = voteOnMessages.get(callbackMessageId);
 
 		try {
-			if (rant != null) {
-				EventItem react = rant.react(id, callbackQuery);
+			if (v != null) {
+				EventItem react = v.react(id, callbackQuery);
 				return react;
 			}
 		} catch (TelegramApiException e) {

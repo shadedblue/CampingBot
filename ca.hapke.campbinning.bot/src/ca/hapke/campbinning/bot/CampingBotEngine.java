@@ -56,10 +56,6 @@ import ca.odell.glazedlists.FilterList;
  */
 public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
-	public static final String MARKDOWN = "MarkdownV2";
-	public static final String TEXT_MENTION = "text_mention";
-	public static final String MENTION = "mention";
-
 	private boolean online = false;
 	private User me;
 	protected CampingUser meCamping;
@@ -449,10 +445,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				int offset = msgEnt.getOffset();
 
 				CampingUser possibleChoice = null;
-				if (MENTION.equalsIgnoreCase(type)) {
+				if (BotConstants.MENTION.equalsIgnoreCase(type)) {
 					// usernamed victim: the text is their @username
 					possibleChoice = userMonitor.monitor(msgEnt);
-				} else if (TEXT_MENTION.equalsIgnoreCase(type)) {
+				} else if (BotConstants.TEXT_MENTION.equalsIgnoreCase(type)) {
 					// non-usernamed victim: we get the User struct
 					possibleChoice = userMonitor.getUser(msgEnt.getUser());
 				} else {
@@ -461,10 +457,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				}
 
 				if (isBetterSelection(frontToBack, offset, currentOffset, currentChoice, possibleChoice, priority)) {
-					if (MENTION.equalsIgnoreCase(type)) {
+					if (BotConstants.MENTION.equalsIgnoreCase(type)) {
 						currentChoice = possibleChoice;
 						currentOffset = offset;
-					} else if (TEXT_MENTION.equalsIgnoreCase(type)) {
+					} else if (BotConstants.TEXT_MENTION.equalsIgnoreCase(type)) {
 						currentChoice = possibleChoice;
 						currentOffset = offset;
 					}

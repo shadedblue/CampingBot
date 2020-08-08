@@ -29,29 +29,29 @@ public class CalendarMonitor extends TimerThreadWithKill {
 		super("CalendarMonitorThread", 1000);
 	}
 
-	private EventList<CalendaredEvent> calendaredEvents = GlazedLists.threadSafeList(new BasicEventList<>());
+	private EventList<CalendaredEvent<?>> calendaredEvents = GlazedLists
+			.threadSafeList(new BasicEventList<CalendaredEvent>());
 
 	@Override
 	protected void doWork() {
 		ZonedDateTime now = ZonedDateTime.now();
-		for (CalendaredEvent event : calendaredEvents) {
-			TimesProvider timeProvider = event.getTimeProvider();
-			ByCalendar future = timeProvider.getNearestFuture();
-			if (future.getFuture().isBefore(now)) {
-				invoke(event, timeProvider, future);
-			}
+		for (CalendaredEvent<?> event : calendaredEvents) {
+			work(now, event);
 		}
 	}
 
-	public void updateAllNextTimes() {
-		for (CalendaredEvent event : calendaredEvents) {
-			TimesProvider timeProvider = event.getTimeProvider();
-			timeProvider.generateNearestEvents(ZonedDateTime.now());
+	/**
+	 * Helper method for doWork so that we can parameterize and bind the <T> types, without breaking inheritance
+	 */
+	private <T> void work(ZonedDateTime now, CalendaredEvent<T> event) {
+		TimesProvider<T> timeProvider = event.getTimeProvider();
+		ByCalendar<T> future = timeProvider.getNearestFuture();
+		if (future.getFuture().isBefore(now)) {
+			invoke(event, timeProvider, future);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void invoke(CalendaredEvent event, TimesProvider timeProvider, ByCalendar calendarPoint) {
+	private <T> void invoke(CalendaredEvent<T> event, TimesProvider<T> timeProvider, ByCalendar<T> calendarPoint) {
 		ZonedDateTime now = ZonedDateTime.now();
 		if (event.shouldRun()) {
 			try {
@@ -62,24 +62,29 @@ public class CalendarMonitor extends TimerThreadWithKill {
 					timeProvider.remove(calendarPoint);
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			timeProvider.setLastExecTime();
 		}
 		timeProvider.generateNearestEvents(now);
 	}
 
-	public boolean add(CalendaredEvent e) {
+	public <T> boolean add(CalendaredEvent<T> e) {
 		StartupMode startupMode = e.getStartupMode();
 		if (startupMode == StartupMode.Always || startupMode == StartupMode.Conditional) {
-			TimesProvider timeProvider = e.getTimeProvider();
+			TimesProvider<T> timeProvider = e.getTimeProvider();
 			invoke(e, timeProvider, timeProvider.getMostNearestPast());
 		}
 		return calendaredEvents.add(e);
 	}
 
-	public EventList<CalendaredEvent> getEvents() {
+	public void updateAllNextTimes() {
+		for (CalendaredEvent event : calendaredEvents) {
+			TimesProvider timeProvider = event.getTimeProvider();
+			timeProvider.generateNearestEvents(ZonedDateTime.now());
+		}
+	}
+
+	public EventList<CalendaredEvent<?>> getEvents() {
 		return calendaredEvents;
 	}
 }

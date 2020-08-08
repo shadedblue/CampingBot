@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 
@@ -50,7 +51,7 @@ public class EditTextCommandResult extends CommandResult {
 			send.setReplyMarkup((InlineKeyboardMarkup) keyboard);
 
 		send.setText(text);
-		send.setParseMode(CampingBotEngine.MARKDOWN);
+		send.setParseMode(BotConstants.MARKDOWN);
 		/**
 		 * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
 		 */

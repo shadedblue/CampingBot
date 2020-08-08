@@ -8,14 +8,14 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 /**
  * @author Nathan Hapke
  */
-public class TableFormatCalendaredEvent extends CampingTableFormat implements AdvancedTableFormat<CalendaredEvent> {
+public class TableFormatCalendaredEvent extends CampingTableFormat implements AdvancedTableFormat<CalendaredEvent<?>> {
 
 	public TableFormatCalendaredEvent() {
 		super(new String[] { "Thread", "Next", "Prev", "Run?" }, new int[] { 125, 75, 75, 25 });
 	}
 
 	@Override
-	public Object getColumnValue(CalendaredEvent e, int column) {
+	public Object getColumnValue(CalendaredEvent<?> e, int column) {
 
 		switch (column) {
 		case 0:

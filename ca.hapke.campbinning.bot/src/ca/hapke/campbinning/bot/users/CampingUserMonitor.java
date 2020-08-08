@@ -9,7 +9,7 @@ import java.util.Set;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.users.CampingUser.Birthday;
@@ -152,10 +152,10 @@ public class CampingUserMonitor implements CampingSerializable {
 
 	public CampingUser monitor(MessageEntity msgEnt) {
 		String type = msgEnt.getType();
-		if (CampingBot.TEXT_MENTION.equalsIgnoreCase(type)) {
+		if (BotConstants.TEXT_MENTION.equalsIgnoreCase(type)) {
 			return monitor(msgEnt.getUser());
 		}
-		if (CampingBot.MENTION.equalsIgnoreCase(type)) {
+		if (BotConstants.MENTION.equalsIgnoreCase(type)) {
 			return monitor(UNKNOWN_USER_ID, msgEnt.getText(), null, null, false);
 		}
 

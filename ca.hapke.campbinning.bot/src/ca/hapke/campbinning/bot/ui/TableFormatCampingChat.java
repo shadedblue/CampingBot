@@ -31,6 +31,7 @@ public class TableFormatCampingChat extends CampingTableFormat implements Advanc
 		throw new IllegalStateException();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Class getColumnClass(int column) {
 		switch (column) {

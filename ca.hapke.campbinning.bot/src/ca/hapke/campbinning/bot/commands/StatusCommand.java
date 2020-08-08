@@ -24,11 +24,6 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	private TimeFormatter tf = new TimeFormatter(2, ", ", false, false);
 	private ZonedDateTime onlineTime;
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL d, h:mm:ss a");
-//	private HideItInlineCommand hideIt;
-
-	public StatusCommand() {
-//		this.hideIt = hideIt;
-	}
 
 	@Override
 	public void statusOffline() {
@@ -63,25 +58,6 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 		} else {
 			r.add("???");
 		}
-//		r.add("\nHide It", TextStyle.Bold);
-//
-//		LoadingCache<Integer, String> confirmedTopics = hideIt.getConfirmedTopics();
-//		r.add("\n");
-//		r.add("Topics (" + confirmedTopics.size() + ") ", TextStyle.Italic);
-//		for (Map.Entry<Integer, String> e : confirmedTopics.asMap().entrySet()) {
-//			r.add(e.getValue());
-//			r.add(" ");
-//		}
-//
-//		Map<String, HiddenText> msgs = hideIt.getConfirmedMessages();
-//		r.add("\n");
-//		r.add("Messages (" + msgs.size() + ") ", TextStyle.Italic);
-//		for (Entry<String, HiddenText> e : msgs.entrySet()) {
-//			r.add("\n");
-//			r.add(e.getKey());
-//			r.add(": ");
-//			r.add(e.getValue().getClearText());
-//		}
 		return r;
 	}
 
@@ -99,5 +75,4 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	public AccessLevel accessRequired() {
 		return AccessLevel.Admin;
 	}
-
 }

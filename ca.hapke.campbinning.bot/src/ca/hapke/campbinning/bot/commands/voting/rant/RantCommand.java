@@ -13,7 +13,7 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 /**
  * @author Nathan Hapke
  */
-public class RantCommand extends VotingCommand {
+public class RantCommand extends VotingCommand<Integer> {
 
 	static final String RANT = "rant";
 
@@ -27,8 +27,8 @@ public class RantCommand extends VotingCommand {
 	}
 
 	@Override
-	protected VoteTracker initiateVote(CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic) throws VoteInitiationException, TelegramApiException {
+	protected VoteTracker<Integer> initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
+			Message activation, Message topic) throws VoteInitiationException, TelegramApiException {
 		return new RantTracker(bot, ranter, activater, chatId, activation, topic);
 	}
 
