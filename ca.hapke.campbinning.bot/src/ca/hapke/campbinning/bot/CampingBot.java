@@ -3,6 +3,11 @@ package ca.hapke.campbinning.bot;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.AbstractCommand;
@@ -21,7 +26,10 @@ import ca.hapke.campbinning.bot.commands.voting.aita.AitaCommand;
 import ca.hapke.campbinning.bot.commands.voting.rant.RantCommand;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.mbiyf.MbiyfCommand;
+import ca.hapke.campbinning.bot.response.TextCommandResult;
+import ca.hapke.campbinning.bot.response.fragments.TextStyle;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 
 /**
  * @author Nathan Hapke
@@ -103,6 +111,31 @@ public class CampingBot extends CampingBotEngine {
 				hasCategories.add((HasCategories<String>) command);
 			} catch (Exception e) {
 				// Ignore if it's not a <String>
+			}
+		}
+	}
+
+	@Override
+	public void onUpdateReceived(Update update) {
+		super.onUpdateReceived(update);
+		Message message = update.getMessage();
+		if (message != null) {
+			int messageId = message.getMessageId();
+			if (messageId % 25000 == 0) {
+				User from = message.getFrom();
+				CampingUser cu = CampingUserMonitor.getInstance().getUser(from);
+				TextCommandResult result = new TextCommandResult(BotCommand.PleasureModel);
+				result.add("DING DING DING! We have a winner!", TextStyle.Underline);
+				result.add("\nMessage #");
+				result.add("" + messageId, TextStyle.Bold);
+				result.add(" sent by ");
+				result.add(cu);
+				result.add("!");
+				try {
+					result.send(this, message.getChatId());
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

@@ -373,8 +373,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					}
 					if (outputResult != null) {
 						SendResult sendResult = outputResult.send(this, chatId);
-						logSendResult(telegramId, campingFromUser, eventTime, chat, outputCommand, outputResult,
-								sendResult);
+						logSendResult(sendResult.outgoingMsg.getMessageId(), campingFromUser, eventTime, chat,
+								outputCommand, outputResult, sendResult);
 					}
 
 				} catch (TelegramApiException e) {
