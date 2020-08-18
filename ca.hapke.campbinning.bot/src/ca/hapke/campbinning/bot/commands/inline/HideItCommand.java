@@ -1,11 +1,12 @@
 package ca.hapke.campbinning.bot.commands.inline;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import javax.persistence.EntityManager;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -23,7 +24,9 @@ import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.commands.callback.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
+import ca.hapke.campbinning.bot.log.DatabaseConsumer;
 import ca.hapke.campbinning.bot.log.EventItem;
+import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
@@ -37,15 +40,17 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
 	private LoadingCache<String, HiddenText> providedQueries;
-	private Map<String, HiddenText> confirmedMessages;
+	private LoadingCache<Integer, HideItMessage> confirmedCache;
 	private LoadingCache<Integer, String> confirmedTopics;
 	private CampingBotEngine bot;
 	static final Character[] blots = new Character[] { '░', '▀', '█', '▄', '▒', '▙', '▟', '▛', '▜', '▀', '▔', '▖', '▗',
 			'▘', '▝' };
 	private int nextTopicId = 1;
+	private DatabaseConsumer db;
 
-	public HideItCommand(CampingBotEngine bot) {
+	public HideItCommand(CampingBotEngine bot, DatabaseConsumer db) {
 		this.bot = bot;
+		this.db = db;
 
 		confirmedTopics = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
 				.build(new CacheLoader<Integer, String>() {
@@ -61,7 +66,15 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 						return null;
 					}
 				});
-		confirmedMessages = new HashMap<>(100);
+		confirmedCache = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
+				.build(new CacheLoader<Integer, HideItMessage>() {
+					@Override
+					public HideItMessage load(Integer key) throws Exception {
+						EntityManager manager = db.getManager();
+						HideItMessage hm = manager.find(HideItMessage.class, key);
+						return hm;
+					}
+				});
 	}
 
 	@Override
@@ -90,12 +103,25 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 				nextTopicId++;
 			}
 		}
+		HideItMessage msg = new HideItMessage(queryId, details.getClearText());
+		add(msg);
 
-		confirmedMessages.put(fullId, details);
-
-		EventItem item = new EventItem(BotCommand.HideIt, campingFromUser, null, null, queryId, details.getClearText(),
-				null);
+		EventItem item = new EventItem(BotCommand.HideItSend, campingFromUser, null, null, queryId,
+				details.getClearText(), null);
 		return item;
+	}
+
+	private void add(HideItMessage msg) {
+		confirmedCache.put(msg.getMessageId(), msg);
+
+		try {
+			EntityManager manager = db.getManager();
+			manager.getTransaction().begin();
+			manager.persist(msg);
+			manager.getTransaction().commit();
+		} catch (Exception e) {
+			EventLogger.getInstance().add(new EventItem("Could not save HideIt" + e.getLocalizedMessage()));
+		}
 	}
 
 	@Override
@@ -115,22 +141,23 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		int qty = 2 + (int) (confirmedTopics.size());
 		List<InlineQueryResult> output = new ArrayList<>(qty);
 
-		createInlineOption(output, updateId, null, input);
+		output.add(createInlineOption(0, updateId, null, input));
 		if (containsDash) {
-			createInlineOption(output, updateId, typedTopic, spoiler);
+			output.add(createInlineOption(1, updateId, typedTopic, spoiler));
 		}
 		for (String topic : confirmedTopics.asMap().values()) {
 			if (topic.equalsIgnoreCase(typedTopic))
 				continue;
-			createInlineOption(output, updateId, topic, input);
+			int i = output.size();
+			output.add(createInlineOption(i, updateId, topic, input));
 		}
 
 		return output;
 
 	}
 
-	public void createInlineOption(List<InlineQueryResult> output, int updateId, String topic, String textToHide) {
-		CallbackId callbackId = new CallbackId(getCommandName(), updateId, output.size());
+	public InlineQueryResultArticle createInlineOption(int i, int updateId, String topic, String textToHide) {
+		CallbackId callbackId = new CallbackId(getCommandName(), updateId, i);
 		String queryId = callbackId.getResult();
 		String blotText = createBlotText(textToHide, topic);
 		HiddenText item = new HiddenText(topic, textToHide, blotText);
@@ -153,7 +180,7 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 
 		article.setId(queryId);
 		article.setInputMessageContent(content);
-		output.add(article);
+		return article;
 	}
 
 	public String createBlotText(String clear, String topic) {
@@ -183,9 +210,14 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
 		String callbackQueryId = callbackQuery.getId();
-		String hideId = id.getResult();
 
-		HiddenText details = confirmedMessages.get(hideId);
+		HideItMessage details = null;
+		try {
+			details = confirmedCache.get(id.getUpdateId());
+		} catch (Exception e1) {
+			return new EventItem(
+					"Could not process HideIt callback: " + callbackQueryId + " : " + e1.getLocalizedMessage());
+		}
 		if (details == null) {
 			return new EventItem("Could not process HideIt callback: " + callbackQueryId);
 		}
@@ -200,9 +232,17 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 
 			User fromUser = callbackQuery.getFrom();
 			CampingUser user = CampingUserMonitor.getInstance().monitor(fromUser);
-			return new EventItem(BotCommand.HideIt, user, null, null, null, displayToUser, null);
+			return new EventItem(BotCommand.HideItReveal, user, null, null, null, displayToUser, null);
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
 		}
+	}
+
+	public Map<Integer, HideItMessage> getConfirmedMessages() {
+		return confirmedCache.asMap();
+	}
+
+	public LoadingCache<Integer, String> getConfirmedTopics() {
+		return confirmedTopics;
 	}
 }

@@ -76,9 +76,9 @@ public class CampingBot extends CampingBotEngine {
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
 
-		hideItCommand = new HideItCommand(this);
+		hideItCommand = new HideItCommand(this, databaseConsumer);
 
-		statusCommand = new StatusCommand();
+		statusCommand = new StatusCommand(hideItCommand);
 		addStatusUpdate(statusCommand);
 
 		serializer = new CampingXmlSerializer(system, spellCommand, countdownGen, aitaCommand, partyCommand,

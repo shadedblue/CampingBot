@@ -5,7 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
@@ -23,11 +29,56 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 	private EventLogger eventLogger;
 	private Connection connection;
 	private TimesProvider<Void> times;
+	private EntityManager manager;
 
 	public DatabaseConsumer(CampingSystem system, EventLogger eventLogger) {
 		this.system = system;
 		this.eventLogger = eventLogger;
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
+	}
+
+	private Connection getConnection() {
+		String dbHost = system.getDbHost();
+		int dbPort = system.getDbPort();
+		String dbUser = system.getDbUser();
+		String dbPass = system.getDbPass();
+		String db = system.getDbDb();
+
+		try {
+			if (system.isDbEnabled() && (connection == null || connection.isClosed())) {
+
+				String url = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + db;
+				Properties props = new Properties();
+				props.setProperty("user", dbUser);
+				props.setProperty("password", dbPass);
+				connection = DriverManager.getConnection(url, props);
+			}
+		} catch (SQLException e) {
+			connection = null;
+			e.printStackTrace();
+		}
+
+		try {
+			if (system.isDbEnabled() && manager == null) {
+				Map<String, String> persistenceMap = new HashMap<String, String>();
+				String url2 = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + db;
+				persistenceMap.put("javax.persistence.jdbc.url", url2);
+				persistenceMap.put("javax.persistence.jdbc.user", dbUser);
+				persistenceMap.put("javax.persistence.jdbc.password", dbPass);
+				EntityManagerFactory emf = Persistence.createEntityManagerFactory("campingbot", persistenceMap);
+				manager = emf.createEntityManager();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return connection;
+	}
+
+	public EntityManager getManager() {
+		if (manager == null)
+			getConnection();
+		return manager;
 	}
 
 	@Override
@@ -55,30 +106,15 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 
 		try {
 			if (dbLog.size() > 0 && system.isDbEnabled()) {
-				String dbHost = system.getDbHost();
-				int dbPort = system.getDbPort();
-				String dbUser = system.getDbUser();
-				String dbPass = system.getDbPass();
-
-				try {
-					if (connection == null || connection.isClosed()) {
-						String url = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/camping";
-						Properties props = new Properties();
-						props.setProperty("user", dbUser);
-						props.setProperty("password", dbPass);
-						connection = DriverManager.getConnection(url, props);
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-					connection = null;
+				Connection connection = getConnection();
+				if (connection == null)
 					return;
-				}
 
 				while (dbLog.size() > 0) {
 					EventItem item = dbLog.get(0);
 					try {
 						long timestamp = item.d.getTime() / 1000;
-						DatabaseQuery query = new DatabaseQuery("public.activity");
+						DatabaseQuery query = new DatabaseQuery("activity");
 						int campingId = -1;
 						long chatId = -1;
 						long commandTypeId = -1;

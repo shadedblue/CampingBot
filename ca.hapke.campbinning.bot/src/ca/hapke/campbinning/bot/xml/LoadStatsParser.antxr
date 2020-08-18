@@ -122,19 +122,20 @@ document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, Aita
 	;
 <db> [CampingSystem cs]
 	{ 
-		String host,port,user,pass; 
+		String host,port,user,pass,db; 
 	}
 	:
 	host=<dbHost>
 	port=<dbPort>
 	user=<dbUser>
 	pass=<dbPass>
+	db=<dbDb>
 	{
 		int port2 = 5432;
 		if (!"null".equalsIgnoreCase(port)) {
 			port2 = Integer.parseInt(port);
 		} 
-		cs.enableDb(host,port2,user,pass);
+		cs.enableDb(host,port2,user,pass,db);
 	}
 	;
 <countdown>[CountdownCommand countdownGen]
@@ -330,6 +331,9 @@ document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, Aita
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <dbPass> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbDb> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <item> returns [String value = null]

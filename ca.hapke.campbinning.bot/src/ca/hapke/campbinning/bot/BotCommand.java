@@ -48,7 +48,8 @@ public enum BotCommand implements CommandType {
 	PartyEveryday(null, true, BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF),
 	UiString(null, false),
 	NicknameConversion(null, true, BotCommandIds.NICKNAME | BotCommandIds.USE),
-	HideIt(null, true, BotCommandIds.INLINE | BotCommandIds.TEXT | BotCommandIds.USE),
+	HideItSend(null, true, BotCommandIds.INLINE | BotCommandIds.TEXT | BotCommandIds.SET),
+	HideItReveal(null, false, BotCommandIds.INLINE | BotCommandIds.TEXT | BotCommandIds.USE),
 	Talk(null, true, BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
 
 	private static final String BOT_COMMAND = "bot_command";

@@ -28,6 +28,7 @@ public class CampingSystem implements CampingSerializable {
 	private String botUsername;
 	private boolean dbEnabled = false;
 	private boolean connectOnStartup = false;
+	private String dbDb;
 
 	public String getDbHost() {
 		return dbHost;
@@ -41,12 +42,21 @@ public class CampingSystem implements CampingSerializable {
 		return dbUser;
 	}
 
+	public String getDbPass() {
+		return dbPass;
+	}
+
+	public String getDbDb() {
+		return dbDb;
+	}
+
 	public boolean isDbEnabled() {
 		return dbEnabled;
 	}
 
-	public void enableDb(String host, int port, String user, String pass) {
-		if (this.dbHost == null && this.dbPort == -1 && this.dbUser == null && this.dbPass == null) {
+	public void enableDb(String host, int port, String user, String pass, String db) {
+		if (this.dbHost == null && this.dbPort == -1 && this.dbUser == null && this.dbPass == null
+				&& this.dbDb == null) {
 			if (port <= 0)
 				port = 5432;
 			this.dbEnabled = true;
@@ -54,6 +64,7 @@ public class CampingSystem implements CampingSerializable {
 			this.dbPort = port;
 			this.dbUser = user;
 			this.dbPass = pass;
+			this.dbDb = db;
 		}
 	}
 
@@ -86,10 +97,6 @@ public class CampingSystem implements CampingSerializable {
 			this.botUsername = botUsername;
 	}
 
-	public String getDbPass() {
-		return dbPass;
-	}
-
 	public boolean isConnectOnStartup() {
 		return connectOnStartup;
 	}
@@ -114,6 +121,7 @@ public class CampingSystem implements CampingSerializable {
 			of.tagAndValue("dbPort", dbPort);
 			of.tagAndValue("dbUser", dbUser);
 			of.tagAndValue("dbPass", dbPass);
+			of.tagAndValue("dbDb", dbDb);
 			of.finish(dbTag);
 		}
 		of.finish(outerTag);
