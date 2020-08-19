@@ -63,25 +63,23 @@ public class EventItem {
 		builder.append("] ");
 
 		if (telegramId != null) {
-			builder.append("(");
 			builder.append(telegramId);
-			builder.append(")");
+			builder.append(":");
 		}
 		if (command != null) {
 			builder.append(command);
-			builder.append(": ");
+			builder.append(" ");
 		}
 		if (user != null) {
 			builder.append(user.getFirstOrUserName());
 		}
 		if (chat != null) {
-			builder.append("~");
+			builder.append("[");
 			builder.append(chat.getChatname());
-			builder.append(": ");
-			builder.append(chat.getChatId());
+			builder.append("]");
+//			builder.append(chat.getChatId());
 		}
 		if (rest != null && rest.length() > 0) {
-			builder.append(": ");
 			builder.append(rest);
 		}
 		if (extraData != null) {

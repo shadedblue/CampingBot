@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot.commands;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +29,6 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class HypeCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
-
-	private static final String TITLE_GENERATING_HYPE = "Generating Hype!";
-
 	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Hype };
 
 	@Override
@@ -38,8 +36,12 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 		return SLASH_COMMANDS;
 	}
 
+	private static final Character[] blotsFull = new Character[] { '▓', '█', '█' };
+	private static final Character[] blotsFade = new Character[] { '░', '▙', '▟', '▛', '▜', '▞', '▚' };
+	private static final Character[] blotsPartial = new Character[] { '▔', '▖', '▗', '▘', '▝' };
+
 	private class EditingMessageThread extends Thread {
-		private static final String TITLE_IM_SO_HYPED = "I'm So Hyped!";
+		private static final int EDIT_DELAY = 2000;
 		private TextCommandResult target;
 		private CampingUser campingFromUser;
 
@@ -50,14 +52,14 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 
 		@Override
 		public void run() {
-			int edits = 0;
-			int attempts = 0;
+			int edits = 1;
+			int attempts = 1;
 			Message message = null;
 			Long chatId = null;
 			CampingChat chat = null;
-			while (edits < EDIT_COUNT && attempts < EDIT_COUNT) {
+			while (edits <= EDIT_COUNT && attempts <= EDIT_COUNT) {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(EDIT_DELAY);
 				} catch (InterruptedException e) {
 				}
 				if (message == null) {
@@ -70,15 +72,14 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 					attempts++;
 				}
 				if (message != null) {
-					List<ResultFragment> frags = createNumbers();
+					List<ResultFragment> frags = createNumbers(edits);
 					sendEdit(message, chat, frags);
 					edits++;
 				}
 			}
-
 			if (!BotConstants.DEBUG) {
 				String txt = CampingUtil.getRandom(hypes);
-				List<ResultFragment> frags = createText(TITLE_IM_SO_HYPED, txt);
+				List<ResultFragment> frags = createText(txt, EDIT_COUNT, true);
 				sendEdit(message, chat, frags);
 			}
 		}
@@ -113,6 +114,7 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 	private CampingBotEngine bot;
 	private CampingChatManager chatManager;
 	private List<String> dicks;
+	private NumberFormat nf;
 
 	private static final String goatse = "      ,-----,\r\n" + "    _// __ \\\\\\\\___\r\n" + " C___)/    \\\\(___>\r\n"
 			+ "C____)      (____>\r\n" + "C____)\\\\____/(____>\r\n" + " C___)      (___>\r\n" + "     \\\\_____//\r\n"
@@ -130,9 +132,6 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 	private static final String fu = " ████████  ███   ███\r\n" + "░███░░░░  ░███  ░███ \r\n"
 			+ "░███      ░███  ░███ \r\n" + "░███████  ░███  ░███ \r\n" + "░███░░░   ░███  ░███ \r\n"
 			+ "░███      ░███  ░███ \r\n" + "░███      ░░███████  \r\n" + "░░░        ░░░░░░░    ";
-//	private static final String shakeThatAss = "3    B F05B00 B886B1\r\n" + "A JUST        7515AD\r\n"
-//			+ "A      SHAKE  95050B\r\n" + "E0B752        3E451C\r\n" + "97CF2A D      E54900\r\n"
-//			+ "A06CF8 8 THAT 4     \r\n" + "508536 E      2 ASS \r\n" + "1CD7B1 B9F194 7     ";
 	private static final String shakeThatAss = "3*----*F05B00 B886B1\r\n" + "A|JUST|-----* 7515AD\r\n"
 			+ "A*----|SHAKE| 95050B\r\n" + "E0B752*-----* 3E451C\r\n" + "97CF2A D*----*E54900\r\n"
 			+ "A06CF8 8|THAT|4*---*\r\n" + "508536 E*----*2|ASS|\r\n" + "1CD7B1 B9F194 7*---*";
@@ -150,21 +149,22 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 		categories.put(DICKS_CATEGORY, f2069);
 		categories.put(DICKS_CATEGORY, fu);
 		categories.put(DICKS_CATEGORY, shakeThatAss);
+
+		nf = NumberFormat.getInstance();
+		nf.setMaximumFractionDigits(0);
 	}
 
 	@Override
 	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
 			CampingUser campingFromUser) {
-//	public CommandResult hypeCommand(CampingUser campingFromUser) {
-		List<ResultFragment> frags = createNumbers();
+		List<ResultFragment> frags = createNumbers(0);
 		TextCommandResult result = new TextCommandResult(BotCommand.Hype, frags);
 		if (!BotConstants.DEBUG)
 			new EditingMessageThread(result, campingFromUser).start();
 		return result;
 	}
 
-	public List<ResultFragment> createNumbers() {
-		String title = TITLE_GENERATING_HYPE;
+	public List<ResultFragment> createNumbers(int i) {
 		String txt;
 		if (BotConstants.DEBUG) {
 			txt = shakeThatAss;
@@ -176,29 +176,77 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 			}
 		}
 
-		return createText(title, txt);
+		return createText(txt, i, false);
 	}
 
-	public List<ResultFragment> createText(String title, String txt) {
-		List<ResultFragment> frags = new ArrayList<>(3);
-		frags.add(
-				new TextFragment(createTitle(title, TITLE_BAR_WIDTH, false), CaseChoice.Upper, TextStyle.Preformatted));
+	public List<ResultFragment> createText(String txt, int i, boolean finishing) {
+		List<ResultFragment> frags = new ArrayList<>(5);
+
+		double pct = ((double) i) / EDIT_COUNT;
+		TextFragment progress = new TextFragment(createProgressBar(i, pct), CaseChoice.Upper, TextStyle.Preformatted);
+
+		int deviation = (int) (7 * Math.random());
+		int intPct = (int) (100 * pct);
+		int nPlus = intPct + deviation;
+		double n;
+		if (finishing) {
+			// must be over 100%
+			n = nPlus;
+		} else if (nPlus >= 100 || Math.random() < 0.5) {
+			n = intPct - deviation;
+		} else {
+			n = nPlus;
+		}
+		String title = " " + nf.format(n) + "% HYPED ";
+
+		frags.add(progress);
+		frags.add(new TextFragment(createTitle(title, false), CaseChoice.Upper, TextStyle.Preformatted));
+		progress = new TextFragment(createProgressBar(i, pct), CaseChoice.Upper, TextStyle.Preformatted);
+		frags.add(progress);
 		frags.add(new TextFragment(txt, CaseChoice.Normal, TextStyle.Preformatted));
-		frags.add(new TextFragment(createBottom(TITLE_BAR_WIDTH), CaseChoice.Upper, TextStyle.Preformatted));
+//		frags.add(progress);
+
 		return frags;
 	}
 
-	private String createBottom(int width) {
-		StringBuilder sb = new StringBuilder(width);
-		for (int i = 0; i < width; i++) {
-			sb.append("-");
+	private String createProgressBar(int i, double pct) {
+		StringBuilder sb = new StringBuilder(TITLE_BAR_WIDTH);
+		int width = TITLE_BAR_WIDTH - 4;
+//		sb.append("❰");
+		sb.append(CampingUtil.getRandom(blotsPartial));
+		sb.append(CampingUtil.getRandom(blotsFade));
+
+		int fullBoxes = (int) (width * pct);
+
+		int j = 0;
+		while (j < fullBoxes) {
+			sb.append(CampingUtil.getRandom(blotsFull));
+			j++;
 		}
-		return sb.toString();
+
+		for (int k = 0; k < 1 && j < width; k++) {
+			sb.append(CampingUtil.getRandom(blotsFade));
+			j++;
+		}
+
+		for (int k = 0; k < 2 && j < width; k++) {
+			sb.append(CampingUtil.getRandom(blotsPartial));
+			j++;
+		}
+
+		while (j < width) {
+			sb.append(" ");
+			j++;
+		}
+//		sb.append("❱")
+		sb.append(CampingUtil.getRandom(blotsFade));
+		sb.append(CampingUtil.getRandom(blotsPartial));
+		return createTitle(sb, false);
 	}
 
-	public String createTitle(String title, int width, boolean bounce) {
-		StringBuilder sb = new StringBuilder(width);
-		int dashQty = width - title.length();
+	public String createTitle(CharSequence title, boolean bounce) {
+		StringBuilder sb = new StringBuilder(TITLE_BAR_WIDTH);
+		int dashQty = TITLE_BAR_WIDTH - title.length();
 		int before, after;
 
 		if (!bounce) {
@@ -209,12 +257,31 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 		}
 		after = dashQty - before;
 
-		for (int i = 0; i < before; i++) {
-			sb.append("-");
+		int i = 0;
+		for (; i < before - 2; i++) {
+			sb.append(CampingUtil.getRandom(blotsPartial));
 		}
+		if (i < before) {
+			sb.append(CampingUtil.getRandom(blotsFade));
+			i++;
+		}
+		if (i < before) {
+			sb.append(CampingUtil.getRandom(blotsFull));
+		}
+
 		sb.append(title);
-		for (int i = 0; i < after; i++) {
-			sb.append("-");
+
+		i = 0;
+		if (i < after) {
+			sb.append(CampingUtil.getRandom(blotsFull));
+			i++;
+		}
+		if (i < after) {
+			sb.append(CampingUtil.getRandom(blotsFade));
+			i++;
+		}
+		for (; i < after; i++) {
+			sb.append(CampingUtil.getRandom(blotsPartial));
 		}
 		return sb.toString();
 	}
