@@ -138,28 +138,46 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 			spoiler = input;
 		}
 
-		int qty = 2 + (int) (confirmedTopics.size());
+		boolean providePartial = spoiler.contains("*");
+
+		int qty = 2 + (providePartial ? 2 : 1) * (int) (confirmedTopics.size());
 		List<InlineQueryResult> output = new ArrayList<>(qty);
 
-		output.add(createInlineOption(0, updateId, null, input));
+		output.add(createInlineOption(0, updateId, null, input, false));
+		if (providePartial) {
+			output.add(createInlineOption(1, updateId, null, input, true));
+		}
 		if (containsDash) {
-			output.add(createInlineOption(1, updateId, typedTopic, spoiler));
+			output.add(createInlineOption(output.size(), updateId, typedTopic, spoiler, false));
+			if (providePartial) {
+				output.add(createInlineOption(output.size(), updateId, typedTopic, spoiler, true));
+			}
 		}
 		for (String topic : confirmedTopics.asMap().values()) {
 			if (topic.equalsIgnoreCase(typedTopic))
 				continue;
-			int i = output.size();
-			output.add(createInlineOption(i, updateId, topic, input));
+			output.add(createInlineOption(output.size(), updateId, topic, input, false));
+			if (providePartial) {
+				output.add(createInlineOption(output.size(), updateId, topic, input, true));
+			}
 		}
 
+//		System.out.println(input);
+//		for (InlineQueryResult x : output) {
+//			System.out.println(x);
+//		}
+//		System.out.println("----------");
 		return output;
 
 	}
 
-	public InlineQueryResultArticle createInlineOption(int i, int updateId, String topic, String textToHide) {
+	public InlineQueryResultArticle createInlineOption(int i, int updateId, String topic, String textToHide,
+			boolean partial) {
 		CallbackId callbackId = new CallbackId(getCommandName(), updateId, i);
 		String queryId = callbackId.getResult();
-		String blotText = createBlotText(textToHide, topic);
+		String blotText = createBlotText(textToHide, topic, partial);
+		if (partial)
+			textToHide = removeStars(textToHide);
 		HiddenText item = new HiddenText(topic, textToHide, blotText);
 		providedQueries.put(queryId, item);
 
@@ -172,9 +190,9 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		article.setReplyMarkup(InlineCommandBase.createKeyboard(new String[] { "Show" }, new String[] { queryId }));
 		String label;
 		if (topic != null) {
-			label = topic;
+			label = blotText;
 		} else {
-			label = "No topic";
+			label = "(No topic) " + blotText;
 		}
 		article.setTitle("HideIt: " + label);
 
@@ -183,9 +201,22 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		return article;
 	}
 
-	public String createBlotText(String clear, String topic) {
-		String[] words = clear.split(SPACE);
-		int outLen = words.length;
+	private String removeStars(String textToHide) {
+		int length = textToHide.length();
+		StringBuilder sb = new StringBuilder(length);
+		for (int j = 0; j < length; j++) {
+			char c = textToHide.charAt(j);
+			if (c != '*') {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+
+	public String createBlotText(String clear, String topic, boolean partial) {
+		boolean partialHiding = false;
+		String[] inputWords = clear.split(SPACE);
+		int outLen = inputWords.length;
 
 		int adjust = 0;
 		if (topic != null) {
@@ -197,10 +228,20 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 			out[0] = topic + " -";
 		}
 		for (int i = 0; i < outLen; i++) {
-			int length = words[i].length();
+			int length = inputWords[i].length();
 			char[] word = new char[length];
-			for (int j = 0; j < length; j++) {
-				word[j] = CampingUtil.getRandom(HideItCommand.blots);
+			for (int j = 0, k = 0; j < length; j++) {
+				char c = inputWords[i].charAt(j);
+				if (partial && c == '*') {
+					partialHiding = !partialHiding;
+				} else {
+					if (partial && !partialHiding) {
+						word[k] = c;
+					} else {
+						word[k] = CampingUtil.getRandom(HideItCommand.blots);
+					}
+					k++;
+				}
 			}
 			out[i + adjust] = new String(word);
 		}

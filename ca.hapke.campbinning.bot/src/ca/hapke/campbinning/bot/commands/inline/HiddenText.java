@@ -19,12 +19,31 @@ public class HiddenText {
 		return topic;
 	}
 
-	public String getBlotText() {
-		return blotText;
-	}
-
 	public String getClearText() {
 		return clearText;
 	}
 
+	public String getBlotText() {
+		return blotText;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("HiddenText [");
+		if (topic != null) {
+			builder.append("topic=");
+			builder.append(topic);
+			builder.append(" -- ");
+		}
+		if (clearText != null) {
+			builder.append(clearText);
+			builder.append(" => ");
+		}
+		if (blotText != null) {
+			builder.append(blotText);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 }

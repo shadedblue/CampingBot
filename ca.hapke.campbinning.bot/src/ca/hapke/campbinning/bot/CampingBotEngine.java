@@ -208,12 +208,13 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					AnswerInlineQuery answer = new AnswerInlineQuery();
 					answer.setInlineQueryId(inlineQuery.getId());
 					answer.setResults(results);
+					answer.setCacheTime(30);
+					answer.setPersonal(true);
 
 					try {
 						execute(answer);
 					} catch (TelegramApiException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						// Too old. Don't care.
 					}
 				}
 			}
