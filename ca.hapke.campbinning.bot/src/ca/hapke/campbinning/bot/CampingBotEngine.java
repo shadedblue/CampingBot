@@ -1,5 +1,6 @@
 package ca.hapke.campbinning.bot;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -387,18 +388,46 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	}
 
+	public void logFailure(Integer telegramId, CampingUser campingFromUser, Long chatId, BotCommand outputCommand,
+			TelegramApiException e) {
+		CampingChat chat = chatManager.get(chatId);
+		logFailure(telegramId, campingFromUser, null, chat, outputCommand, e);
+	}
+
+	public void logFailure(Integer telegramId, CampingUser campingFromUser, Integer eventTime, Long chatId,
+			BotCommand outputCommand, TelegramApiException e) {
+		CampingChat chat = chatManager.get(chatId);
+		logFailure(telegramId, campingFromUser, eventTime, chat, outputCommand, e);
+	}
+
 	public void logFailure(Integer telegramId, CampingUser campingFromUser, Integer eventTime, CampingChat chat,
 			BotCommand outputCommand, TelegramApiException e) {
+		if (eventTime == null)
+			eventTime = getNow();
 		EventItem outputEvent = null;
 		outputEvent = new EventItem(outputCommand, campingFromUser, eventTime, chat, telegramId,
-				"Exception: " + e.getMessage(), null);
+				"Exception: " + e.getLocalizedMessage(), null);
 		eventLogger.add(outputEvent);
 		System.err.println(e.toString());
 		e.printStackTrace();
 	}
 
+	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Long chatId, BotCommand outputCommand,
+			CommandResult outputResult, SendResult sendResult) {
+		CampingChat chat = chatManager.get(chatId);
+		logSendResult(telegramId, campingFromUser, null, chat, outputCommand, outputResult, sendResult);
+	}
+
+	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Integer eventTime, Long chatId,
+			BotCommand outputCommand, CommandResult outputResult, SendResult sendResult) {
+		CampingChat chat = chatManager.get(chatId);
+		logSendResult(telegramId, campingFromUser, eventTime, chat, outputCommand, outputResult, sendResult);
+	}
+
 	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Integer eventTime, CampingChat chat,
 			BotCommand outputCommand, CommandResult outputResult, SendResult sendResult) {
+		if (eventTime == null)
+			eventTime = getNow();
 		// command may change to a Rejected
 		BotCommand cmd = outputResult.getCmd();
 		BotCommand resultCommand = cmd != null ? cmd : outputCommand;
@@ -406,6 +435,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		outputEvent = new EventItem(resultCommand, campingFromUser, eventTime, chat, telegramId, sendResult.msg,
 				sendResult.extraData);
 		eventLogger.add(outputEvent);
+	}
+
+	private static int getNow() {
+		return (int) (ZonedDateTime.now().toInstant().toEpochMilli() / 1000);
 	}
 
 	protected CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,

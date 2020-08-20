@@ -46,4 +46,5 @@ public abstract class AbstractCommand {
 	public AccessLevel accessRequired() {
 		return AccessLevel.User;
 	}
+
 }

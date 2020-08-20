@@ -134,9 +134,9 @@ public abstract class CommandResult {
 
 	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;
 
-	public SendResult getResult() {
-		return result;
-	}
+//	public SendResult getResult() {
+//		return result;
+//	}
 
 	@Override
 	public String toString() {

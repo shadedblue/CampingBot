@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.games.Animation;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
@@ -90,14 +91,14 @@ public class EnhanceCommand extends AbstractCommand
 
 	@Override
 	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
-			CampingUser campingFromUser) {
+			CampingUser campingFromUser) throws TelegramApiException {
 
 		// update previous enhancements chain
 		Set<Entry<CommandResult, Integer>> entrySet = trackingPending.entrySet();
 		Iterator<Entry<CommandResult, Integer>> iter = entrySet.iterator();
 		while (iter.hasNext()) {
 			Entry<CommandResult, Integer> item = iter.next();
-			SendResult result = item.getKey().getResult();
+			SendResult result = item.getKey().send(bot, chatId);
 			if (result != null) {
 				Integer repliedTo = item.getValue();
 				tracking.put(result.outgoingMsg.getMessageId(), repliedTo);
