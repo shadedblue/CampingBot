@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.time.temporal.ChronoUnit;
 
@@ -121,17 +122,22 @@ public class CampingXmlSerializer implements CalendaredEvent<Void>, ConfigSerial
 	}
 
 	public static File getFileNotInBinFolder(String fn) throws IOException {
-		File f = new File(fn);
-		File dir = f.getCanonicalFile().getParentFile();
-		boolean remakeF = false;
-		while (dir.isDirectory() && dir.getName().equalsIgnoreCase("bin")) {
+		URL url = CampingXmlSerializer.class.getProtectionDomain().getCodeSource().getLocation();
+
+		File f;
+		File dir = new File(url.getFile());
+		int i = 0;
+		while (i < 100) {
+			f = new File(dir.getAbsolutePath() + File.separatorChar + fn);
+			if (f.exists())
+				return f;
 			dir = dir.getParentFile();
-			remakeF = true;
+			if (dir == null || !dir.canRead())
+				return null;
+			i++;
 		}
-		if (remakeF) {
-			f = new File(dir.getAbsolutePath() + File.pathSeparator + fn);
-		}
-		return f;
+		System.err.println("File not found");
+		return null;
 	}
 
 	@Override

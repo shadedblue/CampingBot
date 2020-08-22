@@ -538,7 +538,8 @@ public class CampingBotUi extends JFrame {
 			lblStatus.setText("<html>" + connected + ": <br>" + username + idStr + "</html>");
 			String tooltip = username + " :: " + connected + " | " + CAMPING_BOT;
 			setTitle(tooltip);
-			trayIcon.setToolTip(tooltip);
+			if (trayIcon != null)
+				trayIcon.setToolTip(tooltip);
 		}
 
 	}
