@@ -29,7 +29,6 @@ import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.processors.CharacterRepeater;
 import ca.hapke.campbinning.bot.processors.FontGarbler;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
-import ca.hapke.campbinning.bot.processors.SwitchableProcessor;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.response.SendResult;
@@ -59,7 +58,7 @@ public class EnhanceCommand extends AbstractCommand
 	private static final String RICK_ROLL = "rickroll";
 	private static final String OVER_ENHANCED = "over";
 	private CampingBot bot;
-	private SwitchableProcessor garbler;
+	private MessageProcessor garbler;
 	private CategoriedItems<String> categories;
 	private Resources res;
 	private CategoriedItems<ImageLink> resultImages;
@@ -73,8 +72,8 @@ public class EnhanceCommand extends AbstractCommand
 	public EnhanceCommand(CampingBot bot) {
 		this.bot = bot;
 		res = bot.getRes();
-		MessageProcessor garblerPipe = new CharacterRepeater(true).addAtEnd(new FontGarbler(true));
-		this.garbler = new SwitchableProcessor(true, garblerPipe);
+		this.garbler = new CharacterRepeater(true).addAtEnd(new FontGarbler(0.3));
+//		this.garbler = new SwitchableProcessor(true, garblerPipe);
 		categories = new CategoriedItems<String>(RICK_ROLL, OVER_ENHANCED);
 		rickText = categories.getList(RICK_ROLL);
 
@@ -148,7 +147,7 @@ public class EnhanceCommand extends AbstractCommand
 		// pic
 		String picFileId = getPictureFileId(replyTo);
 		if (picFileId != null) {
-			CommandResult pictureResponse = createPictureResponse(picFileId);
+			CommandResult pictureResponse = createPictureResponse(picFileId, replyTo.getCaption());
 			if (pictureResponse != null)
 				return pictureResponse;
 		}
@@ -158,7 +157,7 @@ public class EnhanceCommand extends AbstractCommand
 		return new TextCommandResult(BotCommand.Enhance, garble(text)).setReplyTo(replyTo.getMessageId());
 	}
 
-	private CommandResult createPictureResponse(String picFileId) {
+	private CommandResult createPictureResponse(String picFileId, String caption) {
 		try {
 			GetFile get = new GetFile().setFileId(picFileId);
 			File in = null;
@@ -178,8 +177,10 @@ public class EnhanceCommand extends AbstractCommand
 			graphics.drawString(str, 5, 5 + size);
 			outImg = File.createTempFile(bot.getBotUsername(), ".jpg");
 			boolean success = ImageIO.write(centreImg, "jpeg", outImg);
+			if (caption == null || caption.length() == 0)
+				caption = "ENHANCE";
 			if (success)
-				return new ImageCommandResult(BotCommand.Enhance, outImg, garble("ENHANCE"));
+				return new ImageCommandResult(BotCommand.Enhance, outImg, garble(caption));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

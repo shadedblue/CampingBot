@@ -5,22 +5,23 @@ package ca.hapke.campbinning.bot.processors;
  */
 public class FontGarbler extends MessageProcessor {
 
-	private static final double P_LOW = 0.2;
-	private static final double P_HIGH = 2 * P_LOW;
+//	private static final double P_LOW = 0.2;
+//	private static final double P_HIGH = 2 * P_LOW;
 	private static final char MIN = ' ';
 	private static final char MAX = 'z';
 	private final double pReplacement;
 	private char[][] font;
 
-	public FontGarbler(boolean highPower) {
+	public FontGarbler(double pReplacement) {
 		super(true);
-		if (highPower)
-			pReplacement = P_HIGH;
-		else
-			pReplacement = P_LOW;
+//		if (highPower)
+//			pReplacement = P_HIGH;
+//		else
+//			pReplacement = P_LOW;
+		this.pReplacement = pReplacement;
 
 		font = new char[MAX - MIN + 1][];
-		add(' ', "Œ �?↔⊞");
+		add(' ', "Œ �?↔⊞");
 		add('!', "¡ᖎ");
 		add('\"', "");
 		add('#', "ᕯ");
@@ -33,16 +34,16 @@ public class FontGarbler extends MessageProcessor {
 		add(',', "");
 		add('-', "");
 		add('.', "");
-		add('0', "₀Ҩ�?⊙");
-		add('1', "�?⅟");
+		add('0', "₀Ҩ�?⊙");
+		add('1', "�?⅟");
 		add('2', "Ⅱ");
 		add('3', "Ҙ⅓");
-		add('4', "�?�₄");
-		add('5', "�?�₅⅕");
-		add('6', "Ⅵ�?�₆⅙");
-		add('7', "�?�₇�?");
-		add('8', "�?�₈⅛");
-		add('9', "�?�₉⅑");
+		add('4', "�?�₄");
+		add('5', "�?�₅⅕");
+		add('6', "Ⅵ�?�₆⅙");
+		add('7', "�?�₇�?");
+		add('8', "�?�₈⅛");
+		add('9', "�?�₉⅑");
 		add(':', "");
 		add(';', "");
 		add('<', "");
@@ -53,7 +54,7 @@ public class FontGarbler extends MessageProcessor {
 		add('A', "Æᗉ");
 		add('B', "βᗵ");
 		add('C', "ÇƆᘓ€");
-		add('D', "�?ᗟ");
+		add('D', "�?ᗟ");
 		add('E', "ƎƩ");
 		add('F', "℉");
 		add('G', "ĞǤ");
@@ -65,7 +66,7 @@ public class FontGarbler extends MessageProcessor {
 		add('M', "");
 		add('N', "ŅӤ");
 		add('O', "ŒὊ");
-		add('P', "¶�?");
+		add('P', "¶�?");
 		add('Q', "");
 		add('R', "ŖƦ");
 		add('S', "ᔖ∮∯∰");
@@ -81,7 +82,7 @@ public class FontGarbler extends MessageProcessor {
 		add('b', "Ҍ");
 		add('c', "ς");
 		add('d', "");
-		add('e', "�?ҿєӚ");
+		add('e', "�?ҿєӚ");
 		add('f', "");
 		add('g', "");
 		add('h', "ĥӊℎ");
@@ -92,14 +93,14 @@ public class FontGarbler extends MessageProcessor {
 		add('m', "ɱ");
 		add('n', "ñӥռᾔ");
 		add('o', "δσ");
-		add('p', "þ�?�?ք");
+		add('p', "þ�?�?ք");
 		add('q', "ο");
-		add('r', "�?");
+		add('r', "�?");
 		add('s', "Ց");
 		add('t', "τէ");
 		add('u', "µǖմ");
 		add('v', "ν");
-		add('w', "�?ω");
+		add('w', "�?ω");
 		add('x', "җ");
 		add('y', "ȳʎ");
 		add('z', "ɀ");
