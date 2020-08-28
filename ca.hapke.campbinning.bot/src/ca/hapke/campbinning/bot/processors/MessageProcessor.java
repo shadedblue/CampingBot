@@ -13,7 +13,7 @@ import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 public abstract class MessageProcessor {
 
 	protected MessageProcessor next;
-	protected boolean enabled = false;
+	protected boolean enabled;
 
 	public MessageProcessor(boolean enabled) {
 		this.enabled = enabled;

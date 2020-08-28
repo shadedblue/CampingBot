@@ -20,12 +20,14 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.games.Animation;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.processors.CharacterRepeater;
 import ca.hapke.campbinning.bot.processors.FontGarbler;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
@@ -45,18 +47,20 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  */
 public class EnhanceCommand extends AbstractCommand
 		implements HasCategories<String>, CampingSerializable, SlashCommand {
-
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Enhance };
-
-	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
-		return SLASH_COMMANDS;
-	}
-
 	private static final String ENHANCE_CONTAINER = "Enhance";
 	private static final String ENHANCE_COMMAND = "enhance";
 	private static final String RICK_ROLL = "rickroll";
 	private static final String OVER_ENHANCED = "over";
+
+	private static final SlashCommandType SlashEnhance = new SlashCommandType(ENHANCE_CONTAINER, ENHANCE_COMMAND,
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.PIC | BotCommandIds.USE);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashEnhance };
+
+	@Override
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
+
 	private CampingBot bot;
 	private MessageProcessor garbler;
 	private CategoriedItems<String> categories;
@@ -89,7 +93,7 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
 
 		// update previous enhancements chain
@@ -128,7 +132,7 @@ public class EnhanceCommand extends AbstractCommand
 		}
 		if (enhancementCount >= 2) {
 			String text = CampingUtil.getRandom(overEnhanced);
-			return new TextCommandResult(BotCommand.Enhance, new TextFragment(text, CaseChoice.Upper))
+			return new TextCommandResult(SlashEnhance, new TextFragment(text, CaseChoice.Upper))
 					.setReplyTo(replyTo.getMessageId());
 		}
 
@@ -154,7 +158,7 @@ public class EnhanceCommand extends AbstractCommand
 
 		// else == text only
 		String text = replyTo.getText();
-		return new TextCommandResult(BotCommand.Enhance, garble(text)).setReplyTo(replyTo.getMessageId());
+		return new TextCommandResult(SlashEnhance, garble(text)).setReplyTo(replyTo.getMessageId());
 	}
 
 	private CommandResult createPictureResponse(String picFileId, String caption) {
@@ -180,7 +184,7 @@ public class EnhanceCommand extends AbstractCommand
 			if (caption == null || caption.length() == 0)
 				caption = "ENHANCE";
 			if (success)
-				return new ImageCommandResult(BotCommand.Enhance, outImg, garble(caption));
+				return new ImageCommandResult(SlashEnhance, outImg, garble(caption));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -191,7 +195,8 @@ public class EnhanceCommand extends AbstractCommand
 	private CommandResult createVideoResponse(Message replyTo) {
 		ImageLink img = CampingUtil.getRandom(rickImages);
 		String lyric = CampingUtil.getRandom(rickText);
-		return new ImageCommandResult(BotCommand.Enhance, img, garble(lyric)).setReplyTo(replyTo.getMessageId());
+		return new ImageCommandResult(SlashEnhance, img, garble(lyric))
+				.setReplyTo(replyTo.getMessageId());
 	}
 
 	public TextFragment garble(String input) {

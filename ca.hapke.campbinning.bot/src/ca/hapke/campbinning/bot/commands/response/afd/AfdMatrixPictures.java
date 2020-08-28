@@ -9,9 +9,9 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.channels.CampingChat;
+import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.response.ImageCommandResult;
@@ -65,7 +65,7 @@ public class AfdMatrixPictures implements CalendaredEvent<Void> {
 			return;
 
 		ImageLink image = new ImageLink("http://www.hapke.ca/images/matrix-" + i + ".jpg", ImageLink.STATIC);
-		ImageCommandResult send = new ImageCommandResult(BotCommand.PleasureModel, image);
+		ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
 		String caption = captions[i];
 		if (caption != null)
 			send.add(caption);
@@ -80,7 +80,7 @@ public class AfdMatrixPictures implements CalendaredEvent<Void> {
 			SendResult result = send.send(bot, chat.chatId);
 
 			Message outgoingMsg = result.outgoingMsg;
-			EventItem ei = new EventItem(BotCommand.PleasureModel, bot.getMeCamping(), outgoingMsg.getDate(), chat,
+			EventItem ei = new EventItem(PleasureModelCommand.PleasureModelCommand, bot.getMeCamping(), outgoingMsg.getDate(), chat,
 					outgoingMsg.getMessageId(), caption, null);
 			EventLogger.getInstance().add(ei);
 		} catch (TelegramApiException e) {
@@ -104,7 +104,7 @@ public class AfdMatrixPictures implements CalendaredEvent<Void> {
 			// finishing
 			ImageLink image = new ImageLink("http://www.hapke.ca/images/42069.jpg", ImageLink.STATIC);
 			String caption = "APRIL FOOLS, MOTHER FUCKERS";
-			ImageCommandResult send = new ImageCommandResult(BotCommand.PleasureModel, image);
+			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
 			send.add(caption);
 
 			sendImage(send, caption);

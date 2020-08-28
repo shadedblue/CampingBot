@@ -8,9 +8,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 
 /**
@@ -20,17 +20,17 @@ public class EditTextCommandResult extends CommandResult {
 
 	private Message message;
 
-	public EditTextCommandResult(BotCommand cmd, Message message) {
+	public EditTextCommandResult(CommandType cmd, Message message) {
 		super(cmd);
 		this.message = message;
 	}
 
-	public EditTextCommandResult(BotCommand cmd, Message message, ResultFragment... fragments) {
+	public EditTextCommandResult(CommandType cmd, Message message, ResultFragment... fragments) {
 		super(cmd, fragments);
 		this.message = message;
 	}
 
-	public EditTextCommandResult(BotCommand cmd, Message message, List<ResultFragment> fragments) {
+	public EditTextCommandResult(CommandType cmd, Message message, List<ResultFragment> fragments) {
 		super(cmd, fragments);
 		this.message = message;
 	}

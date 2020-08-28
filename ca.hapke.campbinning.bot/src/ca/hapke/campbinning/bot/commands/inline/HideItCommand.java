@@ -20,8 +20,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.commands.callback.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.log.DatabaseConsumer;
@@ -36,6 +37,10 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class HideItCommand extends InlineCommandBase implements CallbackCommand {
+	public static final ResponseCommandType HideItSendCommand = new ResponseCommandType("HideItSend",
+			BotCommandIds.INLINE | BotCommandIds.TEXT | BotCommandIds.SET);
+	public static final ResponseCommandType HideItRevealCommand = new ResponseCommandType("HideItReveal",
+			BotCommandIds.INLINE | BotCommandIds.TEXT | BotCommandIds.USE);
 
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
@@ -106,8 +111,8 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		HideItMessage msg = new HideItMessage(queryId, details.getClearText());
 		add(msg);
 
-		EventItem item = new EventItem(BotCommand.HideItSend, campingFromUser, null, null, queryId,
-				details.getClearText(), null);
+		EventItem item = new EventItem(HideItSendCommand, campingFromUser, null, null, queryId, details.getClearText(),
+				null);
 		return item;
 	}
 
@@ -273,7 +278,7 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 
 			User fromUser = callbackQuery.getFrom();
 			CampingUser user = CampingUserMonitor.getInstance().monitor(fromUser);
-			return new EventItem(BotCommand.HideItReveal, user, null, null, null, displayToUser, null);
+			return new EventItem(HideItRevealCommand, user, null, null, null, displayToUser, null);
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
 		}

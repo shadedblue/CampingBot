@@ -6,15 +6,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.channels.CampingChat;
+import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
-import ca.hapke.campbinning.bot.processors.SwitchableProcessor;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.SendResult;
 import ca.hapke.campbinning.bot.response.TitleCommandResult;
@@ -31,10 +30,10 @@ public class AfdTextCommand implements TextCommand {
 	private boolean enabled = false;
 	private CampingChat chat;
 
-	public AfdTextCommand(CampingBot bot, SwitchableProcessor aprilFoolsDayProcessor, CampingChat chat) {
+	public AfdTextCommand(CampingBot bot, MessageProcessor aprilFoolsDayProcessor, CampingChat chat) {
 		this.bot = bot;
 		this.chat = chat;
-		this.processor = aprilFoolsDayProcessor.getPipe();
+		this.processor = aprilFoolsDayProcessor;
 		resources = bot.getRes();
 	}
 
@@ -54,7 +53,7 @@ public class AfdTextCommand implements TextCommand {
 //		}
 
 		if (Math.random() < 0.1) {
-			TitleCommandResult titleCmd = new TitleCommandResult(BotCommand.PartyEveryday);
+			TitleCommandResult titleCmd = new TitleCommandResult(PartyEverydayCommand.PartyEverydayCommand);
 
 			for (int i = 0; i < 3; i++) {
 				titleCmd.add(resources.getRandomBallEmoji());
@@ -83,8 +82,8 @@ public class AfdTextCommand implements TextCommand {
 				SendResult result = titleCmd.send(bot, chat.chatId);
 				out = titleCmd;
 				Message outgoingMsg = result.outgoingMsg;
-				EventItem ei = new EventItem(BotCommand.PartyEveryday, bot.getMeCamping(), outgoingMsg.getDate(), chat,
-						outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
+				EventItem ei = new EventItem(PartyEverydayCommand.PartyEverydayCommand, bot.getMeCamping(), outgoingMsg.getDate(),
+						chat, outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
 				EventLogger.getInstance().add(ei);
 			} catch (TelegramApiException e) {
 				e.printStackTrace();

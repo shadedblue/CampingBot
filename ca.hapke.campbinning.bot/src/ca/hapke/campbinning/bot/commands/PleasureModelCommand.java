@@ -6,9 +6,10 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import ca.hapke.campbinning.bot.BotChoicePriority;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -19,6 +20,8 @@ import ca.hapke.campbinning.bot.util.ImageLink;
  * @author Nathan Hapke
  */
 public class PleasureModelCommand extends AbstractCommand implements TextCommand {
+	public static final ResponseCommandType PleasureModelCommand = new ResponseCommandType("PleasureModel",
+			BotCommandIds.PLEASURE | BotCommandIds.GIF);
 
 	public static final String PLEASURE_MODEL = "pleasure model";
 
@@ -44,7 +47,7 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		ImageLink img = CampingUtil.getRandom(images);
-		return new ImageCommandResult(BotCommand.PleasureModel, img);
+		return new ImageCommandResult(PleasureModelCommand, img);
 	}
 
 	@Override

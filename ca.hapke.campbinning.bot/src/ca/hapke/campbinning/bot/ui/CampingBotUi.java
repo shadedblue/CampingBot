@@ -53,7 +53,6 @@ import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.calendaring.monitor.TimerThreadWithKill;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSystem;
 import ca.hapke.campbinning.bot.CampingXmlSerializer;
@@ -454,10 +453,10 @@ public class CampingBotUi extends JFrame {
 		String msg = txtChat.getText().trim();
 		if (chat != null && msg.length() > 0) {
 			try {
-				TextCommandResult cmd = new TextCommandResult(BotCommand.Talk, new TextFragment(msg));
+				TextCommandResult cmd = new TextCommandResult(CampingBot.TalkCommand, new TextFragment(msg));
 				SendResult result = cmd.send(bot, chat.chatId);
 				Message outgoingMsg = result.outgoingMsg;
-				EventItem ei = new EventItem(BotCommand.Talk, bot.getMeCamping(), outgoingMsg.getDate(), chat,
+				EventItem ei = new EventItem(CampingBot.TalkCommand, bot.getMeCamping(), outgoingMsg.getDate(), chat,
 						outgoingMsg.getMessageId(), msg, null);
 				EventLogger.getInstance().add(ei);
 			} catch (TelegramApiException e) {

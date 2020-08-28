@@ -14,11 +14,13 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingBotEngine;
-import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackCommandBase;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -39,6 +41,17 @@ import ca.odell.glazedlists.GlazedLists;
  */
 public abstract class VotingCommand<T> extends CallbackCommandBase
 		implements CalendaredEvent<Void>, TextCommand, SlashCommand {
+	public static final ResponseCommandType VoteTopicInitiationCommand = new ResponseCommandType("VoteTopicInitiation",
+			BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.SET);
+	public static final ResponseCommandType VoteActivatorCompleteCommand = new ResponseCommandType(
+			"VoteActivatorComplete", BotCommandIds.VOTING | BotCommandIds.FINISH);
+	public static final ResponseCommandType VoteTopicCompleteCommand = new ResponseCommandType("VoteTopicComplete",
+			BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.FINISH);
+	public static final ResponseCommandType VoteCommandFailedCommand = new ResponseCommandType("VoteCommandFailed",
+			BotCommandIds.VOTING | BotCommandIds.FAILURE);
+
+	public static final ResponseCommandType VoteCommand = new ResponseCommandType("Vote",
+			BotCommandIds.VOTING | BotCommandIds.USE);
 
 	protected final Map<Integer, VoteTracker<T>> voteOnMessages = new HashMap<Integer, VoteTracker<T>>();
 	protected final Map<Integer, VoteTracker<T>> voteOnBanners = new HashMap<Integer, VoteTracker<T>>();
@@ -49,19 +62,19 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	protected final CampingBot bot;
 	private TimesProvider<Void> times;
 //	protected final BotCommand respondsTo;
-	private BotCommand[] SLASH_COMMANDS;
+	private SlashCommandType[] SLASH_COMMANDS;
 	private static final TextFragment ALREADY_BEING_VOTED_ON = new TextFragment("Topic already being voted on, ");
 	private static final TextFragment NO_TOPIC_PROVIDED = new TextFragment(
 			"Reply to the topic you would like to vote on, ");
 
-	public VotingCommand(CampingBot campingBot, BotCommand respondsTo) {
-		this.SLASH_COMMANDS = new BotCommand[] { respondsTo };
+	public VotingCommand(CampingBot campingBot, SlashCommandType... respondsTo) {
+		this.SLASH_COMMANDS = respondsTo;
 		this.bot = campingBot;
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
 	}
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 
@@ -92,31 +105,31 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
 		CommandResult result;
 
 		try {
 			Message topic = message.getReplyToMessage();
 			if (topic != null) {
-				result = startVotingInternal(command, bot, message, chatId, campingFromUser, topic);
+				result = startVotingInternal(bot, message, chatId, campingFromUser, topic);
 			} else {
-				result = new TextCommandResult(BotCommand.VoteCommandFailed, NO_TOPIC_PROVIDED,
+				result = new TextCommandResult(VoteCommandFailedCommand, NO_TOPIC_PROVIDED,
 						new InsultFragment(Perspective.You));
 			}
 		} catch (Exception e) {
-			result = new TextCommandResult(BotCommand.VoteCommandFailed, new TextFragment(e.getMessage()));
+			result = new TextCommandResult(VoteCommandFailedCommand, new TextFragment(e.getMessage()));
 		}
 		return result;
 	}
 
-	private CommandResult startVotingInternal(BotCommand type, CampingBotEngine bot, Message activation, Long chatId,
+	private CommandResult startVotingInternal(CampingBotEngine bot, Message activation, Long chatId,
 			CampingUser activater, Message topic) throws TelegramApiException {
 		VoteTracker<T> tracker = null;
 		TextCommandResult output = null;
 		Integer rantMessageId = topic.getMessageId();
 		if (voteOnMessages.containsKey(rantMessageId)) {
-			return new TextCommandResult(BotCommand.VoteCommandFailed, ALREADY_BEING_VOTED_ON,
+			return new TextCommandResult(VoteCommandFailedCommand, ALREADY_BEING_VOTED_ON,
 					new InsultFragment(Perspective.You));
 		} else {
 			CampingUserMonitor uM = CampingUserMonitor.getInstance();
@@ -125,7 +138,7 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 			try {
 				tracker = initiateVote(ranter, activater, chatId, activation, topic);
 			} catch (VoteInitiationException e) {
-				output = new TextCommandResult(BotCommand.VoteCommandFailed, new MentionFragment(activater));
+				output = new TextCommandResult(VoteCommandFailedCommand, new MentionFragment(activater));
 				output.add(e.getMessage());
 			}
 
@@ -176,18 +189,14 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 
-		BotCommand type = null;
 		String msgLower = message.getText().toLowerCase().trim();
-		for (BotCommand respondsTo : SLASH_COMMANDS) {
-			if (msgLower.endsWith("/" + respondsTo.command))
-				type = respondsTo;
+		for (SlashCommandType respondsTo : SLASH_COMMANDS) {
+			if (msgLower.endsWith("/" + respondsTo.slashCommand))
 
-			if (type != null) {
 				try {
-					return startVotingInternal(type, bot, message, chatId, campingFromUser, message);
+					return startVotingInternal(bot, message, chatId, campingFromUser, message);
 				} catch (TelegramApiException e) {
 				}
-			}
 		}
 		return null;
 	}
@@ -195,8 +204,8 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	@Override
 	public boolean isMatch(String msg, Message message) {
 		msg = msg.toLowerCase().trim();
-		for (BotCommand respondsTo : SLASH_COMMANDS) {
-			if (msg.endsWith("/" + respondsTo.command))
+		for (SlashCommandType respondsTo : SLASH_COMMANDS) {
+			if (msg.endsWith("/" + respondsTo.slashCommand))
 				return true;
 		}
 		return false;

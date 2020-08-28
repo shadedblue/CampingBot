@@ -17,7 +17,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
@@ -115,7 +114,7 @@ public abstract class VoteTracker<T> {
 			naIndex = -1;
 		}
 		List<ResultFragment> bannerFrags = getBannerString();
-		bannerText = new TextCommandResult(BotCommand.VoteTopicInitiation, bannerFrags);
+		bannerText = new TextCommandResult(VotingCommand.VoteTopicInitiationCommand, bannerFrags);
 		bannerText.setReplyTo(activation.getMessageId());
 		bannerText.setKeyboard(getKeyboard());
 		bannerResult = bannerText.send(bot, chatId);
@@ -126,7 +125,8 @@ public abstract class VoteTracker<T> {
 		pinBanner.setDisableNotification(Boolean.valueOf(true));
 		bot.execute(pinBanner);
 
-		TextCommandResult votesText = new TextCommandResult(BotCommand.VoteTopicInitiation, getVotesText(completed));
+		TextCommandResult votesText = new TextCommandResult(VotingCommand.VoteTopicInitiationCommand,
+				getVotesText(completed));
 		votesText.setReplyTo(topic.getMessageId());
 		voteTrackingResult = votesText.send(bot, chatId);
 		voteTrackingMessage = voteTrackingResult.outgoingMsg;
@@ -196,8 +196,8 @@ public abstract class VoteTracker<T> {
 		}
 		if (voteChanged) {
 			try {
-				EditTextCommandResult editCmd = new EditTextCommandResult(BotCommand.Vote, voteTrackingMessage,
-						getVotesText(completed));
+				EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand,
+						voteTrackingMessage, getVotesText(completed));
 				editCmd.send(bot, chatId);
 
 			} catch (TelegramApiException e) {
@@ -214,7 +214,7 @@ public abstract class VoteTracker<T> {
 		answer.setCallbackQueryId(callbackQueryId);
 		try {
 			bot.execute(answer);
-			return new EventItem(BotCommand.Vote, user, null, chat, bannerMessage.getMessageId(), display,
+			return new EventItem(VotingCommand.VoteCommand, user, null, chat, bannerMessage.getMessageId(), display,
 					topicMessage.getMessageId());
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
@@ -226,7 +226,8 @@ public abstract class VoteTracker<T> {
 	}
 
 	public void update() {
-		EditTextCommandResult editCmd = new EditTextCommandResult(BotCommand.Vote, bannerMessage, getBannerString());
+		EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand, bannerMessage,
+				getBannerString());
 
 		if (!completed)
 			editCmd.setKeyboard(getKeyboard());
@@ -239,8 +240,8 @@ public abstract class VoteTracker<T> {
 
 	public void updateBannerFinished() {
 		try {
-			EditTextCommandResult edit = new EditTextCommandResult(BotCommand.VoteTopicComplete, bannerMessage,
-					VOTING_COMPLETED);
+			EditTextCommandResult edit = new EditTextCommandResult(VotingCommand.VoteTopicCompleteCommand,
+					bannerMessage, VOTING_COMPLETED);
 			edit.send(bot, chatId);
 		} catch (TelegramApiException e2) {
 		}
@@ -259,7 +260,7 @@ public abstract class VoteTracker<T> {
 
 	public CommandResult createCompletionResult() {
 		List<ResultFragment> votes = getVotesText(true);
-		return new TextCommandResult(BotCommand.VoteTopicComplete, votes);
+		return new TextCommandResult(VotingCommand.VoteTopicCompleteCommand, votes);
 	}
 
 	public void sendFinishedVotingMessage() {
@@ -271,7 +272,7 @@ public abstract class VoteTracker<T> {
 			completionMsg.setReplyTo(messageId);
 			SendResult result = completionMsg.sendInternal(bot, chatId);
 
-			logger.add(new EventItem(BotCommand.VoteTopicComplete, ranter, result.outgoingMsg.getDate(), chat,
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, ranter, result.outgoingMsg.getDate(), chat,
 					result.outgoingMsg.getMessageId(), result.outgoingMsg.getText(), messageId));
 		} catch (TelegramApiException e) {
 			logger.add(new EventItem(e.getLocalizedMessage()));

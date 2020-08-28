@@ -33,8 +33,11 @@ import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.channels.ChatAllowed;
 import ca.hapke.campbinning.bot.commands.AbstractCommand;
-import ca.hapke.campbinning.bot.commands.SlashCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
+import ca.hapke.campbinning.bot.commands.api.InputType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackCommand;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommand;
@@ -50,6 +53,7 @@ import ca.hapke.campbinning.bot.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.ui.IStatus;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.users.CampingUserMonitor;
+import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.odell.glazedlists.FilterList;
 
 /**
@@ -72,7 +76,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	private List<TextCommand> textCommands = new ArrayList<>();
 	private List<InlineCommand> inlineCommands = new ArrayList<>();
 	private Map<String, InlineCommand> inlineMap = new HashMap<>();
-	private Multimap<BotCommand, SlashCommand> slashCommands = ArrayListMultimap.create();
+	private Multimap<SlashCommandType, SlashCommand> slashCommands = ArrayListMultimap.create();
+	private Map<String, SlashCommandType> slashCommandMap = new HashMap<>();
 
 	protected MessageProcessor processor = new DefaultMessageProcessor();
 
@@ -336,10 +341,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		if (message != null) {
 			if (update.hasMessage() && message.hasText()) {
 				String originalMsg = message.getText();
-				BotCommand outputCommand = null;
+				SlashCommandType outputCommand = null;
 				CommandResult outputResult = null;
 
-				outputCommand = BotCommand.findCommand(update, me);
+				outputCommand = findCommand(update, me);
 
 				try {
 					switch (chat.getAllowed()) {
@@ -347,7 +352,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					case NewAnnounced:
 						break;
 					case New:
-						outputResult = new TextCommandResult(BotCommand.JoinThread, new TextFragment(
+						outputResult = new TextCommandResult(CampingChatManager.JoinThreadCommand, new TextFragment(
 								"An administrator must approve this channel before commands are enabled."));
 						chat.setAllowed(ChatAllowed.NewAnnounced);
 						break;
@@ -388,20 +393,52 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	}
 
-	public void logFailure(Integer telegramId, CampingUser campingFromUser, Long chatId, BotCommand outputCommand,
+	public SlashCommandType findCommand(Update update, User me) {
+		Message message = update.getMessage();
+		List<MessageEntity> entities = message.getEntities();
+		if (entities != null) {
+			for (MessageEntity msgEnt : entities) {
+				String type = msgEnt.getType();
+				if (BotConstants.BOT_COMMAND.equalsIgnoreCase(type) && msgEnt.getOffset() == 0) {
+					boolean targetsMe;
+					String msg = msgEnt.getText();
+					String command = msg;
+					int start = msg.indexOf('/');
+					int at = msg.indexOf('@');
+					int length = msg.length();
+					if (at > 0) {
+						command = msg.substring(start + 1, at);
+						String target = msg.substring(at + 1, length);
+						targetsMe = CampingUtil.matchOne(target, me.getFirstName(), me.getUserName(), me.getLastName());
+					} else {
+						command = msg.substring(start + 1);
+						targetsMe = true;
+					}
+
+					if (targetsMe) {
+						return slashCommandMap.get(command);
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public void logFailure(Integer telegramId, CampingUser campingFromUser, Long chatId, CommandType outputCommand,
 			TelegramApiException e) {
 		CampingChat chat = chatManager.get(chatId);
 		logFailure(telegramId, campingFromUser, null, chat, outputCommand, e);
 	}
 
 	public void logFailure(Integer telegramId, CampingUser campingFromUser, Integer eventTime, Long chatId,
-			BotCommand outputCommand, TelegramApiException e) {
+			CommandType outputCommand, TelegramApiException e) {
 		CampingChat chat = chatManager.get(chatId);
 		logFailure(telegramId, campingFromUser, eventTime, chat, outputCommand, e);
 	}
 
 	public void logFailure(Integer telegramId, CampingUser campingFromUser, Integer eventTime, CampingChat chat,
-			BotCommand outputCommand, TelegramApiException e) {
+			CommandType outputCommand, TelegramApiException e) {
 		if (eventTime == null)
 			eventTime = getNow();
 		EventItem outputEvent = null;
@@ -412,25 +449,25 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		e.printStackTrace();
 	}
 
-	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Long chatId, BotCommand outputCommand,
+	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Long chatId, CommandType outputCommand,
 			CommandResult outputResult, SendResult sendResult) {
 		CampingChat chat = chatManager.get(chatId);
 		logSendResult(telegramId, campingFromUser, null, chat, outputCommand, outputResult, sendResult);
 	}
 
 	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Integer eventTime, Long chatId,
-			BotCommand outputCommand, CommandResult outputResult, SendResult sendResult) {
+			CommandType outputCommand, CommandResult outputResult, SendResult sendResult) {
 		CampingChat chat = chatManager.get(chatId);
 		logSendResult(telegramId, campingFromUser, eventTime, chat, outputCommand, outputResult, sendResult);
 	}
 
 	public void logSendResult(Integer telegramId, CampingUser campingFromUser, Integer eventTime, CampingChat chat,
-			BotCommand outputCommand, CommandResult outputResult, SendResult sendResult) {
+			CommandType outputCommand, CommandResult outputResult, SendResult sendResult) {
 		if (eventTime == null)
 			eventTime = getNow();
 		// command may change to a Rejected
-		BotCommand cmd = outputResult.getCmd();
-		BotCommand resultCommand = cmd != null ? cmd : outputCommand;
+		CommandType cmd = outputResult.getCmd();
+		CommandType resultCommand = cmd != null ? cmd : outputCommand;
 		EventItem outputEvent = null;
 		outputEvent = new EventItem(resultCommand, campingFromUser, eventTime, chat, telegramId, sendResult.msg,
 				sendResult.extraData);
@@ -441,11 +478,11 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		return (int) (ZonedDateTime.now().toInstant().toEpochMilli() / 1000);
 	}
 
-	protected CommandResult reactToSlashCommandInText(BotCommand command, Message message, Long chatId,
+	protected CommandResult reactToSlashCommandInText(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
 		for (SlashCommand sc : slashCommands.get(command)) {
 			if (!system.hasAccess(campingFromUser, sc)) {
-				return new TextCommandResult(BotCommand.Status).add(campingFromUser).add(": Access denied, you")
+				return new TextCommandResult(command).add(campingFromUser).add(": Access denied, you")
 						.add(insultGenerator.getInsult());
 			}
 			CommandResult result = sc.respondToSlashCommand(command, message, chatId, campingFromUser);
@@ -555,10 +592,11 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 		if (command instanceof SlashCommand) {
 			SlashCommand sc = (SlashCommand) command;
-			BotCommand[] cmds = sc.getSlashCommandsToRespondTo();
+			SlashCommandType[] cmds = sc.getSlashCommandsToRespondTo();
 			if (cmds != null) {
-				for (BotCommand key : cmds) {
+				for (SlashCommandType key : cmds) {
 					slashCommands.put(key, sc);
+					slashCommandMap.put(key.slashCommand, key);
 				}
 			}
 		}

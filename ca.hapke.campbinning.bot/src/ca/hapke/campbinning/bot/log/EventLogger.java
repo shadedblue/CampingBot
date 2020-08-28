@@ -1,6 +1,6 @@
 package ca.hapke.campbinning.bot.log;
 
-import ca.hapke.campbinning.bot.CommandType;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;

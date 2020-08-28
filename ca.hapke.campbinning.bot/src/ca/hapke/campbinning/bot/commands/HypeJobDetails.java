@@ -7,7 +7,6 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.response.EditTextCommandResult;
 import ca.hapke.campbinning.bot.response.SendResult;
@@ -81,17 +80,17 @@ public class HypeJobDetails implements JobDetails {
 	public boolean doStep(int step, int attempt) {
 		if (step == 0) {
 			List<ResultFragment> frags = createNumbers(0);
-			TextCommandResult result = new TextCommandResult(BotCommand.Hype, frags);
+			TextCommandResult result = new TextCommandResult(HypeCommand.SlashHype, frags);
 
 			SendResult sendResult;
 			try {
 				sendResult = result.send(bot, chatId);
 				targetMessage = sendResult.outgoingMsg;
-				bot.logSendResult(targetMessage.getMessageId(), campingFromUser, chatId, BotCommand.Hype, result,
+				bot.logSendResult(targetMessage.getMessageId(), campingFromUser, chatId, HypeCommand.SlashHype, result,
 						sendResult);
 				return true;
 			} catch (TelegramApiException e) {
-				bot.logFailure(targetMessage.getMessageId(), campingFromUser, chatId, BotCommand.Hype, e);
+				bot.logFailure(targetMessage.getMessageId(), campingFromUser, chatId, HypeCommand.SlashHype, e);
 				return false;
 			}
 		} else if (step <= EDIT_COUNT) {
@@ -108,14 +107,14 @@ public class HypeJobDetails implements JobDetails {
 	private boolean attemptEdit(List<ResultFragment> frags) {
 		Integer telegramId = targetMessage.getMessageId();
 
-		EditTextCommandResult edit = new EditTextCommandResult(BotCommand.Hype, targetMessage, frags);
+		EditTextCommandResult edit = new EditTextCommandResult(HypeCommand.SlashHype, targetMessage, frags);
 		SendResult result;
 		try {
 			result = edit.send(bot, chatId);
-			bot.logSendResult(telegramId, campingFromUser, chatId, BotCommand.Hype, edit, result);
+			bot.logSendResult(telegramId, campingFromUser, chatId, HypeCommand.SlashHype, edit, result);
 			return true;
 		} catch (TelegramApiException e) {
-			bot.logFailure(telegramId, campingFromUser, chatId, BotCommand.Hype, e);
+			bot.logFailure(telegramId, campingFromUser, chatId, HypeCommand.SlashHype, e);
 			return false;
 		}
 	}

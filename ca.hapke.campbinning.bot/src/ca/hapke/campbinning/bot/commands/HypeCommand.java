@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.NoopCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -19,14 +21,16 @@ import ca.hapke.campbinning.bot.util.StagedJob;
  * @author Nathan Hapke
  */
 public class HypeCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Hype };
+	private static final String HYPE_CONTAINER = "Hype";
+	public static final SlashCommandType SlashHype = new SlashCommandType(HYPE_CONTAINER, "hype",
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.TEXT | BotCommandIds.USE);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashHype };
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 
-	private static final String HYPE_CONTAINER = "Hype";
 	private static final String DICKS_CATEGORY = "Dicks";
 	private CategoriedItems<String> categories;
 
@@ -90,12 +94,12 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
 		String hype = CampingUtil.getRandom(hypes);
 		HypeJobDetails details = new HypeJobDetails(campingFromUser, chatId, hype, bot, dicks);
 		softStart(details);
-		return new NoopCommandResult(BotCommand.Hype);
+		return new NoopCommandResult(SlashHype);
 	}
 
 	@Override

@@ -6,9 +6,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 
@@ -18,15 +18,15 @@ import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
  */
 public class TextCommandResult extends CommandResult {
 
-	public TextCommandResult(BotCommand cmd) {
+	public TextCommandResult(CommandType cmd) {
 		super(cmd);
 	}
 
-	public TextCommandResult(BotCommand cmd, ResultFragment... fragments) {
+	public TextCommandResult(CommandType cmd, ResultFragment... fragments) {
 		super(cmd, fragments);
 	}
 
-	public TextCommandResult(BotCommand cmd, List<ResultFragment> fragments) {
+	public TextCommandResult(CommandType cmd, List<ResultFragment> fragments) {
 		super(cmd, fragments);
 	}
 

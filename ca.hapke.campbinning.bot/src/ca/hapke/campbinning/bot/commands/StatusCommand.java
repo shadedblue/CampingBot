@@ -11,7 +11,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import com.google.common.cache.LoadingCache;
 
 import ca.hapke.campbinning.bot.AccessLevel;
-import ca.hapke.campbinning.bot.BotCommand;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.commands.inline.HideItCommand;
 import ca.hapke.campbinning.bot.commands.inline.HideItMessage;
 import ca.hapke.campbinning.bot.response.CommandResult;
@@ -26,7 +28,9 @@ import ca.hapke.campbinning.bot.util.TimeFormatter;
  */
 public class StatusCommand extends AbstractCommand implements IStatus, SlashCommand {
 	private static final String STATUS = "Status";
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Status };
+	public static final SlashCommandType SlashStatus = new SlashCommandType(STATUS, "status",
+			BotCommandIds.TEXT | BotCommandIds.USE);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashStatus };
 	private TimeFormatter tf = new TimeFormatter(2, ", ", false, false);
 	private ZonedDateTime onlineTime;
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL d, h:mm:ss a");
@@ -56,9 +60,9 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
-		TextCommandResult r = new TextCommandResult(BotCommand.Status);
+		TextCommandResult r = new TextCommandResult(SlashStatus);
 		r.add("Online Since", TextStyle.Bold);
 		r.add(": ");
 		if (onlineTime != null) {
@@ -92,7 +96,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 

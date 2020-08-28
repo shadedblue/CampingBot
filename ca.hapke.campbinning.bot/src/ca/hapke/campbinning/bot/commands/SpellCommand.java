@@ -11,13 +11,16 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 
 import ca.hapke.campbinning.bot.BotChoicePriority;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
-import ca.hapke.campbinning.bot.CommandType;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.commands.inline.InlineCommandBase;
 import ca.hapke.campbinning.bot.log.EventItem;
@@ -37,9 +40,15 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 public class SpellCommand extends InlineCommandBase
 		implements HasCategories<String>, CampingSerializable, SlashCommand {
 
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Spell };
-
 	private static final String SPELL = "Spell";
+
+	public static final SlashCommandType SlashSpellCommand = new SlashCommandType(SPELL, "spell",
+			BotCommandIds.SPELL | BotCommandIds.USE);
+	public static final ResponseCommandType SpellDipshitCommand = new ResponseCommandType("SpellDipshit",
+			BotCommandIds.SPELL | BotCommandIds.FAILURE);
+
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashSpellCommand };
+
 	private static final TextFragment CAST_THE = new TextFragment("I cast the ");
 	private static final TextFragment OF = new TextFragment(" of ");
 	private static final TextFragment ON = new TextFragment(" on ");
@@ -65,7 +74,7 @@ public class SpellCommand extends InlineCommandBase
 	private List<String> exclamations;
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
 		CampingUser targetUser = bot.findTarget(message, false, true, BotChoicePriority.Last);
 		SpellResult result = createSpell(campingFromUser, targetUser);
@@ -117,7 +126,7 @@ public class SpellCommand extends InlineCommandBase
 	}
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 
@@ -130,7 +139,7 @@ public class SpellCommand extends InlineCommandBase
 
 		CampingUser targetUser = userMonitor.getUser(targetUserId);
 
-		CommandType cmd = success ? BotCommand.Spell : BotCommand.SpellDipshit;
+		CommandType cmd = success ? SlashSpellCommand : SpellDipshitCommand;
 
 		int campingId = targetUser != null ? targetUser.getCampingId() : -1;
 		EventItem event = new EventItem(cmd, campingFromUser, null, null, id.getUpdateId(), resultText, campingId);

@@ -19,6 +19,8 @@ import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
 import ca.hapke.campbinning.bot.commands.SpellCommand;
 import ca.hapke.campbinning.bot.commands.StatusCommand;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.commands.inline.HideItCommand;
 import ca.hapke.campbinning.bot.commands.inline.NicknameCommand;
 import ca.hapke.campbinning.bot.commands.voting.VoteManagementCommands;
@@ -58,6 +60,10 @@ public class CampingBot extends CampingBotEngine {
 	private List<HasCategories<String>> hasCategories = new ArrayList<>();
 
 	private CalendarMonitor calMonitor;
+
+	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
+			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
+	public static final ResponseCommandType LogStringCommand = new ResponseCommandType("LogString", 0);
 
 	public CampingBot() {
 		spellCommand = new SpellCommand(this);
@@ -124,7 +130,7 @@ public class CampingBot extends CampingBotEngine {
 			if (messageId % 25000 == 0) {
 				User from = message.getFrom();
 				CampingUser cu = CampingUserMonitor.getInstance().getUser(from);
-				TextCommandResult result = new TextCommandResult(BotCommand.PleasureModel);
+				TextCommandResult result = new TextCommandResult(PleasureModelCommand.PleasureModelCommand);
 				result.add("DING DING DING! We have a winner!", TextStyle.Underline);
 				result.add("\nMessage #");
 				result.add("" + messageId, TextStyle.Bold);

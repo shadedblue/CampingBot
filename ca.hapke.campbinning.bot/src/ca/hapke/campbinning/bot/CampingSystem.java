@@ -1,6 +1,6 @@
 package ca.hapke.campbinning.bot;
 
-import ca.hapke.campbinning.bot.commands.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
 

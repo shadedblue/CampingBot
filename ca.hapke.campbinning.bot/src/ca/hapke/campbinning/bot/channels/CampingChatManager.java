@@ -7,9 +7,10 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.CampingSerializable;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -30,6 +31,9 @@ import ca.odell.glazedlists.matchers.Matcher;
  * @author Nathan Hapke
  */
 public class CampingChatManager implements CampingSerializable {
+
+	public static final ResponseCommandType JoinThreadCommand = new ResponseCommandType("JoinThread",
+			BotCommandIds.THREAD | BotCommandIds.SET);
 	private boolean shouldSave = false;
 	private static CampingChatManager instance;
 	private CampingBotEngine bot;
@@ -57,7 +61,7 @@ public class CampingChatManager implements CampingSerializable {
 			GlazedLists.beanConnector(CampingChat.class));
 	private final EventList<CampingChat> chatEvents = GlazedLists.threadSafeList(GlazedLists.readOnlyList(baseList));
 	private final EventList<CampingChat> announceChats = GlazedLists
-			.readOnlyList(new FilterList<>(baseList, new Matcher<CampingChat>() {
+			.readOnlyList(new FilterList<CampingChat>(baseList, new Matcher<CampingChat>() {
 				@Override
 				public boolean matches(CampingChat item) {
 					return item.isAnnounce();
@@ -108,7 +112,7 @@ public class CampingChatManager implements CampingSerializable {
 		for (CampingUser user : admins) {
 			Long chatId = (long) user.getTelegramId();
 
-			CommandResult msg = new TextCommandResult(BotCommand.JoinThread)
+			CommandResult msg = new TextCommandResult(JoinThreadCommand)
 					.add("Invited to: " + chat.getChatname() + " (" + chat.chatId + ")");
 			try {
 				msg.send(bot, chatId);

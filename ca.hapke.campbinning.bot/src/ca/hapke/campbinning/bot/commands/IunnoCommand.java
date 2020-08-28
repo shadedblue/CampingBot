@@ -5,8 +5,10 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -16,7 +18,9 @@ import ca.hapke.campbinning.bot.util.ImageLink;
  * @author Nathan Hapke
  */
 public class IunnoCommand extends AbstractCommand implements TextCommand, SlashCommand {
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.IunnoGoogleIt };
+	private static final SlashCommandType SlashIunno = new SlashCommandType("IunnoGoogleIt", "iunno",
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashIunno };
 	private static final String IUNNO_CATEGORY = "Iunno";
 	protected CampingBot bot;
 	private ImageLink iunnoImg = new ImageLink("http://www.hapke.ca/images/iunno.gif", ImageLink.GIF);
@@ -28,7 +32,7 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
-		ImageCommandResult result = new ImageCommandResult(BotCommand.IunnoGoogleIt, iunnoImg);
+		ImageCommandResult result = new ImageCommandResult(SlashIunno, iunnoImg);
 		result.setReplyToOriginalMessageIfPossible(message);
 		return result;
 	}
@@ -36,7 +40,7 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 	@Override
 	public boolean isMatch(String msg, Message message) {
 		String msgLower = msg.toLowerCase().trim();
-		return msgLower.endsWith("/" + BotCommand.IunnoGoogleIt.command);
+		return msgLower.endsWith("/" + SlashIunno.slashCommand);
 	}
 
 	@Override
@@ -45,12 +49,12 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 	}
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
 		return textCommand(campingFromUser, message.getEntities(), chatId, message);
 	}

@@ -6,11 +6,13 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
 import ca.hapke.campbinning.bot.mbiyf.MbiyfCommand;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
@@ -27,10 +29,13 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
 public class CountdownCommand extends AbstractCommand
 		implements HasCategories<String>, CampingSerializable, SlashCommand {
 
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.Countdown };
+	private static final SlashCommandType SlashCountdown = new SlashCommandType("Countdown", "countdown",
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.TEXT | BotCommandIds.USE);
+
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashCountdown };
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 
@@ -75,12 +80,11 @@ public class CountdownCommand extends AbstractCommand
 			shouldSave = true;
 	}
 
-//	public CommandResult countdownCommand(Long chatId) {
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
 		ZonedDateTime now = new GregorianCalendar().toZonedDateTime();
-		CommandResult result = new TextCommandResult(BotCommand.Countdown);
+		CommandResult result = new TextCommandResult(CountdownCommand.SlashCountdown);
 
 		ZonedDateTime targetEvent;
 		if (countdownTarget != null && now.isBefore(countdownTarget)) {

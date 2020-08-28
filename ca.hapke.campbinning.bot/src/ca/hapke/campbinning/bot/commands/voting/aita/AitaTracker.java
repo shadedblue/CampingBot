@@ -9,10 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.timing.ByTimeOfYear;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
+import ca.hapke.campbinning.bot.commands.voting.VotingCommand;
 import ca.hapke.campbinning.bot.commands.voting.VotingOption;
 import ca.hapke.campbinning.bot.mbiyf.MbiyfCommand;
 import ca.hapke.campbinning.bot.mbiyf.MbiyfMode;
@@ -111,7 +111,7 @@ public class AitaTracker extends VoteTracker<Float> {
 	public CommandResult createCompletionResult() {
 		if (getScore() >= YTA_THRESHOLD) {
 			List<ResultFragment> votes = getVotesText(true);
-			ImageCommandResult icr = new ImageCommandResult(BotCommand.VoteTopicComplete,
+			ImageCommandResult icr = new ImageCommandResult(VotingCommand.VoteTopicCompleteCommand,
 					CampingUtil.getRandom(assholeImages), votes);
 
 			MbiyfMode enable = new MbiyfMode(MbiyfType.Asshole, Collections.singletonList(ranter));

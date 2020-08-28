@@ -8,9 +8,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.BotConstants;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.util.ImageLink;
@@ -28,37 +28,37 @@ public class ImageCommandResult extends CommandResult {
 	private SendMode mode;
 	private File file;
 
-	public ImageCommandResult(BotCommand cmd, File file) {
+	public ImageCommandResult(CommandType cmd, File file) {
 		super(cmd);
 		this.file = file;
 		this.mode = SendMode.File;
 	}
 
-	public ImageCommandResult(BotCommand cmd, File file, ResultFragment... fragments) {
+	public ImageCommandResult(CommandType cmd, File file, ResultFragment... fragments) {
 		super(cmd, fragments);
 		this.file = file;
 		this.mode = SendMode.File;
 	}
 
-	public ImageCommandResult(BotCommand cmd, File file, List<ResultFragment> fragments) {
+	public ImageCommandResult(CommandType cmd, File file, List<ResultFragment> fragments) {
 		super(cmd, fragments);
 		this.file = file;
 		this.mode = SendMode.File;
 	}
 
-	public ImageCommandResult(BotCommand cmd, ImageLink image) {
+	public ImageCommandResult(CommandType cmd, ImageLink image) {
 		super(cmd);
 		this.image = image;
 		this.mode = SendMode.Url;
 	}
 
-	public ImageCommandResult(BotCommand cmd, ImageLink image, ResultFragment... fragments) {
+	public ImageCommandResult(CommandType cmd, ImageLink image, ResultFragment... fragments) {
 		super(cmd, fragments);
 		this.image = image;
 		this.mode = SendMode.Url;
 	}
 
-	public ImageCommandResult(BotCommand cmd, ImageLink image, List<ResultFragment> fragments) {
+	public ImageCommandResult(CommandType cmd, ImageLink image, List<ResultFragment> fragments) {
 		super(cmd, fragments);
 		this.image = image;
 		this.mode = SendMode.Url;

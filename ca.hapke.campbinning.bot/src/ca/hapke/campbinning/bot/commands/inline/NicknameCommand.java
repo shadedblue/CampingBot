@@ -11,20 +11,22 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessageconten
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.BotConstants;
-import ca.hapke.campbinning.bot.commands.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
+import ca.hapke.campbinning.bot.commands.api.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.callback.CallbackId;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
 import ca.hapke.campbinning.bot.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.response.fragments.TextFragment;
 import ca.hapke.campbinning.bot.response.fragments.TextStyle;
-import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.users.CampingUser;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 
@@ -34,12 +36,20 @@ import ca.hapke.campbinning.bot.util.CampingUtil;
  * @author Nathan Hapke
  */
 public class NicknameCommand extends InlineCommandBase implements SlashCommand {
+	public static final ResponseCommandType NicknameConversionCommand = new ResponseCommandType("NicknameConversion",
+			BotCommandIds.NICKNAME | BotCommandIds.USE);
+	public static final ResponseCommandType SetNicknameRejectedCommand = new ResponseCommandType("SetNicknameRejected",
+			BotCommandIds.NICKNAME | BotCommandIds.FAILURE);
 
-	private static final BotCommand[] SLASH_COMMANDS = new BotCommand[] { BotCommand.AllNicknames,
-			BotCommand.SetNickname };
+	public static final SlashCommandType SlashAllNicknames = new SlashCommandType("AllNicknames", "allnicknames",
+			BotCommandIds.NICKNAME | BotCommandIds.USE);
+	public static final SlashCommandType SlashSetNickname = new SlashCommandType("SetNickname", "setnickname",
+			BotCommandIds.NICKNAME | BotCommandIds.SET);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAllNicknames,
+			SlashSetNickname };
 
 	@Override
-	public BotCommand[] getSlashCommandsToRespondTo() {
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
 	}
 
@@ -114,7 +124,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 		}
 
 		String rest = CampingUtil.join(targets, ", ");
-		EventItem event = new EventItem(BotCommand.NicknameConversion, campingFromUser, null, null, id.getUpdateId(),
+		EventItem event = new EventItem(NicknameConversionCommand, campingFromUser, null, null, id.getUpdateId(),
 				resultText, rest);
 		return event;
 	}
@@ -143,16 +153,16 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 
 				if (targetUser != null) {
 					if (targetUser == campingFromUser) {
-						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+						return new TextCommandResult(SetNicknameRejectedCommand).add(campingFromUser)
 								.add(ResultFragment.COLON_SPACE).add(CANT_GIVE_YOURSELF_A_NICKNAME);
 					} else if (rejectNickname(newNickname)) {
-						return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+						return new TextCommandResult(SetNicknameRejectedCommand).add(campingFromUser)
 								.add(ResultFragment.COLON_SPACE).add(INVALID_CHARACTER);
 					} else {
 						String oldNick = targetUser.getNickname();
 						targetUser.setNickname(newNickname, true);
 
-						CommandResult result = new TextCommandResult(BotCommand.SetNickname);
+						CommandResult result = new TextCommandResult(SlashSetNickname);
 						result.add(campingFromUser);
 						result.add(ResultFragment.COLON_SPACE);
 						result.add(targetUser.getFirstOrUserName(), TextStyle.Bold);
@@ -168,12 +178,12 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 					}
 				}
 			} else {
-				return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
+				return new TextCommandResult(SetNicknameRejectedCommand).add(campingFromUser)
 						.add(ResultFragment.COLON_SPACE).add(USER_NOT_FOUND);
 			}
 		}
-		return new TextCommandResult(BotCommand.SetNicknameRejected).add(campingFromUser)
-				.add(ResultFragment.COLON_SPACE).add(INVALID_SYNTAX).add(new InsultFragment(Perspective.You));
+		return new TextCommandResult(SetNicknameRejectedCommand).add(campingFromUser).add(ResultFragment.COLON_SPACE)
+				.add(INVALID_SYNTAX).add(new InsultFragment(Perspective.You));
 	}
 
 	private boolean rejectNickname(String nickname) {
@@ -185,7 +195,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 	}
 
 	public CommandResult allNicknamesCommand() {
-		CommandResult sb = new TextCommandResult(BotCommand.AllNicknames);
+		CommandResult sb = new TextCommandResult(SlashAllNicknames);
 		for (CampingUser u : userMonitor.getUsers()) {
 			String first = u.getFirstname();
 			String nick = u.getNickname();
@@ -207,11 +217,11 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(BotCommand command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
-		if (command == BotCommand.AllNicknames)
+		if (command == SlashAllNicknames)
 			return allNicknamesCommand();
-		if (command == BotCommand.SetNickname)
+		if (command == SlashSetNickname)
 			return setNicknameCommand(campingFromUser, message);
 
 		return null;

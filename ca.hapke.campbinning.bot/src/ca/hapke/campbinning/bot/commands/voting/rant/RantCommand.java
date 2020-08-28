@@ -3,8 +3,9 @@ package ca.hapke.campbinning.bot.commands.voting.rant;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.voting.VoteInitiationException;
 import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
 import ca.hapke.campbinning.bot.commands.voting.VotingCommand;
@@ -16,9 +17,11 @@ import ca.hapke.campbinning.bot.users.CampingUser;
 public class RantCommand extends VotingCommand<Integer> {
 
 	static final String RANT = "rant";
+	private static final SlashCommandType SlashRantActivation = new SlashCommandType("RantActivation", RANT,
+			BotCommandIds.RANT | BotCommandIds.VOTING | BotCommandIds.SET);
 
 	public RantCommand(CampingBot campingBot) {
-		super(campingBot, BotCommand.RantActivatorInitiation);
+		super(campingBot, SlashRantActivation);
 	}
 
 	@Override

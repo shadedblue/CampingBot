@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.vdurmont.emoji.Emoji;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBotEngine;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
 import ca.hapke.campbinning.bot.response.fragments.CaseChoice;
 import ca.hapke.campbinning.bot.response.fragments.EmojiFragment;
 import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
@@ -34,14 +34,14 @@ public abstract class CommandResult {
 
 	protected List<ResultFragment> fragments;
 
-	protected final BotCommand cmd;
+	protected final CommandType cmd;
 
-	public CommandResult(BotCommand cmd) {
+	public CommandResult(CommandType cmd) {
 		this.cmd = cmd;
 		this.fragments = new ArrayList<>();
 	}
 
-	public CommandResult(BotCommand cmd, ResultFragment... fragments) {
+	public CommandResult(CommandType cmd, ResultFragment... fragments) {
 		this.cmd = cmd;
 		if (fragments == null) {
 			this.fragments = new ArrayList<>();
@@ -53,7 +53,7 @@ public abstract class CommandResult {
 		}
 	}
 
-	public CommandResult(BotCommand cmd, List<ResultFragment> fragments) {
+	public CommandResult(CommandType cmd, List<ResultFragment> fragments) {
 		this.cmd = cmd;
 		this.fragments = fragments;
 	}
@@ -102,7 +102,7 @@ public abstract class CommandResult {
 		return this;
 	}
 
-	public BotCommand getCmd() {
+	public CommandType getCmd() {
 		return cmd;
 	}
 

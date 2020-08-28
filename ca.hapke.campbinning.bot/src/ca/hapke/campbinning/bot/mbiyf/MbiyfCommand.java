@@ -22,7 +22,6 @@ import ca.hapke.calendaring.timing.ByTimeOfWeek;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campbinning.bot.BotChoicePriority;
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
@@ -30,6 +29,8 @@ import ca.hapke.campbinning.bot.channels.CampingChat;
 import ca.hapke.campbinning.bot.channels.CampingChatManager;
 import ca.hapke.campbinning.bot.commands.AbstractCommand;
 import ca.hapke.campbinning.bot.commands.TextCommand;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.log.EventItem;
 import ca.hapke.campbinning.bot.log.EventLogger;
 import ca.hapke.campbinning.bot.response.CommandResult;
@@ -50,6 +51,14 @@ import ca.odell.glazedlists.EventList;
  * @author Nathan Hapke
  */
 public class MbiyfCommand extends AbstractCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
+
+	public static final ResponseCommandType MbiyfAnnouncementCommand = new ResponseCommandType("MbiyfAnnouncement",
+			BotCommandIds.BALLS | BotCommandIds.SET);
+	public static final ResponseCommandType MbiyfCommand = new ResponseCommandType("Mbiyf",
+			BotCommandIds.BALLS | BotCommandIds.USE);
+	public static final ResponseCommandType MbiyfDipshitCommand = new ResponseCommandType("MbiyfDipshit",
+			BotCommandIds.BALLS | BotCommandIds.FAILURE);
+
 	private static final String MBIYF = "mbiyf";
 	private static final TextFragment EXCLAMATION = new TextFragment("!");
 	private static final TextFragment APOSTROPHE_S = new TextFragment("'s ");
@@ -150,7 +159,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 			return null;
 
 		if (targetUser == bot.getMeCamping()) {
-			return new TextCommandResult(BotCommand.MbiyfDipshit, new MentionFragment(campingFromUser),
+			return new TextCommandResult(MbiyfDipshitCommand, new MentionFragment(campingFromUser),
 					NOT_BALLSING_MYSELF);
 		}
 
@@ -160,7 +169,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		if (targetUser == null)
 			return null;
 
-		CommandResult result = new TextCommandResult(BotCommand.Mbiyf, MY).add(ball).add(IN).add(targetUser)
+		CommandResult result = new TextCommandResult(MbiyfCommand, MY).add(ball).add(IN).add(targetUser)
 				.add(APOSTROPHE_S);
 		if (mode == MbiyfType.Birthday) {
 			result.add(res.getCake());
@@ -242,7 +251,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 		int i = ((int) Math.random() * 3) + 1;
 		ImageLink image = new ImageLink("http://www.hapke.ca/images/birthday" + i + ".mp4", ImageLink.GIF);
-		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add("M");
 		result.add(res.getRandomBallEmoji());
 		result.add("I ");
@@ -256,7 +265,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 	private CommandResult announceSpecial() {
 		ImageLink image = CampingUtil.getRandom(fridayImages);
-		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 
 		result.add("APPARANTLY TODAY IS SPECIAL FOR ");
 		appendNames(result, false);
@@ -272,7 +281,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 	public CommandResult announceAsshole() throws TelegramApiException {
 		ImageLink image = CampingUtil.getRandom(fridayImages);
-		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add(userRestriction.get(0));
 		result.add(": M");
 		result.add(res.getRandomBallEmoji());
@@ -285,7 +294,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 	public CommandResult announceFriday() throws TelegramApiException {
 		ImageLink image = CampingUtil.getRandom(fridayImages);
-		ImageCommandResult result = new ImageCommandResult(BotCommand.MbiyfAnnouncement, image);
+		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add("It's M");
 		result.add(res.getRandomBallEmoji());
 		result.add("IY");

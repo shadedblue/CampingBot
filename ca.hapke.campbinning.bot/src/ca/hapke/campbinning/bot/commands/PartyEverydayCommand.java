@@ -14,11 +14,12 @@ import java.util.regex.Pattern;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.ImageCommandResult;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
@@ -34,6 +35,9 @@ import ca.hapke.campbinning.bot.xml.OutputFormatter;
  */
 public class PartyEverydayCommand extends AbstractCommand
 		implements HasCategories<String>, TextCommand, CampingSerializable {
+
+	public static final ResponseCommandType PartyEverydayCommand = new ResponseCommandType("PartyEveryday",
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
 	private static final String PARTY = "Party";
 
 	private boolean shouldSave = false;
@@ -114,7 +118,7 @@ public class PartyEverydayCommand extends AbstractCommand
 		ImageLink img = CampingUtil.getRandom(images);
 
 		List<ResultFragment> captionFrags = generateParrrty(message);
-		ImageCommandResult result = new ImageCommandResult(BotCommand.PartyEveryday, img, captionFrags);
+		ImageCommandResult result = new ImageCommandResult(PartyEverydayCommand, img, captionFrags);
 //		result.setReplyTo(message.getMessageId());
 		return result;
 	}

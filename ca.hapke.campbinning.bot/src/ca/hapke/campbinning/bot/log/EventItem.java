@@ -4,9 +4,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import ca.hapke.campbinning.bot.BotCommand;
-import ca.hapke.campbinning.bot.CommandType;
+import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.channels.CampingChat;
+import ca.hapke.campbinning.bot.commands.api.CommandType;
+import ca.hapke.campbinning.bot.commands.api.ResponseCommandType;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**
@@ -45,8 +46,10 @@ public class EventItem {
 
 	}
 
+	public static final ResponseCommandType UiStringCommand = new ResponseCommandType("UiString", 0);
+
 	public EventItem(String input) {
-		command = BotCommand.UiString;
+		command = CampingBot.LogStringCommand;
 		user = null;
 		this.telegramId = null;
 		d = new Date();
@@ -67,7 +70,7 @@ public class EventItem {
 			builder.append(":");
 		}
 		if (command != null) {
-			builder.append(command);
+			builder.append(command.getPrettyName());
 			builder.append(" ");
 		}
 		if (user != null) {

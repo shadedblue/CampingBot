@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
 import ca.hapke.campbinning.bot.response.fragments.InsultFragment;
+import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.response.fragments.TextFragment;
-import ca.hapke.campbinning.bot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campbinning.bot.users.CampingUser;
 
 /**
@@ -52,19 +51,19 @@ public class SpellResult {
 	public TextCommandResult provideCommandResult() {
 		TextCommandResult out;
 		if (success) {
-			out = new TextCommandResult(BotCommand.Spell, spell);
+			out = new TextCommandResult(SpellCommand.SlashSpellCommand, spell);
 		} else {
 			switch (failure) {
 			case Dipshit:
-				out = new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(fromUser),
+				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
 						ResultFragment.COLON_SPACE, NO_VICTIM_COMMAND, new InsultFragment(Perspective.You));
 				break;
 			case NotMe:
-				out = new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(fromUser),
+				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
 						ResultFragment.COLON_SPACE, NOT_BOT_COMMAND);
 				break;
 			default:
-				out = new TextCommandResult(BotCommand.SpellDipshit, new MentionFragment(fromUser),
+				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
 						ResultFragment.COLON_SPACE, UNKNOWN_FAIL);
 				break;
 			}

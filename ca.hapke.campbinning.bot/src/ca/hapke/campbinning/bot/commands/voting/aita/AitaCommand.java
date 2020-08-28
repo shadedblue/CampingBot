@@ -5,11 +5,12 @@ import java.util.List;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campbinning.bot.BotCommand;
 import ca.hapke.campbinning.bot.CampingBot;
 import ca.hapke.campbinning.bot.CampingSerializable;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
+import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.voting.VoteInitiationException;
 import ca.hapke.campbinning.bot.commands.voting.VoteTracker;
 import ca.hapke.campbinning.bot.commands.voting.VotingCommand;
@@ -28,9 +29,11 @@ public class AitaCommand extends VotingCommand<Float> implements CampingSerializ
 	private boolean shouldSave = false;
 
 	private static final String SOMEONE_ELSE_ACTIVATED = " is the asshole!";
+	private static final SlashCommandType SlashAitaActivation = new SlashCommandType("AitaActivation", AITA,
+			BotCommandIds.AITA | BotCommandIds.VOTING | BotCommandIds.SET);
 
 	public AitaCommand(CampingBot campingBot, MbiyfCommand ballsCommand) {
-		super(campingBot, BotCommand.AitaActivatorInitiation);
+		super(campingBot, SlashAitaActivation);
 		this.ballsCommand = ballsCommand;
 		resultCategories = new CategoriedItems<>(AitaTracker.assholeLevels);
 	}
