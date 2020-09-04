@@ -26,8 +26,8 @@ import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
-import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.api.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.processors.CharacterRepeater;
 import ca.hapke.campbinning.bot.processors.FontGarbler;
 import ca.hapke.campbinning.bot.processors.MessageProcessor;
@@ -72,6 +72,91 @@ public class EnhanceCommand extends AbstractCommand
 	private Map<Integer, Integer> tracking = new HashMap<>();
 	private Map<CommandResult, Integer> trackingPending = new HashMap<>();
 	private boolean shouldSave = false;
+
+	private enum Direction {
+		UpLeft(7),
+		Up(8),
+		UpRight(9),
+		MidLeft(4),
+		Mid(5),
+		MidRight(6),
+		DownLeft(1),
+		Down(2),
+		DownRight(3);
+
+		public final int i;
+
+		private Direction(int i) {
+			this.i = i;
+
+		}
+
+		public int getX() {
+			switch (this) {
+			case Up:
+			case Mid:
+			case Down:
+				return 1;
+			case UpLeft:
+			case MidLeft:
+			case DownLeft:
+				return 0;
+			case UpRight:
+			case MidRight:
+			case DownRight:
+				return 2;
+			default:
+				return -1;
+			}
+		}
+
+		public int getY() {
+			switch (this) {
+			case Up:
+			case UpLeft:
+			case UpRight:
+				return 0;
+			case Mid:
+			case MidLeft:
+			case MidRight:
+				return 1;
+			case Down:
+			case DownLeft:
+			case DownRight:
+				return 2;
+			default:
+				return -1;
+			}
+		}
+
+		public static Direction fromString(String s) {
+			s = s.strip();
+			int x = -1;
+			try {
+				x = Integer.parseInt(s);
+			} catch (NumberFormatException e) {
+			}
+
+			for (Direction d : values()) {
+				if (d.i == x)
+					return d;
+				if (s.equalsIgnoreCase(d.toString()))
+					return d;
+			}
+
+			return Mid;
+		}
+
+		public static Direction findDirection(Message message) {
+			String msg = message.getText();
+			String[] split = msg.split(" ");
+			if (split.length >= 2)
+				return fromString(split[1]);
+
+			return Mid;
+		}
+
+	}
 
 	public EnhanceCommand(CampingBot bot) {
 		this.bot = bot;
@@ -151,7 +236,8 @@ public class EnhanceCommand extends AbstractCommand
 		// pic
 		String picFileId = getPictureFileId(replyTo);
 		if (picFileId != null) {
-			CommandResult pictureResponse = createPictureResponse(picFileId, replyTo.getCaption());
+			Direction d = Direction.findDirection(message);
+			CommandResult pictureResponse = createPictureResponse(picFileId, replyTo.getCaption(), d);
 			if (pictureResponse != null)
 				return pictureResponse;
 		}
@@ -161,7 +247,7 @@ public class EnhanceCommand extends AbstractCommand
 		return new TextCommandResult(SlashEnhance, garble(text)).setReplyTo(replyTo.getMessageId());
 	}
 
-	private CommandResult createPictureResponse(String picFileId, String caption) {
+	private CommandResult createPictureResponse(String picFileId, String caption, Direction d) {
 		try {
 			GetFile get = new GetFile().setFileId(picFileId);
 			File in = null;
@@ -172,7 +258,9 @@ public class EnhanceCommand extends AbstractCommand
 			int h = originalImg.getHeight();
 			int wRemove = w / 6;
 			int hRemove = h / 6;
-			BufferedImage centreImg = originalImg.getSubimage(wRemove, hRemove, w - (2 * wRemove), h - (2 * hRemove));
+			int x = d.getX() * wRemove;
+			int y = d.getY() * hRemove;
+			BufferedImage centreImg = originalImg.getSubimage(x, y, w - (2 * wRemove), h - (2 * hRemove));
 
 			String str = "M" + res.getRandomBall() + "IY" + res.getRandomFace();
 			Graphics graphics = centreImg.getGraphics();
@@ -195,8 +283,7 @@ public class EnhanceCommand extends AbstractCommand
 	private CommandResult createVideoResponse(Message replyTo) {
 		ImageLink img = CampingUtil.getRandom(rickImages);
 		String lyric = CampingUtil.getRandom(rickText);
-		return new ImageCommandResult(SlashEnhance, img, garble(lyric))
-				.setReplyTo(replyTo.getMessageId());
+		return new ImageCommandResult(SlashEnhance, img, garble(lyric)).setReplyTo(replyTo.getMessageId());
 	}
 
 	public TextFragment garble(String input) {
