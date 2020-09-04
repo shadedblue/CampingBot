@@ -59,6 +59,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public static final ResponseCommandType MbiyfDipshitCommand = new ResponseCommandType("MbiyfDipshit",
 			BotCommandIds.BALLS | BotCommandIds.FAILURE);
 
+	private static final String BALLS = "balls";
 	private static final String MBIYF = "mbiyf";
 	private static final TextFragment EXCLAMATION = new TextFragment("!");
 	private static final TextFragment APOSTROPHE_S = new TextFragment("'s ");
@@ -77,23 +78,31 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	private TimesProvider<MbiyfMode> times;
 	private List<CampingUser> userRestriction;
 	private MbiyfType mode = MbiyfType.Off;
-	private CategoriedItems<ImageLink> mbiyFridayImages;
+	private CategoriedItems<ImageLink> mbiyfImages;
+	private static final String FRIDAY_IMAGES = "MBIYFriday";
 	private List<ImageLink> fridayImages;
+	private List<ImageLink> birthdayImages;
+	private static final String BIRTHDAY_IMAGES = "MBirthdayIYF";
 
-	public final static String[] ballsTriggers = new String[] { "balls", MBIYF };
-	private static final String FRIDAY_IMAGES = "mbiyfImages";
+	public final static String[] ballsTriggers = new String[] { BALLS, MBIYF };
 	private CrazyCaseProcessor crazyCase = new CrazyCaseProcessor();
 
 	public MbiyfCommand(CampingBot campingBot, Resources res) {
 		this.bot = campingBot;
 		this.res = res;
 
-		this.mbiyFridayImages = new CategoriedItems<ImageLink>(FRIDAY_IMAGES);
-		fridayImages = mbiyFridayImages.getList(FRIDAY_IMAGES);
-		for (int i = 1; i <= 5; i++) {
+		this.mbiyfImages = new CategoriedItems<ImageLink>(FRIDAY_IMAGES);
+		fridayImages = mbiyfImages.getList(FRIDAY_IMAGES);
+		for (int i = 1; i <= 6; i++) {
 			String url = "http://www.hapke.ca/images/mbiyf" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
 			fridayImages.add(lnk);
+		}
+		birthdayImages = mbiyfImages.getList(BIRTHDAY_IMAGES);
+		for (int i = 1; i <= 3; i++) {
+			String url = "http://www.hapke.ca/images/birthday" + i + ".mp4";
+			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
+			birthdayImages.add(lnk);
 		}
 	}
 
@@ -249,8 +258,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public CommandResult announceBirthday() throws TelegramApiException {
 		Emoji cake = res.getCake();
 
-		int i = ((int) Math.random() * 3) + 1;
-		ImageLink image = new ImageLink("http://www.hapke.ca/images/birthday" + i + ".mp4", ImageLink.GIF);
+		ImageLink image = CampingUtil.getRandom(birthdayImages);
 		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add("M");
 		result.add(res.getRandomBallEmoji());
