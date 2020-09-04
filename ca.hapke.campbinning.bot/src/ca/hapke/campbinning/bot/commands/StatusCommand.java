@@ -8,12 +8,10 @@ import java.util.Map.Entry;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import com.google.common.cache.LoadingCache;
-
 import ca.hapke.campbinning.bot.AccessLevel;
 import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
-import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.api.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.inline.HideItCommand;
 import ca.hapke.campbinning.bot.commands.inline.HideItMessage;
 import ca.hapke.campbinning.bot.response.CommandResult;
@@ -75,10 +73,10 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 		}
 		r.add("\nHide It", TextStyle.Bold);
 
-		LoadingCache<Integer, String> confirmedTopics = hideIt.getConfirmedTopics();
+		Map<String, String> confirmedTopics = hideIt.getTopics().asMap();
 		r.add("\n");
 		r.add("Topics (" + confirmedTopics.size() + ") ", TextStyle.Italic);
-		for (Map.Entry<Integer, String> e : confirmedTopics.asMap().entrySet()) {
+		for (Map.Entry<String, String> e : confirmedTopics.entrySet()) {
 			r.add(e.getValue());
 			r.add(" ");
 		}

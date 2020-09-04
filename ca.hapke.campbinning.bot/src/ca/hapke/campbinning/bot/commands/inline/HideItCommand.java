@@ -44,26 +44,18 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 
 	private static final String SPACE = " ";
 	private static final String INLINE_HIDE = "hide";
+	private TopicManager topics;
 	private LoadingCache<String, HiddenText> providedQueries;
 	private LoadingCache<Integer, HideItMessage> confirmedCache;
-	private LoadingCache<Integer, String> confirmedTopics;
 	private CampingBotEngine bot;
 	static final Character[] blots = new Character[] { '░', '▀', '█', '▄', '▒', '▙', '▟', '▛', '▜', '▀', '▔', '▖', '▗',
 			'▘', '▝' };
-	private int nextTopicId = 1;
 	private DatabaseConsumer db;
 
 	public HideItCommand(CampingBotEngine bot, DatabaseConsumer db) {
 		this.bot = bot;
 		this.db = db;
-
-		confirmedTopics = CacheBuilder.newBuilder().expireAfterWrite(48, TimeUnit.HOURS)
-				.build(new CacheLoader<Integer, String>() {
-					@Override
-					public String load(Integer key) throws Exception {
-						return null;
-					}
-				});
+		this.topics = new TopicManager();
 		providedQueries = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).maximumSize(1000)
 				.build(new CacheLoader<String, HiddenText>() {
 					@Override
@@ -90,42 +82,37 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 	@Override
 	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText) {
 		Integer queryId = id.getUpdateId();
-		HiddenText details;
+		HiddenText details = null;
 		String fullId = id.getResult();
 		try {
 			details = providedQueries.get(fullId);
 		} catch (ExecutionException e) {
-			details = null;
+			System.out.println("HideIt-Chosen Error:\nqueryId=" + queryId + "\nfullId=" + fullId);
 		}
 		if (details == null)
 			return new EventItem("Could not Choose HideIt: " + fullId);
 
-		String topic = details.getTopic();
-		if (topic != null) {
-			topic = details.getTopic().trim();
-			if (!confirmedTopics.asMap().containsValue(topic)) {
-				confirmedTopics.put(nextTopicId, topic);
-				nextTopicId++;
-			}
-		}
 		HideItMessage msg = new HideItMessage(queryId, details.getClearText());
-		add(msg);
+		add(msg, details);
 
 		EventItem item = new EventItem(HideItSendCommand, campingFromUser, null, null, queryId, details.getClearText(),
 				null);
 		return item;
 	}
 
-	private void add(HideItMessage msg) {
-		confirmedCache.put(msg.getMessageId(), msg);
-
+	private void add(HideItMessage msg, HiddenText details) {
 		try {
+			confirmedCache.put(msg.getMessageId(), msg);
+			topics.add(details.getTopic());
+
 			EntityManager manager = db.getManager();
 			manager.getTransaction().begin();
 			manager.persist(msg);
 			manager.getTransaction().commit();
 		} catch (Exception e) {
-			EventLogger.getInstance().add(new EventItem("Could not save HideIt" + e.getLocalizedMessage()));
+			String str = "Could not save HideIt" + e.getLocalizedMessage();
+			EventLogger.getInstance().add(new EventItem(str));
+			System.out.println("HideIt-Add Error:\n" + msg.toString());
 		}
 	}
 
@@ -145,42 +132,36 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 
 		boolean providePartial = spoiler.contains("*");
 
-		int qty = 2 + (providePartial ? 2 : 1) * (int) (confirmedTopics.size());
+		int qty = 2 + (providePartial ? 2 : 1) * (int) (topics.size());
 		List<InlineQueryResult> output = new ArrayList<>(qty);
 
-		output.add(createInlineOption(0, updateId, null, input, false));
+		output.add(createInlineOption(0, updateId, null, input, false, processor));
 		if (providePartial) {
-			output.add(createInlineOption(1, updateId, null, input, true));
+			output.add(createInlineOption(1, updateId, null, input, true, processor));
 		}
 		if (containsDash) {
-			output.add(createInlineOption(output.size(), updateId, typedTopic, spoiler, false));
+			output.add(createInlineOption(output.size(), updateId, typedTopic, spoiler, false, processor));
 			if (providePartial) {
-				output.add(createInlineOption(output.size(), updateId, typedTopic, spoiler, true));
+				output.add(createInlineOption(output.size(), updateId, typedTopic, spoiler, true, processor));
 			}
 		}
-		for (String topic : confirmedTopics.asMap().values()) {
+		for (String topic : topics.asMap().values()) {
 			if (topic.equalsIgnoreCase(typedTopic))
 				continue;
-			output.add(createInlineOption(output.size(), updateId, topic, input, false));
+			output.add(createInlineOption(output.size(), updateId, topic, input, false, processor));
 			if (providePartial) {
-				output.add(createInlineOption(output.size(), updateId, topic, input, true));
+				output.add(createInlineOption(output.size(), updateId, topic, input, true, processor));
 			}
 		}
 
-//		System.out.println(input);
-//		for (InlineQueryResult x : output) {
-//			System.out.println(x);
-//		}
-//		System.out.println("----------");
 		return output;
-
 	}
 
 	public InlineQueryResultArticle createInlineOption(int i, int updateId, String topic, String textToHide,
-			boolean partial) {
+			boolean partial, MessageProcessor processor) {
 		CallbackId callbackId = new CallbackId(getCommandName(), updateId, i);
 		String queryId = callbackId.getResult();
-		String blotText = createBlotText(textToHide, topic, partial);
+		String blotText = createBlotText(textToHide, topic, partial, processor);
 		if (partial)
 			textToHide = removeStars(textToHide);
 		HiddenText item = new HiddenText(topic, textToHide, blotText);
@@ -218,7 +199,7 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		return sb.toString();
 	}
 
-	public String createBlotText(String clear, String topic, boolean partial) {
+	public String createBlotText(String clear, String topic, boolean partial, MessageProcessor processor) {
 		boolean partialHiding = false;
 		String[] inputWords = clear.split(SPACE);
 		int outLen = inputWords.length;
@@ -230,7 +211,7 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		String[] out = new String[outLen + adjust];
 
 		if (topic != null) {
-			out[0] = topic + " -";
+			out[0] = processor.processString(topic, false).strip() + " -";
 		}
 		for (int i = 0; i < outLen; i++) {
 			int length = inputWords[i].length();
@@ -288,7 +269,7 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 		return confirmedCache.asMap();
 	}
 
-	public LoadingCache<Integer, String> getConfirmedTopics() {
-		return confirmedTopics;
+	public TopicManager getTopics() {
+		return topics;
 	}
 }
