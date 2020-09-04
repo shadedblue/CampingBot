@@ -11,7 +11,6 @@ public class CrazyCaseProcessor extends MessageProcessor {
 
 	private static final UnaryOperator<Character> UPPER = Character::toUpperCase;
 	private static final UnaryOperator<Character> LOWER = Character::toLowerCase;
-	private static final double PROB_UPPER = 0.75;
 	private static final double[] p = new double[] { 0.75, 0.35, 0.2, 0.25, 0.4, 0.55, 0.75, 0.85, 0.9, 0.95 };
 
 	public CrazyCaseProcessor() {
@@ -21,7 +20,7 @@ public class CrazyCaseProcessor extends MessageProcessor {
 	@Override
 	protected String internalAfterStringAssembled(String value) {
 //	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
-		double p = PROB_UPPER;
+		double p;
 		char[] out = new char[value.length()];
 
 		UnaryOperator<Character> hitCase = UPPER;
@@ -39,13 +38,10 @@ public class CrazyCaseProcessor extends MessageProcessor {
 					hitCase = missCase;
 					missCase = temp;
 					j = 0;
-//					p = PROB_UPPER;
 				} else {
-//					p = 0.4 * p;
 					j++;
 					c = missCase.apply(c);
 				}
-				System.out.print(j);
 			}
 			out[i] = c;
 		}
