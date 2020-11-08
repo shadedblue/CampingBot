@@ -17,6 +17,11 @@ public class InsultFragment extends ResultFragment {
 	private Perspective p;
 
 	public InsultFragment(Perspective p) {
+		this(p, CaseChoice.Normal);
+	}
+
+	public InsultFragment(Perspective p, CaseChoice cc) {
+		super(cc);
 		this.p = p;
 		this.insult = InsultGenerator.getInstance().getInsult();
 	}
