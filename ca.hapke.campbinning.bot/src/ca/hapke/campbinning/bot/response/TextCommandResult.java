@@ -18,6 +18,8 @@ import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
  */
 public class TextCommandResult extends CommandResult {
 
+	private boolean disableWebPagePreview = false;
+
 	public TextCommandResult(CommandType cmd) {
 		super(cmd);
 	}
@@ -30,6 +32,10 @@ public class TextCommandResult extends CommandResult {
 		super(cmd, fragments);
 	}
 
+	public void setDisableWebPagePreview(boolean disableWebPagePreview) {
+		this.disableWebPagePreview = disableWebPagePreview;
+	}
+
 	@Override
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		MessageProcessor processor = bot.getProcessor();
@@ -38,13 +44,15 @@ public class TextCommandResult extends CommandResult {
 		SendResult result = new SendResult(msg, outgoing, null);
 		return result;
 	}
-
+	
 	private Message sendMsg(CampingBotEngine bot, Long chatId, String msg) throws TelegramApiException {
 		SendMessage send = new SendMessage(chatId, msg);
 		if (replyTo != null)
 			send.setReplyToMessageId(replyTo);
 		if (keyboard != null)
 			send.setReplyMarkup(keyboard);
+		if (disableWebPagePreview)
+			send.disableWebPagePreview();
 		send.setParseMode(BotConstants.MARKDOWN);
 		return bot.execute(send);
 	}

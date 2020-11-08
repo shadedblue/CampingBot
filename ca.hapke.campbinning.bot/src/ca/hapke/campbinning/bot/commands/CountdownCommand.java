@@ -11,14 +11,17 @@ import ca.hapke.campbinning.bot.Resources;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
-import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.api.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.mbiyf.MbiyfCommand;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.TextCommandResult;
 import ca.hapke.campbinning.bot.response.fragments.CaseChoice;
+import ca.hapke.campbinning.bot.response.fragments.MentionDisplay;
+import ca.hapke.campbinning.bot.response.fragments.MentionFragment;
 import ca.hapke.campbinning.bot.response.fragments.ResultFragment;
 import ca.hapke.campbinning.bot.users.CampingUser;
+import ca.hapke.campbinning.bot.users.CampingUserMonitor;
 import ca.hapke.campbinning.bot.util.CampingUtil;
 import ca.hapke.campbinning.bot.util.TimeFormatter;
 import ca.hapke.campbinning.bot.xml.OutputFormatter;
@@ -44,14 +47,14 @@ public class CountdownCommand extends AbstractCommand
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
 	public static final String HYPE_CATEGORY = "hype";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 3, 10, 20, 0, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 11, 22, 16, 20, 00).toZonedDateTime();
 	private List<String> hypes;
 	private Resources res;
 	private MbiyfCommand ballsCommand;
 //	private ZoneId zone = TimeZone.getDefault().toZoneId();
 	private CategoriedItems<String> categories;
 	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
-//	private CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
+	private CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 
 	public CountdownCommand(Resources res, MbiyfCommand ballsCommand) {
 		this.res = res;
@@ -89,14 +92,17 @@ public class CountdownCommand extends AbstractCommand
 		ZonedDateTime targetEvent;
 		if (countdownTarget != null && now.isBefore(countdownTarget)) {
 //			int rtv = 558638791;
-			int andrew = 642767839;
-//			int jamieson = 708570894;
-//			CampingUser target = userMonitor.monitor(andrew, null, null, null);
-
-			result.add("GETTING JACKED", CaseChoice.Upper);
+//			int andrew = 642767839;
+			int jamieson = 708570894;
+			CampingUser target = userMonitor.getUser(jamieson);
+			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, null));
+			result.add(" TELLS CSL AND HUSBANDCHOAD TO SSUUUCCCKKKK IIIITTTTT", CaseChoice.Upper);
+//			result.add("2020 CAN GARGLE MY ", CaseChoice.Upper);
+//			result.add(res.getRandomBallEmoji());
+//			result.add(res.getRandomBallEmoji());
+//			result.add(res.getRandomBallEmoji());
+			result.add(ResultFragment.NEWLINE);
 //			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
-
-			result.add(" COUNTDOWN\n");
 
 			targetEvent = countdownTarget;
 		} else {
@@ -145,6 +151,11 @@ public class CountdownCommand extends AbstractCommand
 	@Override
 	public String getCommandName() {
 		return COUNTDOWN_CONTAINER;
+	}
+
+	@Override
+	public List<String> getCategory(String name) {
+		return categories.getList(name);
 	}
 
 }

@@ -44,6 +44,11 @@ public class AitaCommand extends VotingCommand<Float> implements CampingSerializ
 	}
 
 	@Override
+	public List<String> getCategory(String name) {
+		return resultCategories.getList(name);
+	}
+
+	@Override
 	public void addItem(String category, String value) {
 		resultCategories.put(category, value);
 		shouldSave = true;

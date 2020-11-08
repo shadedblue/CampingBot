@@ -80,6 +80,13 @@ public abstract class CampingUtil {
 		return x != null && x.length() > 0 && !BotConstants.STRING_NULL.equalsIgnoreCase(x);
 	}
 
+	public static String blankTheNull(String x) {
+		if (x == null || BotConstants.STRING_NULL.equalsIgnoreCase(x))
+			return "";
+		else
+			return x;
+	}
+
 	public static boolean matchOne(String target, String... accepts) {
 		for (int i = 0; i < accepts.length; i++) {
 			String s = accepts[i];

@@ -9,8 +9,8 @@ import ca.hapke.campbinning.bot.CampingBotEngine;
 import ca.hapke.campbinning.bot.category.CategoriedItems;
 import ca.hapke.campbinning.bot.category.HasCategories;
 import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
-import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.commands.api.SlashCommand;
+import ca.hapke.campbinning.bot.commands.api.SlashCommandType;
 import ca.hapke.campbinning.bot.response.CommandResult;
 import ca.hapke.campbinning.bot.response.NoopCommandResult;
 import ca.hapke.campbinning.bot.users.CampingUser;
@@ -120,5 +120,10 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 	@Override
 	public String getCommandName() {
 		return HYPE_CONTAINER;
+	}
+
+	@Override
+	public List<String> getCategory(String name) {
+		return categories.getList(name);
 	}
 }

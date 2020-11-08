@@ -12,4 +12,6 @@ public interface HasCategories<T> {
 	public void addItem(String category, T value);
 
 	public String getContainerName();
+
+	public List<T> getCategory(String name);
 }

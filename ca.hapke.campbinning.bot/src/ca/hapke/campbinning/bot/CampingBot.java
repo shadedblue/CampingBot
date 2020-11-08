@@ -17,6 +17,8 @@ import ca.hapke.campbinning.bot.commands.HypeCommand;
 import ca.hapke.campbinning.bot.commands.IunnoCommand;
 import ca.hapke.campbinning.bot.commands.PartyEverydayCommand;
 import ca.hapke.campbinning.bot.commands.PleasureModelCommand;
+import ca.hapke.campbinning.bot.commands.QuantityCommand;
+import ca.hapke.campbinning.bot.commands.RedditCommand;
 import ca.hapke.campbinning.bot.commands.SpellCommand;
 import ca.hapke.campbinning.bot.commands.StatusCommand;
 import ca.hapke.campbinning.bot.commands.api.BotCommandIds;
@@ -60,6 +62,7 @@ public class CampingBot extends CampingBotEngine {
 	private List<HasCategories<String>> hasCategories = new ArrayList<>();
 
 	private CalendarMonitor calMonitor;
+	private RedditCommand redditCommand;
 
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
@@ -81,6 +84,7 @@ public class CampingBot extends CampingBotEngine {
 		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this, countdownGen);
+		redditCommand = new RedditCommand();
 
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 
@@ -91,7 +95,8 @@ public class CampingBot extends CampingBotEngine {
 				chatManager, userMonitor, insultGenerator, enhanceCommand);
 
 		hasCategories.add(insultGenerator);
-
+		QuantityCommand quantityCommand = new QuantityCommand(hasCategories);
+		addCommand(quantityCommand);
 		addCommand(spellCommand);
 		addCommand(nicknameCommand);
 		addCommand(hideItCommand);
@@ -106,6 +111,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(hypeCommand);
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
+		addCommand(redditCommand);
 	}
 
 	@SuppressWarnings("unchecked")

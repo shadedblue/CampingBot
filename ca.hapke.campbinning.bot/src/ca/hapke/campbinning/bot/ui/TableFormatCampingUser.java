@@ -24,11 +24,11 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 		case 2:
 			return CampingUtil.removePrefixAt(u.getUsername());
 		case 3:
-			return u.getFirstname();
+			return CampingUtil.blankTheNull(u.getFirstname());
 		case 4:
-			return u.getLastname();
+			return CampingUtil.blankTheNull(u.getLastname());
 		case 5:
-			return u.getNickname();
+			return CampingUtil.blankTheNull(u.getNickname());
 		case 6:
 			return u.isSeenInteraction();
 		case 7:

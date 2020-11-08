@@ -66,4 +66,9 @@ public class InsultGenerator implements HasCategories<String>, CampingSerializab
 		return CampingUtil.getRandom(insultList);
 	}
 
+	@Override
+	public List<String> getCategory(String name) {
+		return categories.getList(name);
+	}
+
 }

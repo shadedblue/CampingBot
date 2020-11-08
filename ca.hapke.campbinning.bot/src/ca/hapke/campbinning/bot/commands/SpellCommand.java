@@ -205,6 +205,11 @@ public class SpellCommand extends InlineCommandBase
 	}
 
 	@Override
+	public List<String> getCategory(String name) {
+		return categories.getList(name);
+	}
+
+	@Override
 	public void addItem(String category, String value) {
 		if (categories.put(category, value))
 			shouldSave = true;

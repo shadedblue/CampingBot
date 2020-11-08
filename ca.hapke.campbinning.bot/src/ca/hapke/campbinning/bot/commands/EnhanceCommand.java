@@ -325,6 +325,11 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	@Override
+	public List<String> getCategory(String name) {
+		return categories.getList(name);
+	}
+
+	@Override
 	public String getContainerName() {
 		return ENHANCE_CONTAINER;
 	}
