@@ -46,7 +46,7 @@ public class RedditCommand extends AbstractCommand implements SlashCommand {
 			CampingUser campingFromUser) throws TelegramApiException {
 		Message target = message.getReplyToMessage();
 		if (target == null)
-			return null;
+			return respondFailure(command);
 		String msg = target.getText();
 		String[] split = msg.split("\\s");
 		for (String s : split) {
@@ -58,6 +58,10 @@ public class RedditCommand extends AbstractCommand implements SlashCommand {
 				return result;
 			}
 		}
+		return respondFailure(command);
+	}
+
+	private CommandResult respondFailure(SlashCommandType command) {
 		return new TextCommandResult(command).add(DO_U).add(new InsultFragment(Perspective.You, CaseChoice.Upper))
 				.add(QUESTION_MARK).add(mf);
 	}
