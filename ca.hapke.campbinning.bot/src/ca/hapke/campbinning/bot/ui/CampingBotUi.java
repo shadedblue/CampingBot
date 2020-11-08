@@ -43,6 +43,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 
 import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.LeaveChat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
@@ -140,6 +141,8 @@ public class CampingBotUi extends JFrame {
 	private SortedList<CampingChat> chatsSorted;
 	private DefaultEventTableModel<CampingChat> chatModel;
 	private JButton btnStatus;
+	private JList<EventItem> lstLog;
+	private JButton btnReply;
 
 	/**
 	 * Launch the application.
@@ -291,14 +294,25 @@ public class CampingBotUi extends JFrame {
 		txtChat = new JTextField();
 		txtChat.addActionListener(sendChatListener);
 		txtChat.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		txtChat.setBounds(161, 5, 320, 26);
+		txtChat.setBounds(161, 5, 474, 26);
 		contentPane.add(txtChat);
 		txtChat.setColumns(10);
 
 		JButton btnSay = new JButton("Say");
 		btnSay.addActionListener(sendChatListener);
-		btnSay.setBounds(486, 5, 61, 26);
+		btnSay.setBounds(641, 3, 85, 26);
 		contentPane.add(btnSay);
+
+		btnReply = new JButton("Reply");
+		btnReply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EventItem event = lstLog.getSelectedValue();
+				chat(event.telegramId, event.chat);
+			}
+		});
+		btnReply.setBounds(641, 32, 85, 26);
+		contentPane.add(btnReply);
 
 		btnStatus = new JButton("Status...");
 		btnStatus.addActionListener(new ActionListener() {
@@ -307,8 +321,18 @@ public class CampingBotUi extends JFrame {
 				changeChatAccess();
 			}
 		});
-		btnStatus.setBounds(549, 5, 86, 26);
+		btnStatus.setBounds(641, 79, 86, 26);
 		contentPane.add(btnStatus);
+
+		JButton btnLeave = new JButton("Leave...");
+		btnLeave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				leaveChat();
+			}
+		});
+		btnLeave.setBounds(641, 108, 86, 26);
+		contentPane.add(btnLeave);
 
 		JLabel lblChats = new CategoryLabel("Chat", Color.cyan);
 		lblChats.setHorizontalAlignment(SwingConstants.CENTER);
@@ -325,7 +349,7 @@ public class CampingBotUi extends JFrame {
 		DefaultEventListModel<EventItem> logModel = new DefaultEventListModel<>(
 				GlazedListsSwing.swingThreadProxyList(recentLog));
 
-		JList<EventItem> lstLog = new JList<>();
+		lstLog = new JList<>();
 		sclLog.setViewportView(lstLog);
 		lstLog.setModel(logModel);
 		lstLog.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -339,7 +363,7 @@ public class CampingBotUi extends JFrame {
 		contentPane.add(lblBySeconds);
 
 		CategoryLabel lblCategory = new CategoryLabel("Categories", Color.orange);
-		lblCategory.setBounds(640, 7, 19, 127);
+		lblCategory.setBounds(765, 7, 19, 127);
 		contentPane.add(lblCategory);
 
 		cmbCategories = new JComboBox<String>();
@@ -360,11 +384,11 @@ public class CampingBotUi extends JFrame {
 		}
 		ComboBoxModel<String> aModel = new DefaultComboBoxModel<String>(categoriesList);
 		cmbCategories.setModel(aModel);
-		cmbCategories.setBounds(660, 5, 525, 26);
+		cmbCategories.setBounds(788, 5, 397, 26);
 		contentPane.add(cmbCategories);
 
 		sclCategories = new JScrollPane();
-		sclCategories.setBounds(660, 33, 599, 101);
+		sclCategories.setBounds(785, 33, 474, 101);
 		contentPane.add(sclCategories);
 
 		txtCategoryValue = new JTextArea();
@@ -449,11 +473,23 @@ public class CampingBotUi extends JFrame {
 	}
 
 	public void chat() {
-		CampingChat chat = getSelectedChat();
+		CampingChat chat;
+		try {
+			chat = getSelectedChat();
+			chat(-1, chat);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(CampingBotUi.this, "Select a chat first", CAMPING_BOT,
+					JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+
+	private void chat(int replyToId, CampingChat chat) {
 		String msg = txtChat.getText().trim();
 		if (chat != null && msg.length() > 0) {
 			try {
 				TextCommandResult cmd = new TextCommandResult(CampingBot.TalkCommand, new TextFragment(msg));
+				if (replyToId > 0)
+					cmd.setReplyTo(replyToId);
 				SendResult result = cmd.send(bot, chat.chatId);
 				Message outgoingMsg = result.outgoingMsg;
 				EventItem ei = new EventItem(CampingBot.TalkCommand, bot.getMeCamping(), outgoingMsg.getDate(), chat,
@@ -479,6 +515,32 @@ public class CampingBotUi extends JFrame {
 					possibleValues, possibleValues[0]);
 			if (selectedValue != null)
 				chat.setAllowed(selectedValue);
+		}
+	}
+
+	protected void leaveChat() {
+		CampingChat chat = getSelectedChat();
+		if (chat != null) {
+			int result = JOptionPane.showConfirmDialog(CampingBotUi.this,
+					"Do you want to leave: " + chat.getChatname() + " #" + chat.getChatId() + "?", "Are you sure?",
+					JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.YES_OPTION) {
+				LeaveChat leave = new LeaveChat();
+				leave.setChatId(chat.getChatId());
+				try {
+					boolean success = bot.execute(leave);
+					if (success) {
+						JOptionPane.showMessageDialog(CampingBotUi.this, "Leave succeeded.", CAMPING_BOT,
+								JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(CampingBotUi.this, "Leave failed.", CAMPING_BOT,
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (TelegramApiException e) {
+					JOptionPane.showMessageDialog(CampingBotUi.this, "Leave failed: " + e.getLocalizedMessage(),
+							CAMPING_BOT, JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 	}
 
