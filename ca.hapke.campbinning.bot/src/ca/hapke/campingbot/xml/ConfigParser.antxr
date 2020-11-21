@@ -1,0 +1,371 @@
+header {
+    package ca.hapke.campingbot.xml;
+    
+    import ca.hapke.campingbot.*;
+    import ca.hapke.campingbot.users.*;
+    import ca.hapke.campingbot.channels.*;
+    import ca.hapke.campingbot.commands.*;
+    import ca.hapke.campingbot.response.*;
+    import ca.hapke.campingbot.voting.*;
+    import java.util.*;
+}
+
+class ConfigParser extends Parser;
+
+document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um, ig, ec] EOF
+    ;
+    
+<camping> [CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+	:
+	 <system>[cs] 
+	(<spell>[sg] )?
+	(<countdown>[countdownGen])?
+	(<voting>[aita]) ?
+	(<party>[pc]) ?
+	(<insults>[ig]) ?
+	(<enhance>[ec]) ?
+	(<chats>[cm]) ?
+	(<users>[um])?
+	;
+<party>[PartyEverydayCommand pc]
+	:
+	<excessives>[pc]
+	;
+<voting>[AitaCommand aita]
+	:
+	<assholes>[aita]
+	<mediocres>[aita]
+	<nices>[aita]
+	;
+	
+<enhance>[EnhanceCommand ec]
+	:
+	<rickrolls>[ec]
+	<overs>[ec]
+	;
+<rickrolls>[EnhanceCommand ec]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{ec.addItem("rickroll", val);}
+		) *
+	;
+<overs>[EnhanceCommand ec]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{ec.addItem("over", val);}
+		) *
+	;
+	
+<excessives>[PartyEverydayCommand pc]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{pc.addItem("excessive", val);}
+		) *
+	;
+<assholes>[AitaCommand aita]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{aita.addItem("asshole", val);}
+		) *
+	;
+<insults>[InsultGenerator ig]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{ig.addItem("insult", val);}
+		) *
+	;
+<mediocres>[AitaCommand aita]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{aita.addItem("mediocre", val);}
+		) *
+	;
+<nices>[AitaCommand aita]
+	{ String val; }
+	:	
+		(
+			val=<item>
+			{aita.addItem("nice", val);}
+		) *
+	;
+<system> [CampingSystem cs]
+	{ 
+		String token,botUsername,adminUser = null; 
+	}
+	:
+	 token=<token>
+	 botUsername=<botUsername>
+	(adminUser=<adminUser>)?
+	(<connectOnStartup>[cs])?
+	(<db>[cs]) ?
+	{
+		cs.setToken(token);
+		cs.setBotUsername(botUsername);
+		if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
+			int adminUser2 = Integer.parseInt(adminUser);
+			cs.setAdminUser(adminUser2);
+		} 
+	}
+	;
+<db> [CampingSystem cs]
+	{ 
+		String host,port,user,pass,db; 
+	}
+	:
+	host=<dbHost>
+	port=<dbPort>
+	user=<dbUser>
+	pass=<dbPass>
+	db=<dbDb>
+	{
+		int port2 = 5432;
+		if (!"null".equalsIgnoreCase(port)) {
+			port2 = Integer.parseInt(port);
+		} 
+		cs.enableDb(host,port2,user,pass,db);
+	}
+	;
+<countdown>[CountdownCommand countdownGen]
+	{ List<String> h; }
+	:
+	h=<hypes>
+	{
+		countdownGen.setHypes(h);
+	}
+	;
+<spell> [SpellCommand sg]
+	{ List<String> a,i,e; }
+	:
+	a=<adjectives>
+	i=<items>
+	e=<exclamations>
+	{
+		sg.setAdjectives(a);
+		sg.setItems(i);
+		sg.setExclamations(e);
+	}
+	;
+<adjectives> returns [List<String> vals = null]
+	{ vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
+	;
+<hypes> returns [List<String> vals = null]
+	{ vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
+	;
+<items> returns [List<String> vals = null]
+	{  vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
+	;
+<exclamations> returns [List<String> vals = null]
+	{  vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
+	;
+<chats> [CampingChatManager cm]
+	:  
+		(<chat>[cm] ) *
+	;
+	
+<chat> [CampingChatManager cm]
+	{
+		CampingChat chat;
+		long chatId = 0;
+		String idStr, name, type, allowed;
+	}
+	:
+		idStr=<id>
+		type=<type>
+		name=<name>
+		allowed=<allowed>
+	{
+		if (idStr != null && !"null".equalsIgnoreCase(idStr)) {
+			chatId = Long.parseLong(idStr);
+		} 
+		if (chatId == 0)
+			return;
+		chat = cm.get(chatId);
+		chat.setChatname(name);
+		chat.setType(type);
+		chat.setAllowed(allowed);
+	}
+	(<announce>[chat]) ?
+	;
+
+<users> [CampingUserMonitor um]
+	{String campingId = null; }
+	: 
+	( campingId=<nextCampingId> ) ?
+	(<user>[um]) *
+	{
+		if (campingId != null && !"null".equalsIgnoreCase(campingId)) {
+			int campingIdInt = Integer.parseInt(campingId);
+			um.setNextCampingId(campingIdInt);
+		} 
+	}
+	;
+
+<user> [CampingUserMonitor um]
+{	String campingId = "null", id, username, first, last, nickname, birthdayMonth = null, birthdayDay = null, lastUpdate, interaction = null;
+	CampingUser user;
+}
+	:	( campingId=<campingId> ) ?
+		id=<id>
+		username=<username>
+		first=<first>
+		last=<last>
+		nickname=<nickname>
+		( interaction=<interaction> ) ?
+		(   birthdayMonth=<birthdayMonth>
+			birthdayDay=<birthdayDay>
+		) ?
+	{
+			
+		int campingIdInt = CampingUserMonitor.UNKNOWN_USER_ID;
+		if (!"null".equalsIgnoreCase(campingId)) {
+			campingIdInt = Integer.parseInt(campingId);
+		} 
+		
+		int idInt = CampingUserMonitor.UNKNOWN_USER_ID;
+		if (!"null".equalsIgnoreCase(id)) {
+			idInt = Integer.parseInt(id);
+		} 
+		if ("null".equalsIgnoreCase(username))
+			username = null;
+		boolean inter = false;
+		if (interaction != null) {
+			try {
+				inter = Boolean.parseBoolean(interaction);
+			} catch (Exception e) {
+			}
+		}
+			
+		user = um.monitor(campingIdInt, idInt, username, first, last, inter);
+		user.setNickname(nickname, false);
+		
+		int bM = -1, bD=-1;
+		if (birthdayMonth != null)
+			bM = Integer.parseInt(birthdayMonth);
+		if (birthdayDay != null)
+			bD = Integer.parseInt(birthdayDay);
+		if (bM > 0 && bD > 0) {
+			user.setBirthday(bM, bD);
+		}
+	}
+	;
+<connectOnStartup>[CampingSystem cs]
+	:	pcdata:PCDATA 
+	{
+		try {
+			String value = pcdata.getText();
+			boolean tf = Boolean.parseBoolean(value);
+			cs.setConnectOnStartup(tf);
+		} catch (Exception e) {
+		}
+	}
+	;
+<announce>[CampingChat chat]
+	:	pcdata:PCDATA 
+	{
+		try {
+			String value = pcdata.getText();
+			boolean tf = Boolean.parseBoolean(value);
+			chat.setAnnounce(tf);
+		} catch (Exception e) {
+		}
+	}
+	;
+<birthdayMonth> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<birthdayDay> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<nextCampingId> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<token> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<botUsername> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<adminUser> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbHost> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbPort> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbUser> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbPass> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<dbDb> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<item> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<campingId> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<id> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<username> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<nickname> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<first> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<last> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<name> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<interaction> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<type> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<allowed> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;

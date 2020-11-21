@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ca.hapke</groupId>
-	<artifactId>campingbros.bot</artifactId>
-	<version>0.4.0-SNAPSHOT</version>
-	<name>CampingBrosBot</name>
+	<artifactId>bot.framework</artifactId>
+	<version>0.5.0</version>
+	<name>CampingBotFramework</name>
 	<properties>
         <maven.compiler.release>14</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,10 +26,10 @@
 			              <goal>copy-resources</goal>
 			            </goals>
 			            <configuration>
-			              <outputDirectory>src/ca/hapke/campbinning/bot/xml</outputDirectory>
+			              <outputDirectory>src/ca/hapke/campingbot/xml</outputDirectory>
 			              <resources>          
 			                <resource>
-			                  <directory>antxr-generated/ca/hapke/campbinning/bot/xml</directory>
+			                  <directory>antxr-generated/ca/hapke/campingbot/xml</directory>
 			                  <filtering>true</filtering>
 			                </resource>
 			              </resources>              
@@ -60,6 +60,11 @@
 			<groupId>ca.hapke</groupId>
 			<artifactId>calendaring</artifactId>
 			<version>0.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.hapke</groupId>
+			<artifactId>util</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
 		<dependency>
