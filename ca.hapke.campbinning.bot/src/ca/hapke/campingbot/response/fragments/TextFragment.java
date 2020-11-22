@@ -40,4 +40,11 @@ public class TextFragment extends ResultFragment {
 		return "TextFragment [" + value + "]";
 	}
 
+	@Override
+	public ResultFragment transform(MessageProcessor proc, boolean useMarkupV2) {
+		String v2 = proc.processString(value, useMarkupV2);
+
+		return new TextFragment(v2, caseChoice, textStyle);
+	}
+
 }

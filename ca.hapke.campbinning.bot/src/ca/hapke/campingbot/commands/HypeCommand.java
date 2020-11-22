@@ -97,7 +97,14 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
-		String hype = CollectionUtil.getRandom(hypes);
+		String hype = null;
+		String incoming = message.getText();
+		if (incoming.contains(" ")) {
+			String searchTerm = incoming.substring(incoming.indexOf(' '));
+			hype = CollectionUtil.search(searchTerm, hypes);
+		} else {
+			hype = CollectionUtil.getRandom(hypes);
+		}
 		HypeJobDetails details = new HypeJobDetails(campingFromUser, chatId, hype, bot, dicks);
 		softStart(details);
 		return new NoopCommandResult(SlashHype);

@@ -86,13 +86,13 @@ public abstract class MessageProcessor {
 		return this;
 	}
 
-	public String process(List<ResultFragment> fragments, boolean useMarkupV2) {
+	public String process(boolean useMarkupV2, List<ResultFragment> fragments) {
 		ResultFragment[] a = new ResultFragment[fragments.size()];
 		a = fragments.toArray(a);
-		return process(a, useMarkupV2);
+		return process(useMarkupV2, a);
 	}
 
-	public String process(ResultFragment[] fragments, boolean useMarkupV2) {
+	public String process(boolean useMarkupV2, ResultFragment... fragments) {
 		if (fragments == null)
 			return null;
 

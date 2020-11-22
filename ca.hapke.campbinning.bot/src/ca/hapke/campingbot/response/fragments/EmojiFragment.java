@@ -20,4 +20,8 @@ public class EmojiFragment extends ResultFragment {
 		return target.getUnicode();
 	}
 
+	@Override
+	public ResultFragment transform(MessageProcessor proc, boolean useMarkupV2) {
+		return this;
+	}
 }

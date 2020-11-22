@@ -8,6 +8,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
+import ca.hapke.campingbot.processors.BlotProcessor;
+import ca.hapke.campingbot.processors.OverlayProcessor;
 import ca.hapke.campingbot.response.EditTextCommandResult;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
@@ -45,8 +47,31 @@ public class HypeJobDetails implements JobDetails {
 	private static final Character[] blotsFull = new Character[] { '▓', '█', '█' };
 	private static final Character[] blotsFade = new Character[] { '░', '▙', '▟', '▛', '▜', '▞', '▚' };
 	private static final Character[] blotsPartial = new Character[] { '▔', '▖', '▗', '▘', '▝' };
-
+	private static final Character[] blotsAll;
+	static {
+		blotsAll = new Character[blotsFull.length + blotsFade.length + blotsPartial.length];
+		int x = 0;
+		for (int i = 0; i < blotsFull.length; i++) {
+			blotsAll[x] = blotsFull[i];
+			x++;
+		}
+		for (int i = 0; i < blotsFade.length; i++) {
+			blotsAll[x] = blotsFade[i];
+			x++;
+		}
+		for (int i = 0; i < blotsPartial.length; i++) {
+			blotsAll[x] = blotsPartial[i];
+			x++;
+		}
+	}
 	private Message targetMessage;
+	private boolean isFailedHype;
+	private int bailStep;
+	private boolean shouldAbort = false;
+	private List<ResultFragment> lastFrags;
+	private int lastPct;
+	private BlotProcessor blotter = new BlotProcessor(true, blotsAll);
+	private OverlayProcessor overlayer = new OverlayProcessor(true);
 
 	public HypeJobDetails(CampingUser campingFromUser, Long chatId, String hype, CampingBotEngine bot,
 			List<String> dicks) {
@@ -55,6 +80,13 @@ public class HypeJobDetails implements JobDetails {
 		this.chatId = chatId;
 		this.bot = bot;
 		this.dicks = dicks;
+
+		this.isFailedHype = hype == null;
+		if (isFailedHype) {
+			bailStep = (int) (EDIT_COUNT * Math.random());
+		} else {
+			bailStep = Integer.MAX_VALUE;
+		}
 	}
 
 	@Override
@@ -80,8 +112,8 @@ public class HypeJobDetails implements JobDetails {
 	@Override
 	public boolean doStep(int step, int attempt) {
 		if (step == 0) {
-			List<ResultFragment> frags = createNumbers(0);
-			TextCommandResult result = new TextCommandResult(HypeCommand.SlashHype, frags);
+			lastFrags = createNumbers(0);
+			TextCommandResult result = new TextCommandResult(HypeCommand.SlashHype, lastFrags);
 
 			SendResult sendResult;
 			try {
@@ -94,15 +126,27 @@ public class HypeJobDetails implements JobDetails {
 				bot.logFailure(targetMessage.getMessageId(), campingFromUser, chatId, HypeCommand.SlashHype, e);
 				return false;
 			}
+
+		} else if (isFailedHype && step >= bailStep) {
+			lastFrags = createFailure(step);
+			boolean complete = attemptEdit(lastFrags);
+			if (complete)
+				shouldAbort = true;
+			return complete;
 		} else if (step <= EDIT_COUNT) {
-			List<ResultFragment> frags = createNumbers(step);
-			return attemptEdit(frags);
+			lastFrags = createNumbers(step);
+			return attemptEdit(lastFrags);
 		} else if (step == EDIT_COUNT + 1) {
-			List<ResultFragment> frags = createText(hype, EDIT_COUNT, true);
-			return attemptEdit(frags);
+			lastFrags = createText(hype, EDIT_COUNT, true);
+			return attemptEdit(lastFrags);
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean shouldAbort() {
+		return shouldAbort;
 	}
 
 	private boolean attemptEdit(List<ResultFragment> frags) {
@@ -132,6 +176,23 @@ public class HypeJobDetails implements JobDetails {
 		return createText(txt, step, false);
 	}
 
+	private List<ResultFragment> createFailure(int step) {
+		int size = lastFrags.size();
+		List<ResultFragment> frags = new ArrayList<>(size);
+		for (int i = 0; i < size - 1; i++) {
+			ResultFragment frag = lastFrags.get(i);
+			frags.add(frag);
+		}
+		ResultFragment end;
+		end = lastFrags.get(size - 1);
+
+		end = end.transform(blotter, true);
+		overlayer.setMessage("404", "HYPE", "NOT", "FOUND");
+		end = end.transform(overlayer, false);
+		frags.add(end);
+		return frags;
+	}
+
 	public List<ResultFragment> createText(String txt, int step, boolean finishing) {
 		List<ResultFragment> frags = new ArrayList<>(5);
 
@@ -140,11 +201,11 @@ public class HypeJobDetails implements JobDetails {
 
 		int deviation = 1 + (int) (6 * Math.random());
 		int intPct = (int) (100 * pct);
-		int n = intPct + deviation;
-		if (!finishing && (n >= 100 || Math.random() < 0.5)) {
-			n = intPct - deviation;
+		lastPct = intPct + deviation;
+		if (!finishing && (lastPct >= 100 || Math.random() < 0.5)) {
+			lastPct = intPct - deviation;
 		}
-		String title = " " + nf.format(n) + "% HYPED ";
+		String title = " " + nf.format(lastPct) + "% HYPED ";
 
 		frags.add(progress);
 		frags.add(new TextFragment(createTitle(title), CaseChoice.Upper, TextStyle.Preformatted));
@@ -252,4 +313,5 @@ public class HypeJobDetails implements JobDetails {
 		} while (l < Math.pow(16, DIGITS - 1) - 1);
 		return l;
 	}
+
 }

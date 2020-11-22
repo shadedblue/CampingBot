@@ -32,6 +32,11 @@ public abstract class ResultFragment {
 
 	public abstract String getValue(MessageProcessor processor, boolean useMarkupV2);
 
+	/**
+	 * Create a new ResultFragment that results from transforming the visible parts via processor.process___()
+	 */
+	public abstract ResultFragment transform(MessageProcessor proc, boolean useMarkupV2);
+
 	public String casify(String s) {
 		switch (caseChoice) {
 		case Normal:

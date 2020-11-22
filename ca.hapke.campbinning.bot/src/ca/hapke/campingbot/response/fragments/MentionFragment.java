@@ -75,4 +75,9 @@ public class MentionFragment extends ResultFragment {
 		return builder.toString();
 	}
 
+	@Override
+	public ResultFragment transform(MessageProcessor proc, boolean useMarkupV2) {
+		return this;
+	}
+
 }

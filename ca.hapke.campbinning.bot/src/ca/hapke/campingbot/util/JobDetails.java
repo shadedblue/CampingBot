@@ -13,7 +13,9 @@ public interface JobDetails {
 	public int getDelay(int step);
 
 	/**
-	 * @return completed?
+	 * @return completed this step?
 	 */
 	public boolean doStep(int step, int attempt);
+
+	public boolean shouldAbort();
 }

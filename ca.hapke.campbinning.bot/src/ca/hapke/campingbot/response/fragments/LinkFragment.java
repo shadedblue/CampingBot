@@ -19,4 +19,8 @@ public class LinkFragment extends ResultFragment {
 		return "[" + processor.processString(text, useMarkupV2) + "](" + url + ")";
 	}
 
+	@Override
+	public ResultFragment transform(MessageProcessor proc, boolean useMarkupV2) {
+		return this;
+	}
 }

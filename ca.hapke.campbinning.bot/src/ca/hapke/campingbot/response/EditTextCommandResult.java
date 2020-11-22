@@ -41,7 +41,7 @@ public class EditTextCommandResult extends CommandResult {
 		EditMessageText send = new EditMessageText();
 		send.setChatId(chatId);
 		send.setMessageId(message.getMessageId());
-		String text = bot.getProcessor().process(fragments, true);
+		String text = bot.getProcessor().process(true, fragments);
 
 		String old = message.getText();
 		if (old.equalsIgnoreCase(text))

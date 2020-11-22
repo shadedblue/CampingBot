@@ -15,6 +15,7 @@ public class InsultFragment extends ResultFragment {
 
 	private String insult;
 	private Perspective p;
+	private String reference = "";
 
 	public InsultFragment(Perspective p) {
 		this(p, CaseChoice.Normal);
@@ -23,12 +24,7 @@ public class InsultFragment extends ResultFragment {
 	public InsultFragment(Perspective p, CaseChoice cc) {
 		super(cc);
 		this.p = p;
-		this.insult = InsultGenerator.getInstance().getInsult();
-	}
 
-	@Override
-	public String getValue(MessageProcessor processor, boolean useMarkupV2) {
-		String reference = "";
 		switch (p) {
 		case Me:
 			reference = "I'm a ";
@@ -38,6 +34,18 @@ public class InsultFragment extends ResultFragment {
 			break;
 
 		}
+		this.insult = InsultGenerator.getInstance().getInsult();
+	}
+
+	private InsultFragment(String insult, Perspective p, String reference) {
+		this.insult = insult;
+		this.p = p;
+		this.reference = reference;
+	}
+
+	@Override
+	public String getValue(MessageProcessor processor, boolean useMarkupV2) {
+
 		String output = reference + insult;
 
 		output = casify(output);
@@ -45,6 +53,13 @@ public class InsultFragment extends ResultFragment {
 		output = markup(output);
 
 		return output;
+	}
+
+	@Override
+	public ResultFragment transform(MessageProcessor proc, boolean useMarkupV2) {
+		String ref2 = proc.processString(reference, useMarkupV2);
+		String insult2 = proc.processString(insult, useMarkupV2);
+		return new InsultFragment(insult2, p, ref2);
 	}
 
 }

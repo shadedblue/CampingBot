@@ -486,7 +486,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			CampingUser campingFromUser) throws TelegramApiException {
 		for (SlashCommand sc : slashCommands.get(command)) {
 			if (!system.hasAccess(campingFromUser, sc)) {
-				return new TextCommandResult(command).add(campingFromUser).add(": Access denied, you")
+				return new TextCommandResult(command).add(campingFromUser).add(": Access denied, you ")
 						.add(insultGenerator.getInsult());
 			}
 			CommandResult result = sc.respondToSlashCommand(command, message, chatId, campingFromUser);

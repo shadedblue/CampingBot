@@ -23,6 +23,8 @@ public abstract class StagedJob<T extends JobDetails> extends StatusThread {
 			while (step < job.getNumSteps() && !abortJob) {
 				int attempts = job.getNumAttempts(step);
 				boolean success = job.doStep(step, attempt);
+				if (job.shouldAbort())
+					break;
 
 				try {
 					Thread.sleep(job.getDelay(step));

@@ -99,7 +99,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 		if (converted == null)
 			return null;
 
-		String output = processor.process(out, true);
+		String output = processor.process(true, out);
 
 		InputTextMessageContent mc = new InputTextMessageContent();
 		mc.setDisableWebPagePreview(true);

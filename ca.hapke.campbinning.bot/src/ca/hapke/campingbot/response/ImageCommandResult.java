@@ -67,7 +67,7 @@ public class ImageCommandResult extends CommandResult {
 	@Override
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) {
 		MessageProcessor processor = bot.getProcessor();
-		String caption = processor.process(this.fragments, true);
+		String caption = processor.process(true, this.fragments);
 		String url = "";
 		try {
 			Message outMsg = null;
