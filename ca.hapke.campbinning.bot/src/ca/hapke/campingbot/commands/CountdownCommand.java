@@ -1,15 +1,14 @@
 package ca.hapke.campingbot.commands;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import ca.hapke.campingbot.Resources;
-import ca.hapke.campingbot.api.CampingSerializable;
-import ca.hapke.campingbot.category.CategoriedItems;
-import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -22,15 +21,11 @@ import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
-import ca.hapke.campingbot.xml.OutputFormatter;
-import ca.hapke.util.CollectionUtil;
-import ca.hapke.util.TimeFormatter;
 
 /**
  * @author Nathan Hapke
  */
-public class CountdownCommand extends AbstractCommand
-		implements HasCategories<String>, CampingSerializable, SlashCommand {
+public class CountdownCommand extends AbstractCommand implements SlashCommand {
 
 	private static final SlashCommandType SlashCountdown = new SlashCommandType("Countdown", "countdown",
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.TEXT | BotCommandIds.USE);
@@ -42,45 +37,17 @@ public class CountdownCommand extends AbstractCommand
 		return SLASH_COMMANDS;
 	}
 
-	private boolean shouldSave = false;
-
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
-	public static final String HYPE_CATEGORY = "hype";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 11, 22, 16, 20, 00).toZonedDateTime();
-	private List<String> hypes;
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 11, 23, 0, 0, 00).toZonedDateTime();
 	private Resources res;
 	private MbiyfCommand ballsCommand;
-//	private ZoneId zone = TimeZone.getDefault().toZoneId();
-	private CategoriedItems<String> categories;
-	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
+//	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
 	private CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 
 	public CountdownCommand(Resources res, MbiyfCommand ballsCommand) {
 		this.res = res;
 		this.ballsCommand = ballsCommand;
-		categories = new CategoriedItems<String>(HYPE_CATEGORY);
-		hypes = categories.getList(HYPE_CATEGORY);
-	}
-
-	@Override
-	public String getContainerName() {
-		return COUNTDOWN_CONTAINER;
-	}
-
-	public void setHypes(List<String> h) {
-		categories.putAll(HYPE_CATEGORY, h);
-	}
-
-	@Override
-	public List<String> getCategoryNames() {
-		return categories.getCategoryNames();
-	}
-
-	@Override
-	public void addItem(String category, String value) {
-		if (categories.put(category, value))
-			shouldSave = true;
 	}
 
 	@Override
@@ -116,36 +83,10 @@ public class CountdownCommand extends AbstractCommand
 		result.add(ResultFragment.NEWLINE);
 		result.add(res.getRandomBallEmoji());
 		result.add(ResultFragment.SPACE);
-		result.add(tf.toPrettyString(targetEvent));
-
-		result.add(ResultFragment.NEWLINE);
-
-		result.add(res.getRandomBallEmoji());
-		result.add(ResultFragment.SPACE);
-		String hypeMsg = CollectionUtil.getRandom(hypes);
-
-		result.add(hypeMsg);
+//		result.add(tf.toPrettyString(targetEvent));
+		result.add(countWeekdays(now.toLocalDate(), targetEvent.toLocalDate()) + " SHIFTS");
 
 		return result;
-	}
-
-	protected List<String> getHypes() {
-		return hypes;
-	}
-
-	@Override
-	public boolean shouldSave() {
-		return shouldSave;
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		String tag = "countdown";
-		of.start(tag);
-		of.tagAndValue(HYPE_CATEGORY, hypes);
-		of.finish(tag);
-
-		shouldSave = false;
 	}
 
 	@Override
@@ -153,9 +94,17 @@ public class CountdownCommand extends AbstractCommand
 		return COUNTDOWN_CONTAINER;
 	}
 
-	@Override
-	public List<String> getCategory(String name) {
-		return categories.getList(name);
-	}
+	/**
+	 * From https://stackoverflow.com/questions/4600034/calculate-number-of-weekdays-between-two-dates-in-java/44942039
+	 */
+	public static long countWeekdays(final LocalDate start, final LocalDate end) {
+		final DayOfWeek startW = start.getDayOfWeek();
+		final DayOfWeek endW = end.getDayOfWeek();
 
+		final long days = ChronoUnit.DAYS.between(start, end);
+		final long daysWithoutWeekends = days - 2 * ((days + startW.getValue()) / 7);
+
+		// adjust for starting and ending on a Sunday:
+		return daysWithoutWeekends + (startW == DayOfWeek.SUNDAY ? 1 : 0) + (endW == DayOfWeek.SUNDAY ? 1 : 0);
+	}
 }

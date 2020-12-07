@@ -81,7 +81,7 @@ public class CampingBot extends CampingBotEngine {
 		aitaCommand = new AitaCommand(this, ballsCommand);
 		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);
 		countdownGen = new CountdownCommand(res, ballsCommand);
-		hypeCommand = new HypeCommand(this, countdownGen);
+		hypeCommand = new HypeCommand(this);
 		redditCommand = new RedditCommand();
 
 		hideItCommand = new HideItCommand(this, databaseConsumer);
@@ -89,7 +89,7 @@ public class CampingBot extends CampingBotEngine {
 		statusCommand = new StatusCommand(hideItCommand);
 		addStatusUpdate(statusCommand);
 
-		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, countdownGen, aitaCommand,
+		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, hypeCommand, aitaCommand,
 				partyCommand, chatManager, userMonitor, insultGenerator, enhanceCommand);
 
 		hasCategories.add(insultGenerator);

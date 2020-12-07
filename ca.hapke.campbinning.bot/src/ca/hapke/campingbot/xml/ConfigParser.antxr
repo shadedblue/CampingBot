@@ -12,15 +12,15 @@ header {
 
 class ConfigParser extends Parser;
 
-document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
-    :   <camping>[ cs, sg, countdownGen, aita, pc, cm, um, ig, ec] EOF
+document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+    :   <camping>[ cs, sg, hype, aita, pc, cm, um, ig, ec] EOF
     ;
     
-<camping> [CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+<camping> [CampingSystem cs, SpellCommand sg, HypeCommand hype, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
-	(<countdown>[countdownGen])?
+	(<countdown>[hype])?
 	(<voting>[aita]) ?
 	(<party>[pc]) ?
 	(<insults>[ig]) ?
@@ -138,12 +138,13 @@ document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, Aita
 		cs.enableDb(host,port2,user,pass,db);
 	}
 	;
-<countdown>[CountdownCommand countdownGen]
-	{ List<String> h; }
+<countdown>[HypeCommand hype]
+	{ List<String> h, d; }
 	:
 	h=<hypes>
+	d=<dicks>
 	{
-		countdownGen.setHypes(h);
+		hype.setHypesAndDicks(h, d);
 	}
 	;
 <spell> [SpellCommand sg]
@@ -167,6 +168,14 @@ document[ CampingSystem cs, SpellCommand sg, CountdownCommand countdownGen, Aita
 		) *
 	;
 <hypes> returns [List<String> vals = null]
+	{ vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
+	;
+<dicks> returns [List<String> vals = null]
 	{ vals = new ArrayList<String>(); String val; }
 	:	
 		(

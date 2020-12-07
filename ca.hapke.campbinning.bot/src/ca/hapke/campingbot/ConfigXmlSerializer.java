@@ -20,8 +20,8 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.api.ConfigSerializer;
 import ca.hapke.campingbot.channels.CampingChatManager;
-import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
+import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.PartyEverydayCommand;
 import ca.hapke.campingbot.commands.SpellCommand;
 import ca.hapke.campingbot.response.InsultGenerator;
@@ -62,7 +62,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	private CampingSerializable[] serializables;
 	private CampingSystem cs;
 	private SpellCommand sg;
-	private CountdownCommand countdownGen;
+	private HypeCommand hype;
 	private AitaCommand aita;
 	private CampingUserMonitor um;
 	private PartyEverydayCommand pc;
@@ -72,19 +72,19 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	private ProtectionDomain protectionDomain;
 
 	public ConfigXmlSerializer(ProtectionDomain protectionDomain, CampingSystem cs, SpellCommand sg,
-			CountdownCommand countdownGen, AitaCommand aita, PartyEverydayCommand partyCommand, CampingChatManager cm,
+			HypeCommand hype, AitaCommand aita, PartyEverydayCommand partyCommand, CampingChatManager cm,
 			CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec) {
 		this.protectionDomain = protectionDomain;
 		this.cs = cs;
 		this.sg = sg;
-		this.countdownGen = countdownGen;
+		this.hype = hype;
 		this.aita = aita;
 		this.pc = partyCommand;
 		this.cm = cm;
 		this.um = um;
 		this.ig = ig;
 		this.ec = ec;
-		this.serializables = new CampingSerializable[] { cs, sg, countdownGen, aita, pc, ig, ec, cm, um };
+		this.serializables = new CampingSerializable[] { cs, sg, hype, aita, pc, ig, ec, cm, um };
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
@@ -169,7 +169,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ConfigParser.class, false, false);
 		ConfigParser parser = new ConfigParser(stream);
 		try {
-			parser.document(cs, sg, countdownGen, aita, pc, cm, um, ig, ec);
+			parser.document(cs, sg, hype, aita, pc, cm, um, ig, ec);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
