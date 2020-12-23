@@ -77,7 +77,7 @@ public class HypeCommand extends AbstractCommand implements CampingSerializable,
 		String hype = null;
 		String incoming = message.getText();
 		if (incoming.contains(" ")) {
-			String searchTerm = incoming.substring(incoming.indexOf(' '));
+			String searchTerm = incoming.substring(incoming.indexOf(' ') + 1);
 			hype = CollectionUtil.search(searchTerm, hypes);
 		} else {
 			hype = CollectionUtil.getRandom(hypes);

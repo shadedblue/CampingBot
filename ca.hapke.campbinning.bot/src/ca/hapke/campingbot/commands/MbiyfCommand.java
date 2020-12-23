@@ -42,8 +42,8 @@ import ca.hapke.campingbot.response.fragments.MentionDisplay;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.users.CampingUser;
-import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.users.CampingUser.Birthday;
+import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.util.ImageLink;
 import ca.hapke.util.CollectionUtil;
 import ca.odell.glazedlists.EventList;
@@ -94,7 +94,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 		this.mbiyfImages = new CategoriedItems<ImageLink>(FRIDAY_IMAGES);
 		fridayImages = mbiyfImages.getList(FRIDAY_IMAGES);
-		for (int i = 1; i <= 6; i++) {
+		for (int i = 1; i <= 7; i++) {
 			String url = "http://www.hapke.ca/images/mbiyf" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
 			fridayImages.add(lnk);

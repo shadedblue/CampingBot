@@ -16,11 +16,10 @@ import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.CaseChoice;
-import ca.hapke.campingbot.response.fragments.MentionDisplay;
-import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
+import ca.hapke.util.TimeFormatter;
 
 /**
  * @author Nathan Hapke
@@ -39,10 +38,10 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2020, 11, 23, 0, 0, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2021, 0, 1, 0, 0, 00).toZonedDateTime();
 	private Resources res;
 	private MbiyfCommand ballsCommand;
-//	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
+	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
 	private CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 
 	public CountdownCommand(Resources res, MbiyfCommand ballsCommand) {
@@ -60,14 +59,14 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 		if (countdownTarget != null && now.isBefore(countdownTarget)) {
 //			int rtv = 558638791;
 //			int andrew = 642767839;
-			int jamieson = 708570894;
-			CampingUser target = userMonitor.getUser(jamieson);
-			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, null));
-			result.add(" TELLS CSL AND HUSBANDCHOAD TO SSUUUCCCKKKK IIIITTTTT", CaseChoice.Upper);
-//			result.add("2020 CAN GARGLE MY ", CaseChoice.Upper);
-//			result.add(res.getRandomBallEmoji());
-//			result.add(res.getRandomBallEmoji());
-//			result.add(res.getRandomBallEmoji());
+//			int jamieson = 708570894;
+//			CampingUser target = userMonitor.getUser(jamieson);
+//			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, null));
+//			result.add(" TELLS CSL AND HUSBANDCHOAD TO SSUUUCCCKKKK IIIITTTTT", CaseChoice.Upper);
+			result.add("2020 CAN GARGLE MY ", CaseChoice.Upper);
+			result.add(res.getRandomBallEmoji());
+			result.add(res.getRandomBallEmoji());
+			result.add(res.getRandomBallEmoji());
 			result.add(ResultFragment.NEWLINE);
 //			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
 
@@ -83,8 +82,8 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 		result.add(ResultFragment.NEWLINE);
 		result.add(res.getRandomBallEmoji());
 		result.add(ResultFragment.SPACE);
-//		result.add(tf.toPrettyString(targetEvent));
-		result.add(countWeekdays(now.toLocalDate(), targetEvent.toLocalDate()) + " SHIFTS");
+		result.add(tf.toPrettyString(targetEvent));
+//		result.add(countWeekdays(now.toLocalDate(), targetEvent.toLocalDate()) + " SHIFTS");
 
 		return result;
 	}
