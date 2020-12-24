@@ -21,14 +21,31 @@ public class UfcTracker extends VoteTracker<Integer> {
 	private String b;
 	private int round;
 	private int rounds;
+	private UfcFight fight;
+	private Message msg;
 
 	public UfcTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message fight, String a, String b, int round, int rounds) throws TelegramApiException {
-		super(bot, ranter, activater, chatId, activation, fight, 1, UfcCommand.UFC_COMMAND, false);
-		this.a = a;
-		this.b = b;
+			Message msg, UfcFight fight, int round) throws TelegramApiException {
+		super(bot, ranter, activater, chatId, activation, msg, 1, UfcCommand.UFC_COMMAND, false);
+		this.msg = msg;
+		this.fight = fight;
+		this.a = fight.a;
+		this.b = fight.b;
 		this.round = round;
-		this.rounds = rounds;
+		this.rounds = fight.rounds;
+	}
+
+	/**
+	 * Advance to next round
+	 */
+	public UfcTracker(UfcTracker previousRound) throws TelegramApiException {
+		super(previousRound.bot, previousRound.ranter, previousRound.activater, previousRound.chatId,
+				previousRound.activation, previousRound.msg, 1, UfcCommand.UFC_COMMAND, false);
+		this.fight = previousRound.fight;
+		this.a = previousRound.fight.a;
+		this.b = previousRound.fight.b;
+		this.round = previousRound.round + 1;
+		this.rounds = previousRound.fight.rounds;
 	}
 
 	@Override
@@ -69,6 +86,14 @@ public class UfcTracker extends VoteTracker<Integer> {
 		sb.add(new TextFragment(b, TextStyle.Bold));
 		sb.add(new TextFragment("\nRound " + round + "/" + rounds));
 		return sb;
+	}
+
+	public int getRound() {
+		return round;
+	}
+
+	public int getRounds() {
+		return rounds;
 	}
 
 }

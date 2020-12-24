@@ -45,6 +45,10 @@ public class CampingChatManager implements CampingSerializable {
 		return instance;
 	}
 
+	public static CampingChatManager getInstance() {
+		return instance;
+	}
+
 	private CampingChatManager(CampingBotEngine bot) {
 		this.bot = bot;
 		ListEventListener<CampingChat> listChangeListener = new ListEventListener<CampingChat>() {

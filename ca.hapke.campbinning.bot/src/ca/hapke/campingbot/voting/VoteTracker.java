@@ -522,6 +522,10 @@ public abstract class VoteTracker<T> {
 		return bannerText;
 	}
 
+	public boolean addListener(VoteChangedListener<T> e) {
+		return voteListeners.add(e);
+	}
+
 	protected float averageVoteValues(Map<Integer, ? extends Number> map) {
 		int count = votes.size() + votesNotApplicable.size();
 		if (count == 0)
