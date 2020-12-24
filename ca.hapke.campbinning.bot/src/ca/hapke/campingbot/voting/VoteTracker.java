@@ -60,12 +60,12 @@ public abstract class VoteTracker<T> {
 	protected final long creationTime = System.currentTimeMillis();
 	protected long completionTime = System.currentTimeMillis() + getVotingTime();
 	protected TimeFormatter formatter = new TimeFormatter(1, "", false, true);
-	protected final String[] shortButtons;
-	protected final String[] buttonCallbackIds;
-	protected final String[] longDescriptions;
-	protected final Map<Integer, T> valueMap;
-	protected final boolean addNa;
-	protected final int naIndex;
+	protected String[] shortButtons;
+	protected String[] buttonCallbackIds;
+	protected String[] longDescriptions;
+	protected final Map<Integer, T> valueMap = new HashMap<Integer, T>();
+	protected boolean addNa;
+	protected int naIndex;
 
 	protected static final TextFragment VOTING_COMPLETED = new TextFragment("Voting Completed!");
 	protected static final String NOT_APPLICABLE_SHORT = "N/A";
@@ -74,20 +74,39 @@ public abstract class VoteTracker<T> {
 	private SendResult bannerResult;
 	private SendResult voteTrackingResult;
 	private TextCommandResult bannerText;
+	protected final boolean allowExtendComplete;
+	protected final Message topic;
+	protected final String command;
+	protected final Message activation;
+	private boolean beginComplete = false;
+
+	protected final List<VoteChangedListener<T>> voteListeners = new ArrayList<VoteChangedListener<T>>();
 
 	public VoteTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic, int naQuorum, String command) throws TelegramApiException {
+			Message topic, int naQuorum, String command, boolean allowExtendComplete) throws TelegramApiException {
 		this.ranter = ranter;
 		this.activater = activater;
 		this.chatId = chatId;
+		this.activation = activation;
+		this.topic = topic;
 
 		this.naQuorum = naQuorum;
 		this.bot = bot;
+		this.command = command;
+		this.allowExtendComplete = allowExtendComplete;
 		this.chat = CampingChatManager.getInstance(bot).get(chatId);
 		this.nf = NumberFormat.getInstance();
 
 		nf.setMinimumFractionDigits(0);
 		nf.setMaximumFractionDigits(1);
+		voteListeners.add(new InternalVoteListener());
+	}
+
+	public void begin() throws TelegramApiException {
+		if (beginComplete)
+			return;
+		else
+			beginComplete = true;
 
 		List<VotingOption<T>> optionsList = new ArrayList<>();
 		addNa = createOptions(optionsList);
@@ -96,7 +115,6 @@ public abstract class VoteTracker<T> {
 		shortButtons = new String[count];
 		longDescriptions = new String[count];
 		buttonCallbackIds = new String[count];
-		valueMap = new HashMap<Integer, T>(count);
 		int updateId = topic.getMessageId();
 		for (int i = 0; i < optionsList.size(); i++) {
 			VotingOption<T> opt = optionsList.get(i);
@@ -138,7 +156,6 @@ public abstract class VoteTracker<T> {
 			EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
 					bannerId, "Failed to pin banner", bannerMessage));
 		}
-
 	}
 
 	public void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
@@ -166,12 +183,11 @@ public abstract class VoteTracker<T> {
 	public EventItem react(CallbackId id, CallbackQuery callbackQuery) throws TelegramApiException {
 		if (completed)
 			return null;
+		EventItem output = null;
 
-		String callbackQueryId = callbackQuery.getId();
+//		String display = longDescriptions[id.getIds()[0]];
 
-		String display = longDescriptions[id.getIds()[0]];
-
-		int vote = id.getIds()[0];
+		int optionId = id.getIds()[0];
 
 		CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
 		Integer previousVote = votes.get(user);
@@ -181,52 +197,93 @@ public abstract class VoteTracker<T> {
 		if (previousVote == null && !prevVoteNA) {
 			// first vote
 			voteChanged = true;
-		} else if (previousVote != null && vote != previousVote) {
+		} else if (previousVote != null && optionId != previousVote) {
 			// had a non-n/a vote, and new vote is different
 			voteChanged = true;
-		} else if (vote == naIndex && !prevVoteNA) {
+		} else if (optionId == naIndex && !prevVoteNA) {
 			// new vote is n/a, and wasn't before
 			voteChanged = true;
-		} else if (vote != naIndex && prevVoteNA) {
+		} else if (optionId != naIndex && prevVoteNA) {
 			// new vote is not n/a, and was before
 			voteChanged = true;
 		}
 
-		if (vote == naIndex) {
+		if (optionId == naIndex) {
 			votes.remove(user);
 			votesNotApplicable.add(user);
-			if (votesNotApplicable.size() >= naQuorum)
+			if (votesNotApplicable.size() >= naQuorum) {
 				complete();
+
+				for (VoteChangedListener<T> vcl : voteListeners) {
+					EventItem result = vcl.completedByUser(optionId, callbackQuery, user);
+					if (result != null)
+						output = result;
+				}
+			}
+
 		} else {
-			votes.put(user, vote);
+			votes.put(user, optionId);
 			votesNotApplicable.remove(user);
 		}
 		if (voteChanged) {
-			try {
-				EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand,
-						voteTrackingMessage, getVotesText(completed));
-				editCmd.send(bot, chatId);
-
-			} catch (TelegramApiException e) {
-				EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, user, null, chat,
-						bannerMessage.getMessageId(), "Failed to update banner", voteTrackingMessage));
+			for (VoteChangedListener<T> vcl : voteListeners) {
+				EventItem result = vcl.changed(optionId, callbackQuery, user);
+				if (result != null)
+					output = result;
+			}
+		} else {
+			for (VoteChangedListener<T> vcl : voteListeners) {
+				EventItem result = vcl.confirmed(optionId, callbackQuery, user);
+				if (result != null)
+					output = result;
 			}
 		}
 
+		return output;
+	}
+
+	protected EventItem showBanner(CallbackQuery callback, String displayToUser, CampingUser user) {
+		String callbackQueryId = callback.getId();
 		AnswerCallbackQuery answer = new AnswerCallbackQuery();
-		String voteDisplayToUser;
-		if (voteChanged)
-			voteDisplayToUser = "Received your vote of: " + display + "!";
-		else
-			voteDisplayToUser = "Your vote was already: " + display + "!";
-		answer.setText(voteDisplayToUser);
+
+		answer.setText(displayToUser);
 		answer.setCallbackQueryId(callbackQueryId);
 		try {
 			bot.execute(answer);
-			return new EventItem(VotingCommand.VoteCommand, user, null, chat, bannerMessage.getMessageId(), display,
+			return new EventItem(VotingCommand.VoteCommand, user, chat, bannerMessage.getMessageId(), displayToUser,
 					topicMessage.getMessageId());
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
+		}
+	}
+
+	private class InternalVoteListener implements VoteChangedListener<T> {
+		@Override
+		public EventItem changed(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+			String display = longDescriptions[optionId];
+			String voteDisplayToUser = "You voted: " + display + "!";
+
+			EventItem result = showBanner(callbackQuery, voteDisplayToUser, user);
+			updateVoteTracker(user);
+			return result;
+		}
+
+		@Override
+		public EventItem confirmed(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+			String display = longDescriptions[optionId];
+			String voteDisplayToUser = "Your vote was already: " + display + "!";
+
+			return showBanner(callbackQuery, voteDisplayToUser, user);
+		}
+
+		@Override
+		public EventItem completedByUser(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+			return showBanner(callbackQuery, "You completed the voting!", user);
+		}
+
+		@Override
+		public EventItem completedAutomatic() {
+			return null;
 		}
 	}
 
@@ -235,6 +292,8 @@ public abstract class VoteTracker<T> {
 	}
 
 	public void update() {
+		EventLogger logger = EventLogger.getInstance();
+
 		EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand, bannerMessage,
 				getBannerString());
 
@@ -242,31 +301,70 @@ public abstract class VoteTracker<T> {
 			editCmd.setKeyboard(getKeyboard());
 
 		try {
-			editCmd.send(bot, chatId);
+			SendResult result = editCmd.send(bot, chatId);
+			logger.add(new EventItem(VotingCommand.VoteCommand, null, chat, bannerMessage.getMessageId(), result.msg));
 		} catch (TelegramApiException e) {
+			// HACK commented out, because this fails if same text... the time thing.
+//			logger.add(new EventItem(VotingCommand.VoteCommand, null, null, chat, bannerMessage.getMessageId(),
+//					"Failed to update banner", voteTrackingMessage));
 		}
 	}
 
 	public void updateBannerFinished() {
+		EventLogger logger = EventLogger.getInstance();
 		try {
 			EditTextCommandResult edit = new EditTextCommandResult(VotingCommand.VoteTopicCompleteCommand,
 					bannerMessage, VOTING_COMPLETED);
-			edit.send(bot, chatId);
+			SendResult result = edit.send(bot, chatId);
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, null, chat,
+					voteTrackingMessage.getMessageId(), result.msg));
 		} catch (TelegramApiException e2) {
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, null, null, chat,
+					bannerMessage.getMessageId(), "Failed to update banner on Complete", voteTrackingMessage));
+		}
+	}
+
+	protected void updateVoteTracker(CampingUser user) {
+		EventLogger logger = EventLogger.getInstance();
+		try {
+			List<ResultFragment> votesText = getVotesText(completed);
+			EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand, voteTrackingMessage,
+					votesText);
+			SendResult result = editCmd.send(bot, chatId);
+			logger.add(new EventItem(VotingCommand.VoteCommand, user, chat, voteTrackingMessage.getMessageId(),
+					result.msg));
+		} catch (TelegramApiException e) {
+			logger.add(new EventItem(VotingCommand.VoteCommandFailedCommand, user, null, chat,
+					bannerMessage.getMessageId(), "Failed to update tracker", voteTrackingMessage));
 		}
 	}
 
 	public void unpinBanner() {
+		boolean success = false;
+		boolean failure = false;
 		try {
 			String chatString = Long.toString(chatId);
 			Message pinnedMsg = bot.execute(new GetChat(chatString)).getPinnedMessage();
 			if (pinnedMsg != null && bannerMessage.getMessageId().equals(pinnedMsg.getMessageId())) {
 				UnpinChatMessage unpin = new UnpinChatMessage(chatString);
-				bot.execute(unpin);
+				success = bot.execute(unpin);
+				if (!success)
+					failure = true;
 			}
 		} catch (TelegramApiException e1) {
-			EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
-					bannerMessage.getMessageId(), "Failed to unpin banner", bannerMessage));
+			failure = true;
+		}
+
+		if (success || failure) {
+			EventLogger logger = EventLogger.getInstance();
+			if (success) {
+				logger.add(new EventItem(VotingCommand.VoteCommand, activater, null, chat, bannerMessage.getMessageId(),
+						"Unpinned banner", bannerMessage));
+			} else if (failure) {
+				logger.add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
+						bannerMessage.getMessageId(), "Failed to unpin banner", bannerMessage));
+
+			}
 		}
 	}
 
@@ -284,8 +382,7 @@ public abstract class VoteTracker<T> {
 			completionMsg.setReplyTo(messageId);
 			SendResult result = completionMsg.sendInternal(bot, chatId);
 
-			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, ranter, result.outgoingMsg.getDate(), chat,
-					result.outgoingMsg.getMessageId(), result.outgoingMsg.getText(), messageId));
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, ranter, chat, result));
 		} catch (TelegramApiException e) {
 			logger.add(new EventItem(e.getLocalizedMessage()));
 		}
@@ -320,8 +417,10 @@ public abstract class VoteTracker<T> {
 			sb.add(new TextFragment(longer));
 		}
 
-		sb.add(new TextFragment("\nOriginal speaker, or activater may reply to this with /complete or /extend.",
-				TextStyle.Italic));
+		if (allowExtendComplete) {
+			sb.add(new TextFragment("\nOriginal speaker, or activater may reply to this with /complete or /extend.",
+					TextStyle.Italic));
+		}
 		return sb;
 	}
 
@@ -421,6 +520,20 @@ public abstract class VoteTracker<T> {
 
 	public TextCommandResult getBannerText() {
 		return bannerText;
+	}
+
+	protected float averageVoteValues(Map<Integer, ? extends Number> map) {
+		int count = votes.size() + votesNotApplicable.size();
+		if (count == 0)
+			return 0;
+
+		float sum = 0;
+		for (Integer v : votes.values()) {
+			Number pts = map.get(v);
+			sum += pts.floatValue();
+		}
+		float avg = sum / count;
+		return avg;
 	}
 
 }

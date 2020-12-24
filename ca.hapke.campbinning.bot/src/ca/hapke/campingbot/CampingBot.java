@@ -33,6 +33,7 @@ import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.voting.AitaCommand;
 import ca.hapke.campingbot.voting.RantCommand;
+import ca.hapke.campingbot.voting.UfcCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
 
 /**
@@ -43,6 +44,7 @@ public class CampingBot extends CampingBotEngine {
 	private Resources res = new Resources();
 	private AitaCommand aitaCommand;
 	private RantCommand rantCommand;
+	private UfcCommand ufcCommand;
 	private VoteManagementCommands voteManagementCommands;
 
 	private StatusCommand statusCommand;
@@ -78,8 +80,9 @@ public class CampingBot extends CampingBotEngine {
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
 		rantCommand = new RantCommand(this);
+		ufcCommand = new UfcCommand(this);
 		aitaCommand = new AitaCommand(this, ballsCommand);
-		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);
+		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand/* , ufcCommand */);
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
 		redditCommand = new RedditCommand();
@@ -101,6 +104,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(ballsCommand);
 		addCommand(aitaCommand);
 		addCommand(rantCommand);
+		addCommand(ufcCommand);
 		addCommand(pleasureCommand);
 		addCommand(iunnoCommand);
 		addCommand(partyCommand);

@@ -38,7 +38,7 @@ public class AitaTracker extends VoteTracker<Float> {
 
 	public AitaTracker(CampingBotEngine bot, CampingUser ranter, Long chatId, Message activation, Message topic,
 			CategoriedItems<String> resultCategories, MbiyfCommand ballsCommand) throws TelegramApiException {
-		super(bot, ranter, ranter, chatId, activation, topic, NOT_QUORUM, AitaCommand.AITA);
+		super(bot, ranter, ranter, chatId, activation, topic, NOT_QUORUM, AitaCommand.AITA, true);
 
 		this.resultTexts = resultCategories;
 		this.ballsCommand = ballsCommand;

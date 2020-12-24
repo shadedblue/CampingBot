@@ -8,6 +8,7 @@ import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.CommandType;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
+import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
@@ -33,6 +34,26 @@ public class EventItem {
 		return new Date();
 	}
 
+	/**
+	 * Omitting time means it happened right now
+	 */
+	public EventItem(CommandType command, CampingUser user, CampingChat chat, Integer telegramId, String rest) {
+		this(command, user, null, chat, telegramId, rest, null);
+	}
+
+	/**
+	 * Omitting time means it happened right now
+	 */
+	public EventItem(CommandType command, CampingUser user, CampingChat chat, Integer telegramId, String rest,
+			Object extraData) {
+		this(command, user, null, chat, telegramId, rest, extraData);
+	}
+
+	public EventItem(CommandType command, CampingUser user, CampingChat chat, SendResult result) {
+		this(command, user, result.outgoingMsg.getDate(), chat, result.outgoingMsg.getMessageId(), result.msg,
+				result.extraData);
+	}
+
 	public EventItem(CommandType command, CampingUser user, Integer ctime, CampingChat chat, Integer telegramId,
 			String rest, Object extraData) {
 		this.command = command;
@@ -43,7 +64,6 @@ public class EventItem {
 		this.chat = chat;
 		this.rest = rest;
 		this.extraData = extraData;
-
 	}
 
 	public static final ResponseCommandType UiStringCommand = new ResponseCommandType("UiString", 0);

@@ -24,7 +24,6 @@ import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.log.EventItem;
-import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
@@ -128,8 +127,8 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 			CampingUser activater, Message topic) throws TelegramApiException {
 		VoteTracker<T> tracker = null;
 		TextCommandResult output = null;
-		Integer rantMessageId = topic.getMessageId();
-		if (voteOnMessages.containsKey(rantMessageId)) {
+		Integer targetMessageId = topic.getMessageId();
+		if (voteOnMessages.containsKey(targetMessageId)) {
 			return new TextCommandResult(VoteCommandFailedCommand, ALREADY_BEING_VOTED_ON,
 					new InsultFragment(Perspective.You));
 		} else {
@@ -138,21 +137,26 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 			try {
 				tracker = initiateVote(ranter, activater, chatId, activation, topic);
+				addTracker(tracker, targetMessageId);
 			} catch (VoteInitiationException e) {
 				output = new TextCommandResult(VoteCommandFailedCommand, new MentionFragment(activater));
 				output.add(e.getMessage());
 			}
 
-			if (tracker != null) {
-				inProgress.add(tracker);
-				voteOnMessages.put(rantMessageId, tracker);
-				voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
-			}
 		}
 		if (output == null && tracker != null) {
 			output = tracker.getBannerText();
 		}
 		return output;
+	}
+
+	protected void addTracker(VoteTracker<T> tracker, Integer targetMessageId) throws TelegramApiException {
+		if (tracker != null) {
+			tracker.begin();
+			inProgress.add(tracker);
+			voteOnMessages.put(targetMessageId, tracker);
+			voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
+		}
 	}
 
 	protected abstract VoteTracker<T> initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
@@ -165,11 +169,10 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 		try {
 			if (v != null) {
-				EventItem react = v.react(id, callbackQuery);
-				return react;
+				return v.react(id, callbackQuery);
 			}
 		} catch (TelegramApiException e) {
-			EventLogger.getInstance().add(new EventItem("Failed to react to callback: " + callbackQuery.getData()));
+			return new EventItem("Failed to react to callback: " + callbackQuery.getData());
 		}
 		return null;
 	}
