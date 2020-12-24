@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
 import ca.hapke.campingbot.api.IStatus;
@@ -54,7 +54,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public void connectFailed(TelegramApiRequestException e) {
+	public void connectFailed(TelegramApiException e) {
 		onlineTime = null;
 	}
 

@@ -42,11 +42,9 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumnModel;
 
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.LeaveChat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
@@ -154,7 +152,7 @@ public abstract class CampingBotUi extends JFrame {
 	 */
 	public CampingBotUi() {
 
-		ApiContextInitializer.init();
+//		ApiContextInitializer.init();
 		protectionDomain = provideProtectionDomain();
 		this.bot = new CampingBot(protectionDomain);
 		bot.init();
@@ -515,7 +513,7 @@ public abstract class CampingBotUi extends JFrame {
 					JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
 				LeaveChat leave = new LeaveChat();
-				leave.setChatId(chat.getChatId());
+				leave.setChatId(Long.toString(chat.getChatId()));
 				try {
 					boolean success = bot.execute(leave);
 					if (success) {
@@ -571,7 +569,7 @@ public abstract class CampingBotUi extends JFrame {
 		}
 
 		@Override
-		public void connectFailed(TelegramApiRequestException e) {
+		public void connectFailed(TelegramApiException e) {
 			btnConnect.setEnabled(true);
 			connected = "Connect Failed: " + e.getMessage();
 			statusChanged();

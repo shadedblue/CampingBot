@@ -24,7 +24,9 @@ public abstract class AbstractCommand {
 		for (int i = 0; i < buttons.length; i++) {
 			String text = buttons[i];
 			String value = values[i];
-			row.add(new InlineKeyboardButton(text).setCallbackData(value));
+			InlineKeyboardButton b = new InlineKeyboardButton(text);
+			b.setCallbackData(value);
+			row.add(b);
 		}
 		List<List<InlineKeyboardButton>> fullKeyboard = new ArrayList<List<InlineKeyboardButton>>();
 		fullKeyboard.add(row);

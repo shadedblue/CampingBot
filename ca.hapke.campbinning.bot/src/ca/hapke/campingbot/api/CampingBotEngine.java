@@ -24,7 +24,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.stickers.Sticker;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -106,7 +106,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 
 		@Override
-		public void connectFailed(TelegramApiRequestException e) {
+		public void connectFailed(TelegramApiException e) {
 			online = false;
 		}
 
@@ -148,12 +148,12 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public void connect() {
 		try {
-			TelegramBotsApi api = new TelegramBotsApi();
+			TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
 			api.registerBot(this);
 			for (IStatus status : statusMonitors) {
 				status.statusOnline();
 			}
-		} catch (TelegramApiRequestException e) {
+		} catch (TelegramApiException e) {
 			for (IStatus status : statusMonitors) {
 				status.connectFailed(e);
 			}
@@ -196,12 +196,11 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 		if (update.hasInlineQuery()) {
 			InlineQuery inlineQuery = update.getInlineQuery();
-			if (inlineQuery.hasQuery()) {
+			String input = inlineQuery.getQuery();
+			if (input != null) {
 
 				List<InlineQueryResult> results = new ArrayList<>();
 				int updateId = update.getUpdateId();
-
-				String input = inlineQuery.getQuery();
 
 				for (InlineCommand inline : inlineCommands) {
 					List<InlineQueryResult> r = inline.provideInlineQuery(update, input, updateId, processor);
@@ -219,7 +218,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					answer.setInlineQueryId(inlineQuery.getId());
 					answer.setResults(results);
 					answer.setCacheTime(30);
-					answer.setPersonal(true);
+					answer.setIsPersonal(true);
 
 					try {
 						execute(answer);

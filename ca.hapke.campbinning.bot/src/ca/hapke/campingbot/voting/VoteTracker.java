@@ -121,10 +121,6 @@ public abstract class VoteTracker<T> {
 		previousBanner = bannerResult.msg;
 		bannerMessage = bannerResult.outgoingMsg;
 
-		PinChatMessage pinBanner = new PinChatMessage(chatId, bannerMessage.getMessageId());
-		pinBanner.setDisableNotification(Boolean.valueOf(true));
-		bot.execute(pinBanner);
-
 		TextCommandResult votesText = new TextCommandResult(VotingCommand.VoteTopicInitiationCommand,
 				getVotesText(completed));
 		votesText.setReplyTo(topic.getMessageId());
@@ -132,6 +128,17 @@ public abstract class VoteTracker<T> {
 		voteTrackingMessage = voteTrackingResult.outgoingMsg;
 
 		this.topicMessage = topic;
+
+		int bannerId = bannerMessage.getMessageId();
+		try {
+			PinChatMessage pinBanner = new PinChatMessage(Long.toString(chatId), bannerId);
+			pinBanner.setDisableNotification(Boolean.valueOf(true));
+			bot.execute(pinBanner);
+		} catch (TelegramApiException e) {
+			EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
+					bannerId, "Failed to pin banner", bannerMessage));
+		}
+
 	}
 
 	public void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
@@ -201,6 +208,8 @@ public abstract class VoteTracker<T> {
 				editCmd.send(bot, chatId);
 
 			} catch (TelegramApiException e) {
+				EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, user, null, chat,
+						bannerMessage.getMessageId(), "Failed to update banner", voteTrackingMessage));
 			}
 		}
 
@@ -249,12 +258,15 @@ public abstract class VoteTracker<T> {
 
 	public void unpinBanner() {
 		try {
-			Message pinnedMsg = bot.execute(new GetChat(chatId)).getPinnedMessage();
+			String chatString = Long.toString(chatId);
+			Message pinnedMsg = bot.execute(new GetChat(chatString)).getPinnedMessage();
 			if (pinnedMsg != null && bannerMessage.getMessageId().equals(pinnedMsg.getMessageId())) {
-				UnpinChatMessage unpin = new UnpinChatMessage(chatId);
+				UnpinChatMessage unpin = new UnpinChatMessage(chatString);
 				bot.execute(unpin);
 			}
 		} catch (TelegramApiException e1) {
+			EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
+					bannerMessage.getMessageId(), "Failed to unpin banner", bannerMessage));
 		}
 	}
 

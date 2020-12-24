@@ -28,6 +28,9 @@ public class TopicManager {
 	}
 
 	public boolean add(String topic) {
+		if (topic == null)
+			return false;
+
 		String key = createKey(topic);
 		if (confirmed.getIfPresent(key) != null)
 			return false;

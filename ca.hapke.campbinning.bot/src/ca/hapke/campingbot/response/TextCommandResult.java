@@ -44,9 +44,9 @@ public class TextCommandResult extends CommandResult {
 		SendResult result = new SendResult(msg, outgoing, null);
 		return result;
 	}
-	
+
 	private Message sendMsg(CampingBotEngine bot, Long chatId, String msg) throws TelegramApiException {
-		SendMessage send = new SendMessage(chatId, msg);
+		SendMessage send = new SendMessage(Long.toString(chatId), msg);
 		if (replyTo != null)
 			send.setReplyToMessageId(replyTo);
 		if (keyboard != null)

@@ -39,7 +39,7 @@ public class EditTextCommandResult extends CommandResult {
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 
 		EditMessageText send = new EditMessageText();
-		send.setChatId(chatId);
+		send.setChatId(Long.toString(chatId));
 		send.setMessageId(message.getMessageId());
 		String text = bot.getProcessor().process(true, fragments);
 

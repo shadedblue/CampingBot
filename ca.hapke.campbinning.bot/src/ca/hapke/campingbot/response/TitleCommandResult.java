@@ -32,7 +32,7 @@ public class TitleCommandResult extends CommandResult {
 		MessageProcessor processor = bot.getProcessor();
 		String msg = processor.process(false, this.fragments);
 
-		SetChatTitle sct = new SetChatTitle(chatId, msg);
+		SetChatTitle sct = new SetChatTitle(Long.toString(chatId), msg);
 		Boolean success = bot.execute(sct);
 
 		return new SendResult("Title change: " + msg, null, success);

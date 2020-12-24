@@ -24,12 +24,13 @@ import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.log.EventItem;
+import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
+import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
-import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.odell.glazedlists.BasicEventList;
@@ -168,6 +169,7 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 				return react;
 			}
 		} catch (TelegramApiException e) {
+			EventLogger.getInstance().add(new EventItem("Failed to react to callback: " + callbackQuery.getData()));
 		}
 		return null;
 	}
@@ -187,16 +189,13 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
-			Message message) {
+			Message message) throws TelegramApiException {
 
 		String msgLower = message.getText().toLowerCase().trim();
 		for (SlashCommandType respondsTo : SLASH_COMMANDS) {
 			if (msgLower.endsWith("/" + respondsTo.slashCommand))
+				return startVotingInternal(bot, message, chatId, campingFromUser, message);
 
-				try {
-					return startVotingInternal(bot, message, chatId, campingFromUser, message);
-				} catch (TelegramApiException e) {
-				}
 		}
 		return null;
 	}

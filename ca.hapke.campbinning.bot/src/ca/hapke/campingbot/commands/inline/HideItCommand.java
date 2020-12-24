@@ -105,16 +105,16 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 	private void add(HideItMessage msg, HiddenText details) {
 		try {
 			confirmedCache.put(msg.getMessageId(), msg);
-			topics.add(details.getTopic());
 
 			EntityManager manager = db.getManager();
 			manager.getTransaction().begin();
 			manager.persist(msg);
 			manager.getTransaction().commit();
+
+			topics.add(details.getTopic());
 		} catch (Exception e) {
 			String str = "Could not save HideIt" + e.getLocalizedMessage();
 			EventLogger.getInstance().add(new EventItem(str));
-			System.out.println("HideIt-Add Error:\n" + msg.toString());
 		}
 	}
 

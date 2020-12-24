@@ -1,6 +1,6 @@
 package ca.hapke.campingbot.api;
 
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.users.CampingUser;
 
@@ -14,5 +14,5 @@ public interface IStatus {
 
 	public void statusMeProvided(CampingUser me);
 
-	public void connectFailed(TelegramApiRequestException e);
+	public void connectFailed(TelegramApiException e);
 }

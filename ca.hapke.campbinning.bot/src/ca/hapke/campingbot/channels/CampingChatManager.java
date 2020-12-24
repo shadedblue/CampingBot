@@ -89,7 +89,7 @@ public class CampingChatManager implements CampingSerializable {
 	public void updateChat(Long chatId, CampingChat chat) {
 		String chatname = null;
 		try {
-			Chat tChat = bot.execute(new GetChat(chatId));
+			Chat tChat = bot.execute(new GetChat(Long.toString(chatId)));
 			shouldSave = true;
 
 			if (tChat.isGroupChat() || tChat.isSuperGroupChat()) {

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -77,13 +78,13 @@ public class ImageCommandResult extends CommandResult {
 				switch (image.type) {
 				case ImageLink.STATIC:
 					SendPhoto p = new SendPhoto();
-					p.setPhoto(url);
+					p.setPhoto(new InputFile(url));
 					outMsg = completePhoto(bot, chatId, caption, p);
 					break;
 				case ImageLink.GIF:
 					SendAnimation ani = new SendAnimation();
-					ani.setChatId(chatId);
-					ani.setAnimation(url);
+					ani.setChatId(Long.toString(chatId));
+					ani.setAnimation(new InputFile(url));
 					if (caption != null && caption.length() > 0) {
 						ani.setCaption(caption);
 						ani.setParseMode(BotConstants.MARKDOWN);
@@ -99,7 +100,7 @@ public class ImageCommandResult extends CommandResult {
 			case File:
 				url = file.getAbsolutePath();
 				SendPhoto p = new SendPhoto();
-				p.setPhoto(file);
+				p.setPhoto(new InputFile(file));
 				outMsg = completePhoto(bot, chatId, caption, p);
 				break;
 			}
@@ -114,7 +115,7 @@ public class ImageCommandResult extends CommandResult {
 
 	public Message completePhoto(CampingBotEngine bot, Long chatId, String caption, SendPhoto p)
 			throws TelegramApiException {
-		p.setChatId(chatId);
+		p.setChatId(Long.toString(chatId));
 		if (caption != null && caption.length() > 0) {
 			p.setCaption(caption);
 			p.setParseMode(BotConstants.MARKDOWN);

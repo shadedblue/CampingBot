@@ -9,17 +9,17 @@ import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
-import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
+import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
  * @author Nathan Hapke
  */
 public class VoteManagementCommands extends AbstractCommand implements SlashCommand {
-	private static final SlashCommandType SlashVoteExtend = new SlashCommandType("VoteExtend", "complete",
+	private static final SlashCommandType SlashVoteExtend = new SlashCommandType("VoteExtend", "extend",
 			BotCommandIds.VOTING | BotCommandIds.FINISH);
-	private static final SlashCommandType SlashVoteForceComplete = new SlashCommandType("VoteForceComplete", "extend",
+	private static final SlashCommandType SlashVoteForceComplete = new SlashCommandType("VoteForceComplete", "complete",
 			BotCommandIds.VOTING | BotCommandIds.USE);
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashVoteExtend,
 			SlashVoteForceComplete };

@@ -250,7 +250,7 @@ public class EnhanceCommand extends AbstractCommand
 
 	private CommandResult createPictureResponse(String picFileId, String caption, Direction d) {
 		try {
-			GetFile get = new GetFile().setFileId(picFileId);
+			GetFile get = new GetFile(picFileId);
 			File in = null;
 			in = bot.downloadFile(bot.execute(get));
 			File outImg;
