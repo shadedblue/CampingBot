@@ -90,18 +90,13 @@ public class UfcCommand extends VotingCommand<Integer> {
 
 	private List<UfcFight> ticket = new ArrayList<>();
 	private int ticketIndex = 0;
+	private UfcTracker currentRound;
 
 	private CampingUser ranter;
-
 	private CampingUser activater;
-
 	private Message topic;
-
 	private Message activation;
-
 	private Long chatId;
-
-	private UfcTracker currentRound;
 
 	public UfcCommand(CampingBot campingBot) {
 		super(campingBot, SlashUfcActivation);

@@ -43,7 +43,7 @@ public class UfcTracker extends VoteTracker<Integer> {
 	 */
 	public UfcTracker(UfcTracker previousRound) throws TelegramApiException {
 		super(previousRound.bot, previousRound.ranter, previousRound.activater, previousRound.chatId,
-				previousRound.activation, previousRound.msg, 1, UfcCommand.UFC_COMMAND, false);
+				previousRound.activation, previousRound.topic, 1, UfcCommand.UFC_COMMAND, false);
 		this.fight = previousRound.fight;
 		this.a = previousRound.fight.a;
 		this.b = previousRound.fight.b;
