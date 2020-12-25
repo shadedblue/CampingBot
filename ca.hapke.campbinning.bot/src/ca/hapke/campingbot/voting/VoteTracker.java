@@ -19,7 +19,7 @@ import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
-import ca.hapke.campingbot.commands.api.InlineCommandBase;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
@@ -318,7 +318,7 @@ public abstract class VoteTracker<T> {
 	}
 
 	protected InlineKeyboardMarkup getKeyboard() {
-		return InlineCommandBase.createKeyboard(shortButtons, buttonCallbackIds);
+		return AbstractCommand.createKeyboard(shortButtons, buttonCallbackIds);
 	}
 
 	public void update() {

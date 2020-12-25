@@ -18,6 +18,7 @@ import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.callback.api.CallbackCommandBase;
 import ca.hapke.campingbot.callback.api.CallbackId;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -53,7 +54,7 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	public static final ResponseCommandType VoteCommand = new ResponseCommandType("Vote",
 			BotCommandIds.VOTING | BotCommandIds.USE);
 
-	protected final Map<Integer, VoteTracker<T>> voteOnMessages = new HashMap<Integer, VoteTracker<T>>();
+	protected final Map<String, VoteTracker<T>> voteOnMessages = new HashMap<String, VoteTracker<T>>();
 	protected final Map<Integer, VoteTracker<T>> voteOnBanners = new HashMap<Integer, VoteTracker<T>>();
 
 	protected final EventList<VoteTracker<T>> inProgress = GlazedLists
@@ -128,7 +129,20 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 		VoteTracker<T> tracker = null;
 		TextCommandResult output = null;
 		Integer targetMessageId = topic.getMessageId();
-		if (voteOnMessages.containsKey(targetMessageId)) {
+
+		// if (voteOnMessages.containsKey(targetMessageId)) {
+		boolean alreadyVoting = false;
+		for (String s : voteOnMessages.keySet()) {
+			try {
+				s = s.substring(0, s.indexOf(AbstractCommand.DELIMITER));
+			} catch (Exception e) {
+			}
+			if (s.equals(targetMessageId.toString())) {
+				alreadyVoting = true;
+				break;
+			}
+		}
+		if (alreadyVoting) {
 			return new TextCommandResult(VoteCommandFailedCommand, ALREADY_BEING_VOTED_ON,
 					new InsultFragment(Perspective.You));
 		} else {
@@ -137,7 +151,8 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 			try {
 				tracker = initiateVote(ranter, activater, chatId, activation, topic);
-				addTracker(tracker, targetMessageId);
+				String key = createKey(targetMessageId);
+				addTracker(tracker, key);
 			} catch (VoteInitiationException e) {
 				output = new TextCommandResult(VoteCommandFailedCommand, new MentionFragment(activater));
 				output.add(e.getMessage());
@@ -150,7 +165,7 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 		return output;
 	}
 
-	protected void addTracker(VoteTracker<T> tracker, Integer targetMessageId) throws TelegramApiException {
+	protected void addTracker(VoteTracker<T> tracker, String targetMessageId) throws TelegramApiException {
 		if (tracker != null) {
 			tracker.begin();
 			inProgress.add(tracker);
@@ -164,8 +179,8 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
-		int callbackMessageId = id.getUpdateId();
-		VoteTracker<T> v = voteOnMessages.get(callbackMessageId);
+		String key = createKey(id.getUpdateId());
+		VoteTracker<T> v = voteOnMessages.get(key);
 
 		try {
 			if (v != null) {
@@ -211,6 +226,10 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 				return true;
 		}
 		return false;
+	}
+
+	protected String createKey(int messageId) {
+		return Integer.toString(messageId);
 	}
 
 }

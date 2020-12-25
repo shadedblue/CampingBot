@@ -77,4 +77,15 @@ public class CallbackId {
 		return ids;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CallbackId [");
+		if (result != null) {
+			builder.append(result);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

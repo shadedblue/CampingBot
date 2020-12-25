@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.log.EventItem;
@@ -15,6 +16,8 @@ import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
+ * TODO change currentRound to a Map<MessageId -> UfcRound>
+ * 
  * @author Nathan Hapke
  */
 public class UfcCommand extends VotingCommand<Integer> {
@@ -79,7 +82,8 @@ public class UfcCommand extends VotingCommand<Integer> {
 				currentRound = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, 1);
 			}
 			currentRound.addListener(new CreateNextTracker());
-			addTracker(currentRound, topicId);
+			String key = createKey(topicId);
+			addTracker(currentRound, key);
 		}
 	}
 
@@ -140,6 +144,12 @@ public class UfcCommand extends VotingCommand<Integer> {
 	@Override
 	public String getCommandName() {
 		return UFC_COMMAND;
+	}
+
+	@Override
+	protected String createKey(int messageId) {
+		return messageId + AbstractCommand.DELIMITER + currentRound.getRound() + AbstractCommand.DELIMITER
+				+ currentRound.getRounds();
 	}
 
 }
