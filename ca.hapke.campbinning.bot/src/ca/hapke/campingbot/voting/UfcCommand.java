@@ -118,12 +118,14 @@ public class UfcCommand extends VotingCommand<Integer> {
 		try {
 			String input = topic.getText();
 			String[] lines = input.split("\n");
-			for (String line : lines) {
+//			for (String line : lines) {
+			for (int i = 0; i < lines.length; i++) {
+				String line = lines[i];
 				String[] parts = line.split("-");
 				String a = parts[0].trim();
 				String b = parts[1].trim();
 				int rounds = Integer.parseInt(parts[2].trim());
-				ticket.add(new UfcFight(a, b, rounds));
+				ticket.add(new UfcFight(i, a, b, rounds));
 			}
 
 			UfcFight first = ticket.get(0);

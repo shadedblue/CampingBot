@@ -2,8 +2,6 @@ package ca.hapke.campingbot.voting;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,12 +46,9 @@ public abstract class VoteTracker<T> {
 	protected final CampingUser activater;
 	protected final Long chatId;
 	protected CampingChat chat;
-	protected Map<CampingUser, Integer> votes = new HashMap<>();
-	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
 	protected boolean completed = false;
 	protected NumberFormat nf;
 	protected Message voteTrackingMessage;
-//	protected String previousVotes;
 	protected Message bannerMessage;
 	protected String previousBanner;
 	protected Message topicMessage;
@@ -63,7 +58,12 @@ public abstract class VoteTracker<T> {
 	protected String[] shortButtons;
 	protected String[] buttonCallbackIds;
 	protected String[] longDescriptions;
-	protected final Map<Integer, T> valueMap = new HashMap<Integer, T>();
+
+//	protected Map<CampingUser, Integer> votes = new HashMap<>();
+//	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
+//	protected final Map<Integer, T> valueMap = new HashMap<Integer, T>();
+	protected final VoteCluster<T> cluster;
+
 	protected boolean addNa;
 	protected int naIndex;
 
@@ -96,10 +96,14 @@ public abstract class VoteTracker<T> {
 		this.allowExtendComplete = allowExtendComplete;
 		this.chat = CampingChatManager.getInstance(bot).get(chatId);
 		this.nf = NumberFormat.getInstance();
-
+		cluster = createCluster();
 		nf.setMinimumFractionDigits(0);
 		nf.setMaximumFractionDigits(1);
 		voteListeners.add(new InternalVoteListener());
+	}
+
+	protected VoteCluster<T> createCluster() {
+		return new VoteCluster<T>(this);
 	}
 
 	public void begin() throws TelegramApiException {
@@ -158,14 +162,36 @@ public abstract class VoteTracker<T> {
 		}
 	}
 
-	public void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
-		CallbackId id = new CallbackId(command, updateId, i);
+	protected void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
+		CallbackId id = createCallbackId(command, updateId, i);
 		String callbackId = id.getResult();
 
 		shortButtons[i] = shortStr;
 		longDescriptions[i] = longStr;
 		buttonCallbackIds[i] = callbackId;
+		Map<Integer, T> valueMap = cluster.getValueMap();
 		valueMap.put(i, value);
+	}
+
+	/**
+	 * Overrideable if you want to do something fancy.
+	 */
+	protected String createClusterKey() {
+		return "default";
+	}
+
+	/**
+	 * Overrideable if you want to do something fancy.
+	 */
+	protected int getOptionId(CallbackId id) {
+		return id.getIds()[0];
+	}
+
+	/**
+	 * Overrideable if you want to do something fancy.
+	 */
+	protected CallbackId createCallbackId(String command, int updateId, int i) {
+		return new CallbackId(command, updateId, i);
 	}
 
 	/**
@@ -187,9 +213,13 @@ public abstract class VoteTracker<T> {
 
 //		String display = longDescriptions[id.getIds()[0]];
 
-		int optionId = id.getIds()[0];
-
 		CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
+
+		Map<Integer, T> valueMap = cluster.getValueMap();
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
+		int optionId = getOptionId(id);
+
 		Integer previousVote = votes.get(user);
 		boolean prevVoteNA = votesNotApplicable.contains(user);
 
@@ -429,6 +459,10 @@ public abstract class VoteTracker<T> {
 	protected List<ResultFragment> getVotesText(boolean completed) {
 		List<ResultFragment> output = new ArrayList<>();
 
+//		Map<Integer, T> valueMap = cluster.getValueMap(id);
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
+
 		int notApplicable = votesNotApplicable.size();
 		int naturalVotes = votes.size();
 		int count = naturalVotes + notApplicable;
@@ -446,12 +480,12 @@ public abstract class VoteTracker<T> {
 		addVotesTextPrefix(completed, output);
 
 		if (shouldShowVotesInCategories()) {
-			int[] votes = new int[shortButtons.length];
-			for (int vote : this.votes.values()) {
-				votes[vote]++;
+			int[] votesByCategories = new int[shortButtons.length];
+			for (int vote : votes.values()) {
+				votesByCategories[vote]++;
 			}
 			if (addNa) {
-				votes[naIndex] = votesNotApplicable.size();
+				votesByCategories[naIndex] = votesNotApplicable.size();
 			}
 
 			for (int i = 0; i < shortButtons.length; i++) {
@@ -459,7 +493,7 @@ public abstract class VoteTracker<T> {
 				output.add(new TextFragment("\n"));
 				output.add(new TextFragment(txt, TextStyle.Bold));
 				output.add(new TextFragment(": "));
-				output.add(new TextFragment(Integer.toString(votes[i])));
+				output.add(new TextFragment(Integer.toString(votesByCategories[i])));
 			}
 		}
 
@@ -527,6 +561,8 @@ public abstract class VoteTracker<T> {
 	}
 
 	protected float averageVoteValues(Map<Integer, ? extends Number> map) {
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
 		int count = votes.size() + votesNotApplicable.size();
 		if (count == 0)
 			return 0;

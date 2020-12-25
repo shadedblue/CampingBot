@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -61,6 +63,10 @@ public class AitaTracker extends VoteTracker<Float> {
 
 	@Override
 	public float getScore() {
+		Map<Integer, Float> valueMap = cluster.getValueMap();
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
+
 		int notApplicable = votesNotApplicable.size();
 		int count = votes.size() + notApplicable;
 
