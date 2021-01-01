@@ -10,7 +10,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.vdurmont.emoji.Emoji;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.CommandType;
+import ca.hapke.campingbot.log.EventItem;
+import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.fragments.CaseChoice;
 import ca.hapke.campingbot.response.fragments.EmojiFragment;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
@@ -132,11 +135,24 @@ public abstract class CommandResult {
 		return result;
 	}
 
-	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;
+	public SendResult sendAndLog(CampingBotEngine bot, CampingChat chat) {
+		if (result == null) {
+			EventLogger logger = EventLogger.getInstance();
+			try {
+				result = send(bot, chat.chatId);
 
-//	public SendResult getResult() {
-//		return result;
-//	}
+				Message outgoingMsg = result.outgoingMsg;
+				EventItem ei = new EventItem(getCmd(), bot.getMeCamping(), outgoingMsg.getDate(), chat,
+						outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
+				logger.add(ei);
+			} catch (TelegramApiException e) {
+				logger.add(new EventItem(e.getLocalizedMessage()));
+			}
+		}
+		return result;
+	}
+
+	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;
 
 	@Override
 	public String toString() {
