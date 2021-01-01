@@ -54,9 +54,6 @@ public class InsultGenerator implements HasCategories<String>, CampingSerializab
 
 	@Override
 	public void getXml(OutputFormatter of) {
-//		of.start(XML_TAG);
-//
-//		of.finish(XML_TAG);
 		of.tagAndValue(INSULT_CATEGORY, categories.getList(INSULT_CATEGORY));
 
 		shouldSave = false;
