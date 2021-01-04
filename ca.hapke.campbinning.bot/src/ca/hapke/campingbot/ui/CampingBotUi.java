@@ -2,6 +2,8 @@ package ca.hapke.campingbot.ui;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
@@ -427,22 +429,40 @@ public abstract class CampingBotUi extends JFrame {
 			}
 			SystemTray tray = SystemTray.getSystemTray();
 			try {
-				File fire = ConfigXmlSerializer.getFileNotInBinFolder(protectionDomain, "assets/tray.png");
+				File fire = ConfigXmlSerializer.getFileNotInBinFolder(protectionDomain, "assets/systray.png");
 				URL fireUrl = fire.toURI().toURL();
 				ImageIcon fireIcon = new ImageIcon(fireUrl, "tray-icon");
 				Image fireImg = fireIcon.getImage();
 				trayIcon = new TrayIcon(fireImg, CAMPING_BOT);
 				trayIcon.setImageAutoSize(true);
-				trayIcon.addActionListener(new ActionListener() {
-
+				ActionListener showListener = new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						CampingBotUi.this.setVisible(true);
+						if (CampingBotUi.this.getExtendedState() == ICONIFIED) {
+							bringUp();
+						} else {
+							bringDown();
+						}
+					}
+				};
+				trayIcon.addActionListener(showListener);
+				tray.add(trayIcon);
 
-						CampingBotUi.this.setExtendedState(JFrame.NORMAL);
+				PopupMenu popup = new PopupMenu();
+
+				MenuItem show = new MenuItem("Show/Hide");
+				show.addActionListener(showListener);
+				popup.add(show);
+
+				MenuItem exitItem = new MenuItem("Exit");
+				exitItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						dispatchEvent(new WindowEvent(CampingBotUi.this, WindowEvent.WINDOW_CLOSING));
 					}
 				});
-				tray.add(trayIcon);
+				popup.add(exitItem);
+				trayIcon.setPopupMenu(popup);
 				addWindowStateListener(new WindowStateListener() {
 					@Override
 					public void windowStateChanged(WindowEvent e) {
@@ -457,6 +477,16 @@ public abstract class CampingBotUi extends JFrame {
 
 		statusUpdater.updateUserInfo(bot.getBotUsername(), -1);
 		intervalThread.add(new UiTableRefresher());
+	}
+
+	protected void bringDown() {
+		this.setVisible(false);
+		this.setExtendedState(ICONIFIED);
+	}
+
+	protected void bringUp() {
+		this.setVisible(true);
+		this.setExtendedState(NORMAL);
 	}
 
 	public void chat() {
