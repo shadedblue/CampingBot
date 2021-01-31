@@ -10,9 +10,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.callback.api.CallbackId;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.InlineCommandBase;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
@@ -23,11 +25,11 @@ import ca.hapke.campingbot.processors.MessageProcessor;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
+import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
-import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.hapke.util.StringUtil;
@@ -219,8 +221,8 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
-			CampingUser campingFromUser) {
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+			CampingUser campingFromUser) throws TelegramApiException {
 		if (command == SlashAllNicknames)
 			return allNicknamesCommand();
 		if (command == SlashSetNickname)

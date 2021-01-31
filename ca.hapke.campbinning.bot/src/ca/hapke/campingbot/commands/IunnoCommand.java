@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -32,8 +34,9 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
 			Message message) {
+		Long chatId = chat.chatId;
 		ImageCommandResult result = new ImageCommandResult(SlashIunno, iunnoImg);
 		result.setReplyToOriginalMessageIfPossible(message);
 		return result;
@@ -56,8 +59,8 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
-			CampingUser campingFromUser) {
-		return textCommand(campingFromUser, message.getEntities(), chatId, message);
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+			CampingUser campingFromUser) throws TelegramApiException {
+		return textCommand(campingFromUser, message.getEntities(), chat, message);
 	}
 }

@@ -30,6 +30,7 @@ import ca.hapke.campingbot.users.CampingUser;
  */
 public abstract class CommandResult {
 
+	private static final TextFragment NEW_LINE_FRAG = new TextFragment("\n");
 	protected Integer replyTo;
 	protected ReplyKeyboard keyboard;
 	// protected boolean sent = false;
@@ -115,6 +116,12 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult newLine() {
+		if (fragments.size() > 0)
+			fragments.add(NEW_LINE_FRAG);
+		return this;
+	}
+
 	public CommandType getCmd() {
 		return cmd;
 	}
@@ -140,6 +147,10 @@ public abstract class CommandResult {
 
 	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		if (result == null) {
+			int x = fragments.size() - 1;
+			if (x >= 0 && fragments.get(x) == NEW_LINE_FRAG) {
+				fragments.remove(x);
+			}
 			result = sendInternal(bot, chatId);
 		}
 		return result;
@@ -152,14 +163,19 @@ public abstract class CommandResult {
 				result = send(bot, chat.chatId);
 
 				Message outgoingMsg = result.outgoingMsg;
+				String text = getTextForLog(outgoingMsg);
 				EventItem ei = new EventItem(getCmd(), bot.getMeCamping(), outgoingMsg.getDate(), chat,
-						outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
+						outgoingMsg.getMessageId(), text, null);
 				logger.add(ei);
 			} catch (TelegramApiException e) {
 				logger.add(new EventItem(e.getLocalizedMessage()));
 			}
 		}
 		return result;
+	}
+
+	protected String getTextForLog(Message outgoingMsg) {
+		return outgoingMsg.getText();
 	}
 
 	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;

@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import ca.hapke.campingbot.Resources;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -50,7 +51,7 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
 			CampingUser campingFromUser) {
 		ZonedDateTime now = new GregorianCalendar().toZonedDateTime();
 		CommandResult result = new TextCommandResult(CountdownCommand.SlashCountdown);

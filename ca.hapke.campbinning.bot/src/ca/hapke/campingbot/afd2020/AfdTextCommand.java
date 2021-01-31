@@ -38,7 +38,7 @@ public class AfdTextCommand implements TextCommand {
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
 			Message message) {
 		String incoming = message.getText();
 		CommandResult out = null;
@@ -82,8 +82,8 @@ public class AfdTextCommand implements TextCommand {
 				SendResult result = titleCmd.send(bot, chat.chatId);
 				out = titleCmd;
 				Message outgoingMsg = result.outgoingMsg;
-				EventItem ei = new EventItem(PartyEverydayCommand.PartyEverydayCommand, bot.getMeCamping(), outgoingMsg.getDate(),
-						chat, outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
+				EventItem ei = new EventItem(PartyEverydayCommand.PartyEverydayCommand, bot.getMeCamping(),
+						outgoingMsg.getDate(), chat, outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
 				EventLogger.getInstance().add(ei);
 			} catch (TelegramApiException e) {
 				e.printStackTrace();

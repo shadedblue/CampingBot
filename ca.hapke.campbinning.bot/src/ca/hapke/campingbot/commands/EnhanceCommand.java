@@ -25,6 +25,7 @@ import ca.hapke.campingbot.Resources;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.HasCategories;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -179,8 +180,9 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
 			CampingUser campingFromUser) throws TelegramApiException {
+		Long chatId = chat.chatId;
 
 		// update previous enhancements chain
 		Set<Entry<CommandResult, Integer>> entrySet = trackingPending.entrySet();

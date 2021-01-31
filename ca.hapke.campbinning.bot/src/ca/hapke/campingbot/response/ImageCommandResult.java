@@ -127,4 +127,21 @@ public class ImageCommandResult extends CommandResult {
 		return bot.execute(p);
 	}
 
+	@Override
+	protected String getTextForLog(Message outgoingMsg) {
+		String imageText;
+		switch (mode) {
+		case Url:
+			imageText = image.url;
+			break;
+		case File:
+			imageText = file.getAbsolutePath();
+			break;
+		default:
+			imageText = "N/A";
+			break;
+		}
+		return imageText + " => " + super.getTextForLog(outgoingMsg);
+	}
+
 }

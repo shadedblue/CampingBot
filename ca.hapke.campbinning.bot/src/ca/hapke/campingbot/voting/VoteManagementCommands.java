@@ -1,7 +1,9 @@
 package ca.hapke.campingbot.voting;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -108,8 +110,8 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
-			CampingUser campingFromUser) {
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+			CampingUser campingFromUser) throws TelegramApiException {
 		if (command == SlashVoteForceComplete)
 			return completeVoting(message, campingFromUser);
 		if (command == SlashVoteExtend)
