@@ -11,6 +11,7 @@ import com.vdurmont.emoji.Emoji;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.channels.CampingChat;
+import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.api.CommandType;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
@@ -78,6 +79,11 @@ public abstract class CommandResult {
 
 	public CommandResult add(Integer msg) {
 		fragments.add(new TextFragment(Integer.toString(msg)));
+		return this;
+	}
+
+	public CommandResult add(Integer msg, TextStyle style) {
+		fragments.add(new TextFragment(Integer.toString(msg), style));
 		return this;
 	}
 
@@ -152,6 +158,13 @@ public abstract class CommandResult {
 				fragments.remove(x);
 			}
 			result = sendInternal(bot, chatId);
+		}
+		return result;
+	}
+
+	public SendResult sendAndLog(CampingBotEngine bot, long chatId) {
+		if (result == null) {
+			sendAndLog(bot, CampingChatManager.getInstance(bot).get(chatId));
 		}
 		return result;
 	}

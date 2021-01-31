@@ -91,7 +91,7 @@ public abstract class AfdImagesStage<T> extends Stage implements CalendaredEvent
 		return times;
 	}
 
-	protected ImageLink getAybImgUrl(String category, int i) {
+	protected static ImageLink getAybImgUrl(String category, int i) {
 		return new ImageLink(
 				"http://www.hapke.ca/images/afd21/ayb-" + category + "-" + (i < 10 ? "0" : "") + i + ".png",
 				ImageLink.STATIC);

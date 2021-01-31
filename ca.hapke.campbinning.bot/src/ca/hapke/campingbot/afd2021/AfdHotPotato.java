@@ -24,10 +24,14 @@ import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.response.CommandResult;
+import ca.hapke.campingbot.response.EditCaptionCommandResult;
+import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
+import ca.hapke.campingbot.util.ImageLink;
 import ca.hapke.util.CollectionUtil;
 import ca.hapke.util.StringUtil;
 
@@ -59,13 +63,15 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	static final int MAX_TOSSES = 5;
 	private CampingBot bot;
 
+	// TODO should be a Map based on channel
 	private Message bannerMessage;
 	private List<CampingChat> allowedChats;
 
 	private final CampingChatManager chatMonitor;
 	private final CampingUserMonitor userMonitor;
-	private int nextVotingId = 0;
+	private int roundNumber = 0;
 	private AfdPlayerManager playerManager;
+	private ImageLink noChance = AfdImagesStage.getAybImgUrl("sr", 1);
 
 	public AfdHotPotato(CampingBot bot) {
 		this.bot = bot;
@@ -126,11 +132,11 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 			return null;
 
 		if (command == SlashPotato && bannerMessage == null) {
-			List<TextCommandResult> results = beginRound(Collections.singletonList(chat));
-			TextCommandResult result = results.get(0);
+			List<CommandResult> results = beginRound(Collections.singletonList(chat));
+			CommandResult result = results.get(0);
 			return result;
 		} else if (command == SlashResult) {
-			TextCommandResult result = finishRound();
+			CommandResult result = finishRound();
 
 			return result;
 		} else {
@@ -147,14 +153,15 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		}
 	}
 
-	public List<TextCommandResult> beginRound(List<CampingChat> chats) throws TelegramApiException {
-		List<TextCommandResult> out = new ArrayList<>();
-		nextVotingId++;
+	public List<CommandResult> beginRound(List<CampingChat> chats) throws TelegramApiException {
+		List<CommandResult> out = new ArrayList<>();
+		roundNumber++;
 		for (CampingChat chat : chats) {
-			TextCommandResult result = new TextCommandResult(HotPotatoCommand);
+//			TextCommandResult result = new TextCommandResult(HotPotatoCommand);
+			ImageCommandResult result = new ImageCommandResult(HotPotatoCommand, noChance);
 //			firstPerson = CollectionUtil.getRandom(targets);
 //			result.add(firstPerson, CaseChoice.Upper);
-			result.add("YOU HAVE NO CHANCE TO SURVIVE... MAKE YOUR TIME.");
+			addRoundNumber(result);
 			result.setKeyboard(createVotingKeyboard());
 
 			SendResult sent = result.send(bot, chat.chatId);
@@ -163,6 +170,14 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		}
 		return out;
 
+	}
+
+	protected void addRoundNumber(CommandResult result) {
+		result.add("ROUND ", TextStyle.Bold);
+		result.add(roundNumber, TextStyle.Bold);
+		result.add("\n");
+		result.add(playerManager.getTargets().size());
+		result.add(" PLAYERS REMAIN!");
 	}
 
 	public TextCommandResult finishRound() {
@@ -176,16 +191,19 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 
 		CampingUser target = CollectionUtil.getRandom(targets);
 
-		int potatoLimit = (int) (Math.random() * targets.size() * MAX_TOSSES);
-		int i = 0;
+		int tossesLeft = (int) (Math.random() * targets.size() * MAX_TOSSES);
+//		int i = 0;
 		while (true) {
+
+			result.add(tossesLeft);
+			result.add(" left: ");
 			result.add(target);
 			int index = nextChoice.get(target);
 			List<CampingUser> votes = playerManager.getVotes(target);
 			CampingUser nextTarget = null;
 
 			boolean boom;
-			if (i >= potatoLimit || index >= MAX_TOSSES) {
+			if (tossesLeft <= 0 || index >= MAX_TOSSES) {
 				boom = true;
 			} else {
 				try {
@@ -196,6 +214,16 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 				}
 			}
 			if (boom || nextTarget == null) {
+
+				try {
+					EditCaptionCommandResult editBanner = new EditCaptionCommandResult(HotPotatoCommand, bannerMessage);
+					addRoundNumber(editBanner);
+					editBanner.sendAndLog(bot, null);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 				result.add(" GOT BLOWED UP!");
 				playerManager.advance(target);
 //				targets.remove(target);
@@ -205,7 +233,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 				if (targets.size() == 1) {
 					winner(targets.get(0));
 				} else {
-					startNextRound();
+					advanceToNextRound(target);
 				}
 				break;
 			} else {
@@ -217,13 +245,29 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 				target = nextTarget;
 			}
 
-			i++;
+			tossesLeft--;
 		}
 		return result;
 	}
 
-	private void startNextRound() {
+	private void advanceToNextRound(CampingUser killed) {
+		AybBetweenRoundsImages betweenRounds = new AybBetweenRoundsImages(bot, killed);
+		betweenRounds.add(new StageListener() {
 
+			@Override
+			public void stageComplete(boolean success) {
+				try {
+					beginRound(allowedChats);
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void stageBegan() {
+			}
+		});
+		betweenRounds.begin();
 	}
 
 	private void winner(CampingUser target) {
@@ -247,7 +291,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		for (int i = 0; i < n; i++) {
 			CampingUser user = targets.get(i);
 			buttons[i] = playerManager.getInitials(user);
-			CallbackId id = new CallbackId(POTATO, nextVotingId, user.getTelegramId());
+			CallbackId id = new CallbackId(POTATO, roundNumber, user.getTelegramId());
 			values[i] = id.getResult();
 		}
 		return createKeyboard(buttons, values);

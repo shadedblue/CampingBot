@@ -14,7 +14,7 @@ import ca.hapke.campingbot.util.ImageLink;
 public class AybBeginningImages extends AfdImagesStage<Void> {
 
 	private static final int FIRST_IMAGE = 1;
-	private static final int LAST_IMAGE = 9;
+	private static final int LAST_IMAGE = 8;
 
 	public AybBeginningImages(CampingBot bot) {
 		super(bot);

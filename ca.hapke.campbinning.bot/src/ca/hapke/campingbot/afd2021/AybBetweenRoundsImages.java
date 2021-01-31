@@ -16,8 +16,6 @@ import ca.hapke.campingbot.util.ImageLink;
 public class AybBetweenRoundsImages extends AfdImagesStage<Void> {
 
 	private CampingUser killed;
-	private static final int FIRST_IMAGE = 1;
-	private static final int LAST_IMAGE = 9;
 
 	public AybBetweenRoundsImages(CampingBot bot, CampingUser killed) {
 		super(bot);
@@ -26,7 +24,7 @@ public class AybBetweenRoundsImages extends AfdImagesStage<Void> {
 
 	@Override
 	public StartupMode getStartupMode() {
-		return StartupMode.Never;
+		return StartupMode.Always;
 	}
 
 	@Override

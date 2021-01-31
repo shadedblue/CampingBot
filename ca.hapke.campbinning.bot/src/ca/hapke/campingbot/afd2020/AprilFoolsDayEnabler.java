@@ -30,7 +30,7 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 		this.hotPotato = hotPotato;
 
 		// Testing
-		ByTimeOfYear<Boolean> enable = new ByTimeOfYear<Boolean>(1, 30, 18, 0, true);
+		ByTimeOfYear<Boolean> enable = new ByTimeOfYear<Boolean>(1, 30, 20, 26, true);
 
 		times = new TimesProvider<>(enable);
 	}
