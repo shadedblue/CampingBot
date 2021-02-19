@@ -9,11 +9,11 @@ import ca.hapke.campingbot.users.CampingUser;
  * @author Nathan Hapke
  */
 public interface VoteChangedListener<T> {
-	public EventItem changed(int optionId, CallbackQuery callbackQuery, CampingUser user);
+	public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId);
 
-	public EventItem confirmed(int optionId, CallbackQuery callbackQuery, CampingUser user);
+	public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId);
 
-	public EventItem completedByUser(int optionId, CallbackQuery callbackQuery, CampingUser user);
+	public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId);
 
 	public EventItem completedAutomatic();
 }

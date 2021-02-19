@@ -62,6 +62,7 @@ public abstract class VoteTracker<T> {
 //	protected Map<CampingUser, Integer> votes = new HashMap<>();
 //	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
 //	protected final Map<Integer, T> valueMap = new HashMap<Integer, T>();
+
 	protected final VoteCluster<T> cluster;
 
 	protected boolean addNa;
@@ -245,7 +246,7 @@ public abstract class VoteTracker<T> {
 				complete();
 
 				for (VoteChangedListener<T> vcl : voteListeners) {
-					EventItem result = vcl.completedByUser(optionId, callbackQuery, user);
+					EventItem result = vcl.completedByUser(callbackQuery, user, optionId);
 					if (result != null)
 						output = result;
 				}
@@ -257,13 +258,13 @@ public abstract class VoteTracker<T> {
 		}
 		if (voteChanged) {
 			for (VoteChangedListener<T> vcl : voteListeners) {
-				EventItem result = vcl.changed(optionId, callbackQuery, user);
+				EventItem result = vcl.changed(callbackQuery, user, optionId);
 				if (result != null)
 					output = result;
 			}
 		} else {
 			for (VoteChangedListener<T> vcl : voteListeners) {
-				EventItem result = vcl.confirmed(optionId, callbackQuery, user);
+				EventItem result = vcl.confirmed(callbackQuery, user, optionId);
 				if (result != null)
 					output = result;
 			}
@@ -289,7 +290,7 @@ public abstract class VoteTracker<T> {
 
 	private class InternalVoteListener implements VoteChangedListener<T> {
 		@Override
-		public EventItem changed(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			String display = longDescriptions[optionId];
 			String voteDisplayToUser = "You voted: " + display + "!";
 
@@ -299,7 +300,7 @@ public abstract class VoteTracker<T> {
 		}
 
 		@Override
-		public EventItem confirmed(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			String display = longDescriptions[optionId];
 			String voteDisplayToUser = "Your vote was already: " + display + "!";
 
@@ -307,7 +308,7 @@ public abstract class VoteTracker<T> {
 		}
 
 		@Override
-		public EventItem completedByUser(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			return showBanner(callbackQuery, "You completed the voting!", user);
 		}
 

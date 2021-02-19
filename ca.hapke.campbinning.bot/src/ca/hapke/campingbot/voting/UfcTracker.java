@@ -20,43 +20,48 @@ import ca.hapke.campingbot.users.CampingUser;
  */
 public class UfcTracker extends VoteTracker<Integer> {
 
+	static final int TEN_EIGHT = -2;
+	static final int TEN_NINE = -1;
+	static final int NINE_TEN = 1;
+	static final int EIGHT_TEN = 2;
+
 	private String a;
 	private String b;
 	private int round;
 	private int rounds;
 	private UfcFight fight;
 	private Message msg;
+	private UfcSummarizer summarizer;
 
 	public UfcTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message msg, UfcFight fight, int round) throws TelegramApiException {
+			Message msg, UfcFight fight, int round, UfcSummarizer summarizer) throws TelegramApiException {
 		super(bot, ranter, activater, chatId, activation, msg, 1, UfcCommand.UFC_COMMAND, false);
 		this.msg = msg;
 		this.fight = fight;
+		this.summarizer = summarizer;
 		this.a = fight.a;
 		this.b = fight.b;
 		this.round = round;
 		this.rounds = fight.rounds;
+
+		summarizer.addTracker(round, this);
 	}
 
 	/**
 	 * Advance to next round
 	 */
 	public UfcTracker(UfcTracker previousRound) throws TelegramApiException {
-		super(previousRound.bot, previousRound.ranter, previousRound.activater, previousRound.chatId,
-				previousRound.activation, previousRound.topic, 1, UfcCommand.UFC_COMMAND, false);
-		this.fight = previousRound.fight;
-		this.a = previousRound.fight.a;
-		this.b = previousRound.fight.b;
-		this.round = previousRound.round + 1;
-		this.rounds = previousRound.fight.rounds;
+		this(previousRound.bot, previousRound.ranter, previousRound.activater, previousRound.chatId,
+				previousRound.activation, previousRound.topic, previousRound.fight, previousRound.round + 1,
+				previousRound.summarizer);
 	}
 
 	@Override
 	protected boolean createOptions(List<VotingOption<Integer>> optionsList) {
-		optionsList.add(new VotingOption<Integer>("10-8", "10-8 " + a, -2));
-		optionsList.add(new VotingOption<Integer>("10-9", "10-9 " + a, -1));
-		optionsList.add(new VotingOption<Integer>("9-10", "10-9 " + b, 1));
-		optionsList.add(new VotingOption<Integer>("8-10", "10-8 " + b, 2));
+		optionsList.add(new VotingOption<Integer>("10-8", "10-8 " + a, TEN_EIGHT));
+		optionsList.add(new VotingOption<Integer>("10-9", "10-9 " + a, TEN_NINE));
+		optionsList.add(new VotingOption<Integer>("9-10", "10-9 " + b, NINE_TEN));
+		optionsList.add(new VotingOption<Integer>("8-10", "10-8 " + b, EIGHT_TEN));
 		return true;
 	}
 

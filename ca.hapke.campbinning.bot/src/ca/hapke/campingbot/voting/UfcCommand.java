@@ -25,7 +25,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 		private boolean firstAction = false;
 
 		@Override
-		public EventItem changed(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			if (firstAction == false) {
 				firstAction = true;
 				new DelayThenCreate(currentRound.getRound() < currentRound.getRounds()).start();
@@ -34,13 +34,13 @@ public class UfcCommand extends VotingCommand<Integer> {
 		}
 
 		@Override
-		public EventItem confirmed(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public EventItem completedByUser(int optionId, CallbackQuery callbackQuery, CampingUser user) {
+		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			new DelayThenCreate(false).start();
 			return null;
 		}
@@ -79,7 +79,8 @@ public class UfcCommand extends VotingCommand<Integer> {
 			} else {
 				ticketIndex++;
 				UfcFight fight = ticket.get(ticketIndex);
-				currentRound = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, 1);
+				summarizer = new UfcSummarizer(fight, bot, chatId);
+				currentRound = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, 1, summarizer);
 			}
 			currentRound.addListener(new CreateNextTracker());
 			String key = createKey(topicId);
@@ -88,12 +89,16 @@ public class UfcCommand extends VotingCommand<Integer> {
 	}
 
 	static final String UFC_COMMAND = "ufc";
+	static final String READY_COMMAND = "ready";
 
-	private static final SlashCommandType SlashUfcActivation = new SlashCommandType("UfcActivation", UFC_COMMAND,
+	static final SlashCommandType SlashUfcActivation = new SlashCommandType("UfcActivation", UFC_COMMAND,
 			BotCommandIds.VOTING | BotCommandIds.SET);
+//	private static final SlashCommandType SlashReadyUfc = new SlashCommandType("ReadyUfc", READY_COMMAND,
+//			BotCommandIds.VOTING | BotCommandIds.SET);
 
 	private List<UfcFight> ticket = new ArrayList<>();
 	private int ticketIndex = 0;
+	private UfcSummarizer summarizer;
 	private UfcTracker currentRound;
 
 	private CampingUser ranter;
@@ -135,8 +140,10 @@ public class UfcCommand extends VotingCommand<Integer> {
 		}
 	}
 
-	private UfcTracker createTracker(UfcFight first, int round) throws TelegramApiException {
-		UfcTracker firstVote = new UfcTracker(bot, ranter, activater, chatId, activation, topic, first, round);
+	private UfcTracker createTracker(UfcFight fight, int round) throws TelegramApiException {
+		summarizer = new UfcSummarizer(fight, bot, chatId);
+		UfcTracker firstVote = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, round,
+				summarizer);
 		firstVote.addListener(new CreateNextTracker());
 		return firstVote;
 	}

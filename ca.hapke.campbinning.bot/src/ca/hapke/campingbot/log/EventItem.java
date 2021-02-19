@@ -65,6 +65,11 @@ public class EventItem {
 		this(command, user, null, CampingChatManager.getInstance().get(chatId), telegramId, rest, extraData);
 	}
 
+	public EventItem(CommandType command, CampingUser user, Long chatId, SendResult result) {
+		this(command, user, result.outgoingMsg.getDate(), CampingChatManager.getInstance().get(chatId),
+				result.outgoingMsg.getMessageId(), result.msg, result.extraData);
+	}
+
 	public EventItem(CommandType command, CampingUser user, CampingChat chat, SendResult result) {
 		this(command, user, result.outgoingMsg.getDate(), chat, result.outgoingMsg.getMessageId(), result.msg,
 				result.extraData);
