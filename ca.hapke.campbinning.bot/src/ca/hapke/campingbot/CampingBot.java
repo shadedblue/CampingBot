@@ -81,7 +81,7 @@ public class CampingBot extends CampingBotEngine {
 		processor.addAtEnd(ballsCommand.getCrazyCase());
 		testCommand = new TestVote2Command(this);
 		rantCommand = new RantCommand(this);
-		ufcCommand = new UfcCommand(this);
+		ufcCommand = new UfcCommand(this, res);
 		voteManagementCommands = new VoteManagementCommands(rantCommand/* , ufcCommand */);
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);

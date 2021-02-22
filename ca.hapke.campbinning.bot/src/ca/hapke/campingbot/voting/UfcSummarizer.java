@@ -8,7 +8,10 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.vdurmont.emoji.Emoji;
+
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.Resources;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
@@ -29,17 +32,24 @@ public class UfcSummarizer {
 	private Message msg;
 	private CampingBot bot;
 	private Long chatId;
+	private Emoji checkEmoji;
+	private Emoji xEmoji;
 
-	public UfcSummarizer(UfcFight fight, CampingBot bot, Long chatId) {
+	public UfcSummarizer(UfcFight fight, CampingBot bot, Long chatId, Resources res) {
 		this.fight = fight;
 		this.bot = bot;
 		this.chatId = chatId;
+
+		checkEmoji = res.getCheck();
+		xEmoji = res.getX();
 	}
 
 	private class UpdateListener extends VoteChangedAdapter<Integer> {
 		@Override
 		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
-			sendOrUpdate(user);
+			if (roundToTrackerMap.size() >= fight.rounds) {
+				sendOrUpdate(user);
+			}
 			return null;
 		}
 	}
@@ -47,24 +57,6 @@ public class UfcSummarizer {
 	public void addTracker(int round, UfcTracker ufcTracker) {
 		roundToTrackerMap.put(round, ufcTracker);
 		ufcTracker.addListener(ul);
-	}
-
-	private class JudgingCard {
-		int[] as, bs;
-
-		private JudgingCard(int rounds) {
-			as = new int[rounds];
-			bs = new int[rounds];
-		}
-	}
-
-	private JudgingCard getCard(Map<CampingUser, JudgingCard> judgingCards, CampingUser user) {
-		JudgingCard card = judgingCards.get(user);
-		if (card == null) {
-			card = new JudgingCard(fight.rounds);
-			judgingCards.put(user, card);
-		}
-		return card;
 	}
 
 	public void sendOrUpdate(CampingUser u) {
@@ -76,7 +68,6 @@ public class UfcSummarizer {
 		}
 
 		result.add("Judging Summary");
-		Map<CampingUser, JudgingCard> judgingCards = new HashMap<>();
 		for (Entry<Integer, UfcTracker> e : roundToTrackerMap.entrySet()) {
 			Integer round = e.getKey();
 			UfcTracker tracker = e.getValue();
@@ -85,45 +76,33 @@ public class UfcSummarizer {
 			for (Entry<CampingUser, Integer> voteEntry : votes.entrySet()) {
 				CampingUser user = voteEntry.getKey();
 				int vote = voteEntry.getValue();
-				JudgingCard card = getCard(judgingCards, user);
-
-				int a = -1;
-				int b = -1;
-				switch (vote) {
-				case 0:
-					a = 10;
-					b = 8;
-					break;
-				case 1:
-					a = 10;
-					b = 9;
-					break;
-				case 2:
-					a = 9;
-					b = 10;
-					break;
-				case 3:
-					a = 8;
-					b = 10;
-					break;
-				}
-				if (a >= 0 && b >= 0) {
-					card.as[round - 1] = a;
-					card.bs[round - 1] = b;
-				}
+				fight.setVote(user, round, vote);
 			}
 		}
-		for (Entry<CampingUser, JudgingCard> judgeAndCard : judgingCards.entrySet()) {
+
+		boolean completeJudging = fight.isVotingComplete();
+
+		for (Entry<CampingUser, JudgingCard> judgeAndCard : fight.getJudgingCards().entrySet()) {
 			CampingUser judge = judgeAndCard.getKey();
 			JudgingCard card = judgeAndCard.getValue();
-			int a = 0, b = 0;
-			for (int i = 0; i < card.as.length; i++) {
-				a += card.as[i];
-				b += card.bs[i];
-			}
 			result.add(ResultFragment.NEWLINE);
 			result.add(judge);
-			result.add(" scores it: " + a + "-" + b);
+			if (completeJudging) {
+				int a = 0, b = 0;
+				for (int round = 1; round <= card.getRounds(); round++) {
+					a += card.getA(round);
+					b += card.getB(round);
+				}
+				result.add(" scores it: " + a + "-" + b);
+			} else {
+				for (int round = 1; round <= card.getRounds(); round++) {
+					if (card.hasVote(round)) {
+						result.add(checkEmoji);
+					} else {
+						result.add(xEmoji);
+					}
+				}
+			}
 		}
 
 		try {
@@ -134,8 +113,6 @@ public class UfcSummarizer {
 			EventItem ei = new EventItem(UfcCommand.SlashUfcActivation, u, chatId, sent);
 			EventLogger.getInstance().add(ei);
 		} catch (TelegramApiException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }
