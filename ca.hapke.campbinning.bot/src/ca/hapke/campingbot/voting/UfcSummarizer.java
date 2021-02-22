@@ -36,35 +36,12 @@ public class UfcSummarizer {
 		this.chatId = chatId;
 	}
 
-	private class UpdateListener implements VoteChangedListener<Integer> {
-//
-//		private int round;
-//
-//		public UpdateListener(int round) {
-//			this.round = round;
-//		}
-
+	private class UpdateListener extends VoteChangedAdapter<Integer> {
 		@Override
 		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			sendOrUpdate(user);
 			return null;
 		}
-
-		@Override
-		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
-			return null;
-		}
-
-		@Override
-		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
-			return null;
-		}
-
-		@Override
-		public EventItem completedAutomatic() {
-			return null;
-		}
-
 	}
 
 	public void addTracker(int round, UfcTracker ufcTracker) {
@@ -109,12 +86,30 @@ public class UfcSummarizer {
 				CampingUser user = voteEntry.getKey();
 				int vote = voteEntry.getValue();
 				JudgingCard card = getCard(judgingCards, user);
-				if (vote > 0) {
-					card.as[round - 1] = 10 - vote;
-					card.bs[round - 1] = 10;
-				} else if (vote < 0) {
-					card.as[round - 1] = 10;
-					card.bs[round - 1] = 10 + vote;
+
+				int a = -1;
+				int b = -1;
+				switch (vote) {
+				case 0:
+					a = 10;
+					b = 8;
+					break;
+				case 1:
+					a = 10;
+					b = 9;
+					break;
+				case 2:
+					a = 9;
+					b = 10;
+					break;
+				case 3:
+					a = 8;
+					b = 10;
+					break;
+				}
+				if (a >= 0 && b >= 0) {
+					card.as[round - 1] = a;
+					card.bs[round - 1] = b;
 				}
 			}
 		}

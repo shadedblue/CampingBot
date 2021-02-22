@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -21,7 +22,7 @@ import ca.hapke.campingbot.users.CampingUser;
  * @author Nathan Hapke
  */
 public class UfcCommand extends VotingCommand<Integer> {
-	private class CreateNextTracker implements VoteChangedListener<Integer> {
+	private class CreateNextTracker extends VoteChangedAdapter<Integer> {
 		private boolean firstAction = false;
 
 		@Override
@@ -34,26 +35,15 @@ public class UfcCommand extends VotingCommand<Integer> {
 		}
 
 		@Override
-		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
 		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			new DelayThenCreate(false).start();
-			return null;
-		}
-
-		@Override
-		public EventItem completedAutomatic() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 	}
 
 	private class DelayThenCreate extends Thread {
+		private static final int DELAY_BETWEEN_ROUNDS_SEC = 60;
 		private boolean nextRound;
 
 		public DelayThenCreate(boolean nextRound) {
@@ -64,7 +54,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 		public void run() {
 			Integer topicId = topic.getMessageId();
 			try {
-				Thread.sleep(10 * 1000);
+				Thread.sleep(DELAY_BETWEEN_ROUNDS_SEC * 1000);
 //				boolean nextRound = currentRound.getRound() < currentRound.getRounds();
 				createNextTracker(topicId);
 			} catch (Exception e) {
@@ -83,8 +73,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 				currentRound = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, 1, summarizer);
 			}
 			currentRound.addListener(new CreateNextTracker());
-			String key = createKey(topicId);
-			addTracker(currentRound, key);
+			addTracker(currentRound);
 		}
 	}
 
@@ -153,10 +142,16 @@ public class UfcCommand extends VotingCommand<Integer> {
 		return UFC_COMMAND;
 	}
 
+	/**
+	 * TopicMessageId:Fight#:Round#
+	 */
 	@Override
-	protected String createKey(int messageId) {
-		return messageId + AbstractCommand.DELIMITER + currentRound.getRound() + AbstractCommand.DELIMITER
-				+ currentRound.getRounds();
+	protected String createKey(CallbackId id) {
+		int messageId = id.getUpdateId();
+		int[] ids = id.getIds();
+		int fightId = ids[0];
+		int round = ids[1];
+		return messageId + AbstractCommand.DELIMITER + fightId + AbstractCommand.DELIMITER + round;
 	}
 
 }

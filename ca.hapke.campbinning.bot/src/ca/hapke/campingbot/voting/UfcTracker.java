@@ -35,7 +35,7 @@ public class UfcTracker extends VoteTracker<Integer> {
 
 	public UfcTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
 			Message msg, UfcFight fight, int round, UfcSummarizer summarizer) throws TelegramApiException {
-		super(bot, ranter, activater, chatId, activation, msg, 1, UfcCommand.UFC_COMMAND, false);
+		super(bot, ranter, activater, chatId, activation, msg, 2, UfcCommand.UFC_COMMAND, false);
 		this.msg = msg;
 		this.fight = fight;
 		this.summarizer = summarizer;
@@ -115,9 +115,29 @@ public class UfcTracker extends VoteTracker<Integer> {
 		return fight.fightNumber + AbstractCommand.DELIMITER + round;
 	}
 
+	/**
+	 * TopicMessageId:Fight#:Round#
+	 */
+	@Override
+	public String getKey() {
+		return super.getKey() + AbstractCommand.DELIMITER + createClusterKey();
+	}
+
 	@Override
 	protected int getOptionId(CallbackId id) {
 		return id.getIds()[2];
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("UfcTracker [");
+		builder.append(a);
+		builder.append(" VS ");
+		builder.append(b);
+		builder.append(" r");
+		builder.append(round);
+		return builder.toString();
 	}
 
 }

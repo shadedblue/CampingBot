@@ -151,8 +151,7 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 			try {
 				tracker = initiateVote(ranter, activater, chatId, activation, topic);
-				String key = createKey(targetMessageId);
-				addTracker(tracker, key);
+				addTracker(tracker);
 			} catch (VoteInitiationException e) {
 				output = new TextCommandResult(VoteCommandFailedCommand, new MentionFragment(activater));
 				output.add(e.getMessage());
@@ -165,11 +164,12 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 		return output;
 	}
 
-	protected void addTracker(VoteTracker<T> tracker, String targetMessageId) throws TelegramApiException {
+	protected void addTracker(VoteTracker<T> tracker) throws TelegramApiException {
 		if (tracker != null) {
 			tracker.begin();
 			inProgress.add(tracker);
-			voteOnMessages.put(targetMessageId, tracker);
+			String key = tracker.getKey();
+			voteOnMessages.put(key, tracker);
 			voteOnBanners.put(tracker.getBanner().getMessageId(), tracker);
 		}
 	}
@@ -179,17 +179,17 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
-		String key = createKey(id.getUpdateId());
+		String key = createKey(id);
 		VoteTracker<T> v = voteOnMessages.get(key);
-
 		try {
 			if (v != null) {
 				return v.react(id, callbackQuery);
+			} else {
+				return new EventItem("Failed to find the tracker for key: " + key);
 			}
 		} catch (TelegramApiException e) {
 			return new EventItem("Failed to react to callback: " + callbackQuery.getData());
 		}
-		return null;
 	}
 
 	@Override
@@ -228,7 +228,8 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 		return false;
 	}
 
-	protected String createKey(int messageId) {
+	protected String createKey(CallbackId id) {
+		int messageId = id.getUpdateId();
 		return Integer.toString(messageId);
 	}
 

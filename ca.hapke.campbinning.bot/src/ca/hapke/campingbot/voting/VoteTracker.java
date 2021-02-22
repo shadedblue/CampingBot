@@ -288,7 +288,7 @@ public abstract class VoteTracker<T> {
 		}
 	}
 
-	private class InternalVoteListener implements VoteChangedListener<T> {
+	private class InternalVoteListener extends VoteChangedAdapter<T> {
 		@Override
 		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			String display = longDescriptions[optionId];
@@ -310,11 +310,6 @@ public abstract class VoteTracker<T> {
 		@Override
 		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
 			return showBanner(callbackQuery, "You completed the voting!", user);
-		}
-
-		@Override
-		public EventItem completedAutomatic() {
-			return null;
 		}
 	}
 
@@ -575,6 +570,11 @@ public abstract class VoteTracker<T> {
 		}
 		float avg = sum / count;
 		return avg;
+	}
+
+	public String getKey() {
+		int messageId = topicMessage.getMessageId();
+		return Integer.toString(messageId);
 	}
 
 }
