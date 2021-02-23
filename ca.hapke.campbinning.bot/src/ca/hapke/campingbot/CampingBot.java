@@ -31,7 +31,6 @@ import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
-import ca.hapke.campingbot.vote2.TestVote2Command;
 import ca.hapke.campingbot.voting.RantCommand;
 import ca.hapke.campingbot.voting.UfcCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
@@ -43,7 +42,7 @@ public class CampingBot extends CampingBotEngine {
 
 	private Resources res = new Resources();
 	private RantCommand rantCommand;
-	private TestVote2Command testCommand;
+//	private TestVote2Command testCommand;
 	private UfcCommand ufcCommand;
 	private VoteManagementCommands voteManagementCommands;
 
@@ -79,7 +78,6 @@ public class CampingBot extends CampingBotEngine {
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
-		testCommand = new TestVote2Command(this);
 		rantCommand = new RantCommand(this);
 		ufcCommand = new UfcCommand(this, res);
 		voteManagementCommands = new VoteManagementCommands(rantCommand/* , ufcCommand */);
@@ -103,7 +101,6 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(hideItCommand);
 		addCommand(ballsCommand);
 		addCommand(rantCommand);
-		addCommand(testCommand);
 		addCommand(ufcCommand);
 		addCommand(pleasureCommand);
 		addCommand(iunnoCommand);
