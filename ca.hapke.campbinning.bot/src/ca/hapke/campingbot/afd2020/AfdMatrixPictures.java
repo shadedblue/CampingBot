@@ -2,9 +2,6 @@ package ca.hapke.campingbot.afd2020;
 
 import java.time.temporal.ChronoUnit;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
@@ -12,10 +9,7 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.PleasureModelCommand;
-import ca.hapke.campingbot.log.EventItem;
-import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.ImageCommandResult;
-import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.util.ImageLink;
 
 /**
@@ -70,23 +64,9 @@ public class AfdMatrixPictures implements CalendaredEvent<Void> {
 		if (caption != null)
 			send.add(caption);
 
-		sendImage(send, caption);
+		send.sendAndLog(bot, chat);
 		i++;
 
-	}
-
-	public void sendImage(ImageCommandResult send, String caption) {
-		try {
-			SendResult result = send.send(bot, chat.chatId);
-
-			Message outgoingMsg = result.outgoingMsg;
-			EventItem ei = new EventItem(PleasureModelCommand.PleasureModelCommand, bot.getMeCamping(), outgoingMsg.getDate(), chat,
-					outgoingMsg.getMessageId(), caption, null);
-			EventLogger.getInstance().add(ei);
-		} catch (TelegramApiException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -107,7 +87,7 @@ public class AfdMatrixPictures implements CalendaredEvent<Void> {
 			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
 			send.add(caption);
 
-			sendImage(send, caption);
+			send.sendAndLog(bot, chat);
 		}
 		enabled = on;
 	}

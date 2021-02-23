@@ -94,7 +94,8 @@ public class HypeCommand extends AbstractCommand implements CampingSerializable,
 
 	@Override
 	public void addItem(String category, String value) {
-		categories.put(category, value);
+		if (categories.put(category, value))
+			shouldSave = true;
 	}
 
 	@Override

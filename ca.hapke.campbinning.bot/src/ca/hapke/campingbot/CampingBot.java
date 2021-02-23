@@ -26,6 +26,7 @@ import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.inline.HideItCommand;
 import ca.hapke.campingbot.commands.inline.NicknameCommand;
+import ca.hapke.campingbot.events.HappyNewYearEvent;
 import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextStyle;
@@ -48,6 +49,7 @@ public class CampingBot extends CampingBotEngine {
 
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
+	private HappyNewYearEvent happyNewYear;
 	private PleasureModelCommand pleasureCommand;
 	private EnhanceCommand enhanceCommand;
 	private IunnoCommand iunnoCommand;
@@ -59,9 +61,10 @@ public class CampingBot extends CampingBotEngine {
 	private SpellCommand spellCommand;
 	private HideItCommand hideItCommand;
 	private NicknameCommand nicknameCommand;
+	private RedditCommand redditCommand;
+	private QuantityCommand quantityCommand;
 
 	private CalendarMonitor calMonitor;
-	private RedditCommand redditCommand;
 
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
@@ -78,15 +81,16 @@ public class CampingBot extends CampingBotEngine {
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
+
 		rantCommand = new RantCommand(this);
 		ufcCommand = new UfcCommand(this, res);
 		voteManagementCommands = new VoteManagementCommands(rantCommand/* , ufcCommand */);
+
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
+		happyNewYear = new HappyNewYearEvent(this);
 		redditCommand = new RedditCommand();
-
 		hideItCommand = new HideItCommand(this, databaseConsumer);
-
 		statusCommand = new StatusCommand(hideItCommand);
 		addStatusUpdate(statusCommand);
 
@@ -94,7 +98,7 @@ public class CampingBot extends CampingBotEngine {
 				chatManager, userMonitor, insultGenerator, enhanceCommand);
 
 		hasCategories.add(insultGenerator);
-		QuantityCommand quantityCommand = new QuantityCommand(hasCategories);
+		quantityCommand = new QuantityCommand(hasCategories);
 		addCommand(quantityCommand);
 		addCommand(spellCommand);
 		addCommand(nicknameCommand);
@@ -161,6 +165,7 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
 		calMonitor.add(rantCommand);
+		calMonitor.add(happyNewYear);
 	}
 
 	public Resources getRes() {
