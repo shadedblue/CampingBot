@@ -1,6 +1,7 @@
 package ca.hapke.campingbot.voting;
 
 import java.util.List;
+import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -16,7 +17,7 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	public RantTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
 			Message rant) throws TelegramApiException {
-		super(bot, ranter, activater, chatId, activation, rant, NOT_QUORUM, RantCommand.RANT);
+		super(bot, ranter, activater, chatId, activation, rant, NOT_QUORUM, RantCommand.RANT, true);
 	}
 
 	@Override
@@ -35,17 +36,8 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	@Override
 	public float getScore() {
-		int count = votes.size() + votesNotApplicable.size();
-		if (count == 0)
-			return 0;
-
-		int sum = 0;
-		for (Integer v : votes.values()) {
-			Integer pts = valueMap.get(v);
-			sum += pts.intValue();
-		}
-		float avg = ((float) sum) / count;
-		return avg;
+		Map<Integer, Integer> valueMap = cluster.getValueMap();
+		return averageVoteValues(valueMap);
 	}
 
 	@Override

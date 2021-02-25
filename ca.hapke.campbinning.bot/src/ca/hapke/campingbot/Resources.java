@@ -20,7 +20,6 @@ public class Resources {
 	private final Map<String, Emoji> ballsMap = new HashMap<>();
 	private final List<Emoji> various = new ArrayList<>();
 	private final Map<String, Emoji> variousMap = new HashMap<>();
-	private Emoji cake;
 
 	public void loadAllEmoji() {
 		faces.clear();
@@ -40,11 +39,7 @@ public class Resources {
 				"cherries", "corn", "fire", "zap", "volcano", "floppy_disk", "cd", "tennis", "beers", "fried_shrimp",
 				"grapes", "melon", "tomato", "hot_dog", "taco", "cheese", "cloud_tornado", "peanuts");
 
-		loadVarious();
-	}
-
-	public void loadVarious() {
-		cake = loadEmoji(various, variousMap, "cake");
+		loadEmoji(various, variousMap, "cake", "white_check_mark", "x");
 	}
 
 	private static void loadEmoji(List<Emoji> emojis, Map<String, Emoji> emojisMap, String... aliases) {
@@ -115,9 +110,15 @@ public class Resources {
 	}
 
 	public Emoji getCake() {
-		if (cake == null)
-			loadVarious();
-		return cake;
+		return variousMap.get("cake");
+	}
+
+	public Emoji getCheck() {
+		return variousMap.get("white_check_mark");
+	}
+
+	public Emoji getX() {
+		return variousMap.get("x");
 	}
 
 	private static String getRandom(List<Emoji> l) {

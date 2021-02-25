@@ -26,7 +26,6 @@ import ca.hapke.campingbot.commands.PartyEverydayCommand;
 import ca.hapke.campingbot.commands.SpellCommand;
 import ca.hapke.campingbot.response.InsultGenerator;
 import ca.hapke.campingbot.users.CampingUserMonitor;
-import ca.hapke.campingbot.voting.AitaCommand;
 import ca.hapke.campingbot.xml.ConfigParser;
 import ca.hapke.campingbot.xml.OutputFormatter;
 
@@ -63,7 +62,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	private CampingSystem cs;
 	private SpellCommand sg;
 	private HypeCommand hype;
-	private AitaCommand aita;
+//	private AitaCommand aita;
 	private CampingUserMonitor um;
 	private PartyEverydayCommand pc;
 	private CampingChatManager cm;
@@ -71,20 +70,20 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	private EnhanceCommand ec;
 	private ProtectionDomain protectionDomain;
 
-	public ConfigXmlSerializer(ProtectionDomain protectionDomain, CampingSystem cs, SpellCommand sg,
-			HypeCommand hype, AitaCommand aita, PartyEverydayCommand partyCommand, CampingChatManager cm,
-			CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec) {
+	public ConfigXmlSerializer(ProtectionDomain protectionDomain, CampingSystem cs, SpellCommand sg, HypeCommand hype,
+			PartyEverydayCommand partyCommand, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig,
+			EnhanceCommand ec) {
 		this.protectionDomain = protectionDomain;
 		this.cs = cs;
 		this.sg = sg;
 		this.hype = hype;
-		this.aita = aita;
+//		this.aita = aita;
 		this.pc = partyCommand;
 		this.cm = cm;
 		this.um = um;
 		this.ig = ig;
 		this.ec = ec;
-		this.serializables = new CampingSerializable[] { cs, sg, hype, aita, pc, ig, ec, cm, um };
+		this.serializables = new CampingSerializable[] { cs, sg, hype, pc, ig, ec, cm, um };
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
 	}
 
@@ -169,7 +168,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ConfigParser.class, false, false);
 		ConfigParser parser = new ConfigParser(stream);
 		try {
-			parser.document(cs, sg, hype, aita, pc, cm, um, ig, ec);
+			parser.document(cs, sg, hype, pc, cm, um, ig, ec);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
