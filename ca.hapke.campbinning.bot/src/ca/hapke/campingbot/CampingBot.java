@@ -32,8 +32,8 @@ import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
-import ca.hapke.campingbot.voting.AitaCommand;
 import ca.hapke.campingbot.voting.RantCommand;
+import ca.hapke.campingbot.voting.UfcCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
 
 /**
@@ -42,8 +42,9 @@ import ca.hapke.campingbot.voting.VoteManagementCommands;
 public class CampingBot extends CampingBotEngine {
 
 	private Resources res = new Resources();
-	private AitaCommand aitaCommand;
+//	private AitaCommand aitaCommand;
 	private RantCommand rantCommand;
+	private UfcCommand ufcCommand;
 	private VoteManagementCommands voteManagementCommands;
 
 	private StatusCommand statusCommand;
@@ -82,8 +83,9 @@ public class CampingBot extends CampingBotEngine {
 		processor.addAtEnd(ballsCommand.getCrazyCase());
 
 		rantCommand = new RantCommand(this);
-		aitaCommand = new AitaCommand(this, ballsCommand);
-		voteManagementCommands = new VoteManagementCommands(rantCommand, aitaCommand);
+//		aitaCommand = new AitaCommand(this, ballsCommand);
+		ufcCommand = new UfcCommand(this, res);
+		voteManagementCommands = new VoteManagementCommands(rantCommand, ufcCommand);
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
@@ -93,8 +95,8 @@ public class CampingBot extends CampingBotEngine {
 		statusCommand = new StatusCommand(hideItCommand);
 		addStatusUpdate(statusCommand);
 
-		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, hypeCommand, aitaCommand,
-				partyCommand, chatManager, userMonitor, insultGenerator, enhanceCommand);
+		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, hypeCommand, partyCommand,
+				chatManager, userMonitor, insultGenerator, enhanceCommand);
 
 		hasCategories.add(insultGenerator);
 		quantityCommand = new QuantityCommand(hasCategories);
@@ -103,7 +105,8 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(nicknameCommand);
 		addCommand(hideItCommand);
 		addCommand(ballsCommand);
-		addCommand(aitaCommand);
+//		addCommand(aitaCommand);
+		addCommand(ufcCommand);
 		addCommand(rantCommand);
 		addCommand(pleasureCommand);
 		addCommand(iunnoCommand);
@@ -163,7 +166,7 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add((ConfigXmlSerializer) serializer);
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
-		calMonitor.add(aitaCommand);
+//		calMonitor.add(aitaCommand);
 		calMonitor.add(rantCommand);
 		calMonitor.add(happyNewYear);
 	}

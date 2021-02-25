@@ -31,7 +31,6 @@ import ca.odell.glazedlists.matchers.Matcher;
  * @author Nathan Hapke
  */
 public class CampingChatManager implements CampingSerializable {
-
 	public static final ResponseCommandType JoinThreadCommand = new ResponseCommandType("JoinThread",
 			BotCommandIds.THREAD | BotCommandIds.SET);
 	private boolean shouldSave = false;
@@ -42,6 +41,10 @@ public class CampingChatManager implements CampingSerializable {
 		if (instance == null) {
 			instance = new CampingChatManager(bot);
 		}
+		return instance;
+	}
+
+	public static CampingChatManager getInstance() {
 		return instance;
 	}
 

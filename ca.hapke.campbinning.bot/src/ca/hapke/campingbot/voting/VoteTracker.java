@@ -2,8 +2,6 @@ package ca.hapke.campingbot.voting;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +19,7 @@ import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
-import ca.hapke.campingbot.commands.api.InlineCommandBase;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
@@ -40,7 +38,6 @@ import ca.hapke.util.TimeFormatter;
  *
  */
 public abstract class VoteTracker<T> {
-
 	public abstract float getScore();
 
 	protected CampingBotEngine bot;
@@ -48,24 +45,27 @@ public abstract class VoteTracker<T> {
 	protected final CampingUser activater;
 	protected final Long chatId;
 	protected CampingChat chat;
-	protected Map<CampingUser, Integer> votes = new HashMap<>();
-	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
 	protected boolean completed = false;
 	protected NumberFormat nf;
 	protected Message voteTrackingMessage;
-//	protected String previousVotes;
 	protected Message bannerMessage;
 	protected String previousBanner;
 	protected Message topicMessage;
 	protected final long creationTime = System.currentTimeMillis();
 	protected long completionTime = System.currentTimeMillis() + getVotingTime();
 	protected TimeFormatter formatter = new TimeFormatter(1, "", false, true);
-	protected final String[] shortButtons;
-	protected final String[] buttonCallbackIds;
-	protected final String[] longDescriptions;
-	protected final Map<Integer, T> valueMap;
-	protected final boolean addNa;
-	protected final int naIndex;
+	protected String[] shortButtons;
+	protected String[] buttonCallbackIds;
+	protected String[] longDescriptions;
+
+//	protected Map<CampingUser, Integer> votes = new HashMap<>();
+//	protected Set<CampingUser> votesNotApplicable = new HashSet<>();
+//	protected final Map<Integer, T> valueMap = new HashMap<Integer, T>();
+
+	protected final VoteCluster<T> cluster;
+
+	protected boolean addNa;
+	protected int naIndex;
 
 	protected static final TextFragment VOTING_COMPLETED = new TextFragment("Voting Completed!");
 	protected static final String NOT_APPLICABLE_SHORT = "N/A";
@@ -74,20 +74,43 @@ public abstract class VoteTracker<T> {
 	private SendResult bannerResult;
 	private SendResult voteTrackingResult;
 	private TextCommandResult bannerText;
+	protected final boolean allowExtendComplete;
+	protected final Message topic;
+	protected final String command;
+	protected final Message activation;
+	private boolean beginComplete = false;
+
+	protected final List<VoteChangedListener<T>> voteListeners = new ArrayList<VoteChangedListener<T>>();
 
 	public VoteTracker(CampingBotEngine bot, CampingUser ranter, CampingUser activater, Long chatId, Message activation,
-			Message topic, int naQuorum, String command) throws TelegramApiException {
+			Message topic, int naQuorum, String command, boolean allowExtendComplete) throws TelegramApiException {
 		this.ranter = ranter;
 		this.activater = activater;
 		this.chatId = chatId;
+		this.activation = activation;
+		this.topic = topic;
 
 		this.naQuorum = naQuorum;
 		this.bot = bot;
+		this.command = command;
+		this.allowExtendComplete = allowExtendComplete;
 		this.chat = CampingChatManager.getInstance(bot).get(chatId);
 		this.nf = NumberFormat.getInstance();
-
+		cluster = createCluster();
 		nf.setMinimumFractionDigits(0);
 		nf.setMaximumFractionDigits(1);
+		voteListeners.add(new InternalVoteListener());
+	}
+
+	protected VoteCluster<T> createCluster() {
+		return new VoteCluster<T>(this);
+	}
+
+	public void begin() throws TelegramApiException {
+		if (beginComplete)
+			return;
+		else
+			beginComplete = true;
 
 		List<VotingOption<T>> optionsList = new ArrayList<>();
 		addNa = createOptions(optionsList);
@@ -96,7 +119,6 @@ public abstract class VoteTracker<T> {
 		shortButtons = new String[count];
 		longDescriptions = new String[count];
 		buttonCallbackIds = new String[count];
-		valueMap = new HashMap<Integer, T>(count);
 		int updateId = topic.getMessageId();
 		for (int i = 0; i < optionsList.size(); i++) {
 			VotingOption<T> opt = optionsList.get(i);
@@ -138,17 +160,38 @@ public abstract class VoteTracker<T> {
 			EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
 					bannerId, "Failed to pin banner", bannerMessage));
 		}
-
 	}
 
-	public void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
-		CallbackId id = new CallbackId(command, updateId, i);
+	protected void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
+		CallbackId id = createCallbackId(command, updateId, i);
 		String callbackId = id.getResult();
 
 		shortButtons[i] = shortStr;
 		longDescriptions[i] = longStr;
 		buttonCallbackIds[i] = callbackId;
+		Map<Integer, T> valueMap = cluster.getValueMap();
 		valueMap.put(i, value);
+	}
+
+	/**
+	 * Overrideable if you want to do something fancy.
+	 */
+	protected String createClusterKey() {
+		return "default";
+	}
+
+	/**
+	 * Overrideable if you want to do something fancy.
+	 */
+	protected int getOptionId(CallbackId id) {
+		return id.getIds()[0];
+	}
+
+	/**
+	 * Overrideable if you want to do something fancy.
+	 */
+	protected CallbackId createCallbackId(String command, int updateId, int i) {
+		return new CallbackId(command, updateId, i);
 	}
 
 	/**
@@ -166,14 +209,17 @@ public abstract class VoteTracker<T> {
 	public EventItem react(CallbackId id, CallbackQuery callbackQuery) throws TelegramApiException {
 		if (completed)
 			return null;
+		EventItem output = null;
 
-		String callbackQueryId = callbackQuery.getId();
-
-		String display = longDescriptions[id.getIds()[0]];
-
-		int vote = id.getIds()[0];
+//		String display = longDescriptions[id.getIds()[0]];
 
 		CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
+
+		Map<Integer, T> valueMap = cluster.getValueMap();
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
+		int optionId = getOptionId(id);
+
 		Integer previousVote = votes.get(user);
 		boolean prevVoteNA = votesNotApplicable.contains(user);
 
@@ -181,60 +227,98 @@ public abstract class VoteTracker<T> {
 		if (previousVote == null && !prevVoteNA) {
 			// first vote
 			voteChanged = true;
-		} else if (previousVote != null && vote != previousVote) {
+		} else if (previousVote != null && optionId != previousVote) {
 			// had a non-n/a vote, and new vote is different
 			voteChanged = true;
-		} else if (vote == naIndex && !prevVoteNA) {
+		} else if (optionId == naIndex && !prevVoteNA) {
 			// new vote is n/a, and wasn't before
 			voteChanged = true;
-		} else if (vote != naIndex && prevVoteNA) {
+		} else if (optionId != naIndex && prevVoteNA) {
 			// new vote is not n/a, and was before
 			voteChanged = true;
 		}
 
-		if (vote == naIndex) {
+		if (optionId == naIndex) {
 			votes.remove(user);
 			votesNotApplicable.add(user);
-			if (votesNotApplicable.size() >= naQuorum)
+			if (votesNotApplicable.size() >= naQuorum) {
 				complete();
+
+				for (VoteChangedListener<T> vcl : voteListeners) {
+					EventItem result = vcl.completedByUser(callbackQuery, user, optionId);
+					if (result != null)
+						output = result;
+				}
+			}
+
 		} else {
-			votes.put(user, vote);
+			votes.put(user, optionId);
 			votesNotApplicable.remove(user);
 		}
 		if (voteChanged) {
-			try {
-				EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand,
-						voteTrackingMessage, getVotesText(completed));
-				editCmd.send(bot, chatId);
-
-			} catch (TelegramApiException e) {
-				EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, user, null, chat,
-						bannerMessage.getMessageId(), "Failed to update banner", voteTrackingMessage));
+			for (VoteChangedListener<T> vcl : voteListeners) {
+				EventItem result = vcl.changed(callbackQuery, user, optionId);
+				if (result != null)
+					output = result;
+			}
+		} else {
+			for (VoteChangedListener<T> vcl : voteListeners) {
+				EventItem result = vcl.confirmed(callbackQuery, user, optionId);
+				if (result != null)
+					output = result;
 			}
 		}
 
+		return output;
+	}
+
+	protected EventItem showBanner(CallbackQuery callback, String displayToUser, CampingUser user) {
+		String callbackQueryId = callback.getId();
 		AnswerCallbackQuery answer = new AnswerCallbackQuery();
-		String voteDisplayToUser;
-		if (voteChanged)
-			voteDisplayToUser = "Received your vote of: " + display + "!";
-		else
-			voteDisplayToUser = "Your vote was already: " + display + "!";
-		answer.setText(voteDisplayToUser);
+
+		answer.setText(displayToUser);
 		answer.setCallbackQueryId(callbackQueryId);
 		try {
 			bot.execute(answer);
-			return new EventItem(VotingCommand.VoteCommand, user, null, chat, bannerMessage.getMessageId(), display,
+			return new EventItem(VotingCommand.VoteCommand, user, chat, bannerMessage.getMessageId(), displayToUser,
 					topicMessage.getMessageId());
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
 		}
 	}
 
+	private class InternalVoteListener extends VoteChangedAdapter<T> {
+		@Override
+		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+			String display = longDescriptions[optionId];
+			String voteDisplayToUser = "You voted: " + display + "!";
+
+			EventItem result = showBanner(callbackQuery, voteDisplayToUser, user);
+			updateVoteTracker(user);
+			return result;
+		}
+
+		@Override
+		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+			String display = longDescriptions[optionId];
+			String voteDisplayToUser = "Your vote was already: " + display + "!";
+
+			return showBanner(callbackQuery, voteDisplayToUser, user);
+		}
+
+		@Override
+		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+			return showBanner(callbackQuery, "You completed the voting!", user);
+		}
+	}
+
 	protected InlineKeyboardMarkup getKeyboard() {
-		return InlineCommandBase.createKeyboard(shortButtons, buttonCallbackIds);
+		return AbstractCommand.createKeyboard(shortButtons, buttonCallbackIds);
 	}
 
 	public void update() {
+		EventLogger logger = EventLogger.getInstance();
+
 		EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand, bannerMessage,
 				getBannerString());
 
@@ -242,31 +326,70 @@ public abstract class VoteTracker<T> {
 			editCmd.setKeyboard(getKeyboard());
 
 		try {
-			editCmd.send(bot, chatId);
+			SendResult result = editCmd.send(bot, chatId);
+			logger.add(new EventItem(VotingCommand.VoteCommand, null, chat, bannerMessage.getMessageId(), result.msg));
 		} catch (TelegramApiException e) {
+			// HACK commented out, because this fails if same text... the time thing.
+//			logger.add(new EventItem(VotingCommand.VoteCommand, null, null, chat, bannerMessage.getMessageId(),
+//					"Failed to update banner", voteTrackingMessage));
 		}
 	}
 
 	public void updateBannerFinished() {
+		EventLogger logger = EventLogger.getInstance();
 		try {
 			EditTextCommandResult edit = new EditTextCommandResult(VotingCommand.VoteTopicCompleteCommand,
 					bannerMessage, VOTING_COMPLETED);
-			edit.send(bot, chatId);
+			SendResult result = edit.send(bot, chatId);
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, null, chat,
+					voteTrackingMessage.getMessageId(), result.msg));
 		} catch (TelegramApiException e2) {
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, null, null, chat,
+					bannerMessage.getMessageId(), "Failed to update banner on Complete", voteTrackingMessage));
+		}
+	}
+
+	protected void updateVoteTracker(CampingUser user) {
+		EventLogger logger = EventLogger.getInstance();
+		try {
+			List<ResultFragment> votesText = getVotesText(completed);
+			EditTextCommandResult editCmd = new EditTextCommandResult(VotingCommand.VoteCommand, voteTrackingMessage,
+					votesText);
+			SendResult result = editCmd.send(bot, chatId);
+			logger.add(new EventItem(VotingCommand.VoteCommand, user, chat, voteTrackingMessage.getMessageId(),
+					result.msg));
+		} catch (TelegramApiException e) {
+			logger.add(new EventItem(VotingCommand.VoteCommandFailedCommand, user, null, chat,
+					bannerMessage.getMessageId(), "Failed to update tracker", voteTrackingMessage));
 		}
 	}
 
 	public void unpinBanner() {
+		boolean success = false;
+		boolean failure = false;
 		try {
 			String chatString = Long.toString(chatId);
 			Message pinnedMsg = bot.execute(new GetChat(chatString)).getPinnedMessage();
 			if (pinnedMsg != null && bannerMessage.getMessageId().equals(pinnedMsg.getMessageId())) {
 				UnpinChatMessage unpin = new UnpinChatMessage(chatString);
-				bot.execute(unpin);
+				success = bot.execute(unpin);
+				if (!success)
+					failure = true;
 			}
 		} catch (TelegramApiException e1) {
-			EventLogger.getInstance().add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
-					bannerMessage.getMessageId(), "Failed to unpin banner", bannerMessage));
+			failure = true;
+		}
+
+		if (success || failure) {
+			EventLogger logger = EventLogger.getInstance();
+			if (success) {
+				logger.add(new EventItem(VotingCommand.VoteCommand, activater, null, chat, bannerMessage.getMessageId(),
+						"Unpinned banner", bannerMessage));
+			} else if (failure) {
+				logger.add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
+						bannerMessage.getMessageId(), "Failed to unpin banner", bannerMessage));
+
+			}
 		}
 	}
 
@@ -284,8 +407,7 @@ public abstract class VoteTracker<T> {
 			completionMsg.setReplyTo(messageId);
 			SendResult result = completionMsg.sendInternal(bot, chatId);
 
-			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, ranter, result.outgoingMsg.getDate(), chat,
-					result.outgoingMsg.getMessageId(), result.outgoingMsg.getText(), messageId));
+			logger.add(new EventItem(VotingCommand.VoteTopicCompleteCommand, ranter, chat, result));
 		} catch (TelegramApiException e) {
 			logger.add(new EventItem(e.getLocalizedMessage()));
 		}
@@ -320,8 +442,10 @@ public abstract class VoteTracker<T> {
 			sb.add(new TextFragment(longer));
 		}
 
-		sb.add(new TextFragment("\nOriginal speaker, or activater may reply to this with /complete or /extend.",
-				TextStyle.Italic));
+		if (allowExtendComplete) {
+			sb.add(new TextFragment("\nOriginal speaker, or activater may reply to this with /complete or /extend.",
+					TextStyle.Italic));
+		}
 		return sb;
 	}
 
@@ -329,6 +453,10 @@ public abstract class VoteTracker<T> {
 
 	protected List<ResultFragment> getVotesText(boolean completed) {
 		List<ResultFragment> output = new ArrayList<>();
+
+//		Map<Integer, T> valueMap = cluster.getValueMap(id);
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
 
 		int notApplicable = votesNotApplicable.size();
 		int naturalVotes = votes.size();
@@ -347,12 +475,12 @@ public abstract class VoteTracker<T> {
 		addVotesTextPrefix(completed, output);
 
 		if (shouldShowVotesInCategories()) {
-			int[] votes = new int[shortButtons.length];
-			for (int vote : this.votes.values()) {
-				votes[vote]++;
+			int[] votesByCategories = new int[shortButtons.length];
+			for (int vote : votes.values()) {
+				votesByCategories[vote]++;
 			}
 			if (addNa) {
-				votes[naIndex] = votesNotApplicable.size();
+				votesByCategories[naIndex] = votesNotApplicable.size();
 			}
 
 			for (int i = 0; i < shortButtons.length; i++) {
@@ -360,7 +488,7 @@ public abstract class VoteTracker<T> {
 				output.add(new TextFragment("\n"));
 				output.add(new TextFragment(txt, TextStyle.Bold));
 				output.add(new TextFragment(": "));
-				output.add(new TextFragment(Integer.toString(votes[i])));
+				output.add(new TextFragment(Integer.toString(votesByCategories[i])));
 			}
 		}
 
@@ -423,4 +551,28 @@ public abstract class VoteTracker<T> {
 		return bannerText;
 	}
 
+	public boolean addListener(VoteChangedListener<T> e) {
+		return voteListeners.add(e);
+	}
+
+	protected float averageVoteValues(Map<Integer, ? extends Number> map) {
+		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
+		int count = votes.size() + votesNotApplicable.size();
+		if (count == 0)
+			return 0;
+
+		float sum = 0;
+		for (Integer v : votes.values()) {
+			Number pts = map.get(v);
+			sum += pts.floatValue();
+		}
+		float avg = sum / count;
+		return avg;
+	}
+
+	public String getKey() {
+		int messageId = topicMessage.getMessageId();
+		return Integer.toString(messageId);
+	}
 }

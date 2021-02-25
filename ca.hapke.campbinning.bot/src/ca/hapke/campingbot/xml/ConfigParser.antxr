@@ -12,16 +12,15 @@ header {
 
 class ConfigParser extends Parser;
 
-document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
-    :   <camping>[ cs, sg, hype, aita, pc, cm, um, ig, ec] EOF
+document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+    :   <camping>[ cs, sg, hype, pc, cm, um, ig, ec] EOF
     ;
     
-<camping> [CampingSystem cs, SpellCommand sg, HypeCommand hype, AitaCommand aita, PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
+<camping> [CampingSystem cs, SpellCommand sg, HypeCommand hype,  PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
 	:
 	 <system>[cs] 
 	(<spell>[sg] )?
 	(<countdown>[hype])?
-	(<voting>[aita]) ?
 	(<party>[pc]) ?
 	(<insults>[ig]) ?
 	(<enhance>[ec]) ?
@@ -31,12 +30,6 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, AitaCommand aita,
 <party>[PartyEverydayCommand pc]
 	:
 	<excessives>[pc]
-	;
-<voting>[AitaCommand aita]
-	:
-	<assholes>[aita]
-	<mediocres>[aita]
-	<nices>[aita]
 	;
 	
 <enhance>[EnhanceCommand ec]
@@ -69,36 +62,12 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, AitaCommand aita,
 			{pc.addItem("excessive", val);}
 		) *
 	;
-<assholes>[AitaCommand aita]
-	{ String val; }
-	:	
-		(
-			val=<item>
-			{aita.addItem("asshole", val);}
-		) *
-	;
 <insults>[InsultGenerator ig]
 	{ String val; }
 	:	
 		(
 			val=<item>
 			{ig.addItem("insult", val);}
-		) *
-	;
-<mediocres>[AitaCommand aita]
-	{ String val; }
-	:	
-		(
-			val=<item>
-			{aita.addItem("mediocre", val);}
-		) *
-	;
-<nices>[AitaCommand aita]
-	{ String val; }
-	:	
-		(
-			val=<item>
-			{aita.addItem("nice", val);}
 		) *
 	;
 <system> [CampingSystem cs]
