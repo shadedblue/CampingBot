@@ -31,11 +31,12 @@ import ca.hapke.campingbot.users.CampingUser;
  */
 public class RedditCommand extends AbstractCommand implements SlashCommand, TextCommand {
 
-//	private static final String BEGINNING = "^";
-	private static final String SLASH_R = "(/)?r/";
+	private static final String BEGINNING = "^";
+//	private static final String SLASH_R = "(/)?r/";
 	private static final String R_SLASH = "/?r/";
 //	private static final String SLASH_R_PATTERN = SLASH_R + "[A-Za-z0-9]+";
-	private static final Pattern SLASH_R_PATTERN = Pattern.compile(R_SLASH + "[A-Za-z0-9]+");
+	private static final Pattern INSIDE_WORD_PATTERN = Pattern.compile(BEGINNING + R_SLASH + "[A-Za-z0-9]+\\b");
+	private static final Pattern ANY_R_PATTERN = Pattern.compile(R_SLASH + "[A-Za-z0-9]+\\b");
 	private static final TextFragment DO_U = new TextFragment("DO U EVEN REDDIT, ");
 	private static final TextFragment QUESTION_MARK = new TextFragment("? ");
 	private static final String REDDIT_COMMAND = "reddit";
@@ -70,19 +71,17 @@ public class RedditCommand extends AbstractCommand implements SlashCommand, Text
 	}
 
 	private CommandResult findSubreddit(SlashCommandType command, String msg) {
-		Matcher matcher = SLASH_R_PATTERN.matcher(msg);
-		boolean matches = matcher.find();
-		if (matches) {
-			int start = matcher.start();
-			int end = matcher.end();
-			String s = msg.substring(start, end);
-			String lower = s.toLowerCase();
-//		String[] split = msg.split("\\s");
-//		for (String s : split) {
-//			String lower = s.toLowerCase();
-////			if (lower.startsWith(SLASH_R)) {
-//			if (mat)
-			return linkSubreddit(command, s, lower);
+		String[] split = msg.split("\\s");
+		for (String s : split) {
+			Matcher matcher = INSIDE_WORD_PATTERN.matcher(s);
+			boolean matches = matcher.find();
+			if (matches) {
+				int start = matcher.start();
+				int end = matcher.end();
+				String str = s.substring(start, end);
+				String lower = str.toLowerCase();
+				return linkSubreddit(command, str, lower);
+			}
 		}
 
 		return null;
@@ -112,7 +111,7 @@ public class RedditCommand extends AbstractCommand implements SlashCommand, Text
 
 	@Override
 	public boolean isMatch(String msg, Message message) {
-		Matcher matcher = SLASH_R_PATTERN.matcher(msg);
+		Matcher matcher = ANY_R_PATTERN.matcher(msg);
 		boolean matches = matcher.find();
 		return matches;
 	}
