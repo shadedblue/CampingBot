@@ -327,7 +327,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 						cr.add(" AND ");
 					}
 				}
-				cr.add(new MentionFragment(u, MentionDisplay.First, CaseChoice.Upper, null, null));
+				cr.add(new MentionFragment(u, MentionDisplay.First, CaseChoice.Upper));
 			}
 			if (addApostropheS)
 				cr.add("'S");

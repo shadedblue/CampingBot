@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.voting;
+package ca.hapke.campingbot.voting.ufc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,6 +84,60 @@ public class UfcFight {
 			}
 		}
 		return true;
+	}
+
+	public class PanelVotes {
+		public final int a, b, draws, count;
+
+		private PanelVotes(int a, int b, int draws) {
+			this.a = a;
+			this.b = b;
+			this.draws = draws;
+			this.count = a + b + draws;
+		}
+	}
+
+	public PanelVotes getVotes() {
+		int a = 0, b = 0, draws = 0;
+		for (JudgingCard c : judgingCards.values()) {
+			switch (c.getDecision()) {
+			case A:
+				a++;
+				break;
+			case B:
+				b++;
+				break;
+			case Draw:
+				draws++;
+				break;
+			}
+		}
+		return new PanelVotes(a, b, draws);
+	}
+
+	public PanelDecision getDecision() {
+		if (!isVotingComplete())
+			return PanelDecision.Incomplete;
+
+		PanelVotes votes = getVotes();
+		if (votes.a == votes.count || votes.b == votes.count) {
+			return PanelDecision.Unanimous;
+		}
+		if ((((double) votes.draws) / votes.count) >= 0.5) {
+			return PanelDecision.MajorityDraw;
+		}
+		return PanelDecision.Split;
+	}
+
+	public String getWinner() {
+		PanelVotes votes = getVotes();
+
+		if (votes.a > votes.b)
+			return a;
+		else if (votes.a < votes.b)
+			return b;
+		else
+			return "";
 	}
 
 	public Map<CampingUser, JudgingCard> getJudgingCards() {

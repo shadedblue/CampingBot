@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.voting;
+package ca.hapke.campingbot.voting.ufc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,10 @@ import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.voting.VoteChangedAdapter;
+import ca.hapke.campingbot.voting.VoteInitiationException;
+import ca.hapke.campingbot.voting.VoteTracker;
+import ca.hapke.campingbot.voting.VotingCommand;
 
 /**
  * @author Nathan Hapke
@@ -42,7 +46,8 @@ public class UfcCommand extends VotingCommand<Integer> {
 	}
 
 	private class DelayThenCreate extends Thread {
-		private static final int DELAY_BETWEEN_ROUNDS_SEC = 30;
+		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 30;
+//		private static final int DELAY_BETWEEN_ROUNDS_SEC = 20;
 		private boolean nextRound;
 
 		public DelayThenCreate(boolean nextRound) {
@@ -54,7 +59,6 @@ public class UfcCommand extends VotingCommand<Integer> {
 			Integer topicId = topic.getMessageId();
 			try {
 				Thread.sleep(DELAY_BETWEEN_ROUNDS_SEC * 1000);
-//				boolean nextRound = currentRound.getRound() < currentRound.getRounds();
 				createNextTracker(topicId);
 			} catch (Exception e) {
 				EventLogger.getInstance().add(new EventItem(SlashUfcActivation, activater, chatId, topicId,

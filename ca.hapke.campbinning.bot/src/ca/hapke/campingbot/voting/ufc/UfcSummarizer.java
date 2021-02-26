@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.voting;
+package ca.hapke.campingbot.voting.ufc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,10 @@ import ca.hapke.campingbot.response.EditTextCommandResult;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.voting.VoteChangedAdapter;
+import ca.hapke.campingbot.voting.VoteCluster;
 
 /**
  * @author Nathan Hapke
@@ -33,6 +36,7 @@ public class UfcSummarizer {
 	private Long chatId;
 	private Emoji checkEmoji;
 	private Emoji xEmoji;
+	private Object object;
 
 	public UfcSummarizer(UfcFight fight, CampingBot bot, Long chatId, Resources res) {
 		this.fight = fight;
@@ -66,11 +70,17 @@ public class UfcSummarizer {
 			result = new EditTextCommandResult(UfcCommand.SlashUfcActivation, msg);
 		}
 
-		result.add("Judging Summary");
+		boolean completeJudging = fight.isVotingComplete();
+		if (completeJudging) {
+			result.add("Ladies and Gentlemen, after " + fight.rounds
+					+ " rounds, we go to the judges' scorecards for a decision...");
+		} else {
+			result.add("Judging In Progress...");
+		}
 		for (Entry<Integer, UfcTracker> e : roundToTrackerMap.entrySet()) {
 			Integer round = e.getKey();
 			UfcTracker tracker = e.getValue();
-			VoteCluster<Integer> cluster = tracker.cluster;
+			VoteCluster<Integer> cluster = tracker.getCluster();
 			Map<CampingUser, Integer> votes = cluster.getVotes();
 			for (Entry<CampingUser, Integer> voteEntry : votes.entrySet()) {
 				CampingUser user = voteEntry.getKey();
@@ -79,19 +89,15 @@ public class UfcSummarizer {
 			}
 		}
 
-		boolean completeJudging = fight.isVotingComplete();
-
+		result.add(ResultFragment.NEWLINE);
 		for (Entry<CampingUser, JudgingCard> judgeAndCard : fight.getJudgingCards().entrySet()) {
 			CampingUser judge = judgeAndCard.getKey();
 			JudgingCard card = judgeAndCard.getValue();
-			result.add(ResultFragment.NEWLINE);
 			result.add(judge);
+
 			if (completeJudging) {
-				int a = 0, b = 0;
-				for (int round = 1; round <= card.getRounds(); round++) {
-					a += card.getA(round);
-					b += card.getB(round);
-				}
+				int a = card.getATotal(), b = card.getBTotal();
+
 				result.add(" scores it: " + a + "-" + b);
 			} else {
 				for (int round = 1; round <= card.getRounds(); round++) {
@@ -102,8 +108,28 @@ public class UfcSummarizer {
 					}
 				}
 			}
+			result.add(ResultFragment.NEWLINE);
 		}
-
+		if (completeJudging) {
+			PanelDecision overall = fight.getDecision();
+			switch (overall) {
+			case Incomplete:
+				// Never happens
+				break;
+			case MajorityDraw:
+				result.add("This fight is a ");
+				result.add("MAJORITY DRAW", TextStyle.Bold);
+				break;
+			case Split:
+			case Unanimous:
+				result.add("For your winner by ");
+				result.add(overall == PanelDecision.Split ? "SPLIT DECISION" : "UNANIMOUS DECISION", TextStyle.Bold);
+				result.add(": ");
+				result.add(fight.getWinner(), TextStyle.Bold);
+				result.add("!");
+				break;
+			}
+		}
 		try {
 			SendResult sent = result.send(bot, chatId);
 			if (msg == null) {

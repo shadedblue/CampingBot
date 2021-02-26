@@ -100,6 +100,11 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult add(CampingUser cu, TextStyle style) {
+		fragments.add(new MentionFragment(cu, style));
+		return this;
+	}
+
 	public CommandResult add(Emoji e) {
 		fragments.add(new EmojiFragment(e));
 		return this;

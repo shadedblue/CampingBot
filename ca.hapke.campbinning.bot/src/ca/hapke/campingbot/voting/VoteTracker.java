@@ -575,4 +575,8 @@ public abstract class VoteTracker<T> {
 		int messageId = topicMessage.getMessageId();
 		return Integer.toString(messageId);
 	}
+
+	public VoteCluster<T> getCluster() {
+		return cluster;
+	}
 }

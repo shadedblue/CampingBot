@@ -14,12 +14,20 @@ public class MentionFragment extends ResultFragment {
 	private MentionDisplay displayMode;
 
 	public MentionFragment(CampingUser target) {
-		this(target, MentionDisplay.Nickname, CaseChoice.Normal, null, null);
+		this(target, MentionDisplay.Nickname, CaseChoice.Normal, TextStyle.Normal, null, null);
 	}
 
-	public MentionFragment(CampingUser target, MentionDisplay displayMode, CaseChoice caseChoice, String prefix,
-			String suffix) {
-		super(caseChoice, TextStyle.Normal);
+	public MentionFragment(CampingUser target, TextStyle textStyle) {
+		this(target, MentionDisplay.Nickname, CaseChoice.Normal, textStyle, null, null);
+	}
+
+	public MentionFragment(CampingUser target, MentionDisplay displayMode, CaseChoice caseChoice) {
+		this(target, displayMode, caseChoice, TextStyle.Normal, null, null);
+	}
+
+	public MentionFragment(CampingUser target, MentionDisplay displayMode, CaseChoice caseChoice, TextStyle textStyle,
+			String prefix, String suffix) {
+		super(caseChoice, textStyle);
 		this.target = target;
 		this.displayMode = displayMode;
 		this.prefix = prefix;

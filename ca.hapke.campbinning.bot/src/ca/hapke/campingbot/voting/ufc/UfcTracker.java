@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.voting;
+package ca.hapke.campingbot.voting.ufc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,8 @@ import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.voting.VoteTracker;
+import ca.hapke.campingbot.voting.VotingOption;
 
 /**
  * @author Nathan Hapke

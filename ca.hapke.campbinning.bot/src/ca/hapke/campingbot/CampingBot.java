@@ -33,8 +33,8 @@ import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.voting.RantCommand;
-import ca.hapke.campingbot.voting.UfcCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
+import ca.hapke.campingbot.voting.ufc.UfcCommand;
 
 /**
  * @author Nathan Hapke

@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.voting;
+package ca.hapke.campingbot.voting.ufc;
 
 /**
  * @author Nathan Hapke
@@ -27,7 +27,7 @@ public class JudgingCard {
 	}
 
 	public boolean hasVote(int round) {
-		if (round >= 1 && round < as.length) {
+		if (round >= 1 && round <= as.length) {
 			return as[round - 1] != -1 && bs[round - 1] != -1;
 		}
 		return false;
@@ -58,5 +58,32 @@ public class JudgingCard {
 
 	public int getRounds() {
 		return rounds;
+	}
+
+	public int getATotal() {
+		int a = 0;
+		for (int round = 1; round <= rounds; round++) {
+			a += getA(round);
+		}
+		return a;
+	}
+
+	public int getBTotal() {
+		int b = 0;
+		for (int round = 1; round <= rounds; round++) {
+			b += getB(round);
+		}
+		return b;
+	}
+
+	public JudgeDecision getDecision() {
+		int a, b;
+		a = getATotal();
+		b = getBTotal();
+		if (a == b)
+			return JudgeDecision.Draw;
+		if (a > b)
+			return JudgeDecision.A;
+		return JudgeDecision.B;
 	}
 }
