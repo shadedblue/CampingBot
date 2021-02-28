@@ -83,9 +83,8 @@ public class CampingBot extends CampingBotEngine {
 		processor.addAtEnd(ballsCommand.getCrazyCase());
 
 		rantCommand = new RantCommand(this);
-//		aitaCommand = new AitaCommand(this, ballsCommand);
 		ufcCommand = new UfcCommand(this, res);
-		voteManagementCommands = new VoteManagementCommands(rantCommand, ufcCommand);
+		voteManagementCommands = new VoteManagementCommands(rantCommand);
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
@@ -105,7 +104,6 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(nicknameCommand);
 		addCommand(hideItCommand);
 		addCommand(ballsCommand);
-//		addCommand(aitaCommand);
 		addCommand(ufcCommand);
 		addCommand(rantCommand);
 		addCommand(pleasureCommand);
@@ -166,7 +164,6 @@ public class CampingBot extends CampingBotEngine {
 		calMonitor.add((ConfigXmlSerializer) serializer);
 		calMonitor.add(databaseConsumer);
 		calMonitor.add(ballsCommand);
-//		calMonitor.add(aitaCommand);
 		calMonitor.add(rantCommand);
 		calMonitor.add(happyNewYear);
 	}

@@ -51,8 +51,8 @@ public class UfcCommand extends VotingCommand<Integer> {
 	}
 
 	private class DelayThenCreate extends Thread {
-//		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 30;
-		private static final int DELAY_BETWEEN_ROUNDS_SEC = 20;
+		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 30;
+//		private static final int DELAY_BETWEEN_ROUNDS_SEC = 20;
 		private boolean nextRound;
 
 		public DelayThenCreate(boolean nextRound) {
