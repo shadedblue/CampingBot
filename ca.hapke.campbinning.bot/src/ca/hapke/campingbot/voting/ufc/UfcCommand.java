@@ -10,11 +10,16 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
 import ca.hapke.campingbot.callback.api.CallbackId;
+import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
+import ca.hapke.campingbot.response.CommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.fragments.ResultFragment;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.voting.VoteChangedAdapter;
 import ca.hapke.campingbot.voting.VoteInitiationException;
@@ -25,7 +30,7 @@ import ca.hapke.campingbot.voting.VotingCommand;
  * @author Nathan Hapke
  */
 public class UfcCommand extends VotingCommand<Integer> {
-	private class CreateNextTracker extends VoteChangedAdapter<Integer> {
+	private class WatchForFirstVote extends VoteChangedAdapter<Integer> {
 		private boolean firstAction = false;
 
 		@Override
@@ -46,8 +51,8 @@ public class UfcCommand extends VotingCommand<Integer> {
 	}
 
 	private class DelayThenCreate extends Thread {
-		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 30;
-//		private static final int DELAY_BETWEEN_ROUNDS_SEC = 20;
+//		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 30;
+		private static final int DELAY_BETWEEN_ROUNDS_SEC = 20;
 		private boolean nextRound;
 
 		public DelayThenCreate(boolean nextRound) {
@@ -69,24 +74,36 @@ public class UfcCommand extends VotingCommand<Integer> {
 		protected void createNextTracker(Integer topicId) throws TelegramApiException {
 			if (nextRound) {
 				currentRound = new UfcTracker(currentRound);
+				currentRound.addListener(new WatchForFirstVote());
+				addTracker(currentRound);
 			} else {
 				ticketIndex++;
 				UfcFight fight = ticket.get(ticketIndex);
-				summarizer = new UfcSummarizer(fight, bot, chatId, res);
-				currentRound = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, 1, summarizer);
+				TextCommandResult nextFightAnnouncement = new TextCommandResult(SlashJudgeUfc);
+				nextFightAnnouncement.add("The next fight is: ");
+				nextFightAnnouncement.add(fight.a, TextStyle.Bold);
+				nextFightAnnouncement.add(" vs ");
+				nextFightAnnouncement.add(fight.b, TextStyle.Bold);
+				nextFightAnnouncement.add(ResultFragment.NEWLINE);
+				nextFightAnnouncement.add(fight.rounds + "", TextStyle.Bold);
+				nextFightAnnouncement.add(" rounds");
+				nextFightAnnouncement.add(ResultFragment.NEWLINE);
+				nextFightAnnouncement.add("/");
+				nextFightAnnouncement.add(JUDGING_COMMAND);
+				nextFightAnnouncement.add(" to begin judging");
+
+				nextFightAnnouncement.sendAndLog(bot, CampingChatManager.getInstance(bot).get(chatId));
 			}
-			currentRound.addListener(new CreateNextTracker());
-			addTracker(currentRound);
 		}
 	}
 
 	static final String UFC_COMMAND = "ufc";
-	static final String READY_COMMAND = "ready";
+	static final String JUDGING_COMMAND = "judge";
 
 	static final SlashCommandType SlashUfcActivation = new SlashCommandType("UfcActivation", UFC_COMMAND,
 			BotCommandIds.VOTING | BotCommandIds.SET);
-//	private static final SlashCommandType SlashReadyUfc = new SlashCommandType("ReadyUfc", READY_COMMAND,
-//			BotCommandIds.VOTING | BotCommandIds.SET);
+	private static final SlashCommandType SlashJudgeUfc = new SlashCommandType("UfcJudge", JUDGING_COMMAND,
+			BotCommandIds.VOTING | BotCommandIds.SET);
 
 	private List<UfcFight> ticket = new ArrayList<>();
 	private int ticketIndex = 0;
@@ -101,8 +118,29 @@ public class UfcCommand extends VotingCommand<Integer> {
 	private Resources res;
 
 	public UfcCommand(CampingBot campingBot, Resources res) {
-		super(campingBot, SlashUfcActivation);
+		super(campingBot, SlashUfcActivation, SlashJudgeUfc);
 		this.res = res;
+	}
+
+	@Override
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+			CampingUser campingFromUser) {
+		if (command == SlashUfcActivation)
+			return super.respondToSlashCommand(command, message, chatId, campingFromUser);
+		else if (command == SlashJudgeUfc) {
+			try {
+				UfcFight fight = ticket.get(ticketIndex);
+				if (!summarizer.hasFight(fight)) {
+					currentRound = createTracker(fight, 1);
+					addTracker(currentRound);
+				}
+				// The UfcTracker will log the send events.
+			} catch (TelegramApiException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -126,8 +164,9 @@ public class UfcCommand extends VotingCommand<Integer> {
 				ticket.add(new UfcFight(i, a, b, rounds));
 			}
 
-			UfcFight first = ticket.get(0);
-			currentRound = createTracker(first, 1);
+			UfcFight fight = ticket.get(0);
+			currentRound = createTracker(fight, 1);
+
 			return currentRound;
 		} catch (Exception e) {
 			throw new VoteInitiationException("Give the 'FighterA - FigherB - Rounds' syntax");
@@ -136,10 +175,9 @@ public class UfcCommand extends VotingCommand<Integer> {
 
 	private UfcTracker createTracker(UfcFight fight, int round) throws TelegramApiException {
 		summarizer = new UfcSummarizer(fight, bot, chatId, res);
-		UfcTracker firstVote = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, round,
-				summarizer);
-		firstVote.addListener(new CreateNextTracker());
-		return firstVote;
+		UfcTracker t = new UfcTracker(bot, ranter, activater, chatId, activation, topic, fight, round, summarizer);
+		t.addListener(new WatchForFirstVote());
+		return t;
 	}
 
 	@Override

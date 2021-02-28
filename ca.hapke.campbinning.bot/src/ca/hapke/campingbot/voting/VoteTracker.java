@@ -7,9 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.pinnedmessages.PinChatMessage;
-import org.telegram.telegrambots.meta.api.methods.pinnedmessages.UnpinChatMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -26,6 +24,7 @@ import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.EditTextCommandResult;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.UnpinUtil;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
@@ -364,35 +363,6 @@ public abstract class VoteTracker<T> {
 		}
 	}
 
-	public void unpinBanner() {
-		boolean success = false;
-		boolean failure = false;
-		try {
-			String chatString = Long.toString(chatId);
-			Message pinnedMsg = bot.execute(new GetChat(chatString)).getPinnedMessage();
-			if (pinnedMsg != null && bannerMessage.getMessageId().equals(pinnedMsg.getMessageId())) {
-				UnpinChatMessage unpin = new UnpinChatMessage(chatString);
-				success = bot.execute(unpin);
-				if (!success)
-					failure = true;
-			}
-		} catch (TelegramApiException e1) {
-			failure = true;
-		}
-
-		if (success || failure) {
-			EventLogger logger = EventLogger.getInstance();
-			if (success) {
-				logger.add(new EventItem(VotingCommand.VoteCommand, activater, null, chat, bannerMessage.getMessageId(),
-						"Unpinned banner", bannerMessage));
-			} else if (failure) {
-				logger.add(new EventItem(VotingCommand.VoteCommandFailedCommand, activater, null, chat,
-						bannerMessage.getMessageId(), "Failed to unpin banner", bannerMessage));
-
-			}
-		}
-	}
-
 	public CommandResult createCompletionResult() {
 		List<ResultFragment> votes = getVotesText(true);
 		return new TextCommandResult(VotingCommand.VoteTopicCompleteCommand, votes);
@@ -419,7 +389,7 @@ public abstract class VoteTracker<T> {
 
 		completed = true;
 		updateBannerFinished();
-		unpinBanner();
+		UnpinUtil.unpinSpecific(chatId, bot, bannerMessage);
 
 		sendFinishedVotingMessage();
 	}

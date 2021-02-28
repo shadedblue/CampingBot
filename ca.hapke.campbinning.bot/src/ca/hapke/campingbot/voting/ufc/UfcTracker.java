@@ -140,4 +140,11 @@ public class UfcTracker extends VoteTracker<Integer> {
 		builder.append(round);
 		return builder.toString();
 	}
+
+	/**
+	 * NOOP Handled by {@link UfcSummarizer}
+	 */
+	@Override
+	public void sendFinishedVotingMessage() {
+	}
 }

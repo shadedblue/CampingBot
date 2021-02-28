@@ -18,6 +18,7 @@ import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.EditTextCommandResult;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.UnpinUtil;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
@@ -36,7 +37,6 @@ public class UfcSummarizer {
 	private Long chatId;
 	private Emoji checkEmoji;
 	private Emoji xEmoji;
-	private Object object;
 
 	public UfcSummarizer(UfcFight fight, CampingBot bot, Long chatId, Resources res) {
 		this.fight = fight;
@@ -62,6 +62,9 @@ public class UfcSummarizer {
 		ufcTracker.addListener(ul);
 	}
 
+	/**
+	 * TODO give it ~15s in case of a mis-click?
+	 */
 	public void sendOrUpdate(CampingUser u) {
 		CommandResult result;
 		if (msg == null) {
@@ -130,6 +133,11 @@ public class UfcSummarizer {
 				break;
 			}
 		}
+
+		for (UfcTracker t : roundToTrackerMap.values()) {
+			t.complete();
+		}
+
 		try {
 			SendResult sent = result.send(bot, chatId);
 			if (msg == null) {
@@ -139,5 +147,12 @@ public class UfcSummarizer {
 			EventLogger.getInstance().add(ei);
 		} catch (TelegramApiException e) {
 		}
+
+		UnpinUtil.unpinAll(bot, chatId);
+	}
+
+	public boolean hasFight(UfcFight fight) {
+		return this.fight.equals(fight);
+
 	}
 }

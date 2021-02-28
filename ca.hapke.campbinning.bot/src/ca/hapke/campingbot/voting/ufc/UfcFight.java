@@ -12,7 +12,6 @@ public class UfcFight {
 	public final String a, b;
 	public final int rounds;
 	public final int fightNumber;
-//	private Map<CampingUser, List<Integer>> userToVotes = new HashMap<>();
 	private Map<CampingUser, JudgingCard> judgingCards = new HashMap<>();
 
 	public UfcFight(int fightNumber, String a, String b, int rounds) {
@@ -22,22 +21,6 @@ public class UfcFight {
 		this.fightNumber = fightNumber;
 	}
 
-//	public void setVote(CampingUser user, int round, Integer vote) {
-//		List<Integer> votes = getVoteList(user);
-//		while (votes.size() < round) {
-//			votes.add(0);
-//		}
-//		votes.set(round, vote);
-//	}
-//
-//	private List<Integer> getVoteList(CampingUser user) {
-//		List<Integer> votes = userToVotes.get(user);
-//		if (votes == null) {
-//			votes = new ArrayList<>();
-//			userToVotes.put(user, votes);
-//		}
-//		return votes;
-//	}
 
 	public JudgingCard getCard(CampingUser user) {
 		JudgingCard card = judgingCards.get(user);
@@ -142,5 +125,17 @@ public class UfcFight {
 
 	public Map<CampingUser, JudgingCard> getJudgingCards() {
 		return judgingCards;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("UfcFight [");
+		builder.append(a);
+		builder.append(" vs ");
+		builder.append(b);
+		builder.append(rounds);
+		builder.append(" rounds");
+		return builder.toString();
 	}
 }
