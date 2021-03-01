@@ -3,6 +3,7 @@ package ca.hapke.campingbot.commands;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -55,24 +56,20 @@ public class SpellCommand extends InlineCommandBase
 	private static final TextFragment ON = new TextFragment(" on ");
 	private static final TextFragment AND_YELL = new TextFragment(" and yell \"");
 	private static final TextFragment END_QUOTE = new TextFragment("\"");
-	private static final String ADJECTIVE_CATEGORY = "adjective";
-	private static final String EXCLAMATION_CATEGORY = "exclamation";
-	private static final String ITEM_CATEGORY = "item";
+
+	static final String ADJECTIVE_CATEGORY = "adjective";
+	static final String EXCLAMATION_CATEGORY = "exclamation";
+	static final String ITEM_CATEGORY = "item";
+
 	private CampingBot bot;
 	private boolean shouldSave = false;
 
+	private SpellPacks categoriesByGenre = new SpellPacks();
+
 	public SpellCommand(CampingBot bot) {
 		this.bot = bot;
-		categories = new CategoriedItems<String>(ADJECTIVE_CATEGORY, ITEM_CATEGORY, EXCLAMATION_CATEGORY);
-		adjectives = categories.getList(ADJECTIVE_CATEGORY);
-		items = categories.getList(ITEM_CATEGORY);
-		exclamations = categories.getList(EXCLAMATION_CATEGORY);
-	}
 
-	private CategoriedItems<String> categories;
-	private List<String> adjectives;
-	private List<String> items;
-	private List<String> exclamations;
+	}
 
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
@@ -95,6 +92,10 @@ public class SpellCommand extends InlineCommandBase
 	}
 
 	public List<ResultFragment> cast(CampingUser target) {
+		CategoriedItems<String> categories = categoriesByGenre.getRandomPack();
+		List<String> adjectives = categories.getList(ADJECTIVE_CATEGORY);
+		List<String> items = categories.getList(ITEM_CATEGORY);
+		List<String> exclamations = categories.getList(EXCLAMATION_CATEGORY);
 		String adj = CollectionUtil.getRandom(adjectives);
 		String item = CollectionUtil.getRandom(items);
 		String excl = CollectionUtil.getRandom(exclamations);
@@ -185,33 +186,40 @@ public class SpellCommand extends InlineCommandBase
 		return Collections.singletonList(articleSpell);
 	}
 
-	public void setAdjectives(List<String> adjectives) {
+	public void setValues(String genre, List<String> adjectives, List<String> items, List<String> exclamations) {
+		CategoriedItems<String> categories = categoriesByGenre.get(genre);
 		if (categories.putAll(ADJECTIVE_CATEGORY, adjectives))
 			shouldSave = true;
-	}
 
-	public void setItems(List<String> items) {
 		if (categories.putAll(ITEM_CATEGORY, items))
 			shouldSave = true;
-	}
 
-	public void setExclamations(List<String> exclamations) {
 		if (categories.putAll(EXCLAMATION_CATEGORY, exclamations))
 			shouldSave = true;
 	}
 
 	@Override
 	public List<String> getCategoryNames() {
-		return categories.getCategoryNames();
+		return categoriesByGenre.getCategoryNames();
 	}
 
 	@Override
 	public List<String> getCategory(String name) {
-		return categories.getList(name);
+		int splitter = name.indexOf(SpellPacks.DELIMITER);
+		String genre = name.substring(0, splitter);
+		String category = name.substring(splitter + 1);
+
+		CategoriedItems<String> categories = categoriesByGenre.get(genre);
+		return categories.getList(category);
 	}
 
 	@Override
-	public void addItem(String category, String value) {
+	public void addItem(String name, String value) {
+		int splitter = name.indexOf(SpellPacks.DELIMITER);
+		String genre = name.substring(0, splitter);
+		String category = name.substring(splitter + 1);
+
+		CategoriedItems<String> categories = categoriesByGenre.get(genre);
 		if (categories.put(category, value))
 			shouldSave = true;
 	}
@@ -225,7 +233,16 @@ public class SpellCommand extends InlineCommandBase
 	public void getXml(OutputFormatter of) {
 		String outerTag = "spell";
 		of.start(outerTag);
-		of.tagCategories(categories);
+
+		for (Map.Entry<String, CategoriedItems<String>> e : categoriesByGenre.entrySet()) {
+			String innerTag = "pack";
+			of.start(innerTag);
+			of.tagAndValue("name", e.getKey());
+			of.tagCategories(e.getValue());
+			of.finish(innerTag);
+		}
+
+//		of.tagCategories(categories);
 		of.finish(outerTag);
 
 		shouldSave = false;

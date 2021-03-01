@@ -117,15 +117,19 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 	}
 	;
 <spell> [SpellCommand sg]
-	{ List<String> a,i,e; }
+	: (<pack>[sg]) *
+	;
+<pack> [SpellCommand sg]	
+	{ 
+		String name;
+		List<String> a,i,e; }
 	:
+	name=<name>
 	a=<adjectives>
 	i=<items>
 	e=<exclamations>
 	{
-		sg.setAdjectives(a);
-		sg.setItems(i);
-		sg.setExclamations(e);
+		sg.setValues(name, a, i, e);
 	}
 	;
 <adjectives> returns [List<String> vals = null]
