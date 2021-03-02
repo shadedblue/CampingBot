@@ -36,9 +36,10 @@ public class AybEndGameImages extends AfdImagesStage<Void> {
 
 	@Override
 	protected void populateImages(List<ImageLink> images, Map<ImageLink, String> captionMap) {
-		for (int i = FIRST_IMAGE; i <= LAST_IMAGE; i++) {
+		for (int i = FIRST_IMAGE; i < LAST_IMAGE; i++) {
 			images.add(getAybImgUrl(CATEGORY, i));
 		}
 		images.add(getAybImgUrl(CATEGORY, winner.getTelegramId()));
+		images.add(getAybImgUrl(CATEGORY, LAST_IMAGE));
 	}
 }

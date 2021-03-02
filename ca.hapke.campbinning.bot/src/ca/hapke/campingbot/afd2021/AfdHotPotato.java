@@ -150,6 +150,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	public void begin() {
 		try {
 			beginRound(allowedChats);
+			// TODO set topic to 'All your base bros'
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
 		}
@@ -183,6 +184,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	}
 
 	public TextCommandResult finishRound() {
+		// TODO use /hype generator code to create the results?
 		TextCommandResult result = new TextCommandResult(HotPotatoCommand);
 
 		List<CampingUser> targets = playerManager.getTargets();
