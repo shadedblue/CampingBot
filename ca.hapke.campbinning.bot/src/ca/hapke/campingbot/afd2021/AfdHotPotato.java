@@ -125,13 +125,14 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
 		// SAFETY FOR TESTING
-		if (!chatAllowed(chat))
+		if (!chatAllowed(chatId))
 			return null;
 
 		if (command == SlashPotato && bannerMessage == null) {
+			CampingChat chat = CampingChatManager.getInstance(bot).get(chatId);
 			List<CommandResult> results = beginRound(Collections.singletonList(chat));
 			CommandResult result = results.get(0);
 			return result;
@@ -274,9 +275,9 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		fullGameStage.complete(true);
 	}
 
-	private boolean chatAllowed(CampingChat chat) {
+	private boolean chatAllowed(Long chatId) {
 		for (CampingChat cc : allowedChats) {
-			if (cc == chat)
+			if (cc.chatId == chatId)
 				return true;
 		}
 		return false;

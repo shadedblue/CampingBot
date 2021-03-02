@@ -38,7 +38,7 @@ public class AfdTextCommand implements TextCommand {
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		String incoming = message.getText();
 		CommandResult out = null;

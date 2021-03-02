@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.vdurmont.emoji.EmojiManager;
 
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.CommandType;
@@ -58,7 +57,7 @@ public class RedditCommand extends AbstractCommand implements SlashCommand, Text
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
 		Message target = message.getReplyToMessage();
 		if (target == null)
@@ -104,7 +103,7 @@ public class RedditCommand extends AbstractCommand implements SlashCommand, Text
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		String msg = message.getText();
 		return findSubreddit(REDDIT_COMMAND_TYPE, msg);

@@ -4,7 +4,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 
@@ -14,7 +13,7 @@ import ca.hapke.campingbot.users.CampingUser;
 public interface SlashCommand {
 	public SlashCommandType[] getSlashCommandsToRespondTo();
 
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
 
 	public AccessLevel accessRequired();

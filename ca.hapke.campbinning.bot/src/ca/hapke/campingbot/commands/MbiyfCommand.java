@@ -161,7 +161,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		CampingUser targetUser = bot.findTarget(message, false, true, BotChoicePriority.Last);
 

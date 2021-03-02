@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -32,7 +31,7 @@ public class QuantityCommand extends AbstractCommand implements SlashCommand {
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
 		CommandResult cr = new TextCommandResult(SLASH_COMMAND_TYPES[0]);
 		cr.add("Quantities:\n");

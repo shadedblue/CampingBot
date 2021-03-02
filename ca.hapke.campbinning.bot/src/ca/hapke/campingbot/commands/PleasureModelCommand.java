@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.category.CategoriedItems;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
@@ -47,7 +46,7 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		ImageLink img = CollectionUtil.getRandom(images);
 		return new ImageCommandResult(PleasureModelCommand, img);

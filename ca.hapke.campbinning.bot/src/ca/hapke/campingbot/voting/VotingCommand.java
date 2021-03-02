@@ -19,14 +19,12 @@ import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.callback.api.CallbackCommandBase;
 import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.log.EventItem;
-import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
@@ -108,15 +106,14 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
-			CampingUser campingFromUser) throws TelegramApiException {
-		Long chatId = chat.chatId;
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		CommandResult result;
 
 		try {
 			Message topic = message.getReplyToMessage();
 			if (topic != null) {
-				result = startVotingInternal(bot, message, chat, campingFromUser, topic);
+				result = startVotingInternal(bot, message, chatId, campingFromUser, topic);
 			} else {
 				result = new TextCommandResult(VoteCommandFailedCommand, NO_TOPIC_PROVIDED,
 						new InsultFragment(Perspective.You));
@@ -127,13 +124,25 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 		return result;
 	}
 
-	private CommandResult startVotingInternal(CampingBotEngine bot, Message activation, CampingChat chat,
+	private CommandResult startVotingInternal(CampingBotEngine bot, Message activation, Long chatId,
 			CampingUser activater, Message topic) throws TelegramApiException {
-		Long chatId = chat.chatId;
 		VoteTracker<T> tracker = null;
 		TextCommandResult output = null;
-		Integer rantMessageId = topic.getMessageId();
-		if (voteOnMessages.containsKey(rantMessageId)) {
+		Integer targetMessageId = topic.getMessageId();
+
+		// if (voteOnMessages.containsKey(targetMessageId)) {
+		boolean alreadyVoting = false;
+		for (String s : voteOnMessages.keySet()) {
+			try {
+				s = s.substring(0, s.indexOf(AbstractCommand.DELIMITER));
+			} catch (Exception e) {
+			}
+			if (s.equals(targetMessageId.toString())) {
+				alreadyVoting = true;
+				break;
+			}
+		}
+		if (alreadyVoting) {
 			return new TextCommandResult(VoteCommandFailedCommand, ALREADY_BEING_VOTED_ON,
 					new InsultFragment(Perspective.You));
 		} else {
@@ -197,13 +206,13 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) throws TelegramApiException {
 
 		String msgLower = message.getText().toLowerCase().trim();
 		for (SlashCommandType respondsTo : SLASH_COMMANDS) {
 			if (msgLower.endsWith("/" + respondsTo.slashCommand))
-				return startVotingInternal(bot, message, chat, campingFromUser, message);
+				return startVotingInternal(bot, message, chatId, campingFromUser, message);
 
 		}
 		return null;

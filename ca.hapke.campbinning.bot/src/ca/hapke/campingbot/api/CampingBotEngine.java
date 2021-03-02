@@ -361,7 +361,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 						break;
 					case Allowed:
 						if (outputCommand != null) {
-							outputResult = reactToSlashCommandInText(outputCommand, message, chat, campingFromUser);
+							outputResult = reactToSlashCommandInText(outputCommand, message, chatId, campingFromUser);
 
 						} else {
 							String msg = originalMsg.toLowerCase().trim();
@@ -370,7 +370,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 //						CommandResult result = null;
 							for (TextCommand textCommand : textCommands) {
 								if (textCommand.isMatch(msg, message)) {
-									outputResult = textCommand.textCommand(campingFromUser, entities, chat, message);
+									outputResult = textCommand.textCommand(campingFromUser, entities, chatId, message);
 									if (outputResult != null) {
 										break;
 									}
@@ -481,14 +481,14 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		return (int) (ZonedDateTime.now().toInstant().toEpochMilli() / 1000);
 	}
 
-	protected CommandResult reactToSlashCommandInText(SlashCommandType command, Message message, CampingChat chat,
+	protected CommandResult reactToSlashCommandInText(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
 		for (SlashCommand sc : slashCommands.get(command)) {
 			if (!system.hasAccess(campingFromUser, sc)) {
 				return new TextCommandResult(command).add(campingFromUser).add(": Access denied, you ")
 						.add(insultGenerator.getInsult());
 			}
-			CommandResult result = sc.respondToSlashCommand(command, message, chat, campingFromUser);
+			CommandResult result = sc.respondToSlashCommand(command, message, chatId, campingFromUser);
 			if (result != null)
 				return result;
 		}

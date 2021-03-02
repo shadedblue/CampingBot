@@ -18,7 +18,6 @@ import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
@@ -101,7 +100,7 @@ public class PartyEverydayCommand extends AbstractCommand
 	}
 
 	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, CampingChat chat,
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
 		cooldown.setExec();
 

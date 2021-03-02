@@ -4,13 +4,11 @@ import java.text.NumberFormat;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -74,9 +72,8 @@ public class HypeCommand extends AbstractCommand implements CampingSerializable,
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
-			CampingUser campingFromUser) throws TelegramApiException {
-		Long chatId = chat.chatId;
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		String hype = null;
 		String incoming = message.getText();
 		if (incoming.contains(" ")) {

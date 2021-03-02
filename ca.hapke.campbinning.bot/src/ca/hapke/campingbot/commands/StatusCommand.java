@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
 import ca.hapke.campingbot.api.IStatus;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -60,8 +59,8 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, CampingChat chat,
-			CampingUser campingFromUser) throws TelegramApiException {
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+			CampingUser campingFromUser) {
 		TextCommandResult r = new TextCommandResult(SlashStatus);
 		r.add("Online Since", TextStyle.Bold);
 		r.add(": ");
