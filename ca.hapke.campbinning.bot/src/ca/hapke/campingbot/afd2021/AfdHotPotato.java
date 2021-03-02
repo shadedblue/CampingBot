@@ -28,6 +28,7 @@ import ca.hapke.campingbot.response.EditCaptionCommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
@@ -158,10 +159,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		List<CommandResult> out = new ArrayList<>();
 		roundNumber++;
 		for (CampingChat chat : chats) {
-//			TextCommandResult result = new TextCommandResult(HotPotatoCommand);
 			ImageCommandResult result = new ImageCommandResult(HotPotatoCommand, noChance);
-//			firstPerson = CollectionUtil.getRandom(targets);
-//			result.add(firstPerson, CaseChoice.Upper);
 			addRoundNumber(result);
 			result.setKeyboard(createVotingKeyboard());
 
@@ -174,11 +172,14 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	}
 
 	protected void addRoundNumber(CommandResult result) {
-		result.add("ROUND ", TextStyle.Bold);
+		result.add("HOT POTATO MINI-GAME -- ROUND ", TextStyle.Bold);
 		result.add(roundNumber, TextStyle.Bold);
 		result.add("\n");
 		result.add(playerManager.getTargets().size());
 		result.add(" PLAYERS REMAIN!");
+		result.add(ResultFragment.NEWLINE);
+		result.add("Choose who you boom-boom!");
+
 	}
 
 	public TextCommandResult finishRound() {
@@ -193,6 +194,8 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		CampingUser target = CollectionUtil.getRandom(targets);
 
 		int tossesLeft = (int) (Math.random() * targets.size() * MAX_TOSSES);
+		result.add("THIS POTATO HAVE " + tossesLeft + " TOSSES BEFORE BOOM-BOOM\n");
+		result.newLine();
 //		int i = 0;
 		while (true) {
 
@@ -225,22 +228,46 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 					e.printStackTrace();
 				}
 
-				result.add(" GOT BLOWED UP!");
+				result.add(" ... BOOM!", TextStyle.Bold);
 				playerManager.advance(target);
-//				targets.remove(target);
-//				userToVotesMap.clear();
 				bannerMessage = null;
 
+				AybBetweenRoundsImages betweenRounds = new AybBetweenRoundsImages(bot, target);
 				if (targets.size() == 1) {
-					winner(targets.get(0));
+					CampingUser winner = targets.get(0);
+					fullGameStage.complete(true);
+					betweenRounds.add(new StageListener() {
+						@Override
+						public void stageBegan() {
+						}
+
+						@Override
+						public void stageComplete(boolean success) {
+							AybEndGameImages endImages = new AybEndGameImages(bot, winner);
+							endImages.begin();
+						}
+					});
 				} else {
-					advanceToNextRound(target);
+					betweenRounds.add(new StageListener() {
+						@Override
+						public void stageBegan() {
+						}
+
+						@Override
+						public void stageComplete(boolean success) {
+							try {
+								beginRound(allowedChats);
+							} catch (TelegramApiException e) {
+								e.printStackTrace();
+							}
+						}
+					});
 				}
+				betweenRounds.begin();
 				break;
 			} else {
 				result.add(" chose ");
 				result.add(nextTarget);
-				result.newLine();
 				result.newLine();
 				nextChoice.put(target, index + 1);
 				target = nextTarget;
@@ -249,30 +276,6 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 			tossesLeft--;
 		}
 		return result;
-	}
-
-	private void advanceToNextRound(CampingUser killed) {
-		AybBetweenRoundsImages betweenRounds = new AybBetweenRoundsImages(bot, killed);
-		betweenRounds.add(new StageListener() {
-
-			@Override
-			public void stageComplete(boolean success) {
-				try {
-					beginRound(allowedChats);
-				} catch (TelegramApiException e) {
-					e.printStackTrace();
-				}
-			}
-
-			@Override
-			public void stageBegan() {
-			}
-		});
-		betweenRounds.begin();
-	}
-
-	private void winner(CampingUser target) {
-		fullGameStage.complete(true);
 	}
 
 	private boolean chatAllowed(Long chatId) {
