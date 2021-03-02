@@ -11,7 +11,10 @@ import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
+import ca.hapke.campingbot.log.EventItem;
+import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
+import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
@@ -26,8 +29,6 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
- * TODO add EventChangeListener to events, so that if a Chat gets added, we add it to the Map also.
- * 
  * @author Nathan Hapke
  */
 public class CampingChatManager implements CampingSerializable {
@@ -117,12 +118,16 @@ public class CampingChatManager implements CampingSerializable {
 
 			CommandResult msg = new TextCommandResult(JoinThreadCommand)
 					.add("Invited to: " + chat.getChatname() + " (" + chat.chatId + ")");
+
+			EventItem ei;
 			try {
-				msg.send(bot, chatId);
+				SendResult result = msg.send(bot, chatId);
+				ei = new EventItem(null, user, chat, result);
 			} catch (TelegramApiException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ei = new EventItem("Failed to notify admin: " + user.getNameForLog() + "(" + user.getTelegramId()
+						+ ") about new chat: " + chatId);
 			}
+			EventLogger.getInstance().add(ei);
 		}
 	}
 

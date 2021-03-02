@@ -11,7 +11,6 @@ public class OverlayProcessor extends MessageProcessor {
 
 	public OverlayProcessor(boolean enabled) {
 		super(enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void setMessage(String... msg) {
@@ -21,20 +20,6 @@ public class OverlayProcessor extends MessageProcessor {
 
 	@Override
 	protected String internalProcessStringFragment(String value, boolean useMarkupV2) {
-		int h = 0;
-		int x = 0;
-
-//		for (int i = 0; i < value.length(); i++) {
-//			char c = value.charAt(i);
-//			x++;
-//
-//			if (c == '\n') {
-//				w = Math.max(w, x);
-//				h++;
-//				x = 0;
-//			}
-//
-//		}
 		String[] unders = value.split("\n");
 		Point outer = findDimensions(unders);
 		Point inner = findDimensions(msg);

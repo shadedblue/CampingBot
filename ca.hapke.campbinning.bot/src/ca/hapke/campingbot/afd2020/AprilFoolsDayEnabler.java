@@ -31,7 +31,6 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 
 	@Override
 	public TimesProvider<Boolean> getTimeProvider() {
-		// TODO Auto-generated method stub
 		return times;
 	}
 
