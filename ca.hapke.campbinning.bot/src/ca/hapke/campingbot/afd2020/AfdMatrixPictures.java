@@ -4,6 +4,7 @@ import java.time.temporal.ChronoUnit;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
@@ -54,7 +55,7 @@ public class AfdMatrixPictures implements CalendaredEvent<Void> {
 	}
 
 	@Override
-	public void doWork(Void value) {
+	public void doWork(ByCalendar<Void> event, Void value) {
 		if (!bot.isOnline() && i <= 57)
 			return;
 

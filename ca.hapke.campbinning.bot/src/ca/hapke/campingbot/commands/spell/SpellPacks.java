@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.commands;
+package ca.hapke.campingbot.commands.spell;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
@@ -90,7 +91,7 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 	}
 
 	@Override
-	public void doWork(Void value) {
+	public void doWork(ByCalendar<Void> event, Void value) {
 		for (int i = 0; i < inProgress.size(); i++) {
 			VoteTracker<T> r = inProgress.get(i);
 

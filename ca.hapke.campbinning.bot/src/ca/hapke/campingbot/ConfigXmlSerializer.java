@@ -15,6 +15,7 @@ import com.javadude.antxr.scanner.BasicCrimsonXMLTokenStream;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.api.CampingSerializable;
@@ -23,7 +24,7 @@ import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.PartyEverydayCommand;
-import ca.hapke.campingbot.commands.SpellCommand;
+import ca.hapke.campingbot.commands.spell.SpellCommand;
 import ca.hapke.campingbot.response.InsultGenerator;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.xml.ConfigParser;
@@ -37,7 +38,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	private boolean shouldSave = false;
 
 	@Override
-	public void doWork(Void value) {
+	public void doWork(ByCalendar<Void> event, Void value) {
 		if (shouldSave) {
 			File file = save();
 			if (file != null)

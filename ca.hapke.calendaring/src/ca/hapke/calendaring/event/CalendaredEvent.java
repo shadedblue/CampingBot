@@ -1,5 +1,6 @@
 package ca.hapke.calendaring.event;
 
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.TimesProvider;
 
 /**
@@ -8,7 +9,7 @@ import ca.hapke.calendaring.timing.TimesProvider;
 public interface CalendaredEvent<T> {
 	public TimesProvider<T> getTimeProvider();
 
-	public void doWork(T value);
+	public void doWork(ByCalendar<T> timingEvent, T value);
 
 	public boolean shouldRun();
 

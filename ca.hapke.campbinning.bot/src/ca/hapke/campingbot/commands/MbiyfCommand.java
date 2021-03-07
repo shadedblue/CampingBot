@@ -202,7 +202,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	}
 
 	@Override
-	public void doWork(MbiyfMode value) {
+	public void doWork(ByCalendar<MbiyfMode> event, MbiyfMode value) {
 		mode = value.getType();
 		enabled = value != null && value.isEnablement();
 		crazyCase.setEnabled(enabled);

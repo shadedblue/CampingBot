@@ -1,15 +1,13 @@
-package ca.hapke.campingbot.commands;
+package ca.hapke.campingbot.commands.spell;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
+import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
-import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
@@ -22,8 +20,6 @@ public class SpellResult {
 
 	public static final TextFragment NOT_BOT_COMMAND = new TextFragment(
 			"Foolish infidel. Spells are only to be cast upon mere mortals.");
-	public static final TextFragment NOT_BOT_INLINE = new TextFragment(
-			"I should know better than trying to cast a spell on our supreme overlord!");
 	public static final TextFragment UNKNOWN_FAIL = new TextFragment(
 			"Something went wrong in the bit-bucket... and the spell fizzled!?");
 
@@ -58,35 +54,9 @@ public class SpellResult {
 				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
 						ResultFragment.COLON_SPACE, NO_VICTIM_COMMAND, new InsultFragment(Perspective.You));
 				break;
-			case NotMe:
-				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
-						ResultFragment.COLON_SPACE, NOT_BOT_COMMAND);
-				break;
 			default:
 				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
 						ResultFragment.COLON_SPACE, UNKNOWN_FAIL);
-				break;
-			}
-		}
-		return out;
-	}
-
-	public List<ResultFragment> provideInlineResult() {
-		List<ResultFragment> out;
-		if (success) {
-			out = spell;
-		} else {
-			switch (failure) {
-			case Dipshit:
-				out = new ArrayList<>(2);
-				out.add(new InsultFragment(Perspective.Me));
-				out.add(NO_VICTIM_INLINE);
-				break;
-			case NotMe:
-				out = Collections.singletonList(NOT_BOT_INLINE);
-				break;
-			default:
-				out = Collections.singletonList(UNKNOWN_FAIL);
 				break;
 			}
 		}

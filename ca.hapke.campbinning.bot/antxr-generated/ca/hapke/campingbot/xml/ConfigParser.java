@@ -7,6 +7,7 @@
     import ca.hapke.campingbot.users.*;
     import ca.hapke.campingbot.channels.*;
     import ca.hapke.campingbot.commands.*;
+    import ca.hapke.campingbot.commands.spell.*;
     import ca.hapke.campingbot.response.*;
     import ca.hapke.campingbot.voting.*;
     import java.util.*;
@@ -340,13 +341,13 @@ public ConfigParser(ParserSharedInputState state) {
 			match(15);
 			{
 			{
-			_loop297:
+			_loop43:
 			do {
 				if ((LA(1)==16)) {
 					__xml_pack(sg);
 				}
 				else {
-					break _loop297;
+					break _loop43;
 				}
 				
 			} while (true);
@@ -417,14 +418,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop284:
+			_loop30:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop284;
+					break _loop30;
 				}
 				
 			} while (true);
@@ -470,13 +471,13 @@ public ConfigParser(ParserSharedInputState state) {
 			match(22);
 			{
 			{
-			_loop323:
+			_loop69:
 			do {
 				if ((LA(1)==23)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop323;
+					break _loop69;
 				}
 				
 			} while (true);
@@ -520,13 +521,13 @@ public ConfigParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop331:
+			_loop77:
 			do {
 				if ((LA(1)==25)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop331;
+					break _loop77;
 				}
 				
 			} while (true);
@@ -558,14 +559,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop280:
+			_loop26:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop280;
+					break _loop26;
 				}
 				
 			} while (true);
@@ -591,14 +592,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop272:
+			_loop18:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop272;
+					break _loop18;
 				}
 				
 			} while (true);
@@ -624,14 +625,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop276:
+			_loop22:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop276;
+					break _loop22;
 				}
 				
 			} while (true);
@@ -927,14 +928,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop307:
+			_loop53:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop307;
+					break _loop53;
 				}
 				
 			} while (true);
@@ -960,14 +961,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop311:
+			_loop57:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop311;
+					break _loop57;
 				}
 				
 			} while (true);
@@ -1045,14 +1046,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop303:
+			_loop49:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop303;
+					break _loop49;
 				}
 				
 			} while (true);
@@ -1078,14 +1079,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop315:
+			_loop61:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop315;
+					break _loop61;
 				}
 				
 			} while (true);
@@ -1111,14 +1112,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop319:
+			_loop65:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop319;
+					break _loop65;
 				}
 				
 			} while (true);

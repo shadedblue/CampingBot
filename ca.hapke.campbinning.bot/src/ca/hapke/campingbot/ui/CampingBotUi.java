@@ -52,6 +52,7 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.calendaring.monitor.TimerThreadWithKill;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
@@ -94,7 +95,7 @@ public abstract class CampingBotUi extends JFrame {
 				new ByFrequency<Void>(null, 10, ChronoUnit.SECONDS));
 
 		@Override
-		public void doWork(Void value) {
+		public void doWork(ByCalendar<Void> event, Void value) {
 			userModel.fireTableDataChanged();
 			calendaredModel.fireTableDataChanged();
 		}

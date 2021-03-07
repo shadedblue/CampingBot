@@ -2,6 +2,7 @@ package ca.hapke.campingbot.afd2020;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.processors.MessageProcessor;
@@ -35,7 +36,7 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 	}
 
 	@Override
-	public void doWork(Boolean value) {
+	public void doWork(ByCalendar<Boolean> event, Boolean value) {
 		afdText.enable(value);
 		afdMatrix.enable(value);
 		afdp.setEnabled(value);

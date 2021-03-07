@@ -3,6 +3,7 @@ package ca.hapke.campingbot.ui;
 import java.time.ZonedDateTime;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 
 /**
@@ -21,7 +22,11 @@ public class TableFormatCalendaredEvent extends CampingTableFormat implements Ad
 		case 0:
 			return e.getClass().getSimpleName();
 		case 1:
-			return e.getTimeProvider().getNearestFuture().getFuture();
+			ByCalendar<?> nearestFuture = e.getTimeProvider().getNearestFuture();
+			if (nearestFuture == null) {
+				return null;
+			}
+			return nearestFuture.getFuture();
 		case 2:
 			return e.getTimeProvider().getLastExecTime();
 		case 3:
