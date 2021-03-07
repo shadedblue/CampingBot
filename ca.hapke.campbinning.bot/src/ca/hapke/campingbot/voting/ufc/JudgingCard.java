@@ -12,11 +12,6 @@ public class JudgingCard {
 		this.rounds = rounds;
 		as = new int[rounds];
 		bs = new int[rounds];
-
-		for (int i = 0; i < as.length; i++) {
-			as[i] = -1;
-			bs[i] = -1;
-		}
 	}
 
 	public void setVote(int round, int a, int b) {
@@ -28,14 +23,14 @@ public class JudgingCard {
 
 	public boolean hasVote(int round) {
 		if (round >= 1 && round <= as.length) {
-			return as[round - 1] != -1 && bs[round - 1] != -1;
+			return as[round - 1] > 0 && bs[round - 1] > 0;
 		}
 		return false;
 	}
 
 	public boolean isComplete() {
 		for (int round = 0; round < rounds; round++) {
-			if (as[round] == -1 || bs[round] == -1) {
+			if (as[round] <= 0 || bs[round] <= 0) {
 				return false;
 			}
 		}

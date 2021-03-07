@@ -21,7 +21,6 @@ public class UfcFight {
 		this.fightNumber = fightNumber;
 	}
 
-
 	public JudgingCard getCard(CampingUser user) {
 		JudgingCard card = judgingCards.get(user);
 		if (card == null) {
@@ -61,11 +60,20 @@ public class UfcFight {
 	}
 
 	public boolean isVotingComplete() {
+//		System.out.println("Check UfcFight's Judging complete?");
+//		System.out.println(judgingCards.size() + " cards");
 		for (JudgingCard c : judgingCards.values()) {
-			if (!c.isComplete()) {
+//		for (Map.Entry<CampingUser, JudgingCard> item : judgingCards.entrySet()) {
+//			CampingUser user = item.getKey();
+//			JudgingCard c = item.getValue();
+
+			boolean complete = c.isComplete();
+//			System.out.println(user + " - " + complete);
+			if (!complete) {
 				return false;
 			}
 		}
+//		System.out.println("YES, OVERALL COMPLETE!");
 		return true;
 	}
 

@@ -27,6 +27,8 @@ import ca.hapke.campingbot.voting.VoteTracker;
 import ca.hapke.campingbot.voting.VotingCommand;
 
 /**
+ * NA vote should send to the Summarizer and close out the previous rounds and send the next fight message
+ * 
  * @author Nathan Hapke
  */
 public class UfcCommand extends VotingCommand<Integer> {
@@ -51,7 +53,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 	}
 
 	private class DelayThenCreate extends Thread {
-		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 30;
+		private static final int DELAY_BETWEEN_ROUNDS_SEC = 5 * 60 + 45;
 //		private static final int DELAY_BETWEEN_ROUNDS_SEC = 20;
 		private boolean nextRound;
 
