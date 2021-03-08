@@ -59,10 +59,16 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	private SpellPacks categoriesByGenre = new SpellPacks();
 	private SpellCastingManager castManager;
 
+	private CategoriedItems<String> categories;
+	private List<String> adjectives;
+
 	public SpellCommand(CampingBot bot) {
 		this.bot = bot;
 		castManager = new SpellCastingManager(bot);
 		CalendarMonitor.getInstance().add(castManager);
+
+		categories = new CategoriedItems<String>(ADJECTIVE_CATEGORY);
+		adjectives = categories.getList(ADJECTIVE_CATEGORY);
 	}
 
 	@Override
@@ -88,9 +94,10 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 	public List<ResultFragment> cast(CampingUser caster, CampingUser victim) {
 		CategoriedItems<String> categories = categoriesByGenre.getRandomPack();
-		List<String> adjectives = categories.getList(ADJECTIVE_CATEGORY);
+
 		List<String> items = categories.getList(ITEM_CATEGORY);
 		List<String> exclamations = categories.getList(EXCLAMATION_CATEGORY);
+
 		String adj = CollectionUtil.getRandom(adjectives);
 		String item = CollectionUtil.getRandom(items);
 		String excl = CollectionUtil.getRandom(exclamations);
@@ -123,10 +130,13 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		return SLASH_COMMANDS;
 	}
 
-	public void setValues(String genre, List<String> adjectives, List<String> items, List<String> exclamations) {
-		CategoriedItems<String> categories = categoriesByGenre.get(genre);
+	public void setAdjectives(List<String> adjectives) {
 		if (categories.putAll(ADJECTIVE_CATEGORY, adjectives))
 			shouldSave = true;
+	}
+
+	public void setValues(String genre, List<String> items, List<String> exclamations) {
+		CategoriedItems<String> categories = categoriesByGenre.get(genre);
 
 		if (categories.putAll(ITEM_CATEGORY, items))
 			shouldSave = true;
@@ -137,7 +147,12 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 	@Override
 	public List<String> getCategoryNames() {
-		return categoriesByGenre.getCategoryNames();
+		List<String> extras = categories.getCategoryNames();
+		int extraSize = extras.size();
+		List<String> out = new ArrayList<>(categoriesByGenre.size() * 2 + extraSize);
+		out.addAll(extras);
+		categoriesByGenre.addCategoryNames(out);
+		return out;
 	}
 
 	@Override
@@ -151,13 +166,18 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	}
 
 	@Override
-	public void addItem(String name, String value) {
-		int splitter = name.indexOf(SpellPacks.DELIMITER);
-		String genre = name.substring(0, splitter);
-		String category = name.substring(splitter + 1);
+	public void addItem(String category, String value) {
+		CategoriedItems<String> cats;
+		if (category.contains(DELIMITER)) {
+			int splitter = category.indexOf(SpellPacks.DELIMITER);
+			String genre = category.substring(0, splitter);
+			category = category.substring(splitter + 1);
 
-		CategoriedItems<String> categories = categoriesByGenre.get(genre);
-		if (categories.put(category, value))
+			cats = categoriesByGenre.get(genre);
+		} else {
+			cats = this.categories;
+		}
+		if (cats.put(category, value))
 			shouldSave = true;
 	}
 
@@ -175,6 +195,9 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	public void getXml(OutputFormatter of) {
 		String outerTag = "spell";
 		of.start(outerTag);
+
+		// for adjectives
+		of.tagCategories(categories);
 
 		for (Map.Entry<String, CategoriedItems<String>> e : categoriesByGenre.entrySet()) {
 			String innerTag = "pack";
