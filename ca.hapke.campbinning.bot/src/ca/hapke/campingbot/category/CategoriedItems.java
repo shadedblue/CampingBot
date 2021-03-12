@@ -29,6 +29,10 @@ public class CategoriedItems<T> {
 		return result;
 	}
 
+	public boolean contains(String s) {
+		return names.contains(s);
+	}
+
 	public List<T> getList(String cat) {
 		List<T> list = data.get(cat);
 		if (list == null)

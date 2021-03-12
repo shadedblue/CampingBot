@@ -157,12 +157,19 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 	@Override
 	public List<String> getCategory(String name) {
-		int splitter = name.indexOf(SpellPacks.DELIMITER);
-		String genre = name.substring(0, splitter);
-		String category = name.substring(splitter + 1);
+		if (this.categories.contains(name)) {
+			return this.categories.getList(name);
+		}
+		try {
+			int splitter = name.indexOf(SpellPacks.DELIMITER);
+			String genre = name.substring(0, splitter);
+			String category = name.substring(splitter + 1);
 
-		CategoriedItems<String> categories = categoriesByGenre.get(genre);
-		return categories.getList(category);
+			CategoriedItems<String> categories = categoriesByGenre.get(genre);
+			return categories.getList(category);
+		} catch (Exception e) {
+		}
+		return null;
 	}
 
 	@Override
