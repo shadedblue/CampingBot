@@ -44,33 +44,13 @@ public class HypeJobDetails implements JobDetails {
 	private static final int TITLE_BAR_WIDTH = (DIGITS + 1) * QTY - 1;
 	private static final int EDIT_COUNT = 5;
 
-	private static final Character[] blotsFull = new Character[] { '▓', '█', '█' };
-	private static final Character[] blotsFade = new Character[] { '░', '▙', '▟', '▛', '▜', '▞', '▚' };
-	private static final Character[] blotsPartial = new Character[] { '▔', '▖', '▗', '▘', '▝' };
-	private static final Character[] blotsAll;
-	static {
-		blotsAll = new Character[blotsFull.length + blotsFade.length + blotsPartial.length];
-		int x = 0;
-		for (int i = 0; i < blotsFull.length; i++) {
-			blotsAll[x] = blotsFull[i];
-			x++;
-		}
-		for (int i = 0; i < blotsFade.length; i++) {
-			blotsAll[x] = blotsFade[i];
-			x++;
-		}
-		for (int i = 0; i < blotsPartial.length; i++) {
-			blotsAll[x] = blotsPartial[i];
-			x++;
-		}
-	}
 	private Message targetMessage;
 	private boolean isFailedHype;
 	private int bailStep;
 	private boolean shouldAbort = false;
 	private List<ResultFragment> lastFrags;
 	private int lastPct;
-	private BlotProcessor blotter = new BlotProcessor(true, blotsAll);
+	private BlotProcessor blotter = new BlotProcessor(true, BlotProcessor.blotsAll);
 	private OverlayProcessor overlayer = new OverlayProcessor(true);
 
 	public HypeJobDetails(CampingUser campingFromUser, Long chatId, String hype, CampingBotEngine bot,
@@ -220,24 +200,24 @@ public class HypeJobDetails implements JobDetails {
 		StringBuilder sb = new StringBuilder(TITLE_BAR_WIDTH);
 		int width = TITLE_BAR_WIDTH - 4;
 
-		sb.append(CollectionUtil.getRandom(blotsPartial));
-		sb.append(CollectionUtil.getRandom(blotsFade));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 
 		int fullBoxes = (int) (width * pct);
 
 		int j = 0;
 		while (j < fullBoxes) {
-			sb.append(CollectionUtil.getRandom(blotsFull));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFull));
 			j++;
 		}
 
 		if (j < width) {
-			sb.append(CollectionUtil.getRandom(blotsFade));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 			j++;
 		}
 
 		for (int k = 0; k < 2 && j < width; k++) {
-			sb.append(CollectionUtil.getRandom(blotsPartial));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 			j++;
 		}
 
@@ -246,8 +226,8 @@ public class HypeJobDetails implements JobDetails {
 			j++;
 		}
 
-		sb.append(CollectionUtil.getRandom(blotsFade));
-		sb.append(CollectionUtil.getRandom(blotsPartial));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 
 		return createTitle(sb);
 	}
@@ -262,30 +242,30 @@ public class HypeJobDetails implements JobDetails {
 
 		int i = 0;
 		while (i < before - 2) {
-			sb.append(CollectionUtil.getRandom(blotsPartial));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 			i++;
 		}
 		if (i < before) {
-			sb.append(CollectionUtil.getRandom(blotsFade));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 			i++;
 		}
 		if (i < before) {
-			sb.append(CollectionUtil.getRandom(blotsFull));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFull));
 		}
 
 		sb.append(title);
 
 		i = 0;
 		if (i < after) {
-			sb.append(CollectionUtil.getRandom(blotsFull));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFull));
 			i++;
 		}
 		if (i < after) {
-			sb.append(CollectionUtil.getRandom(blotsFade));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 			i++;
 		}
 		while (i < after) {
-			sb.append(CollectionUtil.getRandom(blotsPartial));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 			i++;
 		}
 		return sb.toString();

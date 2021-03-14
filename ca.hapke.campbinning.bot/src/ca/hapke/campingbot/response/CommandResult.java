@@ -30,8 +30,6 @@ import ca.hapke.campingbot.users.CampingUser;
  * @author Nathan Hapke
  */
 public abstract class CommandResult {
-
-	private static final TextFragment NEW_LINE_FRAG = new TextFragment("\n");
 	protected Integer replyTo;
 	protected ReplyKeyboard keyboard;
 	// protected boolean sent = false;
@@ -124,7 +122,7 @@ public abstract class CommandResult {
 
 	public CommandResult newLine() {
 		if (fragments.size() > 0)
-			fragments.add(NEW_LINE_FRAG);
+			fragments.add(ResultFragment.NEWLINE);
 		return this;
 	}
 
@@ -154,7 +152,7 @@ public abstract class CommandResult {
 	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		if (result == null) {
 			int x = fragments.size() - 1;
-			if (x >= 0 && fragments.get(x) == NEW_LINE_FRAG) {
+			if (x >= 0 && fragments.get(x) == ResultFragment.NEWLINE) {
 				fragments.remove(x);
 			}
 			result = sendInternal(bot, chatId);

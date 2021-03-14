@@ -54,17 +54,11 @@ public class HypeCommand extends AbstractCommand implements CampingSerializable,
 		nf.setMaximumFractionDigits(0);
 	}
 
-	public class HypeJob extends StagedJob<HypeJobDetails> {
-		public HypeJob(HypeJobDetails first) {
-			super(first);
-		}
-	}
-
-	private HypeJob instance;
+	private StagedJob<HypeJobDetails> instance;
 
 	public void softStart(HypeJobDetails details) {
 		if (instance == null || instance.isComplete()) {
-			instance = new HypeJob(details);
+			instance = new StagedJob<HypeJobDetails>(details);
 			instance.start();
 		} else {
 			instance.add(details);

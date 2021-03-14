@@ -9,6 +9,26 @@ public class BlotProcessor extends MessageProcessor {
 
 	private static final double SENSITIVITY = 0.4;
 	private Character[] blots;
+	public static final Character[] blotsAll;
+	public static final Character[] blotsPartial = new Character[] { '▔', '▖', '▗', '▘', '▝' };
+	public static final Character[] blotsFade = new Character[] { '░', '▙', '▟', '▛', '▜', '▞', '▚' };
+	public static final Character[] blotsFull = new Character[] { '▓', '█', '█' };
+	static {
+		blotsAll = new Character[blotsFull.length + blotsFade.length + blotsPartial.length];
+		int x = 0;
+		for (int i = 0; i < blotsFull.length; i++) {
+			blotsAll[x] = blotsFull[i];
+			x++;
+		}
+		for (int i = 0; i < blotsFade.length; i++) {
+			blotsAll[x] = blotsFade[i];
+			x++;
+		}
+		for (int i = 0; i < blotsPartial.length; i++) {
+			blotsAll[x] = blotsPartial[i];
+			x++;
+		}
+	}
 
 	public BlotProcessor(boolean enabled, Character[] blots) {
 		super(enabled);

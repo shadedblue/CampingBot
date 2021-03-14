@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * @author Nathan Hapke
  */
-public abstract class StagedJob<T extends JobDetails> extends StatusThread {
+public class StagedJob<T extends JobDetails> extends StatusThread {
 	protected AbstractQueue<T> jobs = new ConcurrentLinkedQueue<>();
 
 	public StagedJob(T first) {
