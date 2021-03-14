@@ -101,14 +101,14 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		int n = votes.size();
 		String resultText;
 		if (n >= MAX_TOSSES) {
-			resultText = "Done!";
+			resultText = "NO MORE THROWS OF THE BOMB!";
 		} else {
 			int[] ids = id.getIds();
 			int targetId = ids[0];
 			CampingUser votedFor = userMonitor.getUser(targetId);
 			votes.add(votedFor);
 			n++;
-			resultText = StringUtil.ordinal(n) + " choice is: " + playerManager.getInitials(votedFor);
+			resultText = StringUtil.ordinal(n).toUpperCase() + " THROW GO TO " + playerManager.getInitials(votedFor);
 		}
 
 		AnswerCallbackQuery answer = new AnswerCallbackQuery();
@@ -176,13 +176,13 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	}
 
 	protected void addRoundNumber(CommandResult result) {
-		result.add("HOT POTATO MINI-GAME -- ROUND ", TextStyle.Bold);
+		result.add("HOT POTATO BASE-GAME -- ROUND ", TextStyle.Bold);
 		result.add(roundNumber, TextStyle.Bold);
 		result.add("\n");
 		result.add(playerManager.getTargets().size());
-		result.add(" PLAYERS REMAIN!");
+		result.add(" PLAYERS ALIVE!");
 		result.add(ResultFragment.NEWLINE);
-		result.add("Choose who you boom-boom!");
+		result.add("WHO YOU WANT SELECT FOR SET UP THROW THE BOMB?");
 
 	}
 
@@ -199,7 +199,8 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 
 		int tossesLeft = (int) (Math.random() * targets.size() * MAX_TOSSES);
 		List<ResultFragment> stage = new ArrayList<>();
-		stage.add(new TextFragment("THIS POTATO HAVE " + tossesLeft + " TOSSES BEFORE BOOM-BOOM\n"));
+		stage.add(new TextFragment("WAR WAS BEGINNING!\n"));
+		stage.add(new TextFragment("THIS POTATO-BOMB MAY ZIG " + tossesLeft + " TIMES\n"));
 		stage.add(ResultFragment.NEWLINE);
 		fragStages.add(stage);
 
@@ -208,7 +209,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		while (true) {
 			stage = new ArrayList<>();
 			stage.add(new TextFragment("" + tossesLeft));
-			stage.add(new TextFragment(" left: "));
+			stage.add(new TextFragment(" zigs left: "));
 
 			stage.add(new MentionFragment(target));
 			int index = nextChoice.get(target);
@@ -237,47 +238,17 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 					e.printStackTrace();
 				}
 
-				stage.add(new TextFragment(" ... BOOM!", TextStyle.Bold));
+				stage.add(new TextFragment(" ...", TextStyle.Bold));
 				playerManager.advance(target);
 				bannerMessage = null;
 
-				betweenRounds = new AybBetweenRoundsImages(bot, target);
-				if (targets.size() == 1) {
-					CampingUser winner = targets.get(0);
-					fullGameStage.complete(true);
-					betweenRounds.add(new StageListener() {
-						@Override
-						public void stageBegan() {
-						}
-
-						@Override
-						public void stageComplete(boolean success) {
-							AybEndGameImages endImages = new AybEndGameImages(bot, winner);
-							endImages.begin();
-						}
-					});
-				} else {
-					betweenRounds.add(new StageListener() {
-						@Override
-						public void stageBegan() {
-						}
-
-						@Override
-						public void stageComplete(boolean success) {
-							try {
-								beginRound(allowedChats);
-							} catch (TelegramApiException e) {
-								e.printStackTrace();
-							}
-						}
-					});
-				}
+				betweenRounds = createImagesBetweenStages(targets, target);
 				fragStages.add(stage);
 				break;
 			} else {
-				stage.add(new TextFragment(" chose "));
+				stage.add(new TextFragment(" set up "));
 				stage.add(new MentionFragment(nextTarget));
-				stage.add(ResultFragment.NEWLINE);
+				stage.add(new TextFragment(" the bomb!\n"));
 				nextChoice.put(target, index + 1);
 				target = nextTarget;
 			}
@@ -290,6 +261,42 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		StagedJob<HotPotatoRevealJobDetails> job = new StagedJob<HotPotatoRevealJobDetails>(details);
 		job.start();
 		return null;
+	}
+
+	protected AybBetweenRoundsImages createImagesBetweenStages(List<CampingUser> remainingInGame, CampingUser target) {
+		AybBetweenRoundsImages betweenRounds;
+		betweenRounds = new AybBetweenRoundsImages(bot, target);
+		if (remainingInGame.size() == 1) {
+			CampingUser winner = remainingInGame.get(0);
+			fullGameStage.complete(true);
+			betweenRounds.add(new StageListener() {
+				@Override
+				public void stageBegan() {
+				}
+
+				@Override
+				public void stageComplete(boolean success) {
+					AybEndGameImages endImages = new AybEndGameImages(bot, winner);
+					endImages.begin();
+				}
+			});
+		} else {
+			betweenRounds.add(new StageListener() {
+				@Override
+				public void stageBegan() {
+				}
+
+				@Override
+				public void stageComplete(boolean success) {
+					try {
+						beginRound(allowedChats);
+					} catch (TelegramApiException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+		return betweenRounds;
 	}
 
 	private boolean chatAllowed(Long chatId) {

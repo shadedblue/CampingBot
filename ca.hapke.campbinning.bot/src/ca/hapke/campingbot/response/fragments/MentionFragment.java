@@ -11,7 +11,7 @@ import ca.hapke.campingbot.users.CampingUser;
 public class MentionFragment extends ResultFragment {
 	private CampingUser target;
 	private String prefix, suffix;
-	private MentionDisplay displayMode;
+	private String display;
 
 	public MentionFragment(CampingUser target) {
 		this(target, MentionDisplay.Nickname, CaseChoice.Normal, TextStyle.Normal, null, null);
@@ -33,9 +33,33 @@ public class MentionFragment extends ResultFragment {
 			String prefix, String suffix) {
 		super(caseChoice, textStyle);
 		this.target = target;
-		this.displayMode = displayMode;
 		this.prefix = prefix;
 		this.suffix = suffix;
+
+		switch (displayMode) {
+		case Nickname:
+			display = target.getDisplayName();
+			break;
+		case Username:
+			display = target.getUsername();
+			break;
+		case First:
+		default:
+			display = target.getFirstOrUserName();
+			break;
+		}
+	}
+
+	/**
+	 * Only for calling by transform();
+	 */
+	private MentionFragment(CampingUser target, String transformedDisplay, CaseChoice caseChoice, TextStyle textStyle,
+			String prefix, String suffix) {
+		super(caseChoice, textStyle);
+		this.target = target;
+		this.prefix = prefix;
+		this.suffix = suffix;
+		this.display = transformedDisplay;
 	}
 
 	@Override
@@ -59,21 +83,6 @@ public class MentionFragment extends ResultFragment {
 	}
 
 	public String getDisplayText() {
-		// TODO make display a field so that transform can work
-		String display;
-		switch (displayMode) {
-		case Nickname:
-			display = target.getDisplayName();
-			break;
-		case Username:
-			display = target.getUsername();
-			break;
-		case First:
-		default:
-			display = target.getFirstOrUserName();
-			break;
-
-		}
 		return display;
 	}
 
@@ -90,7 +99,9 @@ public class MentionFragment extends ResultFragment {
 
 	@Override
 	public ResultFragment transform(MessageProcessor proc, boolean useMarkupV2) {
-		return this;
+		String transformedDisplay = proc.processString(display, useMarkupV2);
+
+		return new MentionFragment(target, transformedDisplay, caseChoice, textStyle, prefix, suffix);
 	}
 
 }
