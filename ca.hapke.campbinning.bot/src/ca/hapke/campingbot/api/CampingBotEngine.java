@@ -488,7 +488,12 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				return new TextCommandResult(command).add(campingFromUser).add(": Access denied, you ")
 						.add(insultGenerator.getInsult());
 			}
-			CommandResult result = sc.respondToSlashCommand(command, message, chatId, campingFromUser);
+			CommandResult result = null;
+			try {
+				result = sc.respondToSlashCommand(command, message, chatId, campingFromUser);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			if (result != null)
 				return result;
 		}

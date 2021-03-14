@@ -46,7 +46,7 @@ public class CalendarMonitor extends TimerThreadWithKill {
 	private <T> void work(ZonedDateTime now, CalendaredEvent<T> event) {
 		TimesProvider<T> timeProvider = event.getTimeProvider();
 		ByCalendar<T> future = timeProvider.getNearestFuture();
-		if (future.getFuture().isBefore(now)) {
+		if (future != null && future.getFuture().isBefore(now)) {
 			invoke(event, timeProvider, future);
 		}
 	}
@@ -55,13 +55,14 @@ public class CalendarMonitor extends TimerThreadWithKill {
 		ZonedDateTime now = ZonedDateTime.now();
 		if (event.shouldRun()) {
 			try {
-				event.doWork(calendarPoint.value);
+				event.doWork(calendarPoint, calendarPoint.value);
 
 				boolean expired = calendarPoint.activate();
 				if (expired) {
 					timeProvider.remove(calendarPoint);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			timeProvider.setLastExecTime();
 		}

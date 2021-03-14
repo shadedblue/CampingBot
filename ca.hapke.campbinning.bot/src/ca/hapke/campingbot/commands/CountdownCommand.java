@@ -38,7 +38,7 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2021, 0, 1, 0, 0, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2021, 2, 12, 14, 55, 00).toZonedDateTime();
 	private Resources res;
 	private MbiyfCommand ballsCommand;
 	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
@@ -63,10 +63,11 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 //			CampingUser target = userMonitor.getUser(jamieson);
 //			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, null));
 //			result.add(" TELLS CSL AND HUSBANDCHOAD TO SSUUUCCCKKKK IIIITTTTT", CaseChoice.Upper);
-			result.add("2020 CAN GARGLE MY ", CaseChoice.Upper);
+			result.add("SPRING ", CaseChoice.Upper);
 			result.add(res.getRandomBallEmoji());
+			result.add("REAK ", CaseChoice.Upper);
 			result.add(res.getRandomBallEmoji());
-			result.add(res.getRandomBallEmoji());
+			result.add("ITCHES!", CaseChoice.Upper);
 			result.add(ResultFragment.NEWLINE);
 //			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
 

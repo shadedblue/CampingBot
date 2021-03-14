@@ -7,6 +7,7 @@
     import ca.hapke.campingbot.users.*;
     import ca.hapke.campingbot.channels.*;
     import ca.hapke.campingbot.commands.*;
+    import ca.hapke.campingbot.commands.spell.*;
     import ca.hapke.campingbot.response.*;
     import ca.hapke.campingbot.voting.*;
     import java.util.*;
@@ -339,14 +340,21 @@ public ConfigParser(ParserSharedInputState state) {
 			__xml_startTag = LT(1);
 			match(15);
 			{
+			
+					List<String> a;
+				
+			a=__xml_adjectives();
+			
+					sg.setAdjectives(a);
+				
 			{
-			_loop297:
+			_loop43:
 			do {
 				if ((LA(1)==16)) {
 					__xml_pack(sg);
 				}
 				else {
-					break _loop297;
+					break _loop43;
 				}
 				
 			} while (true);
@@ -417,14 +425,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop284:
+			_loop30:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop284;
+					break _loop30;
 				}
 				
 			} while (true);
@@ -470,13 +478,13 @@ public ConfigParser(ParserSharedInputState state) {
 			match(22);
 			{
 			{
-			_loop323:
+			_loop69:
 			do {
 				if ((LA(1)==23)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop323;
+					break _loop69;
 				}
 				
 			} while (true);
@@ -520,13 +528,13 @@ public ConfigParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop331:
+			_loop77:
 			do {
 				if ((LA(1)==25)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop331;
+					break _loop77;
 				}
 				
 			} while (true);
@@ -558,14 +566,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop280:
+			_loop26:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop280;
+					break _loop26;
 				}
 				
 			} while (true);
@@ -591,14 +599,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop272:
+			_loop18:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop272;
+					break _loop18;
 				}
 				
 			} while (true);
@@ -624,14 +632,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop276:
+			_loop22:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop276;
+					break _loop22;
 				}
 				
 			} while (true);
@@ -927,14 +935,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop307:
+			_loop53:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop307;
+					break _loop53;
 				}
 				
 			} while (true);
@@ -960,14 +968,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop311:
+			_loop57:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop311;
+					break _loop57;
 				}
 				
 			} while (true);
@@ -978,6 +986,39 @@ public ConfigParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_8);
+		}
+		return vals;
+	}
+	
+	public final List<String>  __xml_adjectives() throws RecognitionException, TokenStreamException {
+		List<String> vals = null;
+		
+		Token  __xml_startTag = null;
+		
+		try {      // for error handling
+			__xml_startTag = LT(1);
+			match(17);
+			{
+			vals = new ArrayList<String>(); String val;
+			{
+			_loop49:
+			do {
+				if ((LA(1)==40)) {
+					val=__xml_item();
+					vals.add(val);
+				}
+				else {
+					break _loop49;
+				}
+				
+			} while (true);
+			}
+			}
+			match(XML_END_TAG);
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_20);
 		}
 		return vals;
 	}
@@ -994,13 +1035,12 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			
 					String name;
-					List<String> a,i,e;
+					List<String> i,e;
 			name=__xml_name();
-			a=__xml_adjectives();
 			i=__xml_items();
 			e=__xml_exclamations();
 			
-					sg.setValues(name, a, i, e);
+					sg.setValues(name, i, e);
 				
 			}
 			match(XML_END_TAG);
@@ -1034,39 +1074,6 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final List<String>  __xml_adjectives() throws RecognitionException, TokenStreamException {
-		List<String> vals = null;
-		
-		Token  __xml_startTag = null;
-		
-		try {      // for error handling
-			__xml_startTag = LT(1);
-			match(17);
-			{
-			vals = new ArrayList<String>(); String val;
-			{
-			_loop303:
-			do {
-				if ((LA(1)==40)) {
-					val=__xml_item();
-					vals.add(val);
-				}
-				else {
-					break _loop303;
-				}
-				
-			} while (true);
-			}
-			}
-			match(XML_END_TAG);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_22);
-		}
-		return vals;
-	}
-	
 	public final List<String>  __xml_items() throws RecognitionException, TokenStreamException {
 		List<String> vals = null;
 		
@@ -1078,14 +1085,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop315:
+			_loop61:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop315;
+					break _loop61;
 				}
 				
 			} while (true);
@@ -1095,7 +1102,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_23);
+			recover(ex,_tokenSet_22);
 		}
 		return vals;
 	}
@@ -1111,14 +1118,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop319:
+			_loop65:
 			do {
 				if ((LA(1)==40)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop319;
+					break _loop65;
 				}
 				
 			} while (true);
@@ -1185,7 +1192,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_24);
+			recover(ex,_tokenSet_23);
 		}
 	}
 	
@@ -1207,7 +1214,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_25);
+			recover(ex,_tokenSet_24);
 		}
 		return value;
 	}
@@ -1230,7 +1237,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_26);
+			recover(ex,_tokenSet_25);
 		}
 		return value;
 	}
@@ -1253,7 +1260,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_27);
+			recover(ex,_tokenSet_26);
 		}
 		return value;
 	}
@@ -1306,7 +1313,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_28);
+			recover(ex,_tokenSet_27);
 		}
 		return value;
 	}
@@ -1420,7 +1427,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_28);
+			recover(ex,_tokenSet_27);
 		}
 	}
 	
@@ -1442,7 +1449,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_29);
+			recover(ex,_tokenSet_28);
 		}
 		return value;
 	}
@@ -1465,7 +1472,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_30);
+			recover(ex,_tokenSet_29);
 		}
 		return value;
 	}
@@ -1488,7 +1495,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_31);
+			recover(ex,_tokenSet_30);
 		}
 		return value;
 	}
@@ -1511,7 +1518,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_32);
+			recover(ex,_tokenSet_31);
 		}
 		return value;
 	}
@@ -1534,7 +1541,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_33);
+			recover(ex,_tokenSet_32);
 		}
 		return value;
 	}
@@ -1557,7 +1564,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_34);
+			recover(ex,_tokenSet_33);
 		}
 		return value;
 	}
@@ -1580,7 +1587,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_35);
+			recover(ex,_tokenSet_34);
 		}
 		return value;
 	}
@@ -1769,79 +1776,74 @@ public ConfigParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_20 = new BitSet(mk_tokenSet_20());
 	private static final long[] mk_tokenSet_21() {
-		long[] data = { 1125899906973696L, 0L};
+		long[] data = { 1125899907891200L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_21 = new BitSet(mk_tokenSet_21());
 	private static final long[] mk_tokenSet_22() {
-		long[] data = { 1048576L, 0L};
+		long[] data = { 2097152L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_22 = new BitSet(mk_tokenSet_22());
 	private static final long[] mk_tokenSet_23() {
-		long[] data = { 2097152L, 0L};
+		long[] data = { 8388640L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_23 = new BitSet(mk_tokenSet_23());
 	private static final long[] mk_tokenSet_24() {
-		long[] data = { 8388640L, 0L};
+		long[] data = { 571746046443520L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_24 = new BitSet(mk_tokenSet_24());
 	private static final long[] mk_tokenSet_25() {
-		long[] data = { 571746046443520L, 0L};
+		long[] data = { 140737488355328L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_25 = new BitSet(mk_tokenSet_25());
 	private static final long[] mk_tokenSet_26() {
-		long[] data = { 140737488355328L, 0L};
+		long[] data = { 268435488L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_26 = new BitSet(mk_tokenSet_26());
 	private static final long[] mk_tokenSet_27() {
-		long[] data = { 268435488L, 0L};
+		long[] data = { 33554464L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_27 = new BitSet(mk_tokenSet_27());
 	private static final long[] mk_tokenSet_28() {
-		long[] data = { 33554464L, 0L};
+		long[] data = { 4398046511104L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_28 = new BitSet(mk_tokenSet_28());
 	private static final long[] mk_tokenSet_29() {
-		long[] data = { 4398046511104L, 0L};
+		long[] data = { 35184372088832L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_29 = new BitSet(mk_tokenSet_29());
 	private static final long[] mk_tokenSet_30() {
-		long[] data = { 35184372088832L, 0L};
+		long[] data = { 70368744177664L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_30 = new BitSet(mk_tokenSet_30());
 	private static final long[] mk_tokenSet_31() {
-		long[] data = { 70368744177664L, 0L};
+		long[] data = { 17592186044416L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_31 = new BitSet(mk_tokenSet_31());
 	private static final long[] mk_tokenSet_32() {
-		long[] data = { 17592186044416L, 0L};
+		long[] data = { 281475513581600L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_32 = new BitSet(mk_tokenSet_32());
 	private static final long[] mk_tokenSet_33() {
-		long[] data = { 281475513581600L, 0L};
+		long[] data = { 536870944L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_33 = new BitSet(mk_tokenSet_33());
 	private static final long[] mk_tokenSet_34() {
-		long[] data = { 536870944L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_34 = new BitSet(mk_tokenSet_34());
-	private static final long[] mk_tokenSet_35() {
 		long[] data = { 1073741824L, 0L};
 		return data;
 	}
-	public static final BitSet _tokenSet_35 = new BitSet(mk_tokenSet_35());
+	public static final BitSet _tokenSet_34 = new BitSet(mk_tokenSet_34());
 	
 	}

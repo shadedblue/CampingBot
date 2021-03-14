@@ -1,6 +1,5 @@
-package ca.hapke.campingbot.commands;
+package ca.hapke.campingbot.commands.spell;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,15 +21,13 @@ public class SpellPacks {
 	public CategoriedItems<String> get(String genre) {
 		CategoriedItems<String> c = categoriesByGenre.get(genre);
 		if (c == null) {
-			c = new CategoriedItems<String>(SpellCommand.ADJECTIVE_CATEGORY, SpellCommand.ITEM_CATEGORY,
-					SpellCommand.EXCLAMATION_CATEGORY);
+			c = new CategoriedItems<String>(SpellCommand.ITEM_CATEGORY, SpellCommand.EXCLAMATION_CATEGORY);
 			categoriesByGenre.put(genre, c);
 		}
 		return c;
 	}
 
-	public List<String> getCategoryNames() {
-		List<String> out = new ArrayList<>(categoriesByGenre.size() * 3);
+	public List<String> addCategoryNames(List<String> out) {
 		for (Entry<String, CategoriedItems<String>> byGenre : categoriesByGenre.entrySet()) {
 			String genre = byGenre.getKey();
 			for (String cat : byGenre.getValue().getCategoryNames()) {
@@ -65,11 +62,16 @@ public class SpellPacks {
 				return genres[j];
 			}
 			x -= qty;
+			j++;
 		}
 		return genres[size - 1];
 	}
 
 	public Set<Entry<String, CategoriedItems<String>>> entrySet() {
 		return categoriesByGenre.entrySet();
+	}
+
+	public int size() {
+		return categoriesByGenre.size();
 	}
 }

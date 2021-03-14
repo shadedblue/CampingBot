@@ -2,6 +2,7 @@ package ca.hapke.campingbot.events;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.api.CampingBotEngine;
@@ -32,7 +33,7 @@ public class HappyNewYearEvent implements CalendaredEvent<Void> {
 	}
 
 	@Override
-	public void doWork(Void value) {
+	public void doWork(ByCalendar<Void> event, Void value) {
 		for (CampingChat chat : chatMgr.getAnnounceChats()) {
 			ImageLink image = new ImageLink("http://www.hapke.ca/images/farva-spray.gif", ImageLink.GIF);
 			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);

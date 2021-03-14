@@ -72,14 +72,9 @@ public class UfcSummarizer {
 		} else {
 			result = new EditTextCommandResult(UfcCommand.SlashUfcActivation, msg);
 		}
-
-		boolean completeJudging = fight.isVotingComplete();
-		if (completeJudging) {
-			result.add("Ladies and Gentlemen, after " + fight.rounds
-					+ " rounds, we go to the judges' scorecards for a decision...");
-		} else {
-			result.add("Judging In Progress...");
-		}
+		
+		// build the score-cards from scratch
+		// TODO when a person votes for the first time, build their card then, and update it on the fly
 		for (Entry<Integer, UfcTracker> e : roundToTrackerMap.entrySet()) {
 			Integer round = e.getKey();
 			UfcTracker tracker = e.getValue();
@@ -90,6 +85,15 @@ public class UfcSummarizer {
 				int vote = voteEntry.getValue();
 				fight.setVote(user, round, vote);
 			}
+		}
+
+		boolean completeJudging = fight.isVotingComplete();
+//		System.out.println("Is the fight complete?" + completeJudging);
+		if (completeJudging) {
+			result.add("Ladies and Gentlemen, after " + fight.rounds
+					+ " rounds, we go to the judges' scorecards for a decision...");
+		} else {
+			result.add("Judging In Progress...");
 		}
 
 		result.add(ResultFragment.NEWLINE);
@@ -132,10 +136,11 @@ public class UfcSummarizer {
 				result.add("!");
 				break;
 			}
-		}
 
-		for (UfcTracker t : roundToTrackerMap.values()) {
-			t.complete();
+			for (UfcTracker t : roundToTrackerMap.values()) {
+				t.complete();
+			}
+			UnpinUtil.unpinAll(bot, chatId);
 		}
 
 		try {
@@ -148,7 +153,6 @@ public class UfcSummarizer {
 		} catch (TelegramApiException e) {
 		}
 
-		UnpinUtil.unpinAll(bot, chatId);
 	}
 
 	public boolean hasFight(UfcFight fight) {

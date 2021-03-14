@@ -29,6 +29,10 @@ public class CategoriedItems<T> {
 		return result;
 	}
 
+	public boolean contains(String s) {
+		return names.contains(s);
+	}
+
 	public List<T> getList(String cat) {
 		List<T> list = data.get(cat);
 		if (list == null)
@@ -42,6 +46,8 @@ public class CategoriedItems<T> {
 	}
 
 	public boolean put(String cat, T item) {
+		if (item == null || (item instanceof String && "null".equalsIgnoreCase((String) item)))
+			return false;
 		List<T> list = getList(cat);
 		return list.add(item);
 	}
@@ -50,6 +56,9 @@ public class CategoriedItems<T> {
 		boolean result = false;
 		List<T> list = getList(cat);
 		for (T item : items) {
+			if (item == null || (item instanceof String && "null".equalsIgnoreCase((String) item)))
+				continue;
+
 			if (list.add(item))
 				result = true;
 		}
@@ -61,6 +70,9 @@ public class CategoriedItems<T> {
 		boolean result = false;
 		List<T> list = getList(cat);
 		for (T item : items) {
+			if (item == null || (item instanceof String && "null".equalsIgnoreCase((String) item)))
+				continue;
+
 			if (list.add(item))
 				result = true;
 		}

@@ -15,6 +15,7 @@ import javax.persistence.Persistence;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingSystem;
@@ -100,7 +101,7 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 	}
 
 	@Override
-	public void doWork(Void value) {
+	public void doWork(ByCalendar<Void> event, Void value) {
 		EventList<EventItem> dbLog = eventLogger.getDbLog();
 		dbLog.getReadWriteLock().writeLock().lock();
 

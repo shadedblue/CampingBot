@@ -8,6 +8,7 @@ import java.util.Map;
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
+import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
@@ -46,7 +47,7 @@ public abstract class AfdImagesStage<T> extends Stage implements CalendaredEvent
 	protected abstract ByFrequency<T> getFrequency();
 
 	@Override
-	public final void doWork(T value) {
+	public final void doWork(ByCalendar<T> event, T value) {
 		if (!bot.isOnline()) {
 			complete(false);
 			return;
