@@ -187,7 +187,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	}
 
 	public TextCommandResult finishRound(Long chatId) {
-		List<ResultFragment> frags = new ArrayList<>();
+		List<List<ResultFragment>> fragStages = new ArrayList<>();
 
 		List<CampingUser> targets = playerManager.getTargets();
 		Map<CampingUser, Integer> nextChoice = new HashMap<>(targets.size());
@@ -198,14 +198,19 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		CampingUser target = CollectionUtil.getRandom(targets);
 
 		int tossesLeft = (int) (Math.random() * targets.size() * MAX_TOSSES);
-		frags.add(new TextFragment("THIS POTATO HAVE " + tossesLeft + " TOSSES BEFORE BOOM-BOOM\n"));
-		frags.add(ResultFragment.NEWLINE);
+		List<ResultFragment> stage = new ArrayList<>();
+		stage.add(new TextFragment("THIS POTATO HAVE " + tossesLeft + " TOSSES BEFORE BOOM-BOOM\n"));
+		stage.add(ResultFragment.NEWLINE);
+		fragStages.add(stage);
+
+		AybBetweenRoundsImages betweenRounds = null;
+
 		while (true) {
+			stage = new ArrayList<>();
+			stage.add(new TextFragment("" + tossesLeft));
+			stage.add(new TextFragment(" left: "));
 
-			frags.add(new TextFragment("" + tossesLeft));
-			frags.add(new TextFragment(" left: "));
-
-			frags.add(new MentionFragment(target));
+			stage.add(new MentionFragment(target));
 			int index = nextChoice.get(target);
 			List<CampingUser> votes = playerManager.getVotes(target);
 			CampingUser nextTarget = null;
@@ -232,11 +237,11 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 					e.printStackTrace();
 				}
 
-				frags.add(new TextFragment(" ... BOOM!", TextStyle.Bold));
+				stage.add(new TextFragment(" ... BOOM!", TextStyle.Bold));
 				playerManager.advance(target);
 				bannerMessage = null;
 
-				AybBetweenRoundsImages betweenRounds = new AybBetweenRoundsImages(bot, target);
+				betweenRounds = new AybBetweenRoundsImages(bot, target);
 				if (targets.size() == 1) {
 					CampingUser winner = targets.get(0);
 					fullGameStage.complete(true);
@@ -267,21 +272,21 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 						}
 					});
 				}
-				betweenRounds.begin();
+				fragStages.add(stage);
 				break;
 			} else {
-				frags.add(new TextFragment(" chose "));
-				frags.add(new MentionFragment(nextTarget));
-//				result.newLine();
-				frags.add(ResultFragment.NEWLINE);
+				stage.add(new TextFragment(" chose "));
+				stage.add(new MentionFragment(nextTarget));
+				stage.add(ResultFragment.NEWLINE);
 				nextChoice.put(target, index + 1);
 				target = nextTarget;
 			}
 
 			tossesLeft--;
+			fragStages.add(stage);
 		}
 
-		HotPotatoRevealJobDetails details = new HotPotatoRevealJobDetails(bot, chatId, frags);
+		HotPotatoRevealJobDetails details = new HotPotatoRevealJobDetails(bot, chatId, fragStages, betweenRounds);
 		StagedJob<HotPotatoRevealJobDetails> job = new StagedJob<HotPotatoRevealJobDetails>(details);
 		job.start();
 		return null;

@@ -59,6 +59,7 @@ public class MentionFragment extends ResultFragment {
 	}
 
 	public String getDisplayText() {
+		// TODO make display a field so that transform can work
 		String display;
 		switch (displayMode) {
 		case Nickname:

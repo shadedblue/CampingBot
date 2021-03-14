@@ -1,38 +1,35 @@
 package ca.hapke.campingbot.afd2021;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import ca.hapke.campingbot.CampingBot;
-import ca.hapke.campingbot.commands.api.CommandType;
-import ca.hapke.campingbot.response.SendResult;
-import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.commands.UpdatingMessageJobDetails;
+import ca.hapke.campingbot.processors.BlotProcessor;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
-import ca.hapke.campingbot.util.JobDetails;
+import ca.hapke.campingbot.users.CampingUser;
 
 /**
  * @author Nathan Hapke
  */
-public class HotPotatoRevealJobDetails implements JobDetails {
+public class HotPotatoRevealJobDetails extends UpdatingMessageJobDetails {
+	private List<List<ResultFragment>> fragSets;
+	private BlotProcessor blotter;
+	private AybBetweenRoundsImages betweenRounds;
+	private int steps;
 
-	private static final CommandType cmd = AfdHotPotato.HotPotatoCommand;
-	private List<ResultFragment> frags;
-	private Message targetMessage;
-	private CampingBot bot;
-	private Long chatId;
-
-	public HotPotatoRevealJobDetails(CampingBot bot, Long chatId, List<ResultFragment> frags) {
-		this.bot = bot;
-		this.chatId = chatId;
-		this.frags = frags;
+	public HotPotatoRevealJobDetails(CampingBot bot, Long chatId, List<List<ResultFragment>> fragSets,
+			AybBetweenRoundsImages betweenRounds) {
+		super(bot, AfdHotPotato.HotPotatoCommand, chatId);
+		this.fragSets = fragSets;
+		this.betweenRounds = betweenRounds;
+		this.blotter = new BlotProcessor(true, BlotProcessor.blotsAll);
+		steps = fragSets.size() + 1;
 	}
 
 	@Override
 	public int getNumSteps() {
-		return 1;
-//		return frags.size();
+		return steps;
 	}
 
 	@Override
@@ -47,38 +44,46 @@ public class HotPotatoRevealJobDetails implements JobDetails {
 
 	@Override
 	public int getDelay(int step) {
-		return 2000;
+		return 1000;
 	}
 
 	@Override
 	public boolean doStep(int step, int attempt) {
+		List<ResultFragment> out = generateFragments(step);
+		CampingUser fromUser = bot.getMeCamping();
 		if (step == 0) {
-			TextCommandResult result = new TextCommandResult(cmd);
-			for (int i = 0; i < frags.size(); i++) {
-				ResultFragment frag = frags.get(i);
+			return attemptSend(fromUser, out);
+		} else if (step < fragSets.size()) {
+			boolean result = attemptEdit(fromUser, out);
+			return result;
+		} else {
+			betweenRounds.begin();
+			return true;
+		}
+//		return false;
+	}
+
+	protected List<ResultFragment> generateFragments(int step) {
+		List<ResultFragment> result = new ArrayList<>();
+		int i = 0;
+		for (; i <= step && i < fragSets.size(); i++) {
+			List<ResultFragment> stage = fragSets.get(i);
+			for (ResultFragment frag : stage) {
 				result.add(frag);
 			}
-			SendResult sendResult;
-			try {
-				sendResult = result.send(bot, chatId);
-				targetMessage = sendResult.outgoingMsg;
-				bot.logSendResult(targetMessage.getMessageId(), bot.getMeCamping(), chatId, cmd, result, sendResult);
-				return true;
-			} catch (TelegramApiException e) {
-				bot.logFailure(targetMessage.getMessageId(), bot.getMeCamping(), chatId, cmd, e);
-				return false;
-			}
-
-		} else {
-
 		}
-
-		return false;
+		if (i < fragSets.size()) {
+			List<ResultFragment> stage = fragSets.get(i);
+			for (ResultFragment frag : stage) {
+				ResultFragment f2 = frag.transform(blotter, true);
+				result.add(f2);
+			}
+		}
+		return result;
 	}
 
 	@Override
 	public boolean shouldAbort() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
