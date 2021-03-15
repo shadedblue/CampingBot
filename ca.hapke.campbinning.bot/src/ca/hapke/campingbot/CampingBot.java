@@ -11,7 +11,6 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.commands.BallBustingCommand;
 import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
@@ -28,6 +27,7 @@ import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.inline.HideItCommand;
 import ca.hapke.campingbot.commands.inline.NicknameCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
+import ca.hapke.campingbot.events.BallBustingEvent;
 import ca.hapke.campingbot.events.HappyNewYearEvent;
 import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.response.TextCommandResult;
@@ -51,8 +51,6 @@ public class CampingBot extends CampingBotEngine {
 
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
-	private BallBustingCommand ballBustingCommand;
-	private HappyNewYearEvent happyNewYear;
 	private PleasureModelCommand pleasureCommand;
 	private EnhanceCommand enhanceCommand;
 	private IunnoCommand iunnoCommand;
@@ -69,6 +67,9 @@ public class CampingBot extends CampingBotEngine {
 
 	private CalendarMonitor calMonitor;
 
+	private BallBustingEvent ballBustingEvent;
+	private HappyNewYearEvent happyNewYearEvent;
+
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
 	public static final ResponseCommandType LogStringCommand = new ResponseCommandType("LogString", 0);
@@ -83,7 +84,6 @@ public class CampingBot extends CampingBotEngine {
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
-		ballBustingCommand = new BallBustingCommand(this);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
 
 		rantCommand = new RantCommand(this);
@@ -92,10 +92,13 @@ public class CampingBot extends CampingBotEngine {
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
-		happyNewYear = new HappyNewYearEvent(this);
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 		statusCommand = new StatusCommand(hideItCommand);
+
+		happyNewYearEvent = new HappyNewYearEvent(this);
+		ballBustingEvent = new BallBustingEvent(this);
+
 		addStatusUpdate(statusCommand);
 
 		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, hypeCommand, partyCommand,
@@ -123,8 +126,8 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
-		addEvent(happyNewYear);
-		addEvent(ballBustingCommand);
+		addEvent(happyNewYearEvent);
+		addEvent(ballBustingEvent);
 		addEvent((CalendaredEvent<?>) serializer);
 	}
 

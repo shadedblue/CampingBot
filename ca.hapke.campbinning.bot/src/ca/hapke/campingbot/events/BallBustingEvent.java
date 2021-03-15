@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.commands;
+package ca.hapke.campingbot.events;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +25,9 @@ import ca.hapke.campingbot.util.ImageLink;
 /**
  * @author Nathan Hapke
  */
-public class BallBustingCommand implements CalendaredEvent<Integer> {
+public class BallBustingEvent implements CalendaredEvent<Integer> {
 
-	public static final ResponseCommandType BallBustingCommand = new ResponseCommandType("BallBusting",
+	public static final ResponseCommandType BallBustingEvent = new ResponseCommandType("BallBusting",
 			BotCommandIds.PLEASURE | BotCommandIds.GIF);
 
 	private TimesProvider<Integer> times = new TimesProvider<Integer>();
@@ -36,7 +36,7 @@ public class BallBustingCommand implements CalendaredEvent<Integer> {
 	private Map<Integer, String> bustingText = new HashMap<>();
 	private Map<Integer, ImageLink> bustingImgs = new HashMap<>();
 
-	public BallBustingCommand(CampingBot bot) {
+	public BallBustingEvent(CampingBot bot) {
 		this.bot = bot;
 		this.chatMgr = CampingChatManager.getInstance(bot);
 		Integer rtv = Integer.valueOf(558638791);
@@ -65,9 +65,9 @@ public class BallBustingCommand implements CalendaredEvent<Integer> {
 		for (CampingChat chat : chatMgr.getAnnounceChats()) {
 			CommandResult send;
 			if (img != null) {
-				send = new ImageCommandResult(BallBustingCommand, img);
+				send = new ImageCommandResult(BallBustingEvent, img);
 			} else if (text != null) {
-				send = new TextCommandResult(BallBustingCommand);
+				send = new TextCommandResult(BallBustingEvent);
 			} else {
 				return;
 			}
