@@ -25,7 +25,7 @@ import ca.hapke.campingbot.util.ImageLink;
 /**
  * @author Nathan Hapke
  */
-public class BallBustingCommand implements CalendaredEvent<Integer>/* , PostConfigInit */ {
+public class BallBustingCommand implements CalendaredEvent<Integer> {
 
 	public static final ResponseCommandType BallBustingCommand = new ResponseCommandType("BallBusting",
 			BotCommandIds.PLEASURE | BotCommandIds.GIF);
@@ -52,12 +52,6 @@ public class BallBustingCommand implements CalendaredEvent<Integer>/* , PostConf
 			bustingImgs.put(id, image);
 	}
 
-//	@Override
-//	public void init() {
-//		// TODO Auto-generated method stub
-//
-//	}
-
 	@Override
 	public TimesProvider<Integer> getTimeProvider() {
 		return times;
@@ -82,7 +76,6 @@ public class BallBustingCommand implements CalendaredEvent<Integer>/* , PostConf
 			send.add(text);
 			send.sendAndLog(bot, chat);
 		}
-
 	}
 
 	@Override
