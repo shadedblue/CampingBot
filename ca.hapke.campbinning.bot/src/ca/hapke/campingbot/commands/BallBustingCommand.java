@@ -40,7 +40,7 @@ public class BallBustingCommand implements CalendaredEvent<Integer>/* , PostConf
 		this.bot = bot;
 		this.chatMgr = CampingChatManager.getInstance(bot);
 		Integer rtv = Integer.valueOf(558638791);
-		times.add(new ByTimeOfYear<Integer>(3, 14, 19, 54, rtv));
+		times.add(new ByTimeOfYear<Integer>(3, 15, 10, 0, rtv));
 		addContent(rtv, new ImageLink("http://www.hapke.ca/images/ballbusting/rtv-koreans.mp4", ImageLink.GIF),
 				": HAPPY BIRTHDAY FROM THESE KOREAN TRANNIES!");
 	}
