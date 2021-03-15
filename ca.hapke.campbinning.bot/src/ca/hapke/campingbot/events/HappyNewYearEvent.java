@@ -21,6 +21,7 @@ public class HappyNewYearEvent implements CalendaredEvent<Void> {
 	private TimesProvider<Void> times = new TimesProvider<Void>(new ByTimeOfYear<Void>(1, 1, 0, 0, null));
 	private CampingBotEngine bot;
 	private CampingChatManager chatMgr;
+	private ImageLink image = new ImageLink("http://www.hapke.ca/images/farva-spray.gif", ImageLink.GIF);
 
 	public HappyNewYearEvent(CampingBotEngine bot) {
 		this.bot = bot;
@@ -35,7 +36,6 @@ public class HappyNewYearEvent implements CalendaredEvent<Void> {
 	@Override
 	public void doWork(ByCalendar<Void> event, Void value) {
 		for (CampingChat chat : chatMgr.getAnnounceChats()) {
-			ImageLink image = new ImageLink("http://www.hapke.ca/images/farva-spray.gif", ImageLink.GIF);
 			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
 			send.add(HNY_CAPTION);
 

@@ -7,9 +7,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
+import ca.hapke.campingbot.commands.BallBustingCommand;
 import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
@@ -49,6 +51,7 @@ public class CampingBot extends CampingBotEngine {
 
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
+	private BallBustingCommand ballBustingCommand;
 	private HappyNewYearEvent happyNewYear;
 	private PleasureModelCommand pleasureCommand;
 	private EnhanceCommand enhanceCommand;
@@ -80,6 +83,7 @@ public class CampingBot extends CampingBotEngine {
 		databaseConsumer = new DatabaseConsumer(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
+		ballBustingCommand = new BallBustingCommand(this);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
 
 		rantCommand = new RantCommand(this);
@@ -99,6 +103,10 @@ public class CampingBot extends CampingBotEngine {
 
 		hasCategories.add(insultGenerator);
 		quantityCommand = new QuantityCommand(hasCategories);
+	}
+
+	@Override
+	protected void addCommandsAndEvents() {
 		addCommand(quantityCommand);
 		addCommand(spellCommand);
 		addCommand(nicknameCommand);
@@ -115,19 +123,31 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
+		addEvent(happyNewYear);
+		addEvent(ballBustingCommand);
+		addEvent((CalendaredEvent<?>) serializer);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addCommand(AbstractCommand command) {
 		super.addCommand(command);
-		if (command instanceof HasCategories) {
+		if (command instanceof HasCategories<?>) {
 			try {
 				hasCategories.add((HasCategories<String>) command);
 			} catch (Exception e) {
 				// Ignore if it's not a <String>
 			}
 		}
+
+		if (command instanceof CalendaredEvent<?>) {
+			addEvent((CalendaredEvent<?>) command);
+		}
+	}
+
+	protected void addEvent(CalendaredEvent<?> hasCal) {
+		calMonitor = CalendarMonitor.getInstance();
+		calMonitor.add(hasCal);
 	}
 
 	@Override
@@ -158,14 +178,15 @@ public class CampingBot extends CampingBotEngine {
 	@Override
 	protected void postConfigInit() {
 		res.loadAllEmoji();
-		ballsCommand.init();
+		super.postConfigInit();
+		calMonitor.start();
+//		ballsCommand.init();
 
-		calMonitor = CalendarMonitor.getInstance();
-		calMonitor.add((ConfigXmlSerializer) serializer);
-		calMonitor.add(databaseConsumer);
-		calMonitor.add(ballsCommand);
-		calMonitor.add(rantCommand);
-		calMonitor.add(happyNewYear);
+//		calMonitor.add((ConfigXmlSerializer) serializer);
+//		calMonitor.add(databaseConsumer);
+//		calMonitor.add(ballsCommand);
+//		calMonitor.add(rantCommand);
+//		calMonitor.add(happyNewYear);
 	}
 
 	public Resources getRes() {

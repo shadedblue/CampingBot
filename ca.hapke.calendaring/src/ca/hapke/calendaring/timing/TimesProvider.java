@@ -35,8 +35,7 @@ public class TimesProvider<T> {
 	}
 
 	public TimesProvider(List<ByCalendar<T>> inputs) {
-		times.addAll(inputs);
-		generateNearestEvents();
+		addAll(inputs);
 	}
 
 	public TimesProvider(ByCalendar<T> input) {
@@ -45,6 +44,11 @@ public class TimesProvider<T> {
 
 	public void add(ByCalendar<T> input) {
 		times.add(input);
+		generateNearestEvents();
+	}
+
+	public void addAll(List<ByCalendar<T>> inputs) {
+		times.addAll(inputs);
 		generateNearestEvents();
 	}
 

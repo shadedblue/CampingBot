@@ -24,6 +24,7 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
+import ca.hapke.campingbot.api.PostConfigInit;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
@@ -51,7 +52,7 @@ import ca.odell.glazedlists.EventList;
 /**
  * @author Nathan Hapke
  */
-public class MbiyfCommand extends AbstractCommand implements TextCommand, CalendaredEvent<MbiyfMode> {
+public class MbiyfCommand extends AbstractCommand implements TextCommand, CalendaredEvent<MbiyfMode>, PostConfigInit {
 
 	public static final ResponseCommandType MbiyfAnnouncementCommand = new ResponseCommandType("MbiyfAnnouncement",
 			BotCommandIds.BALLS | BotCommandIds.SET);
@@ -76,7 +77,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	private Resources res;
 	private boolean enabled = false;
 	private boolean shouldAnnounce = false;
-	private TimesProvider<MbiyfMode> times;
+	private TimesProvider<MbiyfMode> times = new TimesProvider<>();
 	private List<CampingUser> userRestriction;
 	private MbiyfType mode = MbiyfType.Off;
 	private CategoriedItems<ImageLink> mbiyfImages;
@@ -107,6 +108,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		}
 	}
 
+	@Override
 	public void init() {
 		CampingUserMonitor monitor = CampingUserMonitor.getInstance();
 		List<ByCalendar<MbiyfMode>> targets = new ArrayList<>();
@@ -147,7 +149,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		ByTimeOfYear<MbiyfMode> disableSpecial = createDisableAfter(enableSpecialTime, len, unit);
 		targets.add(disableSpecial);
 
-		times = new TimesProvider<MbiyfMode>(targets);
+		times.addAll(targets);
 		shouldAnnounce = true;
 	}
 

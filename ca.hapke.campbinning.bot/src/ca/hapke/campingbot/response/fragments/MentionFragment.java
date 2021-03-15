@@ -21,6 +21,10 @@ public class MentionFragment extends ResultFragment {
 		this(target, MentionDisplay.Nickname, CaseChoice.Normal, textStyle, null, null);
 	}
 
+	public MentionFragment(CampingUser target, CaseChoice caseChoice) {
+		this(target, MentionDisplay.Nickname, caseChoice, TextStyle.Normal, null, null);
+	}
+
 	public MentionFragment(CampingUser target, MentionDisplay displayMode, CaseChoice caseChoice) {
 		this(target, displayMode, caseChoice, TextStyle.Normal, null, null);
 	}

@@ -87,9 +87,9 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected InsultGenerator insultGenerator = InsultGenerator.getInstance();
 	protected ConfigSerializer serializer;
 	protected List<HasCategories<String>> hasCategories = new ArrayList<>();
+	private List<PostConfigInit> wantsInits = new ArrayList<>();
 
 	private class ConnectionMonitor implements IStatus {
-
 		@Override
 		public void statusOffline() {
 			online = false;
@@ -102,19 +102,16 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 		@Override
 		public void statusMeProvided(CampingUser me) {
-
 		}
 
 		@Override
 		public void connectFailed(TelegramApiException e) {
 			online = false;
 		}
-
 	}
 
 	public CampingBotEngine() {
 		statusMonitors.add(new ConnectionMonitor());
-
 	}
 
 	public final void init() {
@@ -133,6 +130,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 				break;
 			}
 		}
+		addCommandsAndEvents();
 		postConfigInit();
 		if (system.isConnectOnStartup()) {
 			new Thread("ConnectOnStartup") {
@@ -144,7 +142,13 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 	}
 
-	protected abstract void postConfigInit();
+	protected abstract void addCommandsAndEvents();
+
+	protected void postConfigInit() {
+		for (PostConfigInit initable : wantsInits) {
+			initable.init();
+		}
+	}
 
 	public void connect() {
 		try {
@@ -607,6 +611,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					slashCommandMap.put(key.slashCommand, key);
 				}
 			}
+		}
+		if (command instanceof PostConfigInit) {
+			PostConfigInit initable = (PostConfigInit) command;
+			wantsInits.add(initable);
 		}
 	}
 

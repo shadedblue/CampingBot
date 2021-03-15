@@ -20,7 +20,7 @@ public class CalendarMonitor extends TimerThreadWithKill {
 	public static CalendarMonitor getInstance() {
 		if (instance == null || instance.kill) {
 			instance = new CalendarMonitor();
-			instance.start();
+//			instance.start();
 		}
 		return instance;
 	}
@@ -70,12 +70,28 @@ public class CalendarMonitor extends TimerThreadWithKill {
 	}
 
 	public <T> boolean add(CalendaredEvent<T> e) {
+		if (calendaredEvents.contains(e))
+			return false;
+
+		if (isRunning()) {
+			startEvent(e);
+		}
+		return calendaredEvents.add(e);
+	}
+
+	@Override
+	protected void startupCode() {
+		for (CalendaredEvent<?> e : calendaredEvents) {
+			startEvent(e);
+		}
+	}
+
+	protected <T> void startEvent(CalendaredEvent<T> e) {
 		StartupMode startupMode = e.getStartupMode();
 		if (startupMode == StartupMode.Always || startupMode == StartupMode.Conditional) {
 			TimesProvider<T> timeProvider = e.getTimeProvider();
 			invoke(e, timeProvider, timeProvider.getMostNearestPast());
 		}
-		return calendaredEvents.add(e);
 	}
 
 	public void updateAllNextTimes() {
