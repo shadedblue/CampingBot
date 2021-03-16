@@ -98,9 +98,8 @@ public class CampingBot extends CampingBotEngine {
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
-		potatoCommand = new AfdHotPotato(this);
-		afdPics = new AybBeginningImages(this);
-		afdEnabler = new AprilFoolsDayEnabler(afdPics, potatoCommand);
+		potatoCommand = new AfdHotPotato(this, res);
+		afdEnabler = new AprilFoolsDayEnabler(this, potatoCommand);
 
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
@@ -136,9 +135,9 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
-		
-		// TODO remove
+
 		addCommand(potatoCommand);
+		addEvent(afdEnabler);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);
 		addEvent((CalendaredEvent<?>) serializer);
@@ -196,12 +195,6 @@ public class CampingBot extends CampingBotEngine {
 		res.loadAllEmoji();
 		super.postConfigInit();
 		calMonitor.start();
-
-//		calMonitor.add((ConfigXmlSerializer) serializer);
-//		calMonitor.add(databaseConsumer);
-//		calMonitor.add(ballsCommand);
-//		calMonitor.add(rantCommand);
-//		calMonitor.add(happyNewYear);
 	}
 
 	public Resources getRes() {

@@ -36,7 +36,7 @@ public class RantTracker extends VoteTracker<Integer> {
 
 	@Override
 	public float getScore() {
-		Map<Integer, Integer> valueMap = cluster.getValueMap();
+		Map<Long, Integer> valueMap = cluster.getValueMap();
 		return averageVoteValues(valueMap);
 	}
 

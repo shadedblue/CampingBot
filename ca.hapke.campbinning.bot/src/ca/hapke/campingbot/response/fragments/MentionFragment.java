@@ -75,7 +75,7 @@ public class MentionFragment extends ResultFragment {
 		display = markup(display);
 
 		if (useMarkupV2) {
-			int telegramId = target.getTelegramId();
+			long telegramId = target.getTelegramId();
 			return "[" + display + "](tg://user?id=" + telegramId + ")";
 		} else {
 			return display;

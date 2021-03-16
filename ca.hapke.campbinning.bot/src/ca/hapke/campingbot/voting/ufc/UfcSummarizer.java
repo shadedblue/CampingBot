@@ -49,7 +49,7 @@ public class UfcSummarizer {
 
 	private class UpdateListener extends VoteChangedAdapter<Integer> {
 		@Override
-		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 			if (roundToTrackerMap.size() >= fight.rounds) {
 				sendOrUpdate(user);
 			}
@@ -72,18 +72,18 @@ public class UfcSummarizer {
 		} else {
 			result = new EditTextCommandResult(UfcCommand.SlashUfcActivation, msg);
 		}
-		
+
 		// build the score-cards from scratch
 		// TODO when a person votes for the first time, build their card then, and update it on the fly
 		for (Entry<Integer, UfcTracker> e : roundToTrackerMap.entrySet()) {
 			Integer round = e.getKey();
 			UfcTracker tracker = e.getValue();
 			VoteCluster<Integer> cluster = tracker.getCluster();
-			Map<CampingUser, Integer> votes = cluster.getVotes();
-			for (Entry<CampingUser, Integer> voteEntry : votes.entrySet()) {
+			Map<CampingUser, Long> votes = cluster.getVotes();
+			for (Entry<CampingUser, Long> voteEntry : votes.entrySet()) {
 				CampingUser user = voteEntry.getKey();
-				int vote = voteEntry.getValue();
-				fight.setVote(user, round, vote);
+				long vote = voteEntry.getValue();
+				fight.setVote(user, round, (int) vote);
 			}
 		}
 

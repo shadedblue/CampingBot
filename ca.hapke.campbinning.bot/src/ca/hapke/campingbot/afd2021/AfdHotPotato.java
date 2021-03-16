@@ -1,10 +1,10 @@
 package ca.hapke.campingbot.afd2021;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -12,7 +12,15 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
+import ca.hapke.calendaring.event.StartupMode;
+import ca.hapke.calendaring.monitor.CalendarMonitor;
+import ca.hapke.calendaring.timing.ByCalendar;
+import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.Resources;
+import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
+import ca.hapke.campingbot.api.PostConfigInit;
 import ca.hapke.campingbot.callback.api.CallbackCommand;
 import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.channels.CampingChat;
@@ -20,8 +28,6 @@ import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
-import ca.hapke.campingbot.commands.api.SlashCommand;
-import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.EditCaptionCommandResult;
@@ -39,36 +45,25 @@ import ca.hapke.campingbot.util.StagedJob;
 import ca.hapke.util.CollectionUtil;
 import ca.hapke.util.StringUtil;
 
-/**
- * Callback format for ids: (1) telegramId they're voting for.
+/*-
+ * Callback format for ids: 
+ * (0) chatId they're voting inside of 
+ * (1) telegramId they're voting for.
  * 
  * @author Nathan Hapke
  */
-public class AfdHotPotato extends AbstractCommand implements CallbackCommand, SlashCommand, IStage {
-
+public class AfdHotPotato extends AbstractCommand
+		implements CallbackCommand, IStage, CalendaredEvent<Void>, PostConfigInit {
 	private static final String POTATO = "potato";
 	private static final String HOT_POTATO = "HotPotato";
-	private static final String RESULT = "result";
-	private static final String HOT_POTATO_RESULT = "HotPotatoResult";
-	// TODO Remove, only for testing
-	public static final SlashCommandType SlashPotato = new SlashCommandType(HOT_POTATO, POTATO,
-			BotCommandIds.SILLY_RESPONSE | BotCommandIds.VOTING | BotCommandIds.USE);
-	public static final SlashCommandType SlashResult = new SlashCommandType(HOT_POTATO_RESULT, RESULT,
-			BotCommandIds.SILLY_RESPONSE | BotCommandIds.VOTING | BotCommandIds.FINISH);
-	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashPotato, SlashResult };
-
-	@Override
-	public SlashCommandType[] getSlashCommandsToRespondTo() {
-		return SLASH_COMMANDS;
-	}
 
 	public static final ResponseCommandType HotPotatoCommand = new ResponseCommandType(HOT_POTATO,
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.VOTING | BotCommandIds.USE);
 	static final int MAX_TOSSES = 5;
+
 	private CampingBot bot;
 
-	// TODO should be a Map based on channel
-	private Message bannerMessage;
+	private Map<Long, Message> bannerMessageByChatId = new HashMap<>();
 	private List<CampingChat> allowedChats;
 
 	private final CampingChatManager chatMonitor;
@@ -77,34 +72,53 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	private AfdPlayerManager playerManager;
 	private ImageLink noChance = AfdImagesStage.getAybImgUrl("sr", 1);
 
-	public AfdHotPotato(CampingBot bot) {
+	private TimesProvider<Void> times = new TimesProvider<>();
+	private boolean calendarActivated = false;
+	private Resources res;
+	private AybTopicChanger topicChanger;
+
+	public AfdHotPotato(CampingBot bot, Resources res) {
 		this.bot = bot;
+		this.res = res;
 		this.playerManager = new AfdPlayerManager();
 		userMonitor = CampingUserMonitor.getInstance();
 		chatMonitor = CampingChatManager.getInstance(bot);
 		allowedChats = chatMonitor.getAnnounceChats();
+		topicChanger = new AybTopicChanger(bot, res);
 	}
 
+	@Override
 	public void init() {
-		// TODO add all users
 		playerManager.add(554436051, "NH");
 		playerManager.add(763960317, "RH");
 		playerManager.add(1053967313, "CDB");
+		//
+//		playerManager.add(642767839, "AA");
+//		playerManager.add(708570894, "JA");
+//		playerManager.add(696411365, "JM");
+//		playerManager.add(558638791, "RTV");
+//		playerManager.add(768167311, "JB");
+//		playerManager.add(720319686, "RS");
+//		playerManager.add(898821867, "DM");
+//		playerManager.add(943017286, "KA");
 	}
 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
 		CampingUser user = userMonitor.monitor(callbackQuery.getFrom());
-		int fromUserId = user.getTelegramId();
+		long fromUserId = user.getTelegramId();
 
 		List<CampingUser> votes = playerManager.getVotes(fromUserId);
 		int n = votes.size();
 		String resultText;
+
+		long[] ids = id.getIds();
+		long chatId = ids[0];
+		long targetId = ids[1];
+
 		if (n >= MAX_TOSSES) {
 			resultText = "NO MORE THROWS OF THE BOMB!";
 		} else {
-			int[] ids = id.getIds();
-			int targetId = ids[0];
 			CampingUser votedFor = userMonitor.getUser(targetId);
 			votes.add(votedFor);
 			n++;
@@ -116,8 +130,9 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		answer.setCallbackQueryId(callbackQuery.getId());
 		try {
 			bot.execute(answer);
-			return new EventItem(HotPotatoCommand, user, null, chatMonitor.get(bannerMessage.getChat().getId()),
-					bannerMessage.getMessageId(), resultText, null);
+			Message bannerMessage = bannerMessageByChatId.get(chatId);
+			return new EventItem(HotPotatoCommand, user, null, chatMonitor.get(chatId), bannerMessage.getMessageId(),
+					resultText, null);
 		} catch (Exception e) {
 			return new EventItem(e.getLocalizedMessage());
 		}
@@ -129,23 +144,9 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	}
 
 	@Override
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
-			CampingUser campingFromUser) throws TelegramApiException {
-		// SAFETY FOR TESTING
-		if (!chatAllowed(chatId))
-			return null;
-
-		if (command == SlashPotato && bannerMessage == null) {
-			CampingChat chat = CampingChatManager.getInstance(bot).get(chatId);
-			List<CommandResult> results = beginRound(Collections.singletonList(chat));
-			CommandResult result = results.get(0);
-			return result;
-		} else if (command == SlashResult) {
-			CommandResult result = finishRound(chatId);
-
-			return result;
-		} else {
-			return null;
+	public void doWork(ByCalendar<Void> timingEvent, Void value) {
+		for (CampingChat chat : allowedChats) {
+			finishRound(chat.getChatId());
 		}
 	}
 
@@ -153,25 +154,32 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	public void begin() {
 		try {
 			beginRound(allowedChats);
-			// TODO set topic to 'All your base bros'
+			if (!calendarActivated) {
+				calendarActivated = true;
+				times.add(AprilFoolsDayEnabler.ROUND_LENGTH);
+			}
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public List<CommandResult> beginRound(List<CampingChat> chats) throws TelegramApiException {
-		List<CommandResult> out = new ArrayList<>();
+	public void beginRound(List<CampingChat> chats) throws TelegramApiException {
 		roundNumber++;
+		Consumer<CampingChat> changer = topicChanger.createTopicChanger();
+
 		for (CampingChat chat : chats) {
 			ImageCommandResult result = new ImageCommandResult(HotPotatoCommand, noChance);
 			addRoundNumber(result);
-			result.setKeyboard(createVotingKeyboard());
+			long chatId = chat.getChatId();
+			result.setKeyboard(createVotingKeyboard(chatId));
 
-			SendResult sent = result.send(bot, chat.chatId);
-			bannerMessage = sent.outgoingMsg;
-			out.add(result);
+			SendResult sent = result.sendAndLog(bot, chat);
+			Message bannerMessage = sent.outgoingMsg;
+			bannerMessageByChatId.put(chatId, bannerMessage);
+
+			// --------
+			changer.accept(chat);
 		}
-		return out;
 
 	}
 
@@ -230,6 +238,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 			if (boom || nextTarget == null) {
 
 				try {
+					Message bannerMessage = bannerMessageByChatId.get(chatId);
 					EditCaptionCommandResult editBanner = new EditCaptionCommandResult(HotPotatoCommand, bannerMessage);
 					addRoundNumber(editBanner);
 					editBanner.sendAndLog(bot, null);
@@ -240,7 +249,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 
 				stage.add(new TextFragment(" ...", TextStyle.Bold));
 				playerManager.advance(target);
-				bannerMessage = null;
+				bannerMessageByChatId.remove(chatId);
 
 				betweenRounds = createImagesBetweenStages(targets, target);
 				fragStages.add(stage);
@@ -276,6 +285,9 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 
 				@Override
 				public void stageComplete(boolean success) {
+					times.clear();
+					calendarActivated = false;
+					CalendarMonitor.getInstance().remove(AfdHotPotato.this);
 					AybEndGameImages endImages = new AybEndGameImages(bot, winner);
 					endImages.begin();
 				}
@@ -299,15 +311,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		return betweenRounds;
 	}
 
-	private boolean chatAllowed(Long chatId) {
-		for (CampingChat cc : allowedChats) {
-			if (cc.chatId == chatId)
-				return true;
-		}
-		return false;
-	}
-
-	private ReplyKeyboard createVotingKeyboard() {
+	private ReplyKeyboard createVotingKeyboard(long chatId) {
 		List<CampingUser> targets = playerManager.getTargets();
 
 		int n = targets.size();
@@ -316,7 +320,7 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 		for (int i = 0; i < n; i++) {
 			CampingUser user = targets.get(i);
 			buttons[i] = playerManager.getInitials(user);
-			CallbackId id = new CallbackId(POTATO, roundNumber, user.getTelegramId());
+			CallbackId id = new CallbackId(POTATO, roundNumber, chatId, user.getTelegramId());
 			values[i] = id.getResult();
 		}
 		return createKeyboard(buttons, values);
@@ -348,6 +352,25 @@ public class AfdHotPotato extends AbstractCommand implements CallbackCommand, Sl
 	@Override
 	public boolean remove(StageListener e) {
 		return fullGameStage.remove(e);
+	}
+
+	@Override
+	public TimesProvider<Void> getTimeProvider() {
+		return times;
+	}
+
+	@Override
+	public boolean shouldRun() {
+		return calendarActivated;
+	}
+
+	@Override
+	public StartupMode getStartupMode() {
+		return StartupMode.Never;
+	}
+
+	public AybTopicChanger getTopicChanger() {
+		return topicChanger;
 	}
 
 }

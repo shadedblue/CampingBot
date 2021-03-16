@@ -20,7 +20,7 @@ import ca.hapke.campingbot.util.ImageLink;
  * @author Nathan Hapke
  */
 public class ImageCommandResult extends CommandResult {
-	private enum SendMode {
+	enum SendMode {
 		Url,
 		File;
 	}

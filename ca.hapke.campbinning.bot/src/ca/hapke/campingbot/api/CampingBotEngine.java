@@ -118,7 +118,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		serializer.load();
 		FilterList<CampingUser> admins = userMonitor.getAdminUsers();
 		for (CampingUser admin : admins) {
-			CampingChat chat = chatManager.get((long) admin.getTelegramId());
+			CampingChat chat = chatManager.get(admin.getTelegramId());
 			ChatAllowed current = chat.getAllowed();
 			switch (current) {
 			case Allowed:
@@ -562,8 +562,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	private boolean isBetterSelection(boolean frontToBack, int offset, int currentOffset, CampingUser currentChoice,
 			CampingUser possibleChoice, BotChoicePriority priority) {
-		int possibleId = possibleChoice.getTelegramId();
-		int myId = meCamping.getTelegramId();
+		long possibleId = possibleChoice.getTelegramId();
+		long myId = meCamping.getTelegramId();
 		if (possibleId == myId && priority == BotChoicePriority.Never)
 			return false;
 		if (possibleId != myId && priority == BotChoicePriority.Only)

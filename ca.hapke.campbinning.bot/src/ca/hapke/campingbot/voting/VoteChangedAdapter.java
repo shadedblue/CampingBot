@@ -11,17 +11,17 @@ import ca.hapke.campingbot.users.CampingUser;
 public class VoteChangedAdapter<T> implements VoteChangedListener<T> {
 
 	@Override
-	public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+	public EventItem changed(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 		return null;
 	}
 
 	@Override
-	public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+	public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 		return null;
 	}
 
 	@Override
-	public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+	public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 		return null;
 	}
 

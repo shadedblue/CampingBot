@@ -36,7 +36,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 		private boolean firstAction = false;
 
 		@Override
-		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 			if (firstAction == false) {
 				firstAction = true;
 				new DelayThenCreate(currentRound.getRound() < currentRound.getRounds()).start();
@@ -45,7 +45,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 		}
 
 		@Override
-		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 			new DelayThenCreate(false).start();
 			return null;
 		}
@@ -193,9 +193,9 @@ public class UfcCommand extends VotingCommand<Integer> {
 	@Override
 	protected String createKey(CallbackId id) {
 		int messageId = id.getUpdateId();
-		int[] ids = id.getIds();
-		int fightId = ids[0];
-		int round = ids[1];
+		long[] ids = id.getIds();
+		long fightId = ids[0];
+		long round = ids[1];
 		return messageId + AbstractCommand.DELIMITER + fightId + AbstractCommand.DELIMITER + round;
 	}
 

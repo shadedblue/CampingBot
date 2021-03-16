@@ -56,16 +56,26 @@ public abstract class AfdImagesStage<T> extends Stage implements CalendaredEvent
 			complete(true);
 			return;
 		}
-		ImageLink image = images.get(i);
-		for (CampingChat chat : announceChats) {
-			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
-			String caption = captionMap.get(image);
-			if (caption != null)
-				send.add(caption);
+		try {
+			ImageLink image = images.get(i);
+			for (CampingChat chat : announceChats) {
+				doStep(chat, i);
+				ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
+				String caption = captionMap.get(image);
+				if (caption != null)
+					send.add(caption);
 
-			send.sendAndLog(bot, chat);
+				send.sendAndLog(bot, chat);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		i++;
+	}
+
+	protected void doStep(CampingChat chat, int step) {
+
 	}
 
 	@Override
@@ -92,7 +102,7 @@ public abstract class AfdImagesStage<T> extends Stage implements CalendaredEvent
 		return times;
 	}
 
-	protected static ImageLink getAybImgUrl(String category, int i) {
+	protected static ImageLink getAybImgUrl(String category, long i) {
 		return new ImageLink(
 				"http://www.hapke.ca/images/afd21/ayb-" + category + "-" + (i < 10 ? "0" : "") + i + ".png",
 				ImageLink.STATIC);

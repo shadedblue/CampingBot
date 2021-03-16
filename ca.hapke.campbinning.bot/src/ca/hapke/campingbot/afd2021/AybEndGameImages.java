@@ -1,12 +1,12 @@
 package ca.hapke.campingbot.afd2021;
 
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
 
@@ -31,7 +31,7 @@ public class AybEndGameImages extends AfdImagesStage<Void> {
 
 	@Override
 	protected ByFrequency<Void> getFrequency() {
-		return new ByFrequency<Void>(null, 5, ChronoUnit.SECONDS);
+		return AprilFoolsDayEnabler.BETWEEN_IMAGES;
 	}
 
 	@Override

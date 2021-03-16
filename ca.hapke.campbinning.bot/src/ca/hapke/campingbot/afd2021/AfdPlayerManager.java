@@ -20,7 +20,7 @@ public class AfdPlayerManager {
 
 	private final CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 
-	public void add(int id, String initials) {
+	public void add(long id, String initials) {
 		CampingUser user = userMonitor.getUser(id);
 		initialsMap.put(user, initials);
 		targets.add(user);
@@ -35,7 +35,7 @@ public class AfdPlayerManager {
 		return votes;
 	}
 
-	public List<CampingUser> getVotes(int user) {
+	public List<CampingUser> getVotes(long user) {
 		return getVotes(userMonitor.getUser(user));
 	}
 

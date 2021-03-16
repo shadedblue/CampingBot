@@ -23,11 +23,11 @@ import ca.hapke.campingbot.processors.MessageProcessor;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
+import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
-import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.hapke.util.StringUtil;
@@ -71,7 +71,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 		String[] words = input.split(" ");
 		List<ResultFragment> out = new ArrayList<>(2 * words.length - 1);
 		String converted = null;
-		List<Integer> convertedIds = new ArrayList<>();
+		List<Long> convertedIds = new ArrayList<>();
 		for (int i = 0; i < words.length; i++) {
 			String word = words[i];
 			ResultFragment frag = null;
@@ -117,7 +117,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 
 	@Override
 	public EventItem chosenInlineQuery(Update update, CallbackId id, CampingUser campingFromUser, String resultText) {
-		int[] ids = id.getIds();
+		long[] ids = id.getIds();
 		List<String> targets = new ArrayList<>(ids.length);
 		for (int i = 0; i < ids.length; i++) {
 			CampingUser target = userMonitor.getUser(ids[i]);

@@ -34,11 +34,11 @@ public abstract class AbstractCommand {
 		return board;
 	}
 
-	public CallbackId createQueryId(int updateId, int... ids) {
+	public CallbackId createQueryId(int updateId, long... ids) {
 		return new CallbackId(getCommandName(), updateId, ids);
 	}
 
-	public CallbackId createQueryId(int updateId, List<Integer> ids) {
+	public CallbackId createQueryId(int updateId, List<Long> ids) {
 		return new CallbackId(getCommandName(), updateId, ids);
 	}
 

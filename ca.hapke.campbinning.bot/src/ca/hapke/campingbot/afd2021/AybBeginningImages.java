@@ -1,11 +1,13 @@
 package ca.hapke.campingbot.afd2021;
 
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.util.ImageLink;
 
 /**
@@ -16,14 +18,16 @@ public class AybBeginningImages extends AfdImagesStage<Void> {
 	private static final int FIRST_IMAGE = 1;
 //	private static final int FIRST_IMAGE = 8;
 	private static final int LAST_IMAGE = 8;
+	private Consumer<CampingChat> topicChanger;
 
-	public AybBeginningImages(CampingBot bot) {
+	public AybBeginningImages(CampingBot bot, AybTopicChanger topicChanger) {
 		super(bot);
+		this.topicChanger = topicChanger.createTopicChanger();
 	}
 
 	@Override
 	protected ByFrequency<Void> getFrequency() {
-		return new ByFrequency<Void>(null, 5, ChronoUnit.SECONDS);
+		return AprilFoolsDayEnabler.BETWEEN_IMAGES;
 	}
 
 	@Override
@@ -32,4 +36,13 @@ public class AybBeginningImages extends AfdImagesStage<Void> {
 			images.add(getAybImgUrl("b", i));
 		}
 	}
+
+	@Override
+	protected void doStep(CampingChat chat, int step) {
+		if (step == 0) {
+			topicChanger.accept(chat);
+		}
+		super.doStep(chat, step);
+	}
+
 }

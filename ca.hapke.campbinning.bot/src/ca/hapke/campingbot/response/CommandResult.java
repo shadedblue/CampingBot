@@ -175,8 +175,16 @@ public abstract class CommandResult {
 
 				Message outgoingMsg = result.outgoingMsg;
 				String text = getTextForLog(outgoingMsg);
-				EventItem ei = new EventItem(getCmd(), bot.getMeCamping(), outgoingMsg.getDate(), chat,
-						outgoingMsg.getMessageId(), text, null);
+				Integer date;
+				Integer messageId;
+				if (outgoingMsg != null) {
+					date = outgoingMsg.getDate();
+					messageId = outgoingMsg.getMessageId();
+				} else {
+					date = null;
+					messageId = null;
+				}
+				EventItem ei = new EventItem(getCmd(), bot.getMeCamping(), date, chat, messageId, text, null);
 				logger.add(ei);
 			} catch (TelegramApiException e) {
 				logger.add(new EventItem(e.getLocalizedMessage()));
@@ -186,7 +194,10 @@ public abstract class CommandResult {
 	}
 
 	protected String getTextForLog(Message outgoingMsg) {
-		return outgoingMsg.getText();
+		if (outgoingMsg == null)
+			return "";
+		else
+			return outgoingMsg.getText();
 	}
 
 	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;

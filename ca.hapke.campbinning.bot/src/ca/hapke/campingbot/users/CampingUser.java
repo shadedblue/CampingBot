@@ -57,7 +57,7 @@ public class CampingUser {
 
 	}
 
-	private int telegramId = -1;
+	private long telegramId = -1;
 	private final int campingId;
 	private String username;
 	private String firstname;
@@ -79,7 +79,7 @@ public class CampingUser {
 		support.removePropertyChangeListener(pcl);
 	}
 
-	public CampingUser(int telegramId, String username, String firstname, String lastname) {
+	public CampingUser(long telegramId, String username, String firstname, String lastname) {
 		this.campingId = CampingUserMonitor.getInstance().getNextCampingId();
 		this.telegramId = telegramId;
 		this.username = username;
@@ -87,7 +87,7 @@ public class CampingUser {
 		this.lastname = lastname;
 	}
 
-	public CampingUser(int suggestedId, int telegramId, String username, String firstname, String lastname) {
+	public CampingUser(int suggestedId, long telegramId, String username, String firstname, String lastname) {
 		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
 		this.telegramId = telegramId;
 		this.username = username;
@@ -99,7 +99,7 @@ public class CampingUser {
 		return campingId;
 	}
 
-	public int getTelegramId() {
+	public long getTelegramId() {
 		return telegramId;
 	}
 
@@ -156,7 +156,7 @@ public class CampingUser {
 		setSeenInteraction(other.seenInteraction);
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		if (this.telegramId == -1) {
 			this.telegramId = id;
 			support.firePropertyChange("id", null, id);
