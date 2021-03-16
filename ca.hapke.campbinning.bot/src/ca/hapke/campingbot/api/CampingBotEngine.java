@@ -391,7 +391,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 								outputCommand, outputResult, sendResult);
 					}
 
-				} catch (TelegramApiException e) {
+				} catch (Exception e) {
 					logFailure(telegramId, campingFromUser, eventTime, chat, outputCommand, e);
 				}
 			}
@@ -433,19 +433,19 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	}
 
 	public void logFailure(Integer telegramId, CampingUser campingFromUser, Long chatId, CommandType outputCommand,
-			TelegramApiException e) {
+			Exception e) {
 		CampingChat chat = chatManager.get(chatId);
 		logFailure(telegramId, campingFromUser, null, chat, outputCommand, e);
 	}
 
 	public void logFailure(Integer telegramId, CampingUser campingFromUser, Integer eventTime, Long chatId,
-			CommandType outputCommand, TelegramApiException e) {
+			CommandType outputCommand, Exception e) {
 		CampingChat chat = chatManager.get(chatId);
 		logFailure(telegramId, campingFromUser, eventTime, chat, outputCommand, e);
 	}
 
 	public void logFailure(Integer telegramId, CampingUser campingFromUser, Integer eventTime, CampingChat chat,
-			CommandType outputCommand, TelegramApiException e) {
+			CommandType outputCommand, Exception e) {
 		if (eventTime == null)
 			eventTime = getNow();
 		EventItem outputEvent = null;
