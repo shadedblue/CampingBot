@@ -32,10 +32,13 @@ public abstract class TimerThreadWithKill extends Thread {
 	}
 
 	protected volatile boolean kill = false;
+	private boolean running = false;
 
 	@Override
 	public final void run() {
+		startupCode();
 		while (!kill) {
+			running = true;
 			try {
 				Thread.sleep(millis);
 			} catch (InterruptedException e) {
@@ -49,7 +52,19 @@ public abstract class TimerThreadWithKill extends Thread {
 				e.printStackTrace();
 			}
 		}
+		shutdownCode();
+		running = false;
+	}
+
+	protected void startupCode() {
+	}
+
+	protected void shutdownCode() {
 	}
 
 	protected abstract void doWork();
+
+	public boolean isRunning() {
+		return running;
+	}
 }

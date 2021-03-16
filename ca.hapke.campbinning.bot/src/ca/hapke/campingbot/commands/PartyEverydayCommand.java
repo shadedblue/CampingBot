@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +55,7 @@ public class PartyEverydayCommand extends AbstractCommand
 
 	private final ZoneId zone = ZoneId.systemDefault();
 
-	private Cooldown cooldown = new Cooldown(3 * 60);
+//	private Cooldown cooldown = new Cooldown(3 * 60);
 
 	private Pattern p;
 	protected CampingBot bot;
@@ -90,9 +89,6 @@ public class PartyEverydayCommand extends AbstractCommand
 
 	@Override
 	public boolean isMatch(String msg, Message message) {
-		if (!cooldown.isReady())
-			return false;
-
 		String lowerCase = msg.toLowerCase();
 		Matcher m = p.matcher(lowerCase);
 
@@ -102,8 +98,6 @@ public class PartyEverydayCommand extends AbstractCommand
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
-		cooldown.setExec();
-
 		Instant now = Instant.now();
 		LocalDate ld = LocalDate.ofInstant(now, zone);
 		LocalTime lt = LocalTime.ofInstant(now, zone);
@@ -121,12 +115,11 @@ public class PartyEverydayCommand extends AbstractCommand
 
 		List<ResultFragment> captionFrags = generateParrrty(message);
 		ImageCommandResult result = new ImageCommandResult(PartyEverydayCommand, img, captionFrags);
-//		result.setReplyTo(message.getMessageId());
+		result.setReplyTo(message.getMessageId());
 		return result;
 	}
 
 	public List<ResultFragment> generateParrrty(Message message) {
-
 		String lowerCase = message.getText().toLowerCase();
 		Matcher m = p.matcher(lowerCase);
 		int count;
@@ -144,15 +137,11 @@ public class PartyEverydayCommand extends AbstractCommand
 		sb.append(PARTY_END);
 		TextFragment partyFrag = new TextFragment(sb.toString(), TextStyle.Bold);
 
-		if (count >= 5) {
-			List<ResultFragment> list = new ArrayList<>(3);
-			list.add(partyFrag);
-			list.add(new TextFragment("\n\n"));
-			list.add(new TextFragment(CollectionUtil.getRandom(excessives)));
-			return list;
-		} else {
-			return Collections.singletonList(partyFrag);
-		}
+		List<ResultFragment> list = new ArrayList<>(3);
+		list.add(partyFrag);
+		list.add(new TextFragment("\n\n"));
+		list.add(new TextFragment(CollectionUtil.getRandom(excessives)));
+		return list;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
 import ca.hapke.campingbot.afd2021.AfdHotPotato;
@@ -29,6 +30,7 @@ import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.inline.HideItCommand;
 import ca.hapke.campingbot.commands.inline.NicknameCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
+import ca.hapke.campingbot.events.BallBustingEvent;
 import ca.hapke.campingbot.events.HappyNewYearEvent;
 import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.response.TextCommandResult;
@@ -52,7 +54,6 @@ public class CampingBot extends CampingBotEngine {
 
 	private StatusCommand statusCommand;
 	private MbiyfCommand ballsCommand;
-	private HappyNewYearEvent happyNewYear;
 	private PleasureModelCommand pleasureCommand;
 	private EnhanceCommand enhanceCommand;
 	private IunnoCommand iunnoCommand;
@@ -71,6 +72,9 @@ public class CampingBot extends CampingBotEngine {
 	private AfdHotPotato potatoCommand;
 	private AprilFoolsDayEnabler afdEnabler;
 	private AybBeginningImages afdPics;
+
+	private BallBustingEvent ballBustingEvent;
+	private HappyNewYearEvent happyNewYearEvent;
 
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
@@ -94,13 +98,17 @@ public class CampingBot extends CampingBotEngine {
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
-		happyNewYear = new HappyNewYearEvent(this);
 		potatoCommand = new AfdHotPotato(this);
 		afdPics = new AybBeginningImages(this);
 		afdEnabler = new AprilFoolsDayEnabler(afdPics, potatoCommand);
+
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 		statusCommand = new StatusCommand(hideItCommand);
+
+		happyNewYearEvent = new HappyNewYearEvent(this);
+		ballBustingEvent = new BallBustingEvent(this);
+
 		addStatusUpdate(statusCommand);
 
 		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, hypeCommand, partyCommand,
@@ -108,6 +116,10 @@ public class CampingBot extends CampingBotEngine {
 
 		hasCategories.add(insultGenerator);
 		quantityCommand = new QuantityCommand(hasCategories);
+	}
+
+	@Override
+	protected void addCommandsAndEvents() {
 		addCommand(quantityCommand);
 		addCommand(spellCommand);
 		addCommand(nicknameCommand);
@@ -124,22 +136,34 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
-
+		
 		// TODO remove
 		addCommand(potatoCommand);
+		addEvent(happyNewYearEvent);
+		addEvent(ballBustingEvent);
+		addEvent((CalendaredEvent<?>) serializer);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addCommand(AbstractCommand command) {
 		super.addCommand(command);
-		if (command instanceof HasCategories) {
+		if (command instanceof HasCategories<?>) {
 			try {
 				hasCategories.add((HasCategories<String>) command);
 			} catch (Exception e) {
 				// Ignore if it's not a <String>
 			}
 		}
+
+		if (command instanceof CalendaredEvent<?>) {
+			addEvent((CalendaredEvent<?>) command);
+		}
+	}
+
+	protected void addEvent(CalendaredEvent<?> hasCal) {
+		calMonitor = CalendarMonitor.getInstance();
+		calMonitor.add(hasCal);
 	}
 
 	@Override
@@ -170,18 +194,14 @@ public class CampingBot extends CampingBotEngine {
 	@Override
 	protected void postConfigInit() {
 		res.loadAllEmoji();
-		ballsCommand.init();
-		potatoCommand.init();
+		super.postConfigInit();
+		calMonitor.start();
 
-		calMonitor = CalendarMonitor.getInstance();
-		calMonitor.add((ConfigXmlSerializer) serializer);
-		calMonitor.add(databaseConsumer);
-		calMonitor.add(ballsCommand);
-		calMonitor.add(rantCommand);
-		calMonitor.add(happyNewYear);
-
-		calMonitor.add(afdEnabler);
-//		calMonitor.add(afdPics);
+//		calMonitor.add((ConfigXmlSerializer) serializer);
+//		calMonitor.add(databaseConsumer);
+//		calMonitor.add(ballsCommand);
+//		calMonitor.add(rantCommand);
+//		calMonitor.add(happyNewYear);
 	}
 
 	public Resources getRes() {

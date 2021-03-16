@@ -110,8 +110,8 @@ public abstract class CommandResult {
 		return this;
 	}
 
-	public CommandResult add(CampingUser cu, CaseChoice caseChoice) {
-		fragments.add(new MentionFragment(cu, caseChoice));
+	public CommandResult add(CampingUser cu, CaseChoice style) {
+		fragments.add(new MentionFragment(cu, style));
 		return this;
 	}
 
