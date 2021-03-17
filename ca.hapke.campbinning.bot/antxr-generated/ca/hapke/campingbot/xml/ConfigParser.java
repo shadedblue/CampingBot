@@ -1396,9 +1396,9 @@ public ConfigParser(ParserSharedInputState state) {
 						campingIdInt = Integer.parseInt(campingId);
 					} 
 					
-					int idInt = CampingUserMonitor.UNKNOWN_USER_ID;
+					long idInt = CampingUserMonitor.UNKNOWN_USER_ID;
 					if (!"null".equalsIgnoreCase(id)) {
-						idInt = Integer.parseInt(id);
+						idInt = Long.parseLong(id);
 					} 
 					if ("null".equalsIgnoreCase(username))
 						username = null;

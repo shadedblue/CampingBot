@@ -118,7 +118,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		serializer.load();
 		FilterList<CampingUser> admins = userMonitor.getAdminUsers();
 		for (CampingUser admin : admins) {
-			CampingChat chat = chatManager.get((long) admin.getTelegramId());
+			CampingChat chat = chatManager.get(admin.getTelegramId());
 			ChatAllowed current = chat.getAllowed();
 			switch (current) {
 			case Allowed:
@@ -387,8 +387,14 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 					}
 					if (outputResult != null) {
 						SendResult sendResult = outputResult.send(this, chatId);
-						logSendResult(sendResult.outgoingMsg.getMessageId(), campingFromUser, eventTime, chat,
-								outputCommand, outputResult, sendResult);
+						Integer messageId = null;
+						if (sendResult != null) {
+							Message outgoingMsg = sendResult.outgoingMsg;
+							if (outgoingMsg != null)
+								messageId = outgoingMsg.getMessageId();
+						}
+						logSendResult(messageId, campingFromUser, eventTime, chat, outputCommand, outputResult,
+								sendResult);
 					}
 
 				} catch (Exception e) {
@@ -476,8 +482,13 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		CommandType cmd = outputResult.getCmd();
 		CommandType resultCommand = cmd != null ? cmd : outputCommand;
 		EventItem outputEvent = null;
-		outputEvent = new EventItem(resultCommand, campingFromUser, eventTime, chat, telegramId, sendResult.msg,
-				sendResult.extraData);
+		String msg = null;
+		Object extraData = null;
+		if (sendResult != null) {
+			msg = sendResult.msg;
+			extraData = sendResult.extraData;
+		}
+		outputEvent = new EventItem(resultCommand, campingFromUser, eventTime, chat, telegramId, msg, extraData);
 		eventLogger.add(outputEvent);
 	}
 
@@ -562,8 +573,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	private boolean isBetterSelection(boolean frontToBack, int offset, int currentOffset, CampingUser currentChoice,
 			CampingUser possibleChoice, BotChoicePriority priority) {
-		int possibleId = possibleChoice.getTelegramId();
-		int myId = meCamping.getTelegramId();
+		long possibleId = possibleChoice.getTelegramId();
+		long myId = meCamping.getTelegramId();
 		if (possibleId == myId && priority == BotChoicePriority.Never)
 			return false;
 		if (possibleId != myId && priority == BotChoicePriority.Only)

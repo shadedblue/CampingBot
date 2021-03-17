@@ -3,64 +3,80 @@ package ca.hapke.campingbot.response;
 import java.io.Serializable;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.api.CampingBotEngine;
+import ca.hapke.campingbot.channels.CampingChat;
+import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.api.CommandType;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 
 /**
  * @author Nathan Hapke
  */
-public class EditTextCommandResult extends CommandResult {
+public class EditCaptionCommandResult extends CommandResult {
 
 	private Message message;
 
-	public EditTextCommandResult(CommandType cmd, Message message) {
+	public EditCaptionCommandResult(CommandType cmd, Message message) {
 		super(cmd);
 		this.message = message;
 	}
 
-	public EditTextCommandResult(CommandType cmd, Message message, ResultFragment... fragments) {
+	public EditCaptionCommandResult(CommandType cmd, Message message, ResultFragment... fragments) {
 		super(cmd, fragments);
 		this.message = message;
 	}
 
-	public EditTextCommandResult(CommandType cmd, Message message, List<ResultFragment> fragments) {
+	public EditCaptionCommandResult(CommandType cmd, Message message, List<ResultFragment> fragments) {
 		super(cmd, fragments);
 		this.message = message;
 	}
 
 	@Override
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
-		String old = message.getText();
+		String old = message.getCaption();
 		String text = bot.getProcessor().process(true, fragments);
 		if (old.equalsIgnoreCase(text))
 			return new SendResult("Edit ignored: same text as before.", message, null);
 
-		EditMessageText send = new EditMessageText();
-		send.setChatId(Long.toString(message.getChatId()));
-		send.setMessageId(message.getMessageId());
+		EditMessageCaption edit = new EditMessageCaption();
+		Long chatId2 = message.getChatId();
+		edit.setChatId(Long.toString(chatId2));
+		edit.setMessageId(message.getMessageId());
 
 		if (keyboard != null && keyboard instanceof InlineKeyboardMarkup)
-			send.setReplyMarkup((InlineKeyboardMarkup) keyboard);
+			edit.setReplyMarkup((InlineKeyboardMarkup) keyboard);
 
-		send.setText(text);
-		send.setParseMode(BotConstants.MARKDOWN);
+		edit.setCaption(text);
+		edit.setParseMode(BotConstants.MARKDOWN);
+
 		/**
 		 * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
 		 */
-		Serializable out = bot.execute(send);
+		Serializable out = bot.execute(edit);
 		if (out instanceof Message) {
 			Message msg = (Message) out;
 			return new SendResult(text, message, msg);
 		} else {
 			return new SendResult("Edit failed", message, null);
 		}
+	}
+
+	@Override
+	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {
+		return super.send(bot, message.getChatId());
+	}
+
+	@Override
+	public SendResult sendAndLog(CampingBotEngine bot, CampingChat chat) {
+		Long chatId = message.getChatId();
+		CampingChat chat2 = CampingChatManager.getInstance(bot).get(chatId);
+		return super.sendAndLog(bot, chat2);
 	}
 
 }

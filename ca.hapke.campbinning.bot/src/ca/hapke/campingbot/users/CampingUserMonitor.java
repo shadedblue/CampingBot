@@ -56,8 +56,8 @@ public class CampingUserMonitor implements CampingSerializable {
 
 	private int nextCampingId = 1;
 	private Set<Integer> usedCampingIds = new HashSet<>();
-	private final Map<Integer, CampingUser> telegramIdMap = new HashMap<Integer, CampingUser>();
-	private final Map<String, CampingUser> usernameMap = new HashMap<String, CampingUser>();
+	private final Map<Long, CampingUser> telegramIdMap = new HashMap<>();
+	private final Map<String, CampingUser> usernameMap = new HashMap<>();
 	private final FilterList<CampingUser> adminUsers = new FilterList<>(users, new Matcher<CampingUser>() {
 		@Override
 		public boolean matches(CampingUser item) {
@@ -108,7 +108,7 @@ public class CampingUserMonitor implements CampingSerializable {
 		return getUser(user, user.getFirstName());
 	}
 
-	public CampingUser getUser(int id) {
+	public CampingUser getUser(long id) {
 		return telegramIdMap.get(id);
 	}
 
@@ -166,7 +166,7 @@ public class CampingUserMonitor implements CampingSerializable {
 		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname, interacting);
 	}
 
-	public CampingUser monitor(int campingIdInt, int telegramId, String username, String firstname, String lastname,
+	public CampingUser monitor(int campingIdInt, long telegramId, String username, String firstname, String lastname,
 			boolean interacting) {
 		String usernameKey = CampingUtil.generateUsernameKey(username);
 

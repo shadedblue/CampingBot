@@ -567,9 +567,9 @@ public abstract class CampingBotUi extends JFrame {
 		private static final String OFFLINE = "Offline";
 		private String connected = OFFLINE;
 		private String username;
-		private int id;
+		private long id;
 
-		private void updateUserInfo(String inUser, int inTId) {
+		private void updateUserInfo(String inUser, long inTId) {
 			if (inUser != null)
 				username = inUser;
 			if (inTId >= 1)

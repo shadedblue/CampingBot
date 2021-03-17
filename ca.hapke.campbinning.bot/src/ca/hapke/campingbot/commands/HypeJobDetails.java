@@ -4,33 +4,23 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.processors.BlotProcessor;
 import ca.hapke.campingbot.processors.OverlayProcessor;
-import ca.hapke.campingbot.response.EditTextCommandResult;
-import ca.hapke.campingbot.response.SendResult;
-import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.CaseChoice;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
-import ca.hapke.campingbot.util.JobDetails;
 import ca.hapke.util.CollectionUtil;
 import ca.hapke.util.StringUtil;
 
 /**
  * @author Nathan Hapke
  */
-public class HypeJobDetails implements JobDetails {
+public class HypeJobDetails extends UpdatingMessageJobDetails {
 	private final String hype;
-	private final CampingUser campingFromUser;
-	private final Long chatId;
-
-	private final CampingBotEngine bot;
+	final CampingUser campingFromUser;
 	private final List<String> dicks;
 
 	private final static NumberFormat nf;
@@ -44,41 +34,19 @@ public class HypeJobDetails implements JobDetails {
 	private static final int TITLE_BAR_WIDTH = (DIGITS + 1) * QTY - 1;
 	private static final int EDIT_COUNT = 5;
 
-	private static final Character[] blotsFull = new Character[] { '▓', '█', '█' };
-	private static final Character[] blotsFade = new Character[] { '░', '▙', '▟', '▛', '▜', '▞', '▚' };
-	private static final Character[] blotsPartial = new Character[] { '▔', '▖', '▗', '▘', '▝' };
-	private static final Character[] blotsAll;
-	static {
-		blotsAll = new Character[blotsFull.length + blotsFade.length + blotsPartial.length];
-		int x = 0;
-		for (int i = 0; i < blotsFull.length; i++) {
-			blotsAll[x] = blotsFull[i];
-			x++;
-		}
-		for (int i = 0; i < blotsFade.length; i++) {
-			blotsAll[x] = blotsFade[i];
-			x++;
-		}
-		for (int i = 0; i < blotsPartial.length; i++) {
-			blotsAll[x] = blotsPartial[i];
-			x++;
-		}
-	}
-	private Message targetMessage;
 	private boolean isFailedHype;
 	private int bailStep;
 	private boolean shouldAbort = false;
 	private List<ResultFragment> lastFrags;
 	private int lastPct;
-	private BlotProcessor blotter = new BlotProcessor(true, blotsAll);
+	private BlotProcessor blotter = new BlotProcessor(true, BlotProcessor.blotsAll);
 	private OverlayProcessor overlayer = new OverlayProcessor(true);
 
 	public HypeJobDetails(CampingUser campingFromUser, Long chatId, String hype, CampingBotEngine bot,
 			List<String> dicks) {
+		super(bot, HypeCommand.SlashHype, chatId);
 		this.hype = hype;
 		this.campingFromUser = campingFromUser;
-		this.chatId = chatId;
-		this.bot = bot;
 		this.dicks = dicks;
 
 		this.isFailedHype = hype == null;
@@ -113,55 +81,23 @@ public class HypeJobDetails implements JobDetails {
 	public boolean doStep(int step, int attempt) {
 		if (step == 0) {
 			lastFrags = createNumbers(0);
-			TextCommandResult result = new TextCommandResult(HypeCommand.SlashHype, lastFrags);
-
-			SendResult sendResult;
-			try {
-				sendResult = result.send(bot, chatId);
-				targetMessage = sendResult.outgoingMsg;
-				bot.logSendResult(targetMessage.getMessageId(), campingFromUser, chatId, HypeCommand.SlashHype, result,
-						sendResult);
-				return true;
-			} catch (TelegramApiException e) {
-				bot.logFailure(targetMessage.getMessageId(), campingFromUser, chatId, HypeCommand.SlashHype, e);
-				return false;
-			}
+			return attemptSend(campingFromUser, lastFrags);
 
 		} else if (isFailedHype && step >= bailStep) {
 			lastFrags = createFailure(step);
-			boolean complete = attemptEdit(lastFrags);
+			boolean complete = attemptEdit(campingFromUser, lastFrags);
 			if (complete)
 				shouldAbort = true;
 			return complete;
 		} else if (step <= EDIT_COUNT) {
 			lastFrags = createNumbers(step);
-			return attemptEdit(lastFrags);
+			return attemptEdit(campingFromUser, lastFrags);
 		} else if (step == EDIT_COUNT + 1) {
 			lastFrags = createText(hype, EDIT_COUNT, true);
-			return attemptEdit(lastFrags);
+			return attemptEdit(campingFromUser, lastFrags);
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean shouldAbort() {
-		return shouldAbort;
-	}
-
-	private boolean attemptEdit(List<ResultFragment> frags) {
-		Integer telegramId = targetMessage.getMessageId();
-
-		EditTextCommandResult edit = new EditTextCommandResult(HypeCommand.SlashHype, targetMessage, frags);
-		SendResult result;
-		try {
-			result = edit.send(bot, chatId);
-			bot.logSendResult(telegramId, campingFromUser, chatId, HypeCommand.SlashHype, edit, result);
-			return true;
-		} catch (TelegramApiException e) {
-			bot.logFailure(telegramId, campingFromUser, chatId, HypeCommand.SlashHype, e);
-			return false;
-		}
 	}
 
 	public List<ResultFragment> createNumbers(int step) {
@@ -220,24 +156,24 @@ public class HypeJobDetails implements JobDetails {
 		StringBuilder sb = new StringBuilder(TITLE_BAR_WIDTH);
 		int width = TITLE_BAR_WIDTH - 4;
 
-		sb.append(CollectionUtil.getRandom(blotsPartial));
-		sb.append(CollectionUtil.getRandom(blotsFade));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 
 		int fullBoxes = (int) (width * pct);
 
 		int j = 0;
 		while (j < fullBoxes) {
-			sb.append(CollectionUtil.getRandom(blotsFull));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFull));
 			j++;
 		}
 
 		if (j < width) {
-			sb.append(CollectionUtil.getRandom(blotsFade));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 			j++;
 		}
 
 		for (int k = 0; k < 2 && j < width; k++) {
-			sb.append(CollectionUtil.getRandom(blotsPartial));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 			j++;
 		}
 
@@ -246,8 +182,8 @@ public class HypeJobDetails implements JobDetails {
 			j++;
 		}
 
-		sb.append(CollectionUtil.getRandom(blotsFade));
-		sb.append(CollectionUtil.getRandom(blotsPartial));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
+		sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 
 		return createTitle(sb);
 	}
@@ -262,30 +198,30 @@ public class HypeJobDetails implements JobDetails {
 
 		int i = 0;
 		while (i < before - 2) {
-			sb.append(CollectionUtil.getRandom(blotsPartial));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 			i++;
 		}
 		if (i < before) {
-			sb.append(CollectionUtil.getRandom(blotsFade));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 			i++;
 		}
 		if (i < before) {
-			sb.append(CollectionUtil.getRandom(blotsFull));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFull));
 		}
 
 		sb.append(title);
 
 		i = 0;
 		if (i < after) {
-			sb.append(CollectionUtil.getRandom(blotsFull));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFull));
 			i++;
 		}
 		if (i < after) {
-			sb.append(CollectionUtil.getRandom(blotsFade));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsFade));
 			i++;
 		}
 		while (i < after) {
-			sb.append(CollectionUtil.getRandom(blotsPartial));
+			sb.append(CollectionUtil.getRandom(BlotProcessor.blotsPartial));
 			i++;
 		}
 		return sb.toString();
@@ -312,6 +248,11 @@ public class HypeJobDetails implements JobDetails {
 			l = (long) (Math.pow(16, DIGITS) * Math.random());
 		} while (l < Math.pow(16, DIGITS - 1) - 1);
 		return l;
+	}
+
+	@Override
+	public boolean shouldAbort() {
+		return shouldAbort;
 	}
 
 }

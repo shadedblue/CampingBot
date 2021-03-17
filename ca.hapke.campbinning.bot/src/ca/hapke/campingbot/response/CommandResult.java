@@ -11,6 +11,7 @@ import com.vdurmont.emoji.Emoji;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.channels.CampingChat;
+import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.api.CommandType;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
@@ -29,7 +30,6 @@ import ca.hapke.campingbot.users.CampingUser;
  * @author Nathan Hapke
  */
 public abstract class CommandResult {
-
 	protected Integer replyTo;
 	protected ReplyKeyboard keyboard;
 	// protected boolean sent = false;
@@ -80,6 +80,11 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult add(Integer msg, TextStyle style) {
+		fragments.add(new TextFragment(Integer.toString(msg), style));
+		return this;
+	}
+
 	public CommandResult add(String msg, CaseChoice style) {
 		fragments.add(new TextFragment(msg, style));
 		return this;
@@ -115,6 +120,12 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult newLine() {
+		if (fragments.size() > 0)
+			fragments.add(ResultFragment.NEWLINE);
+		return this;
+	}
+
 	public CommandType getCmd() {
 		return cmd;
 	}
@@ -140,7 +151,18 @@ public abstract class CommandResult {
 
 	public SendResult send(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		if (result == null) {
+			int x = fragments.size() - 1;
+			if (x >= 0 && fragments.get(x) == ResultFragment.NEWLINE) {
+				fragments.remove(x);
+			}
 			result = sendInternal(bot, chatId);
+		}
+		return result;
+	}
+
+	public SendResult sendAndLog(CampingBotEngine bot, long chatId) {
+		if (result == null) {
+			sendAndLog(bot, CampingChatManager.getInstance(bot).get(chatId));
 		}
 		return result;
 	}
@@ -152,14 +174,30 @@ public abstract class CommandResult {
 				result = send(bot, chat.chatId);
 
 				Message outgoingMsg = result.outgoingMsg;
-				EventItem ei = new EventItem(getCmd(), bot.getMeCamping(), outgoingMsg.getDate(), chat,
-						outgoingMsg.getMessageId(), outgoingMsg.getText(), null);
+				String text = getTextForLog(outgoingMsg);
+				Integer date;
+				Integer messageId;
+				if (outgoingMsg != null) {
+					date = outgoingMsg.getDate();
+					messageId = outgoingMsg.getMessageId();
+				} else {
+					date = null;
+					messageId = null;
+				}
+				EventItem ei = new EventItem(getCmd(), bot.getMeCamping(), date, chat, messageId, text, null);
 				logger.add(ei);
 			} catch (TelegramApiException e) {
 				logger.add(new EventItem(e.getLocalizedMessage()));
 			}
 		}
 		return result;
+	}
+
+	protected String getTextForLog(Message outgoingMsg) {
+		if (outgoingMsg == null)
+			return "";
+		else
+			return outgoingMsg.getText();
 	}
 
 	public abstract SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException;

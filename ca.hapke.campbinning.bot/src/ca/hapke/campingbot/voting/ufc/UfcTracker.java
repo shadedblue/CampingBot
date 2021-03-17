@@ -77,14 +77,14 @@ public class UfcTracker extends VoteTracker<Integer> {
 	}
 
 	@Override
-	protected CallbackId createCallbackId(String command, int updateId, int i) {
+	protected CallbackId createCallbackId(String command, int updateId, long i) {
 		return new CallbackId(command, updateId, fight.fightNumber, round, i);
 	}
 
 	@Override
 	public float getScore() {
 		// TODO Auto-generated method stub
-		Map<Integer, Integer> valueMap = cluster.getValueMap();
+		Map<Long, Integer> valueMap = cluster.getValueMap();
 		return averageVoteValues(valueMap);
 	}
 
@@ -125,7 +125,7 @@ public class UfcTracker extends VoteTracker<Integer> {
 	}
 
 	@Override
-	protected int getOptionId(CallbackId id) {
+	protected long getOptionId(CallbackId id) {
 		return id.getIds()[2];
 	}
 

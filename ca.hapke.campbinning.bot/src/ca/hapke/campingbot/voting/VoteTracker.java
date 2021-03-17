@@ -161,14 +161,15 @@ public abstract class VoteTracker<T> {
 		}
 	}
 
-	protected void setOption(String command, int updateId, int i, String shortStr, String longStr, T value) {
+	protected void setOption(String command, int updateId, long i, String shortStr, String longStr, T value) {
 		CallbackId id = createCallbackId(command, updateId, i);
 		String callbackId = id.getResult();
 
-		shortButtons[i] = shortStr;
-		longDescriptions[i] = longStr;
-		buttonCallbackIds[i] = callbackId;
-		Map<Integer, T> valueMap = cluster.getValueMap();
+		int j = (int) i;
+		shortButtons[j] = shortStr;
+		longDescriptions[j] = longStr;
+		buttonCallbackIds[j] = callbackId;
+		Map<Long, T> valueMap = cluster.getValueMap();
 		valueMap.put(i, value);
 	}
 
@@ -182,14 +183,14 @@ public abstract class VoteTracker<T> {
 	/**
 	 * Overrideable if you want to do something fancy.
 	 */
-	protected int getOptionId(CallbackId id) {
+	protected long getOptionId(CallbackId id) {
 		return id.getIds()[0];
 	}
 
 	/**
 	 * Overrideable if you want to do something fancy.
 	 */
-	protected CallbackId createCallbackId(String command, int updateId, int i) {
+	protected CallbackId createCallbackId(String command, int updateId, long i) {
 		return new CallbackId(command, updateId, i);
 	}
 
@@ -214,12 +215,12 @@ public abstract class VoteTracker<T> {
 
 		CampingUser user = CampingUserMonitor.getInstance().monitor(callbackQuery.getFrom());
 
-		Map<Integer, T> valueMap = cluster.getValueMap();
-		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Map<Long, T> valueMap = cluster.getValueMap();
+		Map<CampingUser, Long> votes = cluster.getVotes();
 		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
-		int optionId = getOptionId(id);
+		long optionId = getOptionId(id);
 
-		Integer previousVote = votes.get(user);
+		Long previousVote = votes.get(user);
 		boolean prevVoteNA = votesNotApplicable.contains(user);
 
 		boolean voteChanged = false;
@@ -288,8 +289,8 @@ public abstract class VoteTracker<T> {
 
 	private class InternalVoteListener extends VoteChangedAdapter<T> {
 		@Override
-		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
-			String display = longDescriptions[optionId];
+		public EventItem changed(CallbackQuery callbackQuery, CampingUser user, long optionId) {
+			String display = longDescriptions[(int) optionId];
 			String voteDisplayToUser = "You voted: " + display + "!";
 
 			EventItem result = showBanner(callbackQuery, voteDisplayToUser, user);
@@ -298,15 +299,15 @@ public abstract class VoteTracker<T> {
 		}
 
 		@Override
-		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, int optionId) {
-			String display = longDescriptions[optionId];
+		public EventItem confirmed(CallbackQuery callbackQuery, CampingUser user, long optionId) {
+			String display = longDescriptions[(int) optionId];
 			String voteDisplayToUser = "Your vote was already: " + display + "!";
 
 			return showBanner(callbackQuery, voteDisplayToUser, user);
 		}
 
 		@Override
-		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, int optionId) {
+		public EventItem completedByUser(CallbackQuery callbackQuery, CampingUser user, long optionId) {
 			return showBanner(callbackQuery, "You completed the voting!", user);
 		}
 	}
@@ -329,7 +330,8 @@ public abstract class VoteTracker<T> {
 			logger.add(new EventItem(VotingCommand.VoteCommand, null, chat, bannerMessage.getMessageId(), result.msg));
 		} catch (TelegramApiException e) {
 			// HACK commented out, because this fails if same text... the time thing.
-//			logger.add(new EventItem(VotingCommand.VoteCommand, null, null, chat, bannerMessage.getMessageId(),
+
+//			logger.add(new EventItem(VotingCommand.VoteCommand, null, null, chat, bannerMessage.getMessageId(), //
 //					"Failed to update banner", voteTrackingMessage));
 		}
 	}
@@ -357,7 +359,7 @@ public abstract class VoteTracker<T> {
 			SendResult result = editCmd.send(bot, chatId);
 			logger.add(new EventItem(VotingCommand.VoteCommand, user, chat, voteTrackingMessage.getMessageId(),
 					result.msg));
-		} catch (TelegramApiException e) {
+		} catch (Exception e) {
 			logger.add(new EventItem(VotingCommand.VoteCommandFailedCommand, user, null, chat,
 					bannerMessage.getMessageId(), "Failed to update tracker", voteTrackingMessage));
 		}
@@ -425,7 +427,7 @@ public abstract class VoteTracker<T> {
 		List<ResultFragment> output = new ArrayList<>();
 
 //		Map<Integer, T> valueMap = cluster.getValueMap(id);
-		Map<CampingUser, Integer> votes = cluster.getVotes();
+		Map<CampingUser, Long> votes = cluster.getVotes();
 		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
 
 		int notApplicable = votesNotApplicable.size();
@@ -446,8 +448,8 @@ public abstract class VoteTracker<T> {
 
 		if (shouldShowVotesInCategories()) {
 			int[] votesByCategories = new int[shortButtons.length];
-			for (int vote : votes.values()) {
-				votesByCategories[vote]++;
+			for (long vote : votes.values()) {
+				votesByCategories[(int) vote]++;
 			}
 			if (addNa) {
 				votesByCategories[naIndex] = votesNotApplicable.size();
@@ -525,15 +527,15 @@ public abstract class VoteTracker<T> {
 		return voteListeners.add(e);
 	}
 
-	protected float averageVoteValues(Map<Integer, ? extends Number> map) {
-		Map<CampingUser, Integer> votes = cluster.getVotes();
+	protected float averageVoteValues(Map<Long, ? extends Number> map) {
+		Map<CampingUser, Long> votes = cluster.getVotes();
 		Set<CampingUser> votesNotApplicable = cluster.getVotesNotApplicable();
 		int count = votes.size() + votesNotApplicable.size();
 		if (count == 0)
 			return 0;
 
 		float sum = 0;
-		for (Integer v : votes.values()) {
+		for (Long v : votes.values()) {
 			Number pts = map.get(v);
 			sum += pts.floatValue();
 		}

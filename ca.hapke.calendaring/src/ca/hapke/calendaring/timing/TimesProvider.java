@@ -52,8 +52,14 @@ public class TimesProvider<T> {
 		generateNearestEvents();
 	}
 
-	public boolean remove(ByCalendar<T> x) {
-		return times.remove(x);
+	public void remove(ByCalendar<T> x) {
+		times.remove(x);
+		generateNearestEvents();
+	}
+
+	public void clear() {
+		times.clear();
+		generateNearestEvents();
 	}
 
 	public void generateNearestEvents() {

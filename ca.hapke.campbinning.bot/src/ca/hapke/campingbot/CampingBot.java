@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
+import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.CountdownCommand;
@@ -66,6 +67,7 @@ public class CampingBot extends CampingBotEngine {
 	private QuantityCommand quantityCommand;
 
 	private CalendarMonitor calMonitor;
+	private AprilFoolsDayEnabler afdEnabler;
 
 	private BallBustingEvent ballBustingEvent;
 	private HappyNewYearEvent happyNewYearEvent;
@@ -92,6 +94,8 @@ public class CampingBot extends CampingBotEngine {
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
+//		afdEnabler = new AprilFoolsDayEnabler(this);
+
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 		statusCommand = new StatusCommand(hideItCommand);
@@ -126,6 +130,8 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
+
+//		addEvent(afdEnabler);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);
 		addEvent((CalendaredEvent<?>) serializer);
@@ -183,13 +189,6 @@ public class CampingBot extends CampingBotEngine {
 		res.loadAllEmoji();
 		super.postConfigInit();
 		calMonitor.start();
-//		ballsCommand.init();
-
-//		calMonitor.add((ConfigXmlSerializer) serializer);
-//		calMonitor.add(databaseConsumer);
-//		calMonitor.add(ballsCommand);
-//		calMonitor.add(rantCommand);
-//		calMonitor.add(happyNewYear);
 	}
 
 	public Resources getRes() {
