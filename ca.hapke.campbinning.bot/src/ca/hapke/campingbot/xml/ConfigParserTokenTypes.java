@@ -7,6 +7,7 @@
     import ca.hapke.campingbot.users.*;
     import ca.hapke.campingbot.channels.*;
     import ca.hapke.campingbot.commands.*;
+    import ca.hapke.campingbot.commands.spell.*;
     import ca.hapke.campingbot.response.*;
     import ca.hapke.campingbot.voting.*;
     import java.util.*;
