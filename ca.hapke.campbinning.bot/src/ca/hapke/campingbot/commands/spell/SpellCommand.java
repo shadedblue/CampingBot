@@ -138,7 +138,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 			chosenPack = categoriesByGenre.get(word, false);
 		}
 		if (chosenPack == null && first > 0) {
-			word = msg.substring(first);
+			word = msg.substring(first + 1);
 			chosenPack = categoriesByGenre.get(word, false);
 		}
 
