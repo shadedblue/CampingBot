@@ -121,7 +121,9 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
 		SendResult result = outgoingSpell.sendAndLog(bot, chat);
 
-		if (comboType == ComboType.KO) {
+		if (comboType == ComboType.Fizzle) {
+			// TODO Punish a bit
+		} else if (comboType == ComboType.KO) {
 			// KO GIF
 			ImageCommandResult ko = new ImageCommandResult(SpellCommand.SlashSpellCommand, koImg);
 			ko.sendAndLog(bot, chat);

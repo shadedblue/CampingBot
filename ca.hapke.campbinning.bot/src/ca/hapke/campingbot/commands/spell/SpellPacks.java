@@ -2,6 +2,7 @@ package ca.hapke.campingbot.commands.spell;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,16 +16,34 @@ import ca.hapke.campingbot.category.CategoriedItems;
 public class SpellPacks {
 
 	private Map<String, CategoriedItems<String>> categoriesByGenre = new HashMap<>();
+	private Map<String, String> aliasResolver = new HashMap<>();
+	private Map<String, Set<String>> allAliases = new HashMap<>();
 
 	static final String DELIMITER = ":";
 
-	public CategoriedItems<String> get(String genre) {
+	public CategoriedItems<String> get(String genre, boolean shouldCreate) {
 		CategoriedItems<String> c = categoriesByGenre.get(genre);
 		if (c == null) {
+			String resolved = aliasResolver.get(genre.toLowerCase());
+			c = categoriesByGenre.get(resolved);
+		}
+		if (c == null && shouldCreate) {
 			c = new CategoriedItems<String>(SpellCommand.ITEM_CATEGORY, SpellCommand.EXCLAMATION_CATEGORY);
 			categoriesByGenre.put(genre, c);
 		}
 		return c;
+	}
+
+	public void addAliases(String genre, Collection<String> toAdd) {
+		Set<String> current = allAliases.get(genre);
+		if (current == null) {
+			current = new HashSet<>();
+			allAliases.put(genre, current);
+		}
+		current.addAll(toAdd);
+		for (String a : toAdd) {
+			this.aliasResolver.put(a.toLowerCase(), genre);
+		}
 	}
 
 	public List<String> addCategoryNames(List<String> out) {
@@ -69,6 +88,10 @@ public class SpellPacks {
 
 	public Set<Entry<String, CategoriedItems<String>>> entrySet() {
 		return categoriesByGenre.entrySet();
+	}
+
+	public Set<String> getAliases(String genre) {
+		return allAliases.get(genre);
 	}
 
 	public int size() {

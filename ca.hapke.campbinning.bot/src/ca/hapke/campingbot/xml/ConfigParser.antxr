@@ -131,14 +131,23 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 <pack> [SpellCommand sg]	
 	{ 
 		String name;
-		List<String> i,e; }
+		List<String> aliases = null,i,e; }
 	:
 	name=<name>
+	(aliases=<aliases>) ?
 	i=<items>
 	e=<exclamations>
 	{
-		sg.setValues(name, i, e);
+		sg.setValues(name, aliases, i, e);
 	}
+	;
+<aliases> returns [List<String> vals = null]
+	{ vals = new ArrayList<String>(); String val; }
+	:	
+		(
+			val=<item>
+			{vals.add(val);}
+		) *
 	;
 <adjectives> returns [List<String> vals = null]
 	{ vals = new ArrayList<String>(); String val; }

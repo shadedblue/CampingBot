@@ -1,6 +1,6 @@
 package ca.hapke.campingbot.xml;
 
-import java.util.List;
+import java.util.Collection;
 
 import ca.hapke.campingbot.category.CategoriedItems;
 
@@ -50,7 +50,7 @@ public class OutputFormatter {
 		sb.append("\n");
 	}
 
-	public void tagAndValue(String tag, List<String> list) {
+	public void tagAndValue(String tag, Collection<String> list) {
 		String outerTag = tag + "s";
 		start(outerTag);
 

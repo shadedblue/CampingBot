@@ -84,10 +84,6 @@ public class CampingUserMonitor implements CampingSerializable {
 		this.nextCampingId = Math.max(suggestedId, nextCampingId);
 	}
 
-	public CampingUser find(Integer key) {
-		return telegramIdMap.get(key);
-	}
-
 	public CampingUser find(String key) {
 		return usernameMap.get(CampingUtil.generateUsernameKey(key));
 	}
@@ -115,7 +111,9 @@ public class CampingUserMonitor implements CampingSerializable {
 	public CampingUser getUser(User user, String text) {
 		CampingUser result = null;
 		if (user != null) {
-			result = telegramIdMap.get(user.getId());
+			Integer idInt = user.getId();
+			Long id = Long.valueOf(idInt.longValue());
+			result = telegramIdMap.get(id);
 		}
 		if (result == null) {
 			result = getUser(text);

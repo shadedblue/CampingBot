@@ -62,4 +62,15 @@ public class InsultFragment extends ResultFragment {
 		return new InsultFragment(insult2, p, ref2);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Insult[");
+		builder.append(reference);
+		builder.append(" ");
+		builder.append(insult);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

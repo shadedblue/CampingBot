@@ -89,12 +89,13 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 
 	public VoteTracker<?> findTracker(Message replyTo) {
 		VoteTracker<?> tracker = null;
-		Integer key = replyTo.getMessageId();
+		Integer id = replyTo.getMessageId();
+		String key = Integer.toString(id);
 		for (VotingCommand<?> command : commands) {
 			tracker = command.voteOnMessages.get(key);
 			if (tracker != null)
 				break;
-			tracker = command.voteOnBanners.get(key);
+			tracker = command.voteOnBanners.get(id);
 			if (tracker != null)
 				break;
 

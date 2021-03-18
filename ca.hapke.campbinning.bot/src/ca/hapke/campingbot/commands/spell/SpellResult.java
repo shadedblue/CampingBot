@@ -15,11 +15,8 @@ import ca.hapke.campingbot.users.CampingUser;
  */
 public class SpellResult {
 	public static final TextFragment NO_VICTIM_COMMAND = new TextFragment("Spells must be cast upon a victim, ");
-	public static final TextFragment NO_VICTIM_INLINE = new TextFragment(
-			", and didn't pick a victim to cast a spell on!");
-
 	public static final TextFragment NOT_BOT_COMMAND = new TextFragment(
-			"Foolish infidel. Spells are only to be cast upon mere mortals.");
+			"Spells are only to be cast upon mere mortals, ");
 	public static final TextFragment UNKNOWN_FAIL = new TextFragment(
 			"Something went wrong in the bit-bucket... and the spell fizzled!?");
 
@@ -31,10 +28,16 @@ public class SpellResult {
 	private CampingUser target;
 
 	public SpellResult(CampingUser campingFromUser, CampingUser target, List<ResultFragment> spell) {
-		success = true;
-		this.fromUser = campingFromUser;
-		this.target = target;
-		this.spell = spell;
+		if (target != null) {
+			success = true;
+			this.fromUser = campingFromUser;
+			this.target = target;
+			this.spell = spell;
+		} else {
+			success = false;
+			this.fromUser = campingFromUser;
+			this.failure = SpellFailure.NoVictim;
+		}
 	}
 
 	public SpellResult(CampingUser campingFromUser, CampingUser target, SpellFailure failure) {
@@ -50,9 +53,13 @@ public class SpellResult {
 			out = new TextCommandResult(SpellCommand.SlashSpellCommand, spell);
 		} else {
 			switch (failure) {
-			case Dipshit:
+			case NoVictim:
 				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
 						ResultFragment.COLON_SPACE, NO_VICTIM_COMMAND, new InsultFragment(Perspective.You));
+				break;
+			case CastAtBot:
+				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
+						ResultFragment.COLON_SPACE, NOT_BOT_COMMAND, new InsultFragment(Perspective.You));
 				break;
 			default:
 				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),

@@ -52,6 +52,9 @@ public class SpellPropogationManager {
 	}
 
 	public ComboType getComboResult(CampingUser caster, CampingUser victim) {
+		if (victim == null || caster == null)
+			return ComboType.Fizzle;
+
 		long now = getTimestamp();
 		if (deadTimestamps.containsKey(caster)) {
 			Long t = deadTimestamps.get(caster);
