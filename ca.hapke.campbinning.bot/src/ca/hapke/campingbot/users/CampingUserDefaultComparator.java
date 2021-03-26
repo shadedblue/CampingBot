@@ -11,6 +11,12 @@ import java.util.Comparator;
 public class CampingUserDefaultComparator implements Comparator<CampingUser> {
 	@Override
 	public int compare(CampingUser a, CampingUser b) {
-		return a.getCampingId() - b.getCampingId();
+		long diff = a.getCampingId() - b.getCampingId();
+
+		if (diff < 0)
+			return -1;
+		if (diff > 0)
+			return 1;
+		return 0;
 	}
 }

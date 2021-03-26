@@ -132,6 +132,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(redditCommand);
 
 //		addEvent(afdEnabler);
+		addEvent(databaseConsumer);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);
 		addEvent((CalendaredEvent<?>) serializer);

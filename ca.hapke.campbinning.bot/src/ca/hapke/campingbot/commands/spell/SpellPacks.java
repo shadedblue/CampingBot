@@ -2,11 +2,11 @@ package ca.hapke.campingbot.commands.spell;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 
 import ca.hapke.campingbot.category.CategoriedItems;
 
@@ -37,7 +37,7 @@ public class SpellPacks {
 	public void addAliases(String genre, Collection<String> toAdd) {
 		Set<String> current = allAliases.get(genre);
 		if (current == null) {
-			current = new HashSet<>();
+			current = new TreeSet<>();
 			allAliases.put(genre, current);
 		}
 		current.addAll(toAdd);

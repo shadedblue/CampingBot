@@ -54,8 +54,8 @@ public class CampingUserMonitor implements CampingSerializable {
 	private final EventList<CampingUser> users = GlazedLists
 			.threadSafeList(new ObservableElementList<>(new BasicEventList<CampingUser>(), userConnector));
 
-	private int nextCampingId = 1;
-	private Set<Integer> usedCampingIds = new HashSet<>();
+	private long nextCampingId = 1;
+	private Set<Long> usedCampingIds = new HashSet<>();
 	private final Map<Long, CampingUser> telegramIdMap = new HashMap<>();
 	private final Map<String, CampingUser> usernameMap = new HashMap<>();
 	private final FilterList<CampingUser> adminUsers = new FilterList<>(users, new Matcher<CampingUser>() {
@@ -65,12 +65,12 @@ public class CampingUserMonitor implements CampingSerializable {
 		}
 	});
 
-	public int getNextCampingId() {
+	public long getNextCampingId() {
 		usedCampingIds.add(nextCampingId);
 		return nextCampingId++;
 	}
 
-	public int getNextCampingId(int suggestedId) {
+	public long getNextCampingId(long suggestedId) {
 		if (suggestedId == CampingUserMonitor.UNKNOWN_USER_ID || usedCampingIds.contains(suggestedId)) {
 			return getNextCampingId();
 		} else {
@@ -80,7 +80,7 @@ public class CampingUserMonitor implements CampingSerializable {
 		}
 	}
 
-	public void setNextCampingId(int suggestedId) {
+	public void setNextCampingId(long suggestedId) {
 		this.nextCampingId = Math.max(suggestedId, nextCampingId);
 	}
 
@@ -111,8 +111,7 @@ public class CampingUserMonitor implements CampingSerializable {
 	public CampingUser getUser(User user, String text) {
 		CampingUser result = null;
 		if (user != null) {
-			Integer idInt = user.getId();
-			Long id = Long.valueOf(idInt.longValue());
+			Long id = user.getId();
 			result = telegramIdMap.get(id);
 		}
 		if (result == null) {
@@ -126,8 +125,8 @@ public class CampingUserMonitor implements CampingSerializable {
 	}
 
 	public CampingUser monitor(User fromUser) {
-		Integer id = fromUser.getId();
-		int telegramId = id != null ? id.intValue() : UNKNOWN_USER_ID;
+		Long id = fromUser.getId();
+		long telegramId = id != null ? id.intValue() : UNKNOWN_USER_ID;
 		String username = fromUser.getUserName();
 
 		String lastname = fromUser.getLastName();
@@ -160,11 +159,11 @@ public class CampingUserMonitor implements CampingSerializable {
 		return null;
 	}
 
-	public CampingUser monitor(int id, String username, String firstname, String lastname, boolean interacting) {
+	public CampingUser monitor(long id, String username, String firstname, String lastname, boolean interacting) {
 		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname, interacting);
 	}
 
-	public CampingUser monitor(int campingIdInt, long telegramId, String username, String firstname, String lastname,
+	public CampingUser monitor(long campingIdInt, long telegramId, String username, String firstname, String lastname,
 			boolean interacting) {
 		String usernameKey = CampingUtil.generateUsernameKey(username);
 

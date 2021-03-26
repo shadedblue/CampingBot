@@ -2,6 +2,9 @@ package ca.hapke.campingbot.channels;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author Nathan Hapke
@@ -13,6 +16,7 @@ public class CampingChat {
 	private ChatType type = ChatType.Unknown;
 	private ChatAllowed allowed = ChatAllowed.New;
 	private boolean announce = false;
+	private SortedSet<Long> activeUserIds = new TreeSet<>();
 
 	// For GlazedLists to autosort
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -99,6 +103,17 @@ public class CampingChat {
 		support.firePropertyChange("announce", oldVal, announce);
 	}
 
+	public Set<Long> getActiveUserIds() {
+		return activeUserIds;
+	}
+
+	public boolean addActiveUser(long e) {
+		if (type != ChatType.Group)
+			return false;
+
+		return activeUserIds.add(e);
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -107,6 +122,9 @@ public class CampingChat {
 		if (type != null) {
 			builder.append(type);
 			builder.append(":");
+			if (activeUserIds != null && type == ChatType.Group) {
+				builder.append(activeUserIds);
+			}
 		}
 		builder.append(chatId);
 		if (allowed != null) {

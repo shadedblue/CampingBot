@@ -269,9 +269,11 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			telegramId = message.getMessageId();
 			entities = message.getEntities();
 
-			campingFromUser = userMonitor.monitor(message.getFrom(), entities);
+			User from = message.getFrom();
+			campingFromUser = userMonitor.monitor(from, entities);
 			chatId = message.getChatId();
 			chat = chatManager.get(chatId);
+			chat.addActiveUser(from.getId());
 		}
 
 		Object inputExtraData = null;

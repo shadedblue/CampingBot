@@ -58,7 +58,7 @@ public class CampingUser {
 	}
 
 	private long telegramId = -1;
-	private final int campingId;
+	private final long campingId;
 	private String username;
 	private String firstname;
 	private String lastname;
@@ -87,7 +87,7 @@ public class CampingUser {
 		this.lastname = lastname;
 	}
 
-	public CampingUser(int suggestedId, long telegramId, String username, String firstname, String lastname) {
+	public CampingUser(long suggestedId, long telegramId, String username, String firstname, String lastname) {
 		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
 		this.telegramId = telegramId;
 		this.username = username;
@@ -95,7 +95,7 @@ public class CampingUser {
 		this.lastname = lastname;
 	}
 
-	public int getCampingId() {
+	public long getCampingId() {
 		return campingId;
 	}
 

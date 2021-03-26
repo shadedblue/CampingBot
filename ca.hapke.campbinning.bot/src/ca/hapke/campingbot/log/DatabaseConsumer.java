@@ -116,7 +116,7 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 					try {
 						long timestamp = item.d.getTime() / 1000;
 						DatabaseQuery query = new DatabaseQuery("activity");
-						int campingId = -1;
+						long campingId = -1;
 						long chatId = -1;
 						long commandTypeId = -1;
 						int tId = -1;
@@ -133,7 +133,7 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 							commandTypeId = item.command.getId();
 						}
 						query.add("timestamp", ColumnType.Long, timestamp);
-						query.add("campingUserId", ColumnType.Integer, campingId);
+						query.add("campingUserId", ColumnType.Long, campingId);
 						query.add("chatId", ColumnType.Long, chatId);
 						query.add("telegramId", ColumnType.Integer, tId);
 						query.add("campingType", ColumnType.Long, commandTypeId);

@@ -216,9 +216,29 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 		chat.setType(type);
 		chat.setAllowed(allowed);
 	}
+	(<actives>[chat]) ?
 	(<announce>[chat]) ?
 	;
 
+<actives> [CampingChat chat]
+	{  
+		long id; 
+		String value;
+	}
+    :  
+    (
+	    value=<item>
+	    { 
+			if (value != null && !"null".equalsIgnoreCase(value)) {
+				try {
+					id = Long.parseLong(value);
+					chat.addActiveUser(id);
+				} catch (NumberFormatException e) {
+				}
+			}	 
+	    }
+    )*
+	;
 <users> [CampingUserMonitor um]
 	{String campingId = null; }
 	: 

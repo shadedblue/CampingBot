@@ -50,21 +50,33 @@ public class OutputFormatter {
 		sb.append("\n");
 	}
 
-	public void tagAndValue(String tag, Collection<String> list) {
-		String outerTag = tag + "s";
+	public void tagAndValue(String tag, Collection<?> list) {
+		String outerTag;
+		if (tag.endsWith("s"))
+			outerTag = tag;
+		else
+			outerTag = tag + "s";
 		start(outerTag);
 
 		if (list != null) {
-			for (String a : list) {
+			for (Object a : list) {
 				tagAndValue("item", a);
 			}
 		}
 		finish(outerTag);
 	}
 
+	private void tagAndValue(String tag, Object value) {
+		start(tag, false);
+		if (value != null)
+			sb.append(value.toString());
+		finish(tag, false);
+	}
+
 	public void tagAndValue(String tag, String value) {
 		start(tag, false);
-		sb.append(value);
+		if (value != null)
+			sb.append(value);
 		finish(tag, false);
 	}
 

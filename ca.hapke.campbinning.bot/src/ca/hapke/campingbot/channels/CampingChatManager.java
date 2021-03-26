@@ -157,6 +157,8 @@ public class CampingChatManager implements CampingSerializable {
 			of.tagAndValue("type", c.getType().toString());
 			of.tagAndValue("name", c.getChatname());
 			of.tagAndValue("allowed", c.getAllowed().toString());
+			if (c.getType() == ChatType.Group)
+				of.tagAndValue("actives", c.getActiveUserIds());
 			of.tagAndValue("announce", c.isAnnounce());
 
 			of.finish(innerTag);
