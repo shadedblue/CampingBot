@@ -2,6 +2,7 @@ package ca.hapke.campingbot.channels;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -157,8 +158,10 @@ public class CampingChatManager implements CampingSerializable {
 			of.tagAndValue("type", c.getType().toString());
 			of.tagAndValue("name", c.getChatname());
 			of.tagAndValue("allowed", c.getAllowed().toString());
-			if (c.getType() == ChatType.Group)
-				of.tagAndValue("actives", c.getActiveUserIds());
+			Set<Long> activeUserIds = c.getActiveUserIds();
+			if (c.getType() == ChatType.Group && activeUserIds.size() > 0) {
+				of.tagAndValue("actives", activeUserIds);
+			}
 			of.tagAndValue("announce", c.isAnnounce());
 
 			of.finish(innerTag);
