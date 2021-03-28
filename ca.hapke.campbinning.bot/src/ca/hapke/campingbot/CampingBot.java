@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
+import ca.hapke.campingbot.afd2021.AfdHotPotato;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.CountdownCommand;
@@ -43,9 +44,7 @@ import ca.hapke.campingbot.voting.ufc.UfcCommand;
  * @author Nathan Hapke
  */
 public class CampingBot extends CampingBotEngine {
-
 	private Resources res = new Resources();
-//	private AitaCommand aitaCommand;
 	private RantCommand rantCommand;
 	private UfcCommand ufcCommand;
 	private VoteManagementCommands voteManagementCommands;
@@ -75,6 +74,7 @@ public class CampingBot extends CampingBotEngine {
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
 	public static final ResponseCommandType LogStringCommand = new ResponseCommandType("LogString", 0);
+	private AfdHotPotato potatoCommand;
 
 	public CampingBot(ProtectionDomain protectionDomain) {
 		spellCommand = new SpellCommand(this);
@@ -94,7 +94,8 @@ public class CampingBot extends CampingBotEngine {
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
-//		afdEnabler = new AprilFoolsDayEnabler(this);
+		potatoCommand = new AfdHotPotato(this, res);
+		afdEnabler = new AprilFoolsDayEnabler(this, potatoCommand);
 
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
@@ -130,8 +131,9 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(statusCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
+		addCommand(potatoCommand);
 
-//		addEvent(afdEnabler);
+		addEvent(afdEnabler);
 		addEvent(databaseConsumer);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);
@@ -156,7 +158,8 @@ public class CampingBot extends CampingBotEngine {
 	}
 
 	protected void addEvent(CalendaredEvent<?> hasCal) {
-		calMonitor = CalendarMonitor.getInstance();
+		if (this.calMonitor == null)
+			calMonitor = CalendarMonitor.getInstance();
 		calMonitor.add(hasCal);
 	}
 

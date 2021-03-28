@@ -7,8 +7,10 @@ import ca.hapke.util.CollectionUtil;
  */
 public class BlotProcessor extends MessageProcessor {
 
-	private static final double SENSITIVITY = 0.4;
+	private static final double DEFAULT_SENSITIVITY = 0.4;
+//	private static final double SENSITIVITY = 0.4;
 	private Character[] blots;
+	private double sensitivity;
 	public static final Character[] blotsAll;
 	public static final Character[] blotsPartial = new Character[] { '▔', '▖', '▗', '▘', '▝' };
 	public static final Character[] blotsFade = new Character[] { '░', '▙', '▟', '▛', '▜', '▞', '▚' };
@@ -31,8 +33,13 @@ public class BlotProcessor extends MessageProcessor {
 	}
 
 	public BlotProcessor(boolean enabled, Character[] blots) {
+		this(enabled, blots, DEFAULT_SENSITIVITY);
+	}
+
+	public BlotProcessor(boolean enabled, Character[] blots, double sensitivity) {
 		super(enabled);
 		this.blots = blots;
+		this.sensitivity = sensitivity;
 	}
 
 	@Override
@@ -40,7 +47,7 @@ public class BlotProcessor extends MessageProcessor {
 		StringBuilder sb = new StringBuilder(value.length());
 		for (int i = 0; i < value.length(); i++) {
 			char c = value.charAt(i);
-			if (c >= 48 && c <= 122 && Math.random() < SENSITIVITY) {
+			if (c >= 48 && c <= 122 && Math.random() < sensitivity) {
 				c = CollectionUtil.getRandom(blots);
 			}
 			sb.append(c);

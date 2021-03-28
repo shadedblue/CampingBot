@@ -93,6 +93,10 @@ public class CalendarMonitor extends TimerThreadWithKill {
 			invoke(e, timeProvider, timeProvider.getMostNearestPast());
 		}
 	}
+	
+	public <T> boolean remove(CalendaredEvent<T> e) {
+		return calendaredEvents.remove(e);
+	}
 
 	public void updateAllNextTimes() {
 		for (CalendaredEvent event : calendaredEvents) {

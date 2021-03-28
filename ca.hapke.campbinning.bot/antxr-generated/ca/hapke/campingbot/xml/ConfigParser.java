@@ -348,13 +348,13 @@ public ConfigParser(ParserSharedInputState state) {
 					sg.setAdjectives(a);
 				
 			{
-			_loop43:
+			_loop323:
 			do {
 				if ((LA(1)==16)) {
 					__xml_pack(sg);
 				}
 				else {
-					break _loop43;
+					break _loop323;
 				}
 				
 			} while (true);
@@ -425,14 +425,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop30:
+			_loop310:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop30;
+					break _loop310;
 				}
 				
 			} while (true);
@@ -478,13 +478,13 @@ public ConfigParser(ParserSharedInputState state) {
 			match(23);
 			{
 			{
-			_loop74:
+			_loop354:
 			do {
 				if ((LA(1)==24)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop74;
+					break _loop354;
 				}
 				
 			} while (true);
@@ -528,13 +528,13 @@ public ConfigParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop87:
+			_loop367:
 			do {
 				if ((LA(1)==27)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop87;
+					break _loop367;
 				}
 				
 			} while (true);
@@ -566,14 +566,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop26:
+			_loop306:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop26;
+					break _loop306;
 				}
 				
 			} while (true);
@@ -599,14 +599,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop18:
+			_loop298:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop18;
+					break _loop298;
 				}
 				
 			} while (true);
@@ -632,14 +632,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop22:
+			_loop302:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop22;
+					break _loop302;
 				}
 				
 			} while (true);
@@ -935,14 +935,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop58:
+			_loop338:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop58;
+					break _loop338;
 				}
 				
 			} while (true);
@@ -968,14 +968,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop62:
+			_loop342:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop62;
+					break _loop342;
 				}
 				
 			} while (true);
@@ -1001,14 +1001,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop54:
+			_loop334:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop54;
+					break _loop334;
 				}
 				
 			} while (true);
@@ -1102,14 +1102,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop50:
+			_loop330:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop50;
+					break _loop330;
 				}
 				
 			} while (true);
@@ -1135,14 +1135,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop66:
+			_loop346:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop66;
+					break _loop346;
 				}
 				
 			} while (true);
@@ -1168,14 +1168,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop70:
+			_loop350:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop70;
+					break _loop350;
 				}
 				
 			} while (true);
@@ -1348,7 +1348,7 @@ public ConfigParser(ParserSharedInputState state) {
 					String value;
 				
 			{
-			_loop82:
+			_loop362:
 			do {
 				if ((LA(1)==42)) {
 					value=__xml_item();
@@ -1363,7 +1363,7 @@ public ConfigParser(ParserSharedInputState state) {
 						
 				}
 				else {
-					break _loop82;
+					break _loop362;
 				}
 				
 			} while (true);
