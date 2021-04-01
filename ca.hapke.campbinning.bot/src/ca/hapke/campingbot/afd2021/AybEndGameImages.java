@@ -41,5 +41,7 @@ public class AybEndGameImages extends AfdImagesStage<Void> {
 		}
 		images.add(getAybImgUrl(CATEGORY, winner.getTelegramId()));
 		images.add(getAybImgUrl(CATEGORY, LAST_IMAGE));
+		images.add(new ImageLink("http://www.hapke.ca/images/afd21/ayb-f-allballs.gif", ImageLink.GIF));
+		images.add(new ImageLink("http://www.hapke.ca/images/42069.jpg", ImageLink.STATIC));
 	}
 }

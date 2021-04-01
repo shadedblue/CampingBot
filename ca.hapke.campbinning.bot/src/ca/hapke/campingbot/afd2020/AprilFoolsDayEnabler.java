@@ -27,7 +27,8 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 	protected AfdHotPotato hotPotato;
 	protected AfdAybGameOver gameOver = new AfdAybGameOver();
 
-	public static final boolean AFD_DEBUG = true;
+//	public static final boolean AFD_DEBUG = true;
+	public static final boolean AFD_DEBUG = false;
 	public static final ByFrequency<Void> BETWEEN_IMAGES;
 	public static final ByFrequency<Void> ROUND_LENGTH;
 	static {
@@ -46,7 +47,7 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 		ByTimeOfYear<Boolean> enable;
 		if (AFD_DEBUG) {
 			// Testing
-			enable = new ByTimeOfYear<Boolean>(3, 28, 15, 3, true);
+			enable = new ByTimeOfYear<Boolean>(3, 28, 16, 17, true);
 		} else {
 			// Production
 			enable = new ByTimeOfYear<Boolean>(4, 1, 16, 20, true);

@@ -89,19 +89,17 @@ public class AfdHotPotato extends AbstractCommand
 
 	@Override
 	public void init() {
-		playerManager.add(554436051, "NH");
-		playerManager.add(763960317, "RH");
-//		playerManager.add(1053967313, "CDB");
-		//
 		playerManager.add(642767839, "AA");
+		playerManager.add(898821867, "DM");
 		playerManager.add(708570894, "JA");
+		playerManager.add(768167311, "JB");
 		playerManager.add(696411365, "JM");
 
-		playerManager.add(558638791, "RTV");
-		playerManager.add(768167311, "JB");
-		playerManager.add(720319686, "RS");
-		playerManager.add(898821867, "DM");
 		playerManager.add(943017286, "KA");
+		playerManager.add(554436051, "NH");
+		playerManager.add(763960317, "RH");
+		playerManager.add(720319686, "RS");
+		playerManager.add(558638791, "RTV");
 	}
 
 	@Override
