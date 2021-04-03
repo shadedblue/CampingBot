@@ -17,7 +17,6 @@ import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.response.ImageCommandResult;
-import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.users.CampingUser;
@@ -119,7 +118,8 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 			outgoingSpell.add(resources.getBall("fire"));
 		}
 
-		SendResult result = outgoingSpell.sendAndLog(bot, chat);
+//		SendResult result = 
+		outgoingSpell.sendAndLog(bot, chat);
 
 		if (comboType == ComboType.Fizzle) {
 			// TODO Punish a bit
@@ -141,15 +141,18 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 	@Override
 	public void doWork(ByCalendar<CampingUser> event, CampingUser caster) {
 		LinkedList<PendingCast> futures = pendingCasts.get(caster);
-		PendingCast nextCast = futures.peek();
-		nextCast.waits--;
-		if (nextCast.waits == 0) {
-			futures.remove();
-			castNow(caster, nextCast.victim, nextCast.result, nextCast.chat);
 
-			if (futures.isEmpty()) {
-				pendingCasts.remove(caster);
-				times.remove(event);
+		if (futures != null) {
+			PendingCast nextCast = futures.peek();
+			nextCast.waits--;
+			if (nextCast.waits == 0) {
+				futures.remove();
+				castNow(caster, nextCast.victim, nextCast.result, nextCast.chat);
+
+				if (futures.isEmpty()) {
+					pendingCasts.remove(caster);
+					times.remove(event);
+				}
 			}
 		}
 	}
