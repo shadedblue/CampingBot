@@ -29,6 +29,10 @@ public class MentionFragment extends ResultFragment {
 		this(target, displayMode, caseChoice, TextStyle.Normal, null, null);
 	}
 
+	public MentionFragment(CampingUser target, MentionDisplay displayMode, TextStyle textStyle) {
+		this(target, displayMode, CaseChoice.Normal, textStyle, null, null);
+	}
+
 	public MentionFragment(CampingUser target, MentionDisplay displayMode, CaseChoice caseChoice, TextStyle textStyle,
 			String prefix, String suffix) {
 		super(caseChoice, textStyle);
@@ -43,6 +47,10 @@ public class MentionFragment extends ResultFragment {
 		case Username:
 			display = target.getUsername();
 			break;
+		case Initials:
+			display = target.getInitials();
+			if (display.length() > 0)
+				break;
 		case First:
 		default:
 			display = target.getFirstOrUserName();

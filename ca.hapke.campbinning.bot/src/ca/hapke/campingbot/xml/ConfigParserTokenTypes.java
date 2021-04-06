@@ -61,8 +61,9 @@ public interface ConfigParserTokenTypes {
 	// "<nickname>" = 46
 	// "<first>" = 47
 	// "<last>" = 48
-	// "<name>" = 49
-	// "<interaction>" = 50
-	// "<type>" = 51
-	// "<allowed>" = 52
+	// "<initials>" = 49
+	// "<name>" = 50
+	// "<interaction>" = 51
+	// "<type>" = 52
+	// "<allowed>" = 53
 }

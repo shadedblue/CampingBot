@@ -6,5 +6,6 @@ package ca.hapke.campingbot.response.fragments;
 public enum MentionDisplay {
 	First,
 	Username,
-	Nickname;
+	Nickname,
+	Initials;
 }

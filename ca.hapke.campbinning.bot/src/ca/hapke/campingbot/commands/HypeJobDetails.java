@@ -147,7 +147,11 @@ public class HypeJobDetails extends UpdatingMessageJobDetails {
 		frags.add(new TextFragment(createTitle(title), CaseChoice.Upper, TextStyle.Preformatted));
 		progress = new TextFragment(createProgressBar(pct), CaseChoice.Upper, TextStyle.Preformatted);
 		frags.add(progress);
-		frags.add(new TextFragment(txt, CaseChoice.Normal, finishing ? TextStyle.Normal : TextStyle.Preformatted));
+//		if (finishing) {
+//			
+//		} else {
+		frags.add(new TextFragment(txt, CaseChoice.Normal, TextStyle.Preformatted));
+//		}
 
 		return frags;
 	}

@@ -6,6 +6,7 @@ import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.hapke.util.StringUtil;
 
@@ -63,6 +64,7 @@ public class CampingUser {
 	private String firstname;
 	private String lastname;
 	private String nickname;
+	private String initials;
 
 	private Birthday birthday;
 	private boolean seenInteraction = false;
@@ -79,20 +81,34 @@ public class CampingUser {
 		support.removePropertyChangeListener(pcl);
 	}
 
-	public CampingUser(long telegramId, String username, String firstname, String lastname) {
-		this.campingId = CampingUserMonitor.getInstance().getNextCampingId();
-		this.telegramId = telegramId;
-		this.username = username;
-		this.firstname = firstname;
-		this.lastname = lastname;
-	}
+//	public CampingUser(long telegramId, String username, String firstname, String lastname) {
+//		this.campingId = CampingUserMonitor.getInstance().getNextCampingId();
+//		this.telegramId = telegramId;
+//		this.username = username;
+//		this.firstname = firstname;
+//		this.lastname = lastname;
+//	}
 
-	public CampingUser(long suggestedId, long telegramId, String username, String firstname, String lastname) {
+	public CampingUser(long suggestedId, long telegramId, String username, String firstname, String lastname,
+			String initials) {
 		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
 		this.telegramId = telegramId;
 		this.username = username;
 		this.firstname = firstname;
 		this.lastname = lastname;
+		if (initials != null) {
+			this.initials = initials;
+		} else {
+			String f = getInitial(firstname);
+			String l = getInitial(lastname);
+			this.initials = (f + l).toUpperCase();
+		}
+	}
+
+	private String getInitial(String name) {
+		if (name == null || BotConstants.STRING_NULL.equalsIgnoreCase(name) || name.length() == 0)
+			return "";
+		return name.substring(0, 1);
 	}
 
 	public long getCampingId() {
@@ -113,6 +129,10 @@ public class CampingUser {
 
 	public String getLastname() {
 		return lastname;
+	}
+
+	public String getInitials() {
+		return initials;
 	}
 
 	public String getNickname() {
@@ -185,10 +205,24 @@ public class CampingUser {
 	}
 
 	public void setNickname(String value, boolean inChat) {
+		if (nickname != null && nickname.equals(value))
+			return;
 		String oldVal = nickname;
 		nickname = value;
 
 		support.firePropertyChange("nickname", oldVal, nickname);
+		if (inChat)
+			setSeenInteraction(true);
+	}
+
+	public void setInitials(String value, boolean inChat) {
+		if (initials != null && initials.equals(value))
+			return;
+
+		String oldVal = initials;
+		initials = value;
+
+		support.firePropertyChange("initials", oldVal, initials);
 		if (inChat)
 			setSeenInteraction(true);
 	}

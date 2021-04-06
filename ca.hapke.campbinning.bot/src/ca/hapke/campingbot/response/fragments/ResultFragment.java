@@ -38,17 +38,18 @@ public abstract class ResultFragment {
 	public abstract ResultFragment transform(MessageProcessor proc, boolean useMarkupV2);
 
 	public String casify(String s) {
-		switch (caseChoice) {
-		case Normal:
-			// noop
-			break;
-		case Lower:
-			s = s.toLowerCase();
-			break;
-		case Upper:
-			s = s.toUpperCase();
-			break;
-
+		if (caseChoice != null) {
+			switch (caseChoice) {
+			case Normal:
+				// noop
+				break;
+			case Lower:
+				s = s.toLowerCase();
+				break;
+			case Upper:
+				s = s.toUpperCase();
+				break;
+			}
 		}
 		return s;
 	}

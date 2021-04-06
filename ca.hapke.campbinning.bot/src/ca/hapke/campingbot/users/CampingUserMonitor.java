@@ -160,11 +160,11 @@ public class CampingUserMonitor implements CampingSerializable {
 	}
 
 	public CampingUser monitor(long id, String username, String firstname, String lastname, boolean interacting) {
-		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname, interacting);
+		return monitor(UNKNOWN_USER_ID, id, username, firstname, lastname, null, interacting);
 	}
 
 	public CampingUser monitor(long campingIdInt, long telegramId, String username, String firstname, String lastname,
-			boolean interacting) {
+			String initials, boolean interacting) {
 		String usernameKey = CampingUtil.generateUsernameKey(username);
 
 		CampingUser target = telegramIdMap.get(telegramId);
@@ -175,7 +175,7 @@ public class CampingUserMonitor implements CampingSerializable {
 
 		if (target == null && usernameTarget == null) {
 			// never seen this guy before
-			target = new CampingUser(campingIdInt, telegramId, username, firstname, lastname);
+			target = new CampingUser(campingIdInt, telegramId, username, firstname, lastname, initials);
 			target.setSeenInteraction(interacting);
 			users.add(target);
 			if (telegramId != UNKNOWN_USER_ID)
@@ -250,6 +250,7 @@ public class CampingUserMonitor implements CampingSerializable {
 
 			of.tagAndValue("first", u.getFirstname());
 			of.tagAndValue("last", u.getLastname());
+			of.tagAndValue("initials", u.getInitials());
 			of.tagAndValue("nickname", u.getNickname());
 			of.tagAndValue("interaction", u.isSeenInteraction());
 			Birthday bday = u.getBirthday();

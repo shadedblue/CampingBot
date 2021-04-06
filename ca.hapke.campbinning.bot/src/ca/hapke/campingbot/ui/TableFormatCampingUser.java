@@ -10,8 +10,8 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 public class TableFormatCampingUser extends CampingTableFormat implements AdvancedTableFormat<CampingUser> {
 
 	public TableFormatCampingUser() {
-		super(new String[] { "C-ID", "T-ID", "Username", "First", "Last", "Nickname", "Interaction", "B-Day" },
-				new int[] { 50, 100, 150, 100, 100, 250, 75, 75 });
+		super(new String[] { "C-ID", "T-ID", "Username", "First", "Last", "Initials", "Nickname", "Interaction",
+				"B-Day" }, new int[] { 50, 100, 150, 100, 100, 50, 250, 75, 75 });
 	}
 
 	@Override
@@ -28,10 +28,12 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 		case 4:
 			return CampingUtil.blankTheNull(u.getLastname());
 		case 5:
-			return CampingUtil.blankTheNull(u.getNickname());
+			return CampingUtil.blankTheNull(u.getInitials());
 		case 6:
-			return u.isSeenInteraction();
+			return CampingUtil.blankTheNull(u.getNickname());
 		case 7:
+			return u.isSeenInteraction();
+		case 8:
 			return u.getBirthday();
 		}
 		throw new IllegalStateException();
@@ -48,10 +50,11 @@ public class TableFormatCampingUser extends CampingTableFormat implements Advanc
 		case 3:
 		case 4:
 		case 5:
-			return String.class;
 		case 6:
-			return Boolean.class;
+			return String.class;
 		case 7:
+			return Boolean.class;
+		case 8:
 			return CampingUser.Birthday.class;
 		}
 		throw new IllegalStateException();

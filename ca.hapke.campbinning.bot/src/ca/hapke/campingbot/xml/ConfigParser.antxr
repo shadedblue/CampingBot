@@ -253,7 +253,7 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 	;
 
 <user> [CampingUserMonitor um]
-{	String campingId = "null", id, username, first, last, nickname, birthdayMonth = null, birthdayDay = null, lastUpdate, interaction = null;
+{	String campingId = "null", id, username, first, last, initials = null, nickname, birthdayMonth = null, birthdayDay = null, lastUpdate, interaction = null;
 	CampingUser user;
 }
 	:	( campingId=<campingId> ) ?
@@ -261,6 +261,7 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 		username=<username>
 		first=<first>
 		last=<last>
+		( initials=<initials> ) ?
 		nickname=<nickname>
 		( interaction=<interaction> ) ?
 		(   birthdayMonth=<birthdayMonth>
@@ -287,7 +288,7 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 			}
 		}
 			
-		user = um.monitor(campingIdInt, idInt, username, first, last, inter);
+		user = um.monitor(campingIdInt, idInt, username, first, last, initials, inter);
 		user.setNickname(nickname, false);
 		
 		int bM = -1, bD=-1;
@@ -374,6 +375,9 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <last> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<initials> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <name> returns [String value = null]
