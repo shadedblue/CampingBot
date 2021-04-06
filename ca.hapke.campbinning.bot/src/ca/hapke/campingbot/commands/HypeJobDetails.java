@@ -3,15 +3,20 @@ package ca.hapke.campingbot.commands;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.processors.BlotProcessor;
 import ca.hapke.campingbot.processors.OverlayProcessor;
 import ca.hapke.campingbot.response.fragments.CaseChoice;
+import ca.hapke.campingbot.response.fragments.MentionDisplay;
+import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.util.CollectionUtil;
 import ca.hapke.util.StringUtil;
 
@@ -129,6 +134,12 @@ public class HypeJobDetails extends UpdatingMessageJobDetails {
 		return frags;
 	}
 
+	/**
+	 * https://telegram.org/faq#q-what-can-i-use-as-my-username must be 5+ chars long
+	 */
+	private static final String USERNAME_PATTERN = "@[A-Za-z0-9_]{5,}";
+	private static final Pattern USERNAME_REGEX = Pattern.compile(USERNAME_PATTERN);
+
 	public List<ResultFragment> createText(String txt, int step, boolean finishing) {
 		List<ResultFragment> frags = new ArrayList<>(5);
 
@@ -147,11 +158,28 @@ public class HypeJobDetails extends UpdatingMessageJobDetails {
 		frags.add(new TextFragment(createTitle(title), CaseChoice.Upper, TextStyle.Preformatted));
 		progress = new TextFragment(createProgressBar(pct), CaseChoice.Upper, TextStyle.Preformatted);
 		frags.add(progress);
-//		if (finishing) {
-//			
-//		} else {
-		frags.add(new TextFragment(txt, CaseChoice.Normal, TextStyle.Preformatted));
-//		}
+		if (finishing) {
+			int previousBreak = 0;
+			Matcher m = USERNAME_REGEX.matcher(txt);
+			CampingUserMonitor monitor = CampingUserMonitor.getInstance();
+			while (m.find()) {
+				int userBegins = m.start();
+				int userEnds = m.end();
+				String before = txt.substring(previousBreak, userBegins);
+				frags.add(new TextFragment(before, CaseChoice.Normal, TextStyle.Normal));
+				String username = txt.substring(userBegins, userEnds);
+				CampingUser campingUser = monitor.find(username);
+				frags.add(new MentionFragment(campingUser, MentionDisplay.Initials, CaseChoice.Normal));
+
+				previousBreak = userEnds;
+			}
+			if (previousBreak < txt.length()) {
+				String rest = txt.substring(previousBreak);
+				frags.add(new TextFragment(rest, CaseChoice.Normal, TextStyle.Normal));
+			}
+		} else {
+			frags.add(new TextFragment(txt, CaseChoice.Normal, TextStyle.Preformatted));
+		}
 
 		return frags;
 	}

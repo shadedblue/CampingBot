@@ -48,9 +48,11 @@ public class MentionFragment extends ResultFragment {
 			display = target.getUsername();
 			break;
 		case Initials:
-			display = target.getInitials();
-			if (display.length() > 0)
+			String initials = target.getInitials();
+			if (initials.length() > 0) {
+				display = '@' + initials;
 				break;
+			}
 		case First:
 		default:
 			display = target.getFirstOrUserName();
