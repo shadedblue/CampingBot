@@ -71,7 +71,7 @@ public class SetInitialsCommand extends AbstractCommand implements SlashCommand 
 			if (targeting != null) {
 
 				CampingUser targetUser = userMonitor.getUser(targeting);
-				targetUser.setInitials(newInitials, true);
+				targetUser.setInitials(newInitials, false);
 
 				if (targetUser != null) {
 					CommandResult result = new TextCommandResult(SlashSetInitials);

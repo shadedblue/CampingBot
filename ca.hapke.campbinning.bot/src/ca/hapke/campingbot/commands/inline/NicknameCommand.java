@@ -162,7 +162,7 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 								.add(ResultFragment.COLON_SPACE).add(INVALID_CHARACTER);
 					} else {
 						String oldNick = targetUser.getNickname();
-						targetUser.setNickname(newNickname, true);
+						targetUser.setNickname(newNickname, false);
 
 						CommandResult result = new TextCommandResult(SlashSetNickname);
 						result.add(campingFromUser);
