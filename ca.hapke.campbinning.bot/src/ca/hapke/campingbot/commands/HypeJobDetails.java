@@ -10,8 +10,6 @@ import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.processors.BlotProcessor;
 import ca.hapke.campingbot.processors.OverlayProcessor;
 import ca.hapke.campingbot.response.fragments.CaseChoice;
-import ca.hapke.campingbot.response.fragments.MentionDisplay;
-import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
@@ -169,8 +167,9 @@ public class HypeJobDetails extends UpdatingMessageJobDetails {
 				frags.add(new TextFragment(before, CaseChoice.Normal, TextStyle.Normal));
 				String username = txt.substring(userBegins, userEnds);
 				CampingUser campingUser = monitor.find(username);
-				frags.add(new MentionFragment(campingUser, MentionDisplay.Initials, CaseChoice.Normal));
 
+				frags.add(new TextFragment('@' + campingUser.getInitials(), CaseChoice.Upper, TextStyle.Bold));
+//				frags.add(new MentionFragment(campingUser, MentionDisplay.Initials, CaseChoice.Normal));
 				previousBreak = userEnds;
 			}
 			if (previousBreak < txt.length()) {
