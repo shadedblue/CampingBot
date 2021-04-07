@@ -348,13 +348,13 @@ public ConfigParser(ParserSharedInputState state) {
 					sg.setAdjectives(a);
 				
 			{
-			_loop754:
+			_loop897:
 			do {
 				if ((LA(1)==16)) {
 					__xml_pack(sg);
 				}
 				else {
-					break _loop754;
+					break _loop897;
 				}
 				
 			} while (true);
@@ -425,14 +425,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop741:
+			_loop884:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop741;
+					break _loop884;
 				}
 				
 			} while (true);
@@ -478,13 +478,13 @@ public ConfigParser(ParserSharedInputState state) {
 			match(23);
 			{
 			{
-			_loop785:
+			_loop928:
 			do {
 				if ((LA(1)==24)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop785;
+					break _loop928;
 				}
 				
 			} while (true);
@@ -528,13 +528,13 @@ public ConfigParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop798:
+			_loop941:
 			do {
 				if ((LA(1)==27)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop798;
+					break _loop941;
 				}
 				
 			} while (true);
@@ -566,14 +566,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop737:
+			_loop880:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop737;
+					break _loop880;
 				}
 				
 			} while (true);
@@ -599,14 +599,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop729:
+			_loop872:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop729;
+					break _loop872;
 				}
 				
 			} while (true);
@@ -632,14 +632,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop733:
+			_loop876:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop733;
+					break _loop876;
 				}
 				
 			} while (true);
@@ -935,14 +935,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop769:
+			_loop912:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop769;
+					break _loop912;
 				}
 				
 			} while (true);
@@ -968,14 +968,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop773:
+			_loop916:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop773;
+					break _loop916;
 				}
 				
 			} while (true);
@@ -1001,14 +1001,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop765:
+			_loop908:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop765;
+					break _loop908;
 				}
 				
 			} while (true);
@@ -1102,14 +1102,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop761:
+			_loop904:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop761;
+					break _loop904;
 				}
 				
 			} while (true);
@@ -1135,14 +1135,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop777:
+			_loop920:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop777;
+					break _loop920;
 				}
 				
 			} while (true);
@@ -1168,14 +1168,14 @@ public ConfigParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop781:
+			_loop924:
 			do {
 				if ((LA(1)==42)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop781;
+					break _loop924;
 				}
 				
 			} while (true);
@@ -1348,7 +1348,7 @@ public ConfigParser(ParserSharedInputState state) {
 					String value;
 				
 			{
-			_loop793:
+			_loop936:
 			do {
 				if ((LA(1)==42)) {
 					value=__xml_item();
@@ -1363,7 +1363,7 @@ public ConfigParser(ParserSharedInputState state) {
 						
 				}
 				else {
-					break _loop793;
+					break _loop936;
 				}
 				
 			} while (true);
@@ -1540,7 +1540,7 @@ public ConfigParser(ParserSharedInputState state) {
 					}
 						
 					user = um.monitor(campingIdInt, idInt, username, first, last, initials, inter);
-					user.setNickname(nickname, false);
+					user.setNickname(nickname);
 					
 					int bM = -1, bD=-1;
 					if (birthdayMonth != null)

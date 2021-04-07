@@ -170,7 +170,9 @@ public class CampingUser {
 		if (lastname == null)
 			setUsername(other.lastname);
 		if (nickname == null)
-			setNickname(other.nickname, false);
+			setNickname(other.nickname);
+		if (initials == null)
+			setInitials(other.initials);
 		if (birthday == null && other.birthday != null)
 			setBirthday(other.birthday.month, other.birthday.day);
 		setSeenInteraction(other.seenInteraction);
@@ -204,18 +206,16 @@ public class CampingUser {
 		}
 	}
 
-	public void setNickname(String value, boolean inChat) {
+	public void setNickname(String value) {
 		if (nickname != null && nickname.equals(value))
 			return;
 		String oldVal = nickname;
 		nickname = value;
 
 		support.firePropertyChange("nickname", oldVal, nickname);
-		if (inChat)
-			setSeenInteraction(true);
 	}
 
-	public void setInitials(String value, boolean inChat) {
+	public void setInitials(String value) {
 		if (initials != null && initials.equals(value))
 			return;
 
@@ -223,8 +223,6 @@ public class CampingUser {
 		initials = value;
 
 		support.firePropertyChange("initials", oldVal, initials);
-		if (inChat)
-			setSeenInteraction(true);
 	}
 
 	public boolean equals(CampingUser that) {

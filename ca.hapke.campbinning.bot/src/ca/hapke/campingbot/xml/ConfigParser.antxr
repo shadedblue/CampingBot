@@ -289,7 +289,7 @@ document[ CampingSystem cs, SpellCommand sg, HypeCommand hype, PartyEverydayComm
 		}
 			
 		user = um.monitor(campingIdInt, idInt, username, first, last, initials, inter);
-		user.setNickname(nickname, false);
+		user.setNickname(nickname);
 		
 		int bM = -1, bD=-1;
 		if (birthdayMonth != null)
