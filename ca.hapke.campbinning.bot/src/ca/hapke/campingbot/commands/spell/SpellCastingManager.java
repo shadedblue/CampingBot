@@ -53,8 +53,7 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 	private static final String COMBO_BREAKER = "ComboBreaker";
 	private CategoriedItems<ImageLink> images;
 	private List<ImageLink> breakerImages;
-	private ImageLink koImg = new ImageLink("http://www.hapke.ca/images/spell-ko.mp4", ImageLink.GIF);
-	private ImageLink deadImg = new ImageLink("http://www.hapke.ca/images/spell-dead.mp4", ImageLink.GIF);
+	private ImageLink koDeadImg = new ImageLink("http://www.hapke.ca/images/spell-ko-dead.mp4", ImageLink.GIF);
 	private Resources resources;
 
 	public SpellCastingManager(CampingBot bot) {
@@ -125,11 +124,8 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 			// TODO Punish a bit
 		} else if (comboType == ComboType.KO) {
 			// KO GIF
-			ImageCommandResult ko = new ImageCommandResult(SpellCommand.SlashSpellCommand, koImg);
-			ko.sendAndLog(bot, chat);
-			// DEAD GIF
-			ImageCommandResult dead = new ImageCommandResult(SpellCommand.SlashSpellCommand, deadImg);
-			dead.sendAndLog(bot, chat);
+			ImageCommandResult koDead = new ImageCommandResult(SpellCommand.SlashSpellCommand, koDeadImg);
+			koDead.sendAndLog(bot, chat);
 		}
 	}
 

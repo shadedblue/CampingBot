@@ -38,7 +38,7 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2021, 4, 20, 4, 20, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2021, 5, 20, 23, 0, 00).toZonedDateTime();
 	private Resources res;
 	private MbiyfCommand ballsCommand;
 	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);

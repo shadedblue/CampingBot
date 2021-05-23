@@ -169,6 +169,8 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 		if (userRestriction != null && !userRestriction.contains(targetUser))
 			return null;
+		if (targetUser == null)
+			return null;
 
 		CampingUser me = bot.getMeCamping();
 		if (targetUser == me && !userRestriction.contains(me)) {
@@ -178,12 +180,15 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 
 		Emoji ball = res.getRandomBallEmoji();
 		Emoji face = res.getRandomFaceEmoji();
+		CommandResult result;
 
-		if (targetUser == null)
-			return null;
+		if (targetUser == me) {
+			result = new TextCommandResult(MbiyfCommand).add(campingFromUser).add(APOSTROPHE_S).add(ball).add(IN)
+					.add(MY);
+		} else {
+			result = new TextCommandResult(MbiyfCommand, MY).add(ball).add(IN).add(targetUser).add(APOSTROPHE_S);
+		}
 
-		CommandResult result = new TextCommandResult(MbiyfCommand, MY).add(ball).add(IN).add(targetUser)
-				.add(APOSTROPHE_S);
 		if (mode == MbiyfType.Birthday) {
 			result.add(res.getCake());
 		}
