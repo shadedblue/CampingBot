@@ -101,7 +101,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 			fridayImages.add(lnk);
 		}
 		birthdayImages = mbiyfImages.getList(BIRTHDAY_IMAGES);
-		for (int i = 1; i <= 3; i++) {
+		for (int i = 1; i <= 4; i++) {
 			String url = "http://www.hapke.ca/images/birthday" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
 			birthdayImages.add(lnk);
