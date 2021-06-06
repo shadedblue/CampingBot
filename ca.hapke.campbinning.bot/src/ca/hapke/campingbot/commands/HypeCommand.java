@@ -16,6 +16,7 @@ import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.NoopCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.util.StagedJob;
 import ca.hapke.campingbot.xml.OutputFormatter;
 import ca.hapke.util.CollectionUtil;
@@ -74,7 +75,14 @@ public class HypeCommand extends AbstractCommand implements CampingSerializable,
 			String searchTerm = incoming.substring(incoming.indexOf(' ') + 1);
 			hype = CollectionUtil.search(searchTerm, hypes);
 		} else {
-			hype = CollectionUtil.getRandom(hypes);
+			Message replyToMessage = message.getReplyToMessage();
+			if (replyToMessage != null) {
+				CampingUser target = CampingUserMonitor.getInstance().getUser(replyToMessage.getFrom());
+				String searchTerm = '(' + target.getInitials() + ')';
+				hype = CollectionUtil.search(searchTerm, hypes);
+			} else {
+				hype = CollectionUtil.getRandom(hypes);
+			}
 		}
 		HypeJobDetails details = new HypeJobDetails(campingFromUser, chatId, hype, bot, dicks);
 		softStart(details);
