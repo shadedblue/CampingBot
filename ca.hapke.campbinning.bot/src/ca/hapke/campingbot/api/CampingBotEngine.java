@@ -522,10 +522,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			BotChoicePriority priority) {
 		CampingUser currentChoice = null;
 		if (replyFirst) {
-			Message replyTo = message.getReplyToMessage();
-			if (replyTo != null) {
-				currentChoice = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
-			}
+			currentChoice = isReplyBetterChoice(message, priority, currentChoice);
 		}
 
 		List<MessageEntity> entities = message.getEntities();
@@ -564,10 +561,18 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			}
 		}
 
-		if (currentChoice == null) {
-			Message replyTo = message.getReplyToMessage();
-			if (replyTo != null) {
-				currentChoice = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
+		if (currentChoice == null && !replyFirst) {
+			currentChoice = isReplyBetterChoice(message, priority, currentChoice);
+		}
+		return currentChoice;
+	}
+
+	private CampingUser isReplyBetterChoice(Message message, BotChoicePriority priority, CampingUser currentChoice) {
+		Message replyTo = message.getReplyToMessage();
+		if (replyTo != null) {
+			CampingUser possibleChoice = CampingUserMonitor.getInstance().getUser(replyTo.getFrom());
+			if (isBetterSelection(true, 0, 1, currentChoice, possibleChoice, priority)) {
+				currentChoice = possibleChoice;
 			}
 		}
 		return currentChoice;

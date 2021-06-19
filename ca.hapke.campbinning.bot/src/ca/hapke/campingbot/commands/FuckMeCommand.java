@@ -25,7 +25,7 @@ public class FuckMeCommand extends AbstractCommand implements TextCommand, Slash
 
 	private static final String FU = "fu";
 	private static final String FUCK_ME = "Fuck me?";
-	private static final String FUCK_YOU = "fuck you";
+	private static final String FUCK = "fuck";
 	private static final SlashCommandType FU_COMMAND = new SlashCommandType(FUCK_ME, FU,
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.TEXT | BotCommandIds.USE);
 
@@ -62,8 +62,8 @@ public class FuckMeCommand extends AbstractCommand implements TextCommand, Slash
 
 	@Override
 	public boolean isMatch(String msg, Message message) {
-		CampingUser targetUser = bot.findTarget(message, true, true, BotChoicePriority.Only);
-		return targetUser != null && msg.toLowerCase().contains(FUCK_YOU);
+		CampingUser targetUser = bot.findTarget(message, false, true, BotChoicePriority.Only);
+		return targetUser != null && msg.toLowerCase().contains(FUCK);
 	}
 
 	@Override
