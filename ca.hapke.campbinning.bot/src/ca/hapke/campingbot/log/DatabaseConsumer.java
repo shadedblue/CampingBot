@@ -9,10 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByCalendar;
@@ -21,18 +17,31 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.log.DatabaseQuery.ColumnType;
 import ca.odell.glazedlists.EventList;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 /**
  * @author Nathan Hapke
  */
 public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
+	private static DatabaseConsumer instance;
 	private CampingSystem system;
 	private EventLogger eventLogger;
 	private Connection connection;
 	private TimesProvider<Void> times;
 	private EntityManager manager;
 
-	public DatabaseConsumer(CampingSystem system, EventLogger eventLogger) {
+	public static DatabaseConsumer init(CampingSystem system, EventLogger eventLogger) {
+		instance = new DatabaseConsumer(system, eventLogger);
+		return instance;
+	}
+
+	public static DatabaseConsumer getInstance() {
+		return instance;
+	}
+
+	private DatabaseConsumer(CampingSystem system, EventLogger eventLogger) {
 		this.system = system;
 		this.eventLogger = eventLogger;
 		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 15, ChronoUnit.SECONDS));
@@ -44,6 +53,7 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 		String dbUser = system.getDbUser();
 		String dbPass = system.getDbPass();
 		String db = system.getDbDb();
+		String dbDriver = system.getDbDriver();
 
 		try {
 			if (system.isDbEnabled() && (connection == null || connection.isClosed())) {
@@ -63,9 +73,11 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 			if (system.isDbEnabled() && manager == null) {
 				Map<String, String> persistenceMap = new HashMap<String, String>();
 				String url2 = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + db;
-				persistenceMap.put("javax.persistence.jdbc.url", url2);
-				persistenceMap.put("javax.persistence.jdbc.user", dbUser);
-				persistenceMap.put("javax.persistence.jdbc.password", dbPass);
+				persistenceMap.put("jakarta.persistence.jdbc.url", url2);
+				persistenceMap.put("jakarta.persistence.jdbc.user", dbUser);
+				persistenceMap.put("jakarta.persistence.jdbc.password", dbPass);
+				persistenceMap.put("jakarta.persistence.jdbc.driver", dbDriver);
+				persistenceMap.put("jakarta.persistence.schema-generation.database.action", "create");
 				EntityManagerFactory emf = Persistence.createEntityManagerFactory("campingbot", persistenceMap);
 				manager = emf.createEntityManager();
 			}

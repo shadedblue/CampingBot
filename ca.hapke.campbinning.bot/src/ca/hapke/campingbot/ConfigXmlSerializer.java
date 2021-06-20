@@ -20,6 +20,7 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.api.ConfigSerializer;
+import ca.hapke.campingbot.api.PostConfigInit;
 import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
@@ -28,12 +29,13 @@ import ca.hapke.campingbot.commands.spell.SpellCommand;
 import ca.hapke.campingbot.response.InsultGenerator;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.xml.ConfigParser;
+import ca.hapke.campingbot.xml.ContentParser;
 import ca.hapke.campingbot.xml.OutputFormatter;
 
 /**
  * @author Nathan Hapke
  */
-public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSerializer {
+public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSerializer, PostConfigInit {
 	private TimesProvider<Void> times;
 	private boolean shouldSave = false;
 
@@ -58,7 +60,9 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	}
 
 	private static final String CHARSET_TO_USE = "UTF-16";
-	private static final String FILENAME = "config.xml";
+	private static final String OLD_FILENAME = "config.xml";
+	private static final String SETTINGS_FILENAME = "settings.xml";
+	private static final String CONTENT_FILENAME = "content.xml";
 	private CampingSerializable[] serializables;
 	private CampingSystem cs;
 	private SpellCommand sg;
@@ -90,7 +94,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 
 	@Override
 	public File save() {
-		return save(FILENAME);
+		return save(OLD_FILENAME);
 	}
 
 	public File save(String fn) {
@@ -148,28 +152,50 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 
 	@Override
 	public boolean load() {
-		boolean result = load(FILENAME);
-		if (!result)
-			result = load(getBackupFilename(FILENAME));
-		return result;
-	}
-
-	public boolean load(String fn) {
 		try {
-			File f = getFileNotInBinFolder(protectionDomain, fn);
-			return load(f);
-		} catch (Exception ex) {
+			loadSettings(SETTINGS_FILENAME);
+			return true;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		return false;
 	}
 
-	public boolean load(File f) throws IOException, ClassNotFoundException {
-		BasicCrimsonXMLTokenStream stream = new BasicCrimsonXMLTokenStream(
-				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ConfigParser.class, false, false);
-		ConfigParser parser = new ConfigParser(stream);
+	@Override
+	public void init() {
 		try {
-			parser.document(cs, sg, hype, pc, cm, um, ig, ec);
+			loadContent(CONTENT_FILENAME);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean loadSettings(String fn) throws IOException, ClassNotFoundException {
+		File f = getFileNotInBinFolder(protectionDomain, fn);
+		BasicCrimsonXMLTokenStream stream1 = new BasicCrimsonXMLTokenStream(
+				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ConfigParser.class, false, false);
+		ConfigParser conf = new ConfigParser(stream1);
+		try {
+			conf.document(cs);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public boolean loadContent(String fn) throws IOException, ClassNotFoundException {
+		File f = getFileNotInBinFolder(protectionDomain, fn);
+		BasicCrimsonXMLTokenStream stream2 = new BasicCrimsonXMLTokenStream(
+				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ContentParser.class, false, false);
+		ContentParser cont = new ContentParser(stream2);
+		try {
+			cont.document(sg, hype, pc, cm, um, ig, ec);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -186,4 +212,5 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	public StartupMode getStartupMode() {
 		return StartupMode.Never;
 	}
+
 }

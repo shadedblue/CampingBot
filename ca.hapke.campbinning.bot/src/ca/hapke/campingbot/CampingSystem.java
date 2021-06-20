@@ -30,6 +30,7 @@ public class CampingSystem implements CampingSerializable {
 	private boolean dbEnabled = false;
 	private boolean connectOnStartup = false;
 	private String dbDb;
+	private String dbDriver;
 
 	public String getDbHost() {
 		return dbHost;
@@ -51,11 +52,15 @@ public class CampingSystem implements CampingSerializable {
 		return dbDb;
 	}
 
+	public String getDbDriver() {
+		return dbDriver;
+	}
+
 	public boolean isDbEnabled() {
 		return dbEnabled;
 	}
 
-	public void enableDb(String host, int port, String user, String pass, String db) {
+	public void enableDb(String host, int port, String user, String pass, String db, String driver) {
 		if (this.dbHost == null && this.dbPort == -1 && this.dbUser == null && this.dbPass == null
 				&& this.dbDb == null) {
 			if (port <= 0)
@@ -66,6 +71,7 @@ public class CampingSystem implements CampingSerializable {
 			this.dbUser = user;
 			this.dbPass = pass;
 			this.dbDb = db;
+			this.dbDriver = driver;
 		}
 	}
 

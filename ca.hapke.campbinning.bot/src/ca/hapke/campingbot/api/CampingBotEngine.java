@@ -650,6 +650,10 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		callbackMap.put(cc.getCommandName(), cc);
 	}
 
+	protected void addPostConfigInit(PostConfigInit e) {
+		wantsInits.add(e);
+	}
+
 	public boolean isOnline() {
 		return online;
 	}

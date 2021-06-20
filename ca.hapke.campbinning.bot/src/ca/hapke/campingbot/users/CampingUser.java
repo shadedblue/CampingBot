@@ -2,20 +2,33 @@ package ca.hapke.campingbot.users;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.Serializable;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
 import ca.hapke.campingbot.BotConstants;
+import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.hapke.util.StringUtil;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * @author Nathan Hapke
  */
-public class CampingUser {
-	public class Birthday implements Comparable<Birthday> {
+@Entity
+@Table(name = CampingUser.USER_TABLE)
+public class CampingUser implements Serializable {
+	private static final long serialVersionUID = 3805021853368529014L;
+	public static final String USER_TABLE = "Users";
 
+	public class Birthday implements Comparable<Birthday> {
 		public Birthday(int month, int day) {
 			this.month = month;
 			this.day = day;
@@ -59,17 +72,23 @@ public class CampingUser {
 	}
 
 	private long telegramId = -1;
-	private final long campingId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private long campingId;
 	private String username;
 	private String firstname;
 	private String lastname;
 	private String nickname;
 	private String initials;
+	private int birthdayMonth = -1;
+	private int birthdayDay = -1;
 
+	@Transient
 	private Birthday birthday;
 	private boolean seenInteraction = false;
 
 	// For GlazedLists to autosort
+	@Transient
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
 	public static final String UNKNOWN_TARGET = "unknown target";
 
@@ -88,10 +107,13 @@ public class CampingUser {
 //		this.firstname = firstname;
 //		this.lastname = lastname;
 //	}
+	public CampingUser() {
+
+	}
 
 	public CampingUser(long suggestedId, long telegramId, String username, String firstname, String lastname,
 			String initials) {
-		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
+//		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
 		this.telegramId = telegramId;
 		this.username = username;
 		this.firstname = firstname;
@@ -139,19 +161,6 @@ public class CampingUser {
 		return nickname;
 	}
 
-	public void setBirthday(int month, int day) {
-		if (birthday != null)
-			return;
-
-		if (month == -1 || day == -1 || month > 12 || day > 31)
-			return;
-
-		birthday = new Birthday(month, day);
-
-		support.firePropertyChange("birthdayMonth", -1, month);
-		support.firePropertyChange("birthdayDay", -1, day);
-	}
-
 	public boolean hasBirthday() {
 		return birthday != null;
 	}
@@ -160,9 +169,13 @@ public class CampingUser {
 		return birthday;
 	}
 
+	public boolean isSeenInteraction() {
+		return seenInteraction;
+	}
+
 	public void mergeFrom(CampingUser other) {
 		if (telegramId < 0)
-			setId(other.telegramId);
+			setTelegramId(other.telegramId);
 		if (username == null)
 			setUsername(other.username);
 		if (firstname == null)
@@ -178,10 +191,21 @@ public class CampingUser {
 		setSeenInteraction(other.seenInteraction);
 	}
 
-	public void setId(Long id) {
+	public void setTelegramId(Long id) {
 		if (this.telegramId == -1) {
 			this.telegramId = id;
-			support.firePropertyChange("id", null, id);
+			support.firePropertyChange("telegramId", null, id);
+
+			updatePersistence();
+		}
+	}
+
+	public void setCampingId(Long id) {
+		if (this.campingId == -1) {
+			this.campingId = id;
+			support.firePropertyChange("campingId", null, id);
+
+			updatePersistence();
 		}
 	}
 
@@ -189,6 +213,8 @@ public class CampingUser {
 		if (this.username == null && username != null) {
 			this.username = username;
 			support.firePropertyChange("username", null, username);
+
+			updatePersistence();
 		}
 	}
 
@@ -196,6 +222,8 @@ public class CampingUser {
 		if (this.firstname == null && firstname != null) {
 			this.firstname = firstname;
 			support.firePropertyChange("firstname", null, firstname);
+
+			updatePersistence();
 		}
 	}
 
@@ -203,6 +231,8 @@ public class CampingUser {
 		if (this.lastname == null && lastname != null) {
 			this.lastname = lastname;
 			support.firePropertyChange("lastname", null, lastname);
+
+			updatePersistence();
 		}
 	}
 
@@ -213,6 +243,7 @@ public class CampingUser {
 		nickname = value;
 
 		support.firePropertyChange("nickname", oldVal, nickname);
+		updatePersistence();
 	}
 
 	public void setInitials(String value) {
@@ -223,6 +254,44 @@ public class CampingUser {
 		initials = value;
 
 		support.firePropertyChange("initials", oldVal, initials);
+		updatePersistence();
+	}
+
+	public void setSeenInteraction(boolean seenInteraction) {
+		if (this.seenInteraction == false && seenInteraction) {
+			this.seenInteraction = true;
+			support.firePropertyChange("seenInteraction", false, true);
+			updatePersistence();
+		}
+	}
+
+	public void setBirthday(int month, int day) {
+		if (birthday != null)
+			return;
+
+		if (month == -1 || day == -1 || month > 12 || day > 31)
+			return;
+
+		birthday = new Birthday(month, day);
+
+		setBirthdayMonth(month);
+		setBirthdayDay(day);
+	}
+
+	public void setBirthdayDay(int day) {
+		if (birthday == null)
+			birthday = new Birthday(-1, day);
+		this.birthday.day = day;
+		this.birthdayDay = day;
+		support.firePropertyChange("birthdayDay", -1, day);
+	}
+
+	public void setBirthdayMonth(int month) {
+		if (birthday == null)
+			birthday = new Birthday(month, -1);
+		this.birthday.month = month;
+		this.birthdayMonth = month;
+		support.firePropertyChange("birthdayMonth", -1, month);
 	}
 
 	public boolean equals(CampingUser that) {
@@ -262,17 +331,6 @@ public class CampingUser {
 		return CampingUtil.prefixAt(username);
 	}
 
-	public boolean isSeenInteraction() {
-		return seenInteraction;
-	}
-
-	public void setSeenInteraction(boolean seenInteraction) {
-		if (this.seenInteraction == false && seenInteraction) {
-			this.seenInteraction = true;
-			support.firePropertyChange("seenInteraction", false, true);
-		}
-	}
-
 	public String getNameForLog() {
 		StringBuilder sb = new StringBuilder();
 		if (firstname != null)
@@ -289,4 +347,13 @@ public class CampingUser {
 		return sb.toString();
 	}
 
+	private void updatePersistence() {
+		DatabaseConsumer db = DatabaseConsumer.getInstance();
+		if (db != null) {
+			EntityManager mgr = db.getManager();
+			mgr.getTransaction().begin();
+			mgr.persist(this);
+			mgr.getTransaction().commit();
+		}
+	}
 }

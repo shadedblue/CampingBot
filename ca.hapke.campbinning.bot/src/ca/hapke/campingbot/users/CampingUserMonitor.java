@@ -188,7 +188,7 @@ public class CampingUserMonitor implements CampingSerializable {
 		} else if (target == null && usernameTarget != null) {
 			if (telegramId != UNKNOWN_USER_ID) {
 				// learned the id
-				usernameTarget.setId(telegramId);
+				usernameTarget.setTelegramId(telegramId);
 				usernameTarget.setSeenInteraction(interacting);
 				telegramIdMap.put(telegramId, usernameTarget);
 

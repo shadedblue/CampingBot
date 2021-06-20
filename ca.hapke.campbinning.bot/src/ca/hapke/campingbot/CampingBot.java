@@ -89,7 +89,7 @@ public class CampingBot extends CampingBotEngine {
 		enhanceCommand = new EnhanceCommand(this);
 		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
-		databaseConsumer = new DatabaseConsumer(system, eventLogger);
+		databaseConsumer = DatabaseConsumer.init(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
@@ -112,8 +112,10 @@ public class CampingBot extends CampingBotEngine {
 
 		addStatusUpdate(statusCommand);
 
-		serializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand, hypeCommand, partyCommand,
-				chatManager, userMonitor, insultGenerator, enhanceCommand);
+		ConfigXmlSerializer fullSerializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand,
+				hypeCommand, partyCommand, chatManager, userMonitor, insultGenerator, enhanceCommand);
+		serializer = fullSerializer;
+		addPostConfigInit(fullSerializer);
 
 		hasCategories.add(insultGenerator);
 		quantityCommand = new QuantityCommand(hasCategories);
