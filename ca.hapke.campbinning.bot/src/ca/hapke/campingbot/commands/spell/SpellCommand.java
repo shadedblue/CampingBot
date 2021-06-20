@@ -57,7 +57,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	private CampingBot bot;
 	private boolean shouldSave = false;
 
-	private SpellPacks categoriesByGenre = new SpellPacks();
+	private SpellPacks packs = new SpellPacks();
 	private SpellCastingManager castManager;
 
 	private CategoriedItems<String> categories;
@@ -135,18 +135,21 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		String word;
 		if (second > 0) {
 			word = msg.substring(second + 1);
-			chosenPack = categoriesByGenre.get(word, false);
+			chosenPack = packs.get(word, false);
 		}
 		if (chosenPack == null && first > 0) {
 			word = msg.substring(first + 1);
-			chosenPack = categoriesByGenre.get(word, false);
+			chosenPack = packs.get(word, false);
 		}
 
 		if (chosenPack != null)
 			return chosenPack;
 
-		return categoriesByGenre.getRandomPack();
+		return packs.getRandomPack();
+	}
 
+	public SpellPacks getPacks() {
+		return packs;
 	}
 
 	@Override
@@ -165,10 +168,10 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	}
 
 	public void setValues(String genre, List<String> aliases, List<String> items, List<String> exclamations) {
-		CategoriedItems<String> categories = categoriesByGenre.get(genre, true);
+		CategoriedItems<String> categories = packs.get(genre, true);
 
 		if (aliases != null)
-			categoriesByGenre.addAliases(genre, aliases);
+			packs.addAliases(genre, aliases);
 
 		if (categories.putAll(ITEM_CATEGORY, items))
 			shouldSave = true;
@@ -181,9 +184,9 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	public List<String> getCategoryNames() {
 		List<String> extras = categories.getCategoryNames();
 		int extraSize = extras.size();
-		List<String> out = new ArrayList<>(categoriesByGenre.size() * 2 + extraSize);
+		List<String> out = new ArrayList<>(packs.size() * 2 + extraSize);
 		out.addAll(extras);
-		categoriesByGenre.addCategoryNames(out);
+		packs.addCategoryNames(out);
 		return out;
 	}
 
@@ -197,7 +200,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 			String genre = name.substring(0, splitter);
 			String category = name.substring(splitter + 1);
 
-			CategoriedItems<String> categories = categoriesByGenre.get(genre, false);
+			CategoriedItems<String> categories = packs.get(genre, false);
 			return categories.getList(category);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -213,7 +216,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 			String genre = category.substring(0, splitter);
 			category = category.substring(splitter + 1);
 
-			cats = categoriesByGenre.get(genre, false);
+			cats = packs.get(genre, false);
 		} else {
 			cats = this.categories;
 		}
@@ -239,9 +242,9 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		// for adjectives
 		of.tagCategories(categories);
 
-		for (Map.Entry<String, CategoriedItems<String>> e : categoriesByGenre.entrySet()) {
+		for (Map.Entry<String, CategoriedItems<String>> e : packs.entrySet()) {
 			String genre = e.getKey();
-			Set<String> aliases = categoriesByGenre.getAliases(genre);
+			Set<String> aliases = packs.getAliases(genre);
 			CategoriedItems<String> data = e.getValue();
 
 			String innerTag = "pack";
