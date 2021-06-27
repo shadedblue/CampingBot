@@ -7,26 +7,25 @@ import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.hapke.util.StringUtil;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 /**
  * @author Nathan Hapke
  */
 @Entity
-@Table(name = CampingUser.USER_TABLE)
+@Table(name = CampingUser.USER_TABLE, schema = DatabaseConsumer.SCHEMA)
 public class CampingUser implements Serializable {
 	private static final long serialVersionUID = 3805021853368529014L;
-	public static final String USER_TABLE = "Users";
+	public static final String USER_TABLE = "users";
 
 	public class Birthday implements Comparable<Birthday> {
 		public Birthday(int month, int day) {
@@ -73,7 +72,8 @@ public class CampingUser implements Serializable {
 
 	private long telegramId = -1;
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	// TODO enable after migration
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private long campingId;
 	private String username;
 	private String firstname;
@@ -113,7 +113,9 @@ public class CampingUser implements Serializable {
 
 	public CampingUser(long suggestedId, long telegramId, String username, String firstname, String lastname,
 			String initials) {
-//		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
+		// TODO disable after migration
+		this.campingId = CampingUserMonitor.getInstance().getNextCampingId(suggestedId);
+
 		this.telegramId = telegramId;
 		this.username = username;
 		this.firstname = firstname;
@@ -124,6 +126,10 @@ public class CampingUser implements Serializable {
 			String f = getInitial(firstname);
 			String l = getInitial(lastname);
 			this.initials = (f + l).toUpperCase();
+		}
+		try {
+			addPersistence();
+		} catch (Exception e) {
 		}
 	}
 
@@ -347,7 +353,17 @@ public class CampingUser implements Serializable {
 		return sb.toString();
 	}
 
-	private void updatePersistence() {
+	void updatePersistence() {
+		DatabaseConsumer db = DatabaseConsumer.getInstance();
+		if (db != null) {
+			EntityManager mgr = db.getManager();
+			mgr.getTransaction().begin();
+			mgr.merge(this);
+			mgr.getTransaction().commit();
+		}
+	}
+
+	void addPersistence() {
 		DatabaseConsumer db = DatabaseConsumer.getInstance();
 		if (db != null) {
 			EntityManager mgr = db.getManager();

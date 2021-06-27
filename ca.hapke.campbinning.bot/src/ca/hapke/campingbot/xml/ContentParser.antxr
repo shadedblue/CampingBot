@@ -19,7 +19,6 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
     
 <camping> [SpellCommand sg, HypeCommand hype,  PartyEverydayCommand pc, CampingChatManager cm, CampingUserMonitor um, InsultGenerator ig, EnhanceCommand ec]
 	:
-	( <system> )?
 	(<spell>[sg] )?
 	(<countdown>[hype])?
 	(<party>[pc]) ?
@@ -204,14 +203,14 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
     )*
 	;
 <users> [CampingUserMonitor um]
-	{String campingId = null; }
+	{String nextId = null; }
 	: 
-	( campingId=<nextCampingId> ) ?
+	( nextId=<nextCampingId> ) ?
 	(<user>[um]) *
 	{
-		if (campingId != null && !"null".equalsIgnoreCase(campingId)) {
-			int campingIdInt = Integer.parseInt(campingId);
-			um.setNextCampingId(campingIdInt);
+		if (nextId != null && um != null && !"null".equalsIgnoreCase(nextId)) {
+			int nextIdInt = Integer.parseInt(nextId);
+			um.setNextCampingId(nextIdInt);
 		} 
 	}
 	;
@@ -232,6 +231,8 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
 			birthdayDay=<birthdayDay>
 		) ?
 	{
+		if (um == null)
+			return;
 			
 		int campingIdInt = CampingUserMonitor.UNKNOWN_USER_ID;
 		if (!"null".equalsIgnoreCase(campingId)) {
@@ -322,22 +323,6 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
     
-    
-    
-<system>:
-	 <token>
-	 <botUsername>
-	(<adminUser>)?
-	(<connectOnStartup>)?
-	(<db>) ?
-	;
-<db>:
-	<dbHost>
-	<dbPort>
-	<dbUser>
-	<dbPass>
-	<dbDb>
-	;
 <token> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
@@ -345,21 +330,6 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <adminUser> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<dbHost> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<dbPort> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<dbUser> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<dbPass> returns [String value = null]
-    :   pcdata:PCDATA { value = pcdata.getText(); }
-    ;
-<dbDb> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <connectOnStartup> returns [String value = null]

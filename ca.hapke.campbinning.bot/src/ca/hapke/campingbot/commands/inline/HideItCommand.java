@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.persistence.EntityManager;
+
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -32,7 +34,6 @@ import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.util.CollectionUtil;
 import ca.hapke.util.StringUtil;
-import jakarta.persistence.EntityManager;
 
 /**
  * @author Nathan Hapke

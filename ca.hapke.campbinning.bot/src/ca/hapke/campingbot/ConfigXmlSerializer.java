@@ -10,6 +10,9 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.ProtectionDomain;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import javax.persistence.EntityManager;
 
 import com.javadude.antxr.scanner.BasicCrimsonXMLTokenStream;
 
@@ -26,7 +29,9 @@ import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.PartyEverydayCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
+import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.response.InsultGenerator;
+import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.xml.ConfigParser;
 import ca.hapke.campingbot.xml.ContentParser;
@@ -63,6 +68,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	private static final String OLD_FILENAME = "config.xml";
 	private static final String SETTINGS_FILENAME = "settings.xml";
 	private static final String CONTENT_FILENAME = "content.xml";
+	private static final boolean CONTENT_FROM_XML = true;
 	private CampingSerializable[] serializables;
 	private CampingSystem cs;
 	private SpellCommand sg;
@@ -166,12 +172,14 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 
 	@Override
 	public void init() {
-		try {
-			loadContent(CONTENT_FILENAME);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (CONTENT_FROM_XML) {
+			try {
+				loadContent(CONTENT_FILENAME);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -190,12 +198,32 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 	}
 
 	public boolean loadContent(String fn) throws IOException, ClassNotFoundException {
+		CampingUserMonitor userMonitor = um;
+
+		EntityManager jpaManager = DatabaseConsumer.getInstance().getManager();
+		String query = "SELECT u FROM CampingUser u ";
+		try {
+			jpaManager.getTransaction().begin();
+			List<CampingUser> dbUsers = jpaManager.createQuery(query, CampingUser.class).getResultList();
+			for (CampingUser u : dbUsers) {
+				um.addUser(u);
+			}
+			if (dbUsers.size() > 0) {
+				// disable that part of the parser
+				userMonitor = null;
+			}
+		} catch (Exception e1) {
+			System.err.println(e1.getLocalizedMessage());
+		} finally {
+			jpaManager.getTransaction().rollback();
+		}
+
 		File f = getFileNotInBinFolder(protectionDomain, fn);
 		BasicCrimsonXMLTokenStream stream2 = new BasicCrimsonXMLTokenStream(
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ContentParser.class, false, false);
 		ContentParser cont = new ContentParser(stream2);
 		try {
-			cont.document(sg, hype, pc, cm, um, ig, ec);
+			cont.document(sg, hype, pc, cm, userMonitor, ig, ec);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

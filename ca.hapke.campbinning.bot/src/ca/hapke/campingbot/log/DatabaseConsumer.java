@@ -9,6 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
+import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
+
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByCalendar;
@@ -16,15 +22,15 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.log.DatabaseQuery.ColumnType;
+import ca.hapke.campingbot.users.CampingUser;
 import ca.odell.glazedlists.EventList;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 /**
  * @author Nathan Hapke
  */
 public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
+	public static final String SCHEMA = "public";
+
 	private static DatabaseConsumer instance;
 	private CampingSystem system;
 	private EventLogger eventLogger;
@@ -73,12 +79,24 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 			if (system.isDbEnabled() && manager == null) {
 				Map<String, String> persistenceMap = new HashMap<String, String>();
 				String url2 = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + db;
-				persistenceMap.put("jakarta.persistence.jdbc.url", url2);
-				persistenceMap.put("jakarta.persistence.jdbc.user", dbUser);
-				persistenceMap.put("jakarta.persistence.jdbc.password", dbPass);
-				persistenceMap.put("jakarta.persistence.jdbc.driver", dbDriver);
-				persistenceMap.put("jakarta.persistence.schema-generation.database.action", "create");
-				EntityManagerFactory emf = Persistence.createEntityManagerFactory("campingbot", persistenceMap);
+				persistenceMap.put("javax.persistence.jdbc.url", url2);
+				persistenceMap.put("javax.persistence.jdbc.user", dbUser);
+				persistenceMap.put("javax.persistence.jdbc.password", dbPass);
+				persistenceMap.put("javax.persistence.jdbc.driver", dbDriver);
+				persistenceMap.put("javax.persistence.schema-generation.database.action", "update");
+				persistenceMap.put("hibernate.hbm2ddl.auto", "update");
+				persistenceMap.put("hibernate.show_sql", "true");
+
+				// EntityManagerFactory emf = Persistence.createEntityManagerFactory(CampingPersistence.UNIT_NAME,
+//						persistenceMap);
+				CampingPersistenceUnitInfo unitInfo = new CampingPersistenceUnitInfo();
+				unitInfo.add(CampingUser.class.getName());
+				EntityManagerFactory emf = new EntityManagerFactoryBuilderImpl(
+						new PersistenceUnitInfoDescriptor(unitInfo), persistenceMap).build();
+//				PersistenceProvider eclipseLinkProvider = new PersistenceProvider();
+//				EntityManagerFactory emf = eclipseLinkProvider.createContainerEntityManagerFactory(unitInfo,
+//						persistenceMap);
+
 				manager = emf.createEntityManager();
 			}
 		} catch (Exception e) {
@@ -171,6 +189,11 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 		if (connection != null) {
 			connection.rollback();
 			connection.close();
+		}
+
+		if (manager != null) {
+			manager.getTransaction().rollback();
+			manager.close();
 		}
 	}
 

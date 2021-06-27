@@ -7,52 +7,52 @@
 	<version>0.5.0</version>
 	<name>CampingBotFramework</name>
 	<properties>
-        <maven.compiler.release>14</maven.compiler.release>
+		<maven.compiler.release>14</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-        <pluginManagement>
-            <plugins>
-                  <plugin>
-			        <artifactId>maven-resources-plugin</artifactId>
-			        <version>3.2.0</version>
-			        <executions>
-			          <execution>
-			            <id>copy-resources</id>
-			            <!-- here the phase you need -->
-			            <phase>validate</phase>
-			            <goals>
-			              <goal>copy-resources</goal>
-			            </goals>
-			            <configuration>
-			              <outputDirectory>src/ca/hapke/campingbot/xml</outputDirectory>
-			              <resources>          
-			                <resource>
-			                  <directory>antxr-generated/ca/hapke/campingbot/xml</directory>
-			                  <filtering>true</filtering>
-			                </resource>
-			              </resources>              
-			            </configuration>            
-			          </execution>
-			        </executions>
-			      </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
-                </plugin>
-		</plugins>
-     </pluginManagement>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.2.0</version>
+					<executions>
+						<execution>
+							<id>copy-resources</id>
+							<!-- here the phase you need -->
+							<phase>validate</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>src/ca/hapke/campingbot/xml</outputDirectory>
+								<resources>
+									<resource>
+										<directory>antxr-generated/ca/hapke/campingbot/xml</directory>
+										<filtering>true</filtering>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 
-	<resources>
-		<resource>
-			<directory>src</directory>
-			<excludes>
-				<exclude>**/*.java</exclude>
-			</excludes>
-		</resource>
-	</resources>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
 
 	</build>
 	<dependencies>
@@ -70,15 +70,14 @@
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
-			<version>3.0.0</version>
+			<version>2.2.3</version>
 		</dependency>
 
-		<!-- https://wiki.eclipse.org/EclipseLink/Maven -->
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>eclipselink</artifactId>
-			<version>3.0.1</version>
-			<scope>compile</scope>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.5.3.Final</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
@@ -119,16 +118,16 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
 		<dependency>
-		    <groupId>commons-logging</groupId>
-		    <artifactId>commons-logging</artifactId>
-		    <version>1.2</version>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20200518</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20200518</version>
 		</dependency>
-				
+
 	</dependencies>
 </project>
