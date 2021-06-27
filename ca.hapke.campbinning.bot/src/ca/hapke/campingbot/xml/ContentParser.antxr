@@ -159,7 +159,7 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
 	
 <chat> [CampingChatManager cm]
 	{
-		CampingChat chat;
+		CampingChat chat = null;
 		long chatId = 0;
 		String idStr, name, type, allowed;
 	}
@@ -169,15 +169,17 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
 		name=<name>
 		allowed=<allowed>
 	{
-		if (idStr != null && !"null".equalsIgnoreCase(idStr)) {
-			chatId = Long.parseLong(idStr);
-		} 
-		if (chatId == 0)
-			return;
-		chat = cm.get(chatId);
-		chat.setChatname(name);
-		chat.setType(type);
-		chat.setAllowed(allowed);
+		if (cm != null) {
+			if (idStr != null && !"null".equalsIgnoreCase(idStr)) {
+				chatId = Long.parseLong(idStr);
+			} 
+			if (chatId == 0)
+				return;
+			chat = cm.get(chatId);
+			chat.setChatname(name);
+			chat.setType(type);
+			chat.setAllowed(allowed);
+		}
 	}
 	(<actives>[chat]) ?
 	(<announce>[chat]) ?
@@ -185,6 +187,8 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
 
 <actives> [CampingChat chat]
 	{  
+		if (chat == null)
+			return;
 		long id; 
 		String value;
 	}
@@ -269,6 +273,8 @@ document[ SpellCommand sg, HypeCommand hype, PartyEverydayCommand pc, CampingCha
 <announce>[CampingChat chat]
 	:	pcdata:PCDATA 
 	{
+		if (chat == null)
+			return;
 		try {
 			String value = pcdata.getText();
 			boolean tf = Boolean.parseBoolean(value);

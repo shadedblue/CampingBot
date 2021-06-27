@@ -6,19 +6,38 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import ca.hapke.campingbot.log.DatabaseConsumer;
+
 /**
  * @author Nathan Hapke
  */
+@Entity
+@Table(name = CampingChat.CHAT_TABLE, schema = DatabaseConsumer.SCHEMA)
 public class CampingChat {
+	private static final int UNKNOWN_ID = 0;
+	public static final String CHAT_TABLE = "chats";
 	public static final String UNKNOWN = "unknown";
-	public final long chatId;
+	@Id
+	public long chatId = UNKNOWN_ID;
 	private String chatname = UNKNOWN;
 	private ChatType type = ChatType.Unknown;
 	private ChatAllowed allowed = ChatAllowed.New;
 	private boolean announce = false;
-	private SortedSet<Long> activeUserIds = new TreeSet<>();
+	@ElementCollection
+	@CollectionTable(name = "activeUserId", joinColumns = @JoinColumn(name = "chatId"))
+	private Set<Long> activeUserIds;
 
 	// For GlazedLists to autosort
+	@Transient
 	private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 	public void addPropertyChangeListener(PropertyChangeListener pcl) {
@@ -29,12 +48,24 @@ public class CampingChat {
 		support.removePropertyChangeListener(pcl);
 	}
 
+	public CampingChat() {
+		// necessary for JPA
+	}
+
 	public CampingChat(long chatId) {
 		this.chatId = chatId;
+		activeUserIds = new TreeSet<>();
+		addPersistence();
 	}
 
 	public long getChatId() {
 		return chatId;
+	}
+
+	public void setChatId(long chatId) {
+		if (this.chatId == UNKNOWN_ID)
+			this.chatId = chatId;
+		updatePersistence();
 	}
 
 	public String getChatname() {
@@ -46,6 +77,7 @@ public class CampingChat {
 		this.chatname = chatname;
 
 		support.firePropertyChange("chatname", oldVal, chatname);
+		updatePersistence();
 	}
 
 	public boolean shouldUpdateChatDetails() {
@@ -65,6 +97,7 @@ public class CampingChat {
 			ChatType oldVal = this.type;
 			this.type = type;
 			support.firePropertyChange("type", oldVal, type);
+			updatePersistence();
 		}
 	}
 
@@ -84,6 +117,7 @@ public class CampingChat {
 			ChatAllowed oldVal = this.allowed;
 			this.allowed = allowed;
 			support.firePropertyChange("allowed", oldVal, allowed);
+			updatePersistence();
 		}
 	}
 
@@ -101,17 +135,28 @@ public class CampingChat {
 		boolean oldVal = this.announce;
 		this.announce = announce;
 		support.firePropertyChange("announce", oldVal, announce);
+		updatePersistence();
 	}
 
 	public Set<Long> getActiveUserIds() {
 		return activeUserIds;
 	}
 
+	public void setActiveUserIds(SortedSet<Long> activeUserIds) {
+		if (this.activeUserIds == null) {
+			this.activeUserIds = activeUserIds;
+			updatePersistence();
+		}
+	}
+
 	public boolean addActiveUser(long e) {
 		if (type != ChatType.Group)
 			return false;
 
-		return activeUserIds.add(e);
+		boolean add = activeUserIds.add(e);
+		if (add)
+			updatePersistence();
+		return add;
 	}
 
 	@Override
@@ -136,5 +181,25 @@ public class CampingChat {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	void updatePersistence() {
+		DatabaseConsumer db = DatabaseConsumer.getInstance();
+		if (db != null) {
+			EntityManager mgr = db.getManager();
+			mgr.getTransaction().begin();
+			mgr.merge(this);
+			mgr.getTransaction().commit();
+		}
+	}
+
+	void addPersistence() {
+		DatabaseConsumer db = DatabaseConsumer.getInstance();
+		if (db != null) {
+			EntityManager mgr = db.getManager();
+			mgr.getTransaction().begin();
+			mgr.persist(this);
+			mgr.getTransaction().commit();
+		}
 	}
 }

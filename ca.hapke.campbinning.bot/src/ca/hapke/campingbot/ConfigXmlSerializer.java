@@ -24,6 +24,7 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.api.ConfigSerializer;
 import ca.hapke.campingbot.api.PostConfigInit;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
@@ -201,7 +202,7 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 		CampingUserMonitor userMonitor = um;
 
 		EntityManager jpaManager = DatabaseConsumer.getInstance().getManager();
-		String query = "SELECT u FROM CampingUser u ";
+		String query = "SELECT u FROM " + CampingUser.class.getName() + " u ";
 		try {
 			jpaManager.getTransaction().begin();
 			List<CampingUser> dbUsers = jpaManager.createQuery(query, CampingUser.class).getResultList();
@@ -218,12 +219,33 @@ public class ConfigXmlSerializer implements CalendaredEvent<Void>, ConfigSeriali
 			jpaManager.getTransaction().rollback();
 		}
 
+		query = "SELECT c FROM " + CampingChat.class.getName() + " c ";
+		CampingChatManager chatMonitor = cm;
+		try {
+			jpaManager.getTransaction().begin();
+			List<CampingChat> chats = jpaManager.createQuery(query, CampingChat.class).getResultList();
+//			for (CampingUser u : dbUsers) {
+//				um.addUser(u);
+//			}
+			for (CampingChat chat : chats) {
+				chatMonitor.add(chat);
+			}
+			if (chats.size() > 0) {
+				// disable that part of the parser
+				chatMonitor = null;
+			}
+		} catch (Exception e1) {
+			System.err.println(e1.getLocalizedMessage());
+		} finally {
+			jpaManager.getTransaction().rollback();
+		}
+
 		File f = getFileNotInBinFolder(protectionDomain, fn);
 		BasicCrimsonXMLTokenStream stream2 = new BasicCrimsonXMLTokenStream(
 				new FileReader(f, Charset.forName(CHARSET_TO_USE)), ContentParser.class, false, false);
 		ContentParser cont = new ContentParser(stream2);
 		try {
-			cont.document(sg, hype, pc, cm, userMonitor, ig, ec);
+			cont.document(sg, hype, pc, chatMonitor, userMonitor, ig, ec);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

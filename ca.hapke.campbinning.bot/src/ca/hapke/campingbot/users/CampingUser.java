@@ -108,7 +108,7 @@ public class CampingUser implements Serializable {
 //		this.lastname = lastname;
 //	}
 	public CampingUser() {
-
+		// necessary for JPA
 	}
 
 	public CampingUser(long suggestedId, long telegramId, String username, String firstname, String lastname,

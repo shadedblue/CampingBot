@@ -21,6 +21,8 @@ import ca.hapke.calendaring.timing.ByCalendar;
 import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingSystem;
+import ca.hapke.campingbot.channels.CampingChat;
+import ca.hapke.campingbot.commands.inline.HideItMessage;
 import ca.hapke.campingbot.log.DatabaseQuery.ColumnType;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.odell.glazedlists.EventList;
@@ -91,6 +93,10 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 //						persistenceMap);
 				CampingPersistenceUnitInfo unitInfo = new CampingPersistenceUnitInfo();
 				unitInfo.add(CampingUser.class.getName());
+				unitInfo.add(HideItMessage.class.getName());
+				String chatClass = CampingChat.class.getName();
+				unitInfo.add(chatClass);
+				unitInfo.add(chatClass + ".activeUserIds");
 				EntityManagerFactory emf = new EntityManagerFactoryBuilderImpl(
 						new PersistenceUnitInfoDescriptor(unitInfo), persistenceMap).build();
 //				PersistenceProvider eclipseLinkProvider = new PersistenceProvider();

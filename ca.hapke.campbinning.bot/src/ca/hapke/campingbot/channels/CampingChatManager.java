@@ -91,6 +91,16 @@ public class CampingChatManager implements CampingSerializable {
 		return chat;
 	}
 
+	public void add(CampingChat chat) {
+		baseList.add(chat);
+		Long chatId = chat.getChatId();
+		chats.put(chatId, chat);
+
+		if (chat.shouldUpdateChatDetails() && bot != null && bot.isOnline()) {
+			updateChat(chatId, chat);
+		}
+	}
+
 	public void updateChat(Long chatId, CampingChat chat) {
 		String chatname = null;
 		try {
