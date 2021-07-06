@@ -25,6 +25,7 @@ import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
 import ca.hapke.campingbot.api.PostConfigInit;
+import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
@@ -46,7 +47,6 @@ import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUser.Birthday;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.util.ImageLink;
-import ca.hapke.util.CollectionUtil;
 import ca.odell.glazedlists.EventList;
 
 /**
@@ -82,8 +82,8 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	private MbiyfType mode = MbiyfType.Off;
 	private CategoriedItems<ImageLink> mbiyfImages;
 	private static final String FRIDAY_IMAGES = "MBIYFriday";
-	private List<ImageLink> fridayImages;
-	private List<ImageLink> birthdayImages;
+//	private List<ImageLink> fridayImages;
+//	private List<ImageLink> birthdayImages;
 	private static final String BIRTHDAY_IMAGES = "MBirthdayIYF";
 
 	public final static String[] ballsTriggers = new String[] { BALLS, MBIYF };
@@ -93,18 +93,20 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		this.bot = campingBot;
 		this.res = res;
 
-		this.mbiyfImages = new CategoriedItems<ImageLink>(FRIDAY_IMAGES);
-		fridayImages = mbiyfImages.getList(FRIDAY_IMAGES);
+		this.mbiyfImages = new CategoriedImageLinks(FRIDAY_IMAGES);
+//		fridayImages = mbiyfImages.getList(FRIDAY_IMAGES);
 		for (int i = 1; i <= 7; i++) {
 			String url = "http://www.hapke.ca/images/mbiyf" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
-			fridayImages.add(lnk);
+			mbiyfImages.put(FRIDAY_IMAGES, lnk);
+//			fridayImages.add(lnk);
 		}
-		birthdayImages = mbiyfImages.getList(BIRTHDAY_IMAGES);
+//		birthdayImages = mbiyfImages.getList(BIRTHDAY_IMAGES);
 		for (int i = 1; i <= 4; i++) {
 			String url = "http://www.hapke.ca/images/birthday" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
-			birthdayImages.add(lnk);
+			mbiyfImages.put(BIRTHDAY_IMAGES, lnk);
+//			birthdayImages.add(lnk);
 		}
 	}
 
@@ -267,7 +269,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public CommandResult announceBirthday() throws TelegramApiException {
 		Emoji cake = res.getCake();
 
-		ImageLink image = CollectionUtil.getRandom(birthdayImages);
+		ImageLink image = mbiyfImages.getRandom(BIRTHDAY_IMAGES);
 		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add("M");
 		result.add(res.getRandomBallEmoji());
@@ -281,7 +283,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	}
 
 	private CommandResult announceSpecial() {
-		ImageLink image = CollectionUtil.getRandom(fridayImages);
+		ImageLink image = mbiyfImages.getRandom(FRIDAY_IMAGES);
 		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 
 		result.add("APPARANTLY TODAY IS SPECIAL FOR ");
@@ -297,7 +299,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	}
 
 	public CommandResult announceAsshole() throws TelegramApiException {
-		ImageLink image = CollectionUtil.getRandom(fridayImages);
+		ImageLink image = mbiyfImages.getRandom(FRIDAY_IMAGES);
 		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add(userRestriction.get(0));
 		result.add(": M");
@@ -310,7 +312,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	}
 
 	public CommandResult announceFriday() throws TelegramApiException {
-		ImageLink image = CollectionUtil.getRandom(fridayImages);
+		ImageLink image = mbiyfImages.getRandom(FRIDAY_IMAGES);
 		ImageCommandResult result = new ImageCommandResult(MbiyfAnnouncementCommand, image);
 		result.add("It's M");
 		result.add(res.getRandomBallEmoji());

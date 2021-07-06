@@ -11,10 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.CampingSystem;
-import ca.hapke.campingbot.api.CampingSerializable;
-import ca.hapke.campingbot.users.CampingUser.Birthday;
 import ca.hapke.campingbot.util.CampingUtil;
-import ca.hapke.campingbot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
@@ -29,7 +26,7 @@ import ca.odell.glazedlists.matchers.Matcher;
  * 
  * @author Nathan Hapke
  */
-public class CampingUserMonitor implements CampingSerializable {
+public class CampingUserMonitor {
 
 	private boolean shouldSave = false;
 	public static final int UNKNOWN_USER_ID = -1;
@@ -234,46 +231,5 @@ public class CampingUserMonitor implements CampingSerializable {
 
 	public FilterList<CampingUser> getAdminUsers() {
 		return adminUsers;
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		String usersTag = "users";
-		of.start(usersTag);
-		of.tagAndValue("nextCampingId", nextCampingId);
-
-		for (CampingUser u : users) {
-			String userTag = "user";
-			of.start(userTag);
-
-			of.tagAndValue("campingId", u.getCampingId());
-			of.tagAndValue("id", u.getTelegramId());
-
-			String usernameTag = "username";
-			String username = u.getUsername();
-			if (username != null && !"null".equals(username))
-				username = CampingUtil.prefixAt(username);
-			of.tagAndValue(usernameTag, username);
-
-			of.tagAndValue("first", u.getFirstname());
-			of.tagAndValue("last", u.getLastname());
-			of.tagAndValue("initials", u.getInitials());
-			of.tagAndValue("nickname", u.getNickname());
-			of.tagAndValue("interaction", u.isSeenInteraction());
-			Birthday bday = u.getBirthday();
-			if (bday != null) {
-				of.tagAndValue("birthdayMonth", bday.getMonth());
-				of.tagAndValue("birthdayDay", bday.getDay());
-			}
-
-			of.finish(userTag);
-		}
-		of.finish(usersTag);
-		shouldSave = false;
-	}
-
-	@Override
-	public boolean shouldSave() {
-		return shouldSave;
 	}
 }

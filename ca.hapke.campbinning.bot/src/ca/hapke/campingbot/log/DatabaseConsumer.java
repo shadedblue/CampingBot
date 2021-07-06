@@ -92,11 +92,18 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 				// EntityManagerFactory emf = Persistence.createEntityManagerFactory(CampingPersistence.UNIT_NAME,
 //						persistenceMap);
 				CampingPersistenceUnitInfo unitInfo = new CampingPersistenceUnitInfo();
+
 				unitInfo.add(CampingUser.class.getName());
 				unitInfo.add(HideItMessage.class.getName());
+
 				String chatClass = CampingChat.class.getName();
 				unitInfo.add(chatClass);
 				unitInfo.add(chatClass + ".activeUserIds");
+
+				String categoriedClass = CategoriedPersistence.class.getName();
+				unitInfo.add(categoriedClass);
+				unitInfo.add(categoriedClass + "." + CategoriedPersistence.VALUES);
+
 				EntityManagerFactory emf = new EntityManagerFactoryBuilderImpl(
 						new PersistenceUnitInfoDescriptor(unitInfo), persistenceMap).build();
 //				PersistenceProvider eclipseLinkProvider = new PersistenceProvider();
@@ -213,4 +220,17 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 		return StartupMode.Never;
 	}
 
+	public void updatePersistence(Object e) {
+		EntityManager mgr = getManager();
+		mgr.getTransaction().begin();
+		mgr.merge(e);
+		mgr.getTransaction().commit();
+	}
+
+	public void addPersistence(Object e) {
+		EntityManager mgr = getManager();
+		mgr.getTransaction().begin();
+		mgr.persist(e);
+		mgr.getTransaction().commit();
+	}
 }

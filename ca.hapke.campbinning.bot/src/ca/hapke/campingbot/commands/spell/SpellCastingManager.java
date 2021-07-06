@@ -3,7 +3,6 @@ package ca.hapke.campingbot.commands.spell;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
@@ -14,6 +13,7 @@ import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
 import ca.hapke.campingbot.api.CampingBotEngine;
+import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.response.ImageCommandResult;
@@ -21,7 +21,6 @@ import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
-import ca.hapke.util.CollectionUtil;
 
 /**
  * @author Nathan Hapke
@@ -52,19 +51,18 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 	private CampingBotEngine bot;
 	private static final String COMBO_BREAKER = "ComboBreaker";
 	private CategoriedItems<ImageLink> images;
-	private List<ImageLink> breakerImages;
+//	private List<ImageLink> breakerImages;
 	private ImageLink koDeadImg = new ImageLink("http://www.hapke.ca/images/spell-ko-dead.mp4", ImageLink.GIF);
 	private Resources resources;
 
 	public SpellCastingManager(CampingBot bot) {
 		this.bot = bot;
 		resources = bot.getRes();
-		images = new CategoriedItems<>(COMBO_BREAKER);
-		breakerImages = images.getList(COMBO_BREAKER);
+		images = new CategoriedImageLinks(COMBO_BREAKER);
 		for (int i = 1; i <= 7; i++) {
 			String url = "http://www.hapke.ca/images/spell-combo-breaker-" + i + ".gif";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
-			breakerImages.add(lnk);
+			images.put(COMBO_BREAKER, lnk);
 		}
 	}
 
@@ -103,7 +101,8 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 			pendingCasts.remove(victim);
 
 			// COMBO BREAKER GIF
-			ImageLink img = CollectionUtil.getRandom(breakerImages);
+			ImageLink img = images.getRandom(COMBO_BREAKER);
+//					CollectionUtil.getRandom(breakerImages);
 			ImageCommandResult breaker = new ImageCommandResult(SpellCommand.SlashSpellCommand, img);
 			breaker.sendAndLog(bot, chat);
 		}

@@ -279,25 +279,46 @@ public class CampingUser implements Serializable {
 			return;
 
 		birthday = new Birthday(month, day);
+		this.birthdayDay = day;
+		this.birthdayMonth = month;
 
-		setBirthdayMonth(month);
-		setBirthdayDay(day);
+		support.firePropertyChange("birthdayDay", -1, day);
+		support.firePropertyChange("birthdayMonth", -1, month);
+		updatePersistence();
 	}
 
 	public void setBirthdayDay(int day) {
-		if (birthday == null)
-			birthday = new Birthday(-1, day);
-		this.birthday.day = day;
-		this.birthdayDay = day;
-		support.firePropertyChange("birthdayDay", -1, day);
+		int oldDay = this.birthdayDay;
+		if (day != oldDay) {
+			this.birthdayDay = day;
+			if (this.birthday == null) {
+				if (this.birthdayMonth > 0) {
+					this.birthday = new Birthday(birthdayMonth, day);
+				}
+			} else {
+				this.birthday.day = day;
+			}
+
+			support.firePropertyChange("birthdayDay", oldDay, day);
+			updatePersistence();
+		}
 	}
 
 	public void setBirthdayMonth(int month) {
-		if (birthday == null)
-			birthday = new Birthday(month, -1);
-		this.birthday.month = month;
-		this.birthdayMonth = month;
-		support.firePropertyChange("birthdayMonth", -1, month);
+		int oldMonth = this.birthdayMonth;
+		if (month != oldMonth) {
+			this.birthdayMonth = month;
+			if (this.birthday == null) {
+				if (this.birthdayDay > 0) {
+					this.birthday = new Birthday(month, birthdayDay);
+				}
+			} else {
+				this.birthday.month = month;
+			}
+
+			support.firePropertyChange("birthdayMonth", oldMonth, month);
+			updatePersistence();
+		}
 	}
 
 	public boolean equals(CampingUser that) {

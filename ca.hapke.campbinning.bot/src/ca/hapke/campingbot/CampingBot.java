@@ -147,7 +147,6 @@ public class CampingBot extends CampingBotEngine {
 		addEvent(databaseConsumer);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);
-		addEvent((CalendaredEvent<?>) serializer);
 	}
 
 	@SuppressWarnings("unchecked")

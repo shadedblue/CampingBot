@@ -2,14 +2,12 @@ package ca.hapke.campingbot.channels;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
-import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.log.EventItem;
@@ -19,7 +17,6 @@ import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
-import ca.hapke.campingbot.xml.OutputFormatter;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
@@ -32,7 +29,7 @@ import ca.odell.glazedlists.matchers.Matcher;
 /**
  * @author Nathan Hapke
  */
-public class CampingChatManager implements CampingSerializable {
+public class CampingChatManager {
 	public static final ResponseCommandType JoinThreadCommand = new ResponseCommandType("JoinThread",
 			BotCommandIds.THREAD | BotCommandIds.SET);
 	private boolean shouldSave = false;
@@ -148,36 +145,5 @@ public class CampingChatManager implements CampingSerializable {
 
 	public EventList<CampingChat> getAnnounceChats() {
 		return announceChats;
-	}
-
-	@Override
-	public boolean shouldSave() {
-		return shouldSave;
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		String innerTag = "chat";
-		String outerTag = innerTag + "s";
-		of.start(outerTag);
-
-		for (CampingChat c : chatEvents) {
-			of.start(innerTag);
-
-			of.tagAndValue("id", c.getChatId());
-			of.tagAndValue("type", c.getType().toString());
-			of.tagAndValue("name", c.getChatname());
-			of.tagAndValue("allowed", c.getAllowed().toString());
-			Set<Long> activeUserIds = c.getActiveUserIds();
-			if (c.getType() == ChatType.Group && activeUserIds.size() > 0) {
-				of.tagAndValue("actives", activeUserIds);
-			}
-			of.tagAndValue("announce", c.isAnnounce());
-
-			of.finish(innerTag);
-		}
-
-		of.finish(outerTag);
-		shouldSave = false;
 	}
 }

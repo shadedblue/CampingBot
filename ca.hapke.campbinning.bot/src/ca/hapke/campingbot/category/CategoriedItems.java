@@ -6,14 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.hapke.util.CollectionUtil;
+
 /**
  * Could make this a Keyed type that extends Comparable<K>
  * 
  * @author Nathan Hapke
  */
-public class CategoriedItems<T> {
-	private List<String> names = new ArrayList<>();
-	private Map<String, List<T>> data = new HashMap<>();
+public abstract class CategoriedItems<T> {
+	protected List<String> names = new ArrayList<>();
+	protected Map<String, List<T>> data = new HashMap<>();
 
 	public CategoriedItems(String... categoryNames) {
 		for (String k : categoryNames) {
@@ -21,7 +23,7 @@ public class CategoriedItems<T> {
 		}
 	}
 
-	public List<T> addCategory(String cat) {
+	protected List<T> addCategory(String cat) {
 		names.add(cat);
 
 		List<T> result = new ArrayList<T>();
@@ -33,7 +35,17 @@ public class CategoriedItems<T> {
 		return names.contains(s);
 	}
 
-	public List<T> getList(String cat) {
+	public T getRandom(String cat) {
+		return CollectionUtil.getRandom(getList(cat));
+	}
+
+	public abstract T search(String cat, String term);
+
+	public int getSize(String cat) {
+		return getList(cat).size();
+	}
+
+	protected List<T> getList(String cat) {
 		List<T> list = data.get(cat);
 		if (list == null)
 			list = addCategory(cat);
@@ -49,6 +61,8 @@ public class CategoriedItems<T> {
 		if (item == null || (item instanceof String && "null".equalsIgnoreCase((String) item)))
 			return false;
 		List<T> list = getList(cat);
+		if (list.contains(item))
+			return false;
 		return list.add(item);
 	}
 
@@ -78,4 +92,5 @@ public class CategoriedItems<T> {
 		}
 		return result;
 	}
+
 }

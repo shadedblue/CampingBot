@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
+import ca.hapke.campingbot.category.CategoriedStrings;
 import ca.hapke.campingbot.processors.BlotProcessor;
 import ca.hapke.campingbot.processors.OverlayProcessor;
 import ca.hapke.campingbot.response.fragments.CaseChoice;
@@ -24,7 +25,8 @@ import ca.hapke.util.StringUtil;
 public class HypeJobDetails extends UpdatingMessageJobDetails {
 	private final String hype;
 	final CampingUser campingFromUser;
-	private final List<String> dicks;
+//	private final List<String> dicks;
+	private final CategoriedStrings categories;
 
 	private final static NumberFormat nf;
 	static {
@@ -46,11 +48,12 @@ public class HypeJobDetails extends UpdatingMessageJobDetails {
 	private OverlayProcessor overlayer = new OverlayProcessor(true);
 
 	public HypeJobDetails(CampingUser campingFromUser, Long chatId, String hype, CampingBotEngine bot,
-			List<String> dicks) {
+			CategoriedStrings categories) {
 		super(bot, HypeCommand.SlashHype, chatId);
 		this.hype = hype;
 		this.campingFromUser = campingFromUser;
-		this.dicks = dicks;
+//		this.dicks = dicks;
+		this.categories = categories;
 
 		this.isFailedHype = hype == null;
 		if (isFailedHype) {
@@ -107,7 +110,7 @@ public class HypeJobDetails extends UpdatingMessageJobDetails {
 		String txt;
 
 		if (Math.random() < 0.1) {
-			txt = CollectionUtil.getRandom(dicks);
+			txt = categories.getRandom(HypeCommand.DICK_CATEGORY);
 		} else {
 			txt = generateNumbersString();
 		}

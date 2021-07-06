@@ -7,9 +7,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
@@ -32,8 +34,9 @@ public class CampingChat {
 	private ChatType type = ChatType.Unknown;
 	private ChatAllowed allowed = ChatAllowed.New;
 	private boolean announce = false;
-	@ElementCollection
-	@CollectionTable(name = "activeUserId", joinColumns = @JoinColumn(name = "chatId"))
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "usersInChats", joinColumns = @JoinColumn(name = "chatId"))
+	@Column(name = "userId")
 	private Set<Long> activeUserIds;
 
 	// For GlazedLists to autosort

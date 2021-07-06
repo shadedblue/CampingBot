@@ -2,18 +2,17 @@ package ca.hapke.campingbot.response;
 
 import java.util.List;
 
-import ca.hapke.campingbot.api.CampingSerializable;
-import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.xml.OutputFormatter;
-import ca.hapke.util.CollectionUtil;
+import ca.hapke.campingbot.category.HasPersistedCategories;
+import ca.hapke.campingbot.category.PersistedCategoriedStrings;
+import ca.hapke.campingbot.log.CategoriedPersistence;
 
 /**
  * Singleton for the InsultFragments to find me
  * 
  * @author Nathan Hapke
  */
-public class InsultGenerator implements HasCategories<String>, CampingSerializable {
+public class InsultGenerator implements HasCategories<String>, HasPersistedCategories {
 	private static InsultGenerator instance = new InsultGenerator();
 
 	public static InsultGenerator getInstance() {
@@ -21,15 +20,12 @@ public class InsultGenerator implements HasCategories<String>, CampingSerializab
 	}
 
 	private InsultGenerator() {
-		categories = new CategoriedItems<>(INSULT_CATEGORY);
-		insultList = categories.getList(INSULT_CATEGORY);
+		categories = new PersistedCategoriedStrings(INSULT_CATEGORY);
 	}
 
-	private boolean shouldSave = false;
 	private static final String INSULT_CATEGORY = "insult";
-	private static final String INSULTS_CONTAINER = "Insults";
-	private CategoriedItems<String> categories;
-	private List<String> insultList;
+	public static final String INSULTS_CONTAINER = "Insults";
+	private PersistedCategoriedStrings categories;
 
 	@Override
 	public List<String> getCategoryNames() {
@@ -38,8 +34,7 @@ public class InsultGenerator implements HasCategories<String>, CampingSerializab
 
 	@Override
 	public void addItem(String category, String value) {
-		if (categories.put(category, value))
-			shouldSave = true;
+		categories.put(category, value);
 	}
 
 	@Override
@@ -47,25 +42,19 @@ public class InsultGenerator implements HasCategories<String>, CampingSerializab
 		return INSULTS_CONTAINER;
 	}
 
-	@Override
-	public boolean shouldSave() {
-		return shouldSave;
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		of.tagAndValue(INSULT_CATEGORY, categories.getList(INSULT_CATEGORY));
-
-		shouldSave = false;
-	}
-
 	public String getInsult() {
-		return CollectionUtil.getRandom(insultList);
+		return categories.getRandom(INSULT_CATEGORY);
 	}
 
 	@Override
-	public List<String> getCategory(String name) {
-		return categories.getList(name);
+	public int getSize(String s) {
+		return categories.getSize(s);
+	}
+
+	@Override
+	public void loadPersistence(CategoriedPersistence cats) {
+		List<String> insults = cats.getValues();
+		categories.loadPersistence(INSULT_CATEGORY, insults, cats);
 	}
 
 }

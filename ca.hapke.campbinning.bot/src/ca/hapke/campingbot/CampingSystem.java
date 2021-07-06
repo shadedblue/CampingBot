@@ -1,16 +1,14 @@
 package ca.hapke.campingbot;
 
-import ca.hapke.campingbot.api.CampingSerializable;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.users.CampingUser;
-import ca.hapke.campingbot.xml.OutputFormatter;
 
 /**
  * Singleton
  * 
  * @author Nathan Hapke
  */
-public class CampingSystem implements CampingSerializable {
+public class CampingSystem {
 
 	private static CampingSystem instance = new CampingSystem();
 
@@ -112,35 +110,8 @@ public class CampingSystem implements CampingSerializable {
 		this.connectOnStartup = connectOnStartup;
 	}
 
-	@Override
-	public void getXml(OutputFormatter of) {
-
-		String outerTag = "system";
-		of.start(outerTag);
-		of.tagAndValue("token", token);
-		of.tagAndValue("botUsername", botUsername);
-		of.tagAndValue("adminUser", adminUser);
-		of.tagAndValue("connectOnStartup", connectOnStartup);
-		if (dbEnabled) {
-			String dbTag = "db";
-			of.start(dbTag);
-			of.tagAndValue("dbHost", dbHost);
-			of.tagAndValue("dbPort", dbPort);
-			of.tagAndValue("dbUser", dbUser);
-			of.tagAndValue("dbPass", dbPass);
-			of.tagAndValue("dbDb", dbDb);
-			of.finish(dbTag);
-		}
-		of.finish(outerTag);
-	}
-
 	public boolean canConnect() {
 		return botUsername != null && token != null;
-	}
-
-	@Override
-	public boolean shouldSave() {
-		return false;
 	}
 
 	public boolean hasAccess(CampingUser campingFromUser, SlashCommand sc) {

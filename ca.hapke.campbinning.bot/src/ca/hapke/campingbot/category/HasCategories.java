@@ -13,5 +13,6 @@ public interface HasCategories<T> {
 
 	public String getContainerName();
 
-	public List<T> getCategory(String name);
+	public int getSize(String s);
+
 }

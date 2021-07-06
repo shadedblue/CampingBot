@@ -22,8 +22,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
-import ca.hapke.campingbot.api.CampingSerializable;
+import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
+import ca.hapke.campingbot.category.CategoriedStrings;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -40,14 +41,11 @@ import ca.hapke.campingbot.response.fragments.CaseChoice;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
-import ca.hapke.campingbot.xml.OutputFormatter;
-import ca.hapke.util.CollectionUtil;
 
 /**
  * @author Nathan Hapke
  */
-public class EnhanceCommand extends AbstractCommand
-		implements HasCategories<String>, CampingSerializable, SlashCommand {
+public class EnhanceCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
 	private static final String ENHANCE_CONTAINER = "Enhance";
 	private static final String ENHANCE_COMMAND = "enhance";
 	private static final String RICK_ROLL = "rickroll";
@@ -66,10 +64,10 @@ public class EnhanceCommand extends AbstractCommand
 	private MessageProcessor garbler;
 	private CategoriedItems<String> categories;
 	private Resources res;
-	private CategoriedItems<ImageLink> resultImages;
-	private List<ImageLink> rickImages;
-	private List<String> rickText;
-	private List<String> overEnhanced;
+	private CategoriedItems<ImageLink> categoriesImages;
+//	private List<ImageLink> rickImages;
+//	private List<String> rickText;
+//	private List<String> overEnhanced;
 	private Map<Integer, Integer> tracking = new HashMap<>();
 	private Map<CommandResult, Integer> trackingPending = new HashMap<>();
 	private boolean shouldSave = false;
@@ -164,17 +162,18 @@ public class EnhanceCommand extends AbstractCommand
 		res = bot.getRes();
 		this.garbler = new CharacterRepeater(true).addAtEnd(new FontGarbler(0.3));
 //		this.garbler = new SwitchableProcessor(true, garblerPipe);
-		categories = new CategoriedItems<String>(RICK_ROLL, OVER_ENHANCED);
-		rickText = categories.getList(RICK_ROLL);
+		categories = new CategoriedStrings(RICK_ROLL, OVER_ENHANCED);
+//		rickText = categories.getList(RICK_ROLL);
 
-		overEnhanced = categories.getList(OVER_ENHANCED);
+//		overEnhanced = categories.getList(OVER_ENHANCED);
 
-		this.resultImages = new CategoriedItems<ImageLink>(RICK_ROLL);
-		rickImages = resultImages.getList(RICK_ROLL);
+		this.categoriesImages = new CategoriedImageLinks(RICK_ROLL);
+//		rickImages = resultImages.getList(RICK_ROLL);
 		for (int i = 1; i <= 3; i++) {
 			String url = "http://www.hapke.ca/images/rick" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
-			rickImages.add(lnk);
+//			rickImages.add(lnk);
+			categoriesImages.put(RICK_ROLL, lnk);
 		}
 	}
 
@@ -217,7 +216,8 @@ public class EnhanceCommand extends AbstractCommand
 			enhancementCount++;
 		}
 		if (enhancementCount >= 2) {
-			String text = CollectionUtil.getRandom(overEnhanced);
+			String text = categories.getRandom(OVER_ENHANCED);
+//					CollectionUtil.getRandom(overEnhanced);
 			return new TextCommandResult(SlashEnhance, new TextFragment(text, CaseChoice.Upper))
 					.setReplyTo(replyTo.getMessageId());
 		}
@@ -282,8 +282,10 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	private CommandResult createVideoResponse(Message replyTo) {
-		ImageLink img = CollectionUtil.getRandom(rickImages);
-		String lyric = CollectionUtil.getRandom(rickText);
+		ImageLink img = categoriesImages.getRandom(RICK_ROLL);
+//				CollectionUtil.getRandom(rickImages);
+		String lyric = categories.getRandom(RICK_ROLL);
+//				CollectionUtil.getRandom(rickText);
 		return new ImageCommandResult(SlashEnhance, img, garble(lyric)).setReplyTo(replyTo.getMessageId());
 	}
 
@@ -326,26 +328,13 @@ public class EnhanceCommand extends AbstractCommand
 	}
 
 	@Override
-	public List<String> getCategory(String name) {
-		return categories.getList(name);
-	}
-
-	@Override
 	public String getContainerName() {
 		return ENHANCE_CONTAINER;
 	}
 
 	@Override
-	public boolean shouldSave() {
-		return shouldSave;
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		of.start(ENHANCE_COMMAND);
-		of.tagCategories(categories);
-		of.finish(ENHANCE_COMMAND);
-		shouldSave = false;
+	public int getSize(String s) {
+		return categories.getSize(s);
 	}
 
 }

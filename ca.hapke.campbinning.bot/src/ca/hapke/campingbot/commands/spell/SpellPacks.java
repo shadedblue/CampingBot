@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import ca.hapke.campingbot.category.CategoriedItems;
+import ca.hapke.campingbot.category.CategoriedStrings;
 
 /**
  * @author Nathan Hapke
@@ -28,7 +29,7 @@ public class SpellPacks {
 			c = categoriesByGenre.get(resolved);
 		}
 		if (c == null && shouldCreate) {
-			c = new CategoriedItems<String>(SpellCommand.ITEM_CATEGORY, SpellCommand.EXCLAMATION_CATEGORY);
+			c = new CategoriedStrings(SpellCommand.ITEM_CATEGORY, SpellCommand.EXCLAMATION_CATEGORY);
 			categoriesByGenre.put(genre, c);
 		}
 		return c;
@@ -68,7 +69,7 @@ public class SpellPacks {
 		CategoriedItems[] genres = new CategoriedItems[size];
 		genres = values.toArray(genres);
 		for (CategoriedItems items : genres) {
-			int n = items.getList(SpellCommand.EXCLAMATION_CATEGORY).size();
+			int n = items.getSize(SpellCommand.EXCLAMATION_CATEGORY);
 			qtys[i] = n;
 			total += n;
 			i++;

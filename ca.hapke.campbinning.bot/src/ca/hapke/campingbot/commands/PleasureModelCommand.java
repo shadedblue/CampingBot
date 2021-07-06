@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -16,7 +17,6 @@ import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
-import ca.hapke.util.CollectionUtil;
 
 /**
  * @author Nathan Hapke
@@ -29,14 +29,14 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 
 	protected CampingBot bot;
 	private CategoriedItems<ImageLink> categories;
-	private List<ImageLink> images;
+//	private List<ImageLink> images;
 
 	public PleasureModelCommand(CampingBot bot) {
 		this.bot = bot;
-		categories = new CategoriedItems<ImageLink>(PLEASURE_MODEL);
-		images = categories.getList(PLEASURE_MODEL);
-		images.add(new ImageLink("http://www.hapke.ca/images/lame.jpg", ImageLink.STATIC));
-		images.add(new ImageLink("http://www.hapke.ca/images/business-time.gif", ImageLink.GIF));
+		categories = new CategoriedImageLinks(PLEASURE_MODEL);
+//		images = categories.getList(PLEASURE_MODEL);
+		categories.put(PLEASURE_MODEL, new ImageLink("http://www.hapke.ca/images/lame.jpg", ImageLink.STATIC));
+		categories.put(PLEASURE_MODEL, new ImageLink("http://www.hapke.ca/images/business-time.gif", ImageLink.GIF));
 	}
 
 	@Override
@@ -48,7 +48,8 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) {
-		ImageLink img = CollectionUtil.getRandom(images);
+//		ImageLink img = CollectionUtil.getRandom(images);
+		ImageLink img = categories.getRandom(PLEASURE_MODEL);
 		return new ImageCommandResult(PleasureModelCommand, img);
 	}
 

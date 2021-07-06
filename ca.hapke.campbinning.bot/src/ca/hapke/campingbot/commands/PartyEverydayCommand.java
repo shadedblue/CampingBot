@@ -14,8 +14,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 
 import ca.hapke.campingbot.CampingBot;
-import ca.hapke.campingbot.api.CampingSerializable;
+import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
+import ca.hapke.campingbot.category.CategoriedStrings;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -28,14 +29,11 @@ import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
-import ca.hapke.campingbot.xml.OutputFormatter;
-import ca.hapke.util.CollectionUtil;
 
 /**
  * @author Nathan Hapke
  */
-public class PartyEverydayCommand extends AbstractCommand
-		implements HasCategories<String>, TextCommand, CampingSerializable {
+public class PartyEverydayCommand extends AbstractCommand implements HasCategories<String>, TextCommand {
 
 	public static final ResponseCommandType PartyEverydayCommand = new ResponseCommandType("PartyEveryday",
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
@@ -59,17 +57,17 @@ public class PartyEverydayCommand extends AbstractCommand
 
 	private Pattern p;
 	protected CampingBot bot;
-	private CategoriedItems<String> categories = new CategoriedItems<String>(EXCESSIVE_CATEGORY);
-	private CategoriedItems<ImageLink> imgCategories = new CategoriedItems<ImageLink>(NSFW_CATEGORY, SFW_CATEGORY);
-	private List<ImageLink> imagesNsfw;
-	private List<ImageLink> imagesSfw;
-	private List<String> excessives;
+	private CategoriedItems<String> categories = new CategoriedStrings(EXCESSIVE_CATEGORY);
+	private CategoriedItems<ImageLink> imgCategories = new CategoriedImageLinks(NSFW_CATEGORY, SFW_CATEGORY);
+//	private List<ImageLink> imagesNsfw;
+//	private List<ImageLink> imagesSfw;
+//	private List<String> excessives;
 
 	public PartyEverydayCommand(CampingBot bot) {
 		this.bot = bot;
-		imagesNsfw = imgCategories.getList(NSFW_CATEGORY);
-		imagesSfw = imgCategories.getList(SFW_CATEGORY);
-		excessives = categories.getList(EXCESSIVE_CATEGORY);
+//		imagesNsfw = imgCategories.getList(NSFW_CATEGORY);
+//		imagesSfw = imgCategories.getList(SFW_CATEGORY);
+//		excessives = categories.getList(EXCESSIVE_CATEGORY);
 		addImage("http://www.hapke.ca/images/party-boy1.gif", false);
 		addImage("http://www.hapke.ca/images/party-boy3.gif", false);
 		addImage("http://www.hapke.ca/images/party-rave-girls.gif", true);
@@ -82,9 +80,11 @@ public class PartyEverydayCommand extends AbstractCommand
 
 	private void addImage(String url, boolean sfw) {
 		ImageLink lnk = new ImageLink(url, ImageLink.GIF);
-		imagesNsfw.add(lnk);
+		imgCategories.put(NSFW_CATEGORY, lnk);
+//		imagesNsfw.add(lnk);
 		if (sfw)
-			imagesSfw.add(lnk);
+			imgCategories.put(SFW_CATEGORY, lnk);
+//			imagesSfw.add(lnk);
 	}
 
 	@Override
@@ -104,14 +104,14 @@ public class PartyEverydayCommand extends AbstractCommand
 		int day = ld.getDayOfWeek().getValue();
 		int hour = lt.getHour();
 
-		List<ImageLink> images;
+		String category;
 		if (day >= DayOfWeek.MONDAY.getValue() && day <= DayOfWeek.FRIDAY.getValue() && hour >= SFW_START_HOUR
 				&& hour < SFW_END_HOUR) {
-			images = imagesSfw;
+			category = SFW_CATEGORY;
 		} else {
-			images = imagesNsfw;
+			category = NSFW_CATEGORY;
 		}
-		ImageLink img = CollectionUtil.getRandom(images);
+		ImageLink img = imgCategories.getRandom(category);
 
 		List<ResultFragment> captionFrags = generateParrrty(message);
 		ImageCommandResult result = new ImageCommandResult(PartyEverydayCommand, img, captionFrags);
@@ -140,7 +140,7 @@ public class PartyEverydayCommand extends AbstractCommand
 		List<ResultFragment> list = new ArrayList<>(3);
 		list.add(partyFrag);
 		list.add(new TextFragment("\n\n"));
-		list.add(new TextFragment(CollectionUtil.getRandom(excessives)));
+		list.add(new TextFragment(categories.getRandom(EXCESSIVE_CATEGORY)));
 		return list;
 	}
 
@@ -156,32 +156,17 @@ public class PartyEverydayCommand extends AbstractCommand
 	}
 
 	@Override
-	public List<String> getCategory(String name) {
-		return categories.getList(name);
-	}
-
-	@Override
 	public String getContainerName() {
 		return PARTY;
 	}
 
 	@Override
-	public boolean shouldSave() {
-		return shouldSave;
-	}
-
-	@Override
-	public void getXml(OutputFormatter of) {
-		String tag = "party";
-		of.start(tag);
-		of.tagCategories(categories);
-		of.finish(tag);
-
-		shouldSave = false;
-	}
-
-	@Override
 	public String getCommandName() {
 		return PARTY;
+	}
+
+	@Override
+	public int getSize(String s) {
+		return categories.getSize(s);
 	}
 }

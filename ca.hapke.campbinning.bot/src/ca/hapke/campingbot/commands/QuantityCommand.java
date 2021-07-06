@@ -73,8 +73,8 @@ public class QuantityCommand extends AbstractCommand implements SlashCommand {
 			for (String name : names) {
 				cr.add(">");
 				cr.add(name);
-				List<String> category = data.getList(name);
-				cr.add(": " + category.size() + "\n");
+				int size = data.getSize(name);
+				cr.add(": " + size + "\n");
 			}
 		}
 	}
@@ -83,7 +83,7 @@ public class QuantityCommand extends AbstractCommand implements SlashCommand {
 		List<String> cats = categories.getCategoryNames();
 		for (String s : cats) {
 			cr.add(s);
-			cr.add(": " + categories.getCategory(s).size() + "\n");
+			cr.add(": " + categories.getSize(s) + "\n");
 		}
 	}
 
