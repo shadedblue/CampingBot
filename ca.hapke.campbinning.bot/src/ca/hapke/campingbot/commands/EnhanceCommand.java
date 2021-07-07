@@ -24,7 +24,7 @@ import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
 import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
-import ca.hapke.campingbot.category.CategoriedStrings;
+import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -62,15 +62,11 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 
 	private CampingBot bot;
 	private MessageProcessor garbler;
-	private CategoriedItems<String> categories;
+	private CategoriedStringsPersisted categories;
 	private Resources res;
 	private CategoriedItems<ImageLink> categoriesImages;
-//	private List<ImageLink> rickImages;
-//	private List<String> rickText;
-//	private List<String> overEnhanced;
 	private Map<Integer, Integer> tracking = new HashMap<>();
 	private Map<CommandResult, Integer> trackingPending = new HashMap<>();
-	private boolean shouldSave = false;
 
 	private enum Direction {
 		UpLeft(7),
@@ -161,18 +157,12 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 		this.bot = bot;
 		res = bot.getRes();
 		this.garbler = new CharacterRepeater(true).addAtEnd(new FontGarbler(0.3));
-//		this.garbler = new SwitchableProcessor(true, garblerPipe);
-		categories = new CategoriedStrings(RICK_ROLL, OVER_ENHANCED);
-//		rickText = categories.getList(RICK_ROLL);
-
-//		overEnhanced = categories.getList(OVER_ENHANCED);
+		categories = new CategoriedStringsPersisted(ENHANCE_CONTAINER, RICK_ROLL, OVER_ENHANCED);
 
 		this.categoriesImages = new CategoriedImageLinks(RICK_ROLL);
-//		rickImages = resultImages.getList(RICK_ROLL);
 		for (int i = 1; i <= 3; i++) {
 			String url = "http://www.hapke.ca/images/rick" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
-//			rickImages.add(lnk);
 			categoriesImages.put(RICK_ROLL, lnk);
 		}
 	}
@@ -324,7 +314,6 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	@Override
 	public void addItem(String category, String value) {
 		categories.put(category, value);
-		shouldSave = true;
 	}
 
 	@Override
@@ -336,5 +325,4 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	public int getSize(String s) {
 		return categories.getSize(s);
 	}
-
 }
