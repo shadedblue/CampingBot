@@ -75,6 +75,9 @@ public abstract class CategoriedItems<T> {
 			if (item == null || (item instanceof String && "null".equalsIgnoreCase((String) item)))
 				continue;
 
+			if (list.contains(item))
+				return false;
+
 			if (list.add(item))
 				result = true;
 		}
@@ -88,6 +91,9 @@ public abstract class CategoriedItems<T> {
 		for (T item : items) {
 			if (item == null || (item instanceof String && "null".equalsIgnoreCase((String) item)))
 				continue;
+
+			if (list.contains(item))
+				return false;
 
 			if (list.add(item))
 				result = true;

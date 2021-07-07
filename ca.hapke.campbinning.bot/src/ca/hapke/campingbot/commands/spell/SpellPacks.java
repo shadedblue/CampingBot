@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.CategoriedStrings;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
 
 /**
  * @author Nathan Hapke
@@ -19,8 +20,6 @@ public class SpellPacks {
 	private Map<String, CategoriedItems<String>> categoriesByGenre = new HashMap<>();
 	private Map<String, String> aliasResolver = new HashMap<>();
 	private Map<String, Set<String>> allAliases = new HashMap<>();
-
-	static final String DELIMITER = ":";
 
 	public CategoriedItems<String> get(String genre, boolean shouldCreate) {
 		CategoriedItems<String> c = categoriesByGenre.get(genre);
@@ -51,7 +50,7 @@ public class SpellPacks {
 		for (Entry<String, CategoriedItems<String>> byGenre : categoriesByGenre.entrySet()) {
 			String genre = byGenre.getKey();
 			for (String cat : byGenre.getValue().getCategoryNames()) {
-				String x = genre + DELIMITER + cat;
+				String x = genre + AbstractCommand.DELIMITER + cat;
 				out.add(x);
 			}
 		}

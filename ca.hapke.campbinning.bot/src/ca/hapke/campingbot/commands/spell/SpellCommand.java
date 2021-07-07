@@ -9,7 +9,7 @@ import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.category.CategoriedItems;
-import ca.hapke.campingbot.category.CategoriedStrings;
+import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
@@ -51,21 +51,18 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	static final String ITEM_CATEGORY = "item";
 
 	private CampingBot bot;
-	private boolean shouldSave = false;
 
 	private SpellPacks packs = new SpellPacks();
 	private SpellCastingManager castManager;
 
 	private CategoriedItems<String> categories;
-//	private List<String> adjectives;
 
 	public SpellCommand(CampingBot bot) {
 		this.bot = bot;
 		castManager = new SpellCastingManager(bot);
 		CalendarMonitor.getInstance().add(castManager);
 
-		categories = new CategoriedStrings(ADJECTIVE_CATEGORY);
-//		adjectives = categories.getList(ADJECTIVE_CATEGORY);
+		categories = new CategoriedStringsPersisted(SPELL, ADJECTIVE_CATEGORY);
 	}
 
 	@Override
@@ -93,9 +90,6 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 	public List<ResultFragment> cast(CampingUser caster, CampingUser victim, Message message) {
 		CategoriedItems<String> pack = choosePack(message);
-
-//		List<String> items = pack.getList(ITEM_CATEGORY);
-//		List<String> exclamations = pack.getList(EXCLAMATION_CATEGORY);
 
 		String adj = categories.getRandom(ADJECTIVE_CATEGORY);
 		String item = pack.getRandom(ITEM_CATEGORY);
@@ -159,8 +153,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	}
 
 	public void setAdjectives(List<String> adjectives) {
-		if (categories.putAll(ADJECTIVE_CATEGORY, adjectives))
-			shouldSave = true;
+		categories.putAll(ADJECTIVE_CATEGORY, adjectives);
 	}
 
 	public void setValues(String genre, List<String> aliases, List<String> items, List<String> exclamations) {
@@ -169,11 +162,9 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		if (aliases != null)
 			packs.addAliases(genre, aliases);
 
-		if (categories.putAll(ITEM_CATEGORY, items))
-			shouldSave = true;
+		categories.putAll(ITEM_CATEGORY, items);
 
-		if (categories.putAll(EXCLAMATION_CATEGORY, exclamations))
-			shouldSave = true;
+		categories.putAll(EXCLAMATION_CATEGORY, exclamations);
 	}
 
 	@Override
@@ -186,29 +177,11 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		return out;
 	}
 
-//	@Override
-//	public List<String> getCategory(String name) {
-//		if (this.categories.contains(name)) {
-//			return this.categories.getList(name);
-//		}
-//		try {
-//			int splitter = name.indexOf(SpellPacks.DELIMITER);
-//			String genre = name.substring(0, splitter);
-//			String category = name.substring(splitter + 1);
-//
-//			CategoriedItems<String> categories = packs.get(genre, false);
-//			return categories.getList(category);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
-
 	@Override
 	public void addItem(String category, String value) {
 		CategoriedItems<String> cats;
 		if (category.contains(DELIMITER)) {
-			int splitter = category.indexOf(SpellPacks.DELIMITER);
+			int splitter = category.indexOf(AbstractCommand.DELIMITER);
 			String genre = category.substring(0, splitter);
 			category = category.substring(splitter + 1);
 
@@ -216,8 +189,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		} else {
 			cats = this.categories;
 		}
-		if (cats.put(category, value))
-			shouldSave = true;
+		cats.put(category, value);
 	}
 
 	@Override

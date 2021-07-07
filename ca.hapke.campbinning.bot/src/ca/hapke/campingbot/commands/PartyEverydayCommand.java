@@ -16,7 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.category.CategoriedImageLinks;
 import ca.hapke.campingbot.category.CategoriedItems;
-import ca.hapke.campingbot.category.CategoriedStrings;
+import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -39,8 +39,6 @@ public class PartyEverydayCommand extends AbstractCommand implements HasCategori
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
 	private static final String PARTY = "Party";
 
-	private boolean shouldSave = false;
-
 	private static final int SFW_START_HOUR = 8;
 	private static final int SFW_END_HOUR = 16;
 	private static final String EXCESSIVE_CATEGORY = "excessive";
@@ -53,21 +51,13 @@ public class PartyEverydayCommand extends AbstractCommand implements HasCategori
 
 	private final ZoneId zone = ZoneId.systemDefault();
 
-//	private Cooldown cooldown = new Cooldown(3 * 60);
-
 	private Pattern p;
 	protected CampingBot bot;
-	private CategoriedItems<String> categories = new CategoriedStrings(EXCESSIVE_CATEGORY);
+	private CategoriedStringsPersisted categories = new CategoriedStringsPersisted(PARTY, EXCESSIVE_CATEGORY);
 	private CategoriedItems<ImageLink> imgCategories = new CategoriedImageLinks(NSFW_CATEGORY, SFW_CATEGORY);
-//	private List<ImageLink> imagesNsfw;
-//	private List<ImageLink> imagesSfw;
-//	private List<String> excessives;
 
 	public PartyEverydayCommand(CampingBot bot) {
 		this.bot = bot;
-//		imagesNsfw = imgCategories.getList(NSFW_CATEGORY);
-//		imagesSfw = imgCategories.getList(SFW_CATEGORY);
-//		excessives = categories.getList(EXCESSIVE_CATEGORY);
 		addImage("http://www.hapke.ca/images/party-boy1.gif", false);
 		addImage("http://www.hapke.ca/images/party-boy3.gif", false);
 		addImage("http://www.hapke.ca/images/party-rave-girls.gif", true);
@@ -81,10 +71,8 @@ public class PartyEverydayCommand extends AbstractCommand implements HasCategori
 	private void addImage(String url, boolean sfw) {
 		ImageLink lnk = new ImageLink(url, ImageLink.GIF);
 		imgCategories.put(NSFW_CATEGORY, lnk);
-//		imagesNsfw.add(lnk);
 		if (sfw)
 			imgCategories.put(SFW_CATEGORY, lnk);
-//			imagesSfw.add(lnk);
 	}
 
 	@Override
@@ -151,8 +139,7 @@ public class PartyEverydayCommand extends AbstractCommand implements HasCategori
 
 	@Override
 	public void addItem(String category, String value) {
-		if (categories.put(category, value))
-			shouldSave = true;
+		categories.put(category, value);
 	}
 
 	@Override
