@@ -33,7 +33,7 @@ import ca.hapke.campingbot.commands.inline.NicknameCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
 import ca.hapke.campingbot.events.BallBustingEvent;
 import ca.hapke.campingbot.events.HappyNewYearEvent;
-import ca.hapke.campingbot.log.DatabaseConsumer;
+import ca.hapke.campingbot.response.InsultGenerator;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
@@ -41,6 +41,7 @@ import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.voting.RantCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
 import ca.hapke.campingbot.voting.ufc.UfcCommand;
+import ca.hapke.campingbot.xml.ContentLoader;
 
 /**
  * @author Nathan Hapke
@@ -61,7 +62,6 @@ public class CampingBot extends CampingBotEngine {
 
 	private CountdownCommand countdownGen;
 	private HypeCommand hypeCommand;
-	private DatabaseConsumer databaseConsumer;
 	private SpellCommand spellCommand;
 	private HideItCommand hideItCommand;
 	private NicknameCommand nicknameCommand;
@@ -81,6 +81,7 @@ public class CampingBot extends CampingBotEngine {
 	private AfdHotPotato potatoCommand;
 
 	public CampingBot(ProtectionDomain protectionDomain) {
+		super(protectionDomain);
 		spellCommand = new SpellCommand(this);
 		nicknameCommand = new NicknameCommand();
 		initialsCommand = new SetInitialsCommand();
@@ -89,7 +90,6 @@ public class CampingBot extends CampingBotEngine {
 		enhanceCommand = new EnhanceCommand(this);
 		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
-		databaseConsumer = DatabaseConsumer.init(system, eventLogger);
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
@@ -112,8 +112,9 @@ public class CampingBot extends CampingBotEngine {
 
 		addStatusUpdate(statusCommand);
 
-		ConfigXmlSerializer fullSerializer = new ConfigXmlSerializer(protectionDomain, system, spellCommand,
-				hypeCommand, partyCommand, chatManager, userMonitor, insultGenerator, enhanceCommand);
+		InsultGenerator insultGenerator = InsultGenerator.getInstance();
+		ContentLoader fullSerializer = new ContentLoader(protectionDomain, spellCommand, hypeCommand, partyCommand,
+				chatManager, userMonitor, insultGenerator, enhanceCommand);
 		serializer = fullSerializer;
 		addPostConfigInit(fullSerializer);
 

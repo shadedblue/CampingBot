@@ -1,12 +1,11 @@
 package ca.hapke.campingbot.commands;
 
-import java.text.NumberFormat;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import ca.hapke.campingbot.api.CampingBotEngine;
-import ca.hapke.campingbot.category.CategoriedStrings;
+import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -21,7 +20,8 @@ import ca.hapke.campingbot.util.StagedJob;
 /**
  * @author Nathan Hapke
  */
-public class HypeCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
+public class HypeCommand extends AbstractCommand
+		implements HasCategories<String>, SlashCommand {
 	private static final String HYPE_CONTAINER = "Hype";
 	public static final String HYPE_CATEGORY = "hype";
 	public static final String DICK_CATEGORY = "dick";
@@ -34,22 +34,12 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 		return SLASH_COMMANDS;
 	}
 
-	private CategoriedStrings categories;
-	private boolean shouldSave = false;
-
-//	private List<String> hypes;
+	private CategoriedStringsPersisted categories;
 	private CampingBotEngine bot;
-//	private List<String> dicks;
-	private NumberFormat nf;
 
 	public HypeCommand(CampingBotEngine bot) {
 		this.bot = bot;
-		categories = new CategoriedStrings(HYPE_CATEGORY, DICK_CATEGORY);
-//		dicks = categories.getList(DICK_CATEGORY);
-//		hypes = categories.getList(HYPE_CATEGORY);
-
-		nf = NumberFormat.getInstance();
-		nf.setMaximumFractionDigits(0);
+		categories = new CategoriedStringsPersisted(HYPE_CONTAINER, HYPE_CATEGORY, DICK_CATEGORY);
 	}
 
 	private StagedJob<HypeJobDetails> instance;
@@ -71,7 +61,6 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 		if (incoming.contains(" ")) {
 			String searchTerm = incoming.substring(incoming.indexOf(' ') + 1);
 			hype = categories.search(HYPE_CATEGORY, searchTerm);
-//					CollectionUtil.search(searchTerm, hypes);
 		} else {
 			Message replyToMessage = message.getReplyToMessage();
 			if (replyToMessage != null) {
@@ -94,8 +83,7 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 
 	@Override
 	public void addItem(String category, String value) {
-		if (categories.put(category, value))
-			shouldSave = true;
+		categories.put(category, value);
 	}
 
 	@Override

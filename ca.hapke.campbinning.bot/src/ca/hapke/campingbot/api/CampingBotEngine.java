@@ -1,5 +1,6 @@
 package ca.hapke.campingbot.api;
 
+import java.security.ProtectionDomain;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import ca.hapke.campingbot.commands.api.InputType;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.commands.api.TextCommand;
+import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.processors.DefaultMessageProcessor;
@@ -56,6 +58,7 @@ import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
+import ca.hapke.campingbot.xml.ConfigLoader;
 import ca.hapke.util.StringUtil;
 import ca.odell.glazedlists.FilterList;
 
@@ -69,10 +72,12 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	protected CampingUser meCamping;
 	private Set<IStatus> statusMonitors = new HashSet<>();
 
-	protected EventLogger eventLogger = EventLogger.getInstance();
-	protected CampingChatManager chatManager = CampingChatManager.getInstance(this);
-	protected CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
-	protected CampingSystem system = CampingSystem.getInstance();
+	protected final EventLogger eventLogger = EventLogger.getInstance();
+	protected final CampingSystem system = CampingSystem.getInstance();
+	protected final DatabaseConsumer databaseConsumer;
+
+	protected final CampingChatManager chatManager = CampingChatManager.getInstance(this);
+	protected final CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
 
 	private List<CallbackCommand> callbackCommands = new ArrayList<>();
 	private Map<String, CallbackCommand> callbackMap = new HashMap<>();
@@ -84,7 +89,6 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	protected MessageProcessor processor = new DefaultMessageProcessor();
 
-	protected InsultGenerator insultGenerator = InsultGenerator.getInstance();
 	protected ConfigSerializer serializer;
 	protected List<HasCategories<String>> hasCategories = new ArrayList<>();
 	private List<PostConfigInit> wantsInits = new ArrayList<>();
@@ -110,12 +114,15 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 	}
 
-	public CampingBotEngine() {
+	public CampingBotEngine(ProtectionDomain protectionDomain) {
 		statusMonitors.add(new ConnectionMonitor());
+		serializer = new ConfigLoader(protectionDomain, system);
+		serializer.load();
+		databaseConsumer = DatabaseConsumer.init(system, eventLogger);
 	}
 
 	public final void init() {
-		serializer.load();
+//		serializer.load();
 		FilterList<CampingUser> admins = userMonitor.getAdminUsers();
 		for (CampingUser admin : admins) {
 			CampingChat chat = chatManager.get(admin.getTelegramId());
@@ -503,7 +510,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		for (SlashCommand sc : slashCommands.get(command)) {
 			if (!system.hasAccess(campingFromUser, sc)) {
 				return new TextCommandResult(command).add(campingFromUser).add(": Access denied, you ")
-						.add(insultGenerator.getInsult());
+						.add(InsultGenerator.getInstance().getInsult());
 			}
 			CommandResult result = null;
 			try {

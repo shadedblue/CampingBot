@@ -57,7 +57,6 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.CampingSystem;
-import ca.hapke.campingbot.ConfigXmlSerializer;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.api.IStatus;
 import ca.hapke.campingbot.category.HasCategories;
@@ -73,6 +72,7 @@ import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserDefaultComparator;
 import ca.hapke.campingbot.users.CampingUserMonitor;
+import ca.hapke.campingbot.xml.AbstractLoader;
 import ca.hapke.util.ui.CategoryLabel;
 import ca.hapke.util.ui.PrettyTimeCellRenderer;
 import ca.odell.glazedlists.EventList;
@@ -416,7 +416,7 @@ public abstract class CampingBotUi extends JFrame {
 
 		Image app = null;
 		try {
-			File f = ConfigXmlSerializer.getFileNotInBinFolder(protectionDomain, "assets/app.png");
+			File f = AbstractLoader.getFileNotInBinFolder(protectionDomain, "assets/app.png");
 			URL appUrl = f.toURI().toURL();
 			ImageIcon appIcon = new ImageIcon(appUrl, "app-icon");
 			app = appIcon.getImage();
@@ -430,7 +430,7 @@ public abstract class CampingBotUi extends JFrame {
 			}
 			SystemTray tray = SystemTray.getSystemTray();
 			try {
-				File fire = ConfigXmlSerializer.getFileNotInBinFolder(protectionDomain, "assets/systray.png");
+				File fire = AbstractLoader.getFileNotInBinFolder(protectionDomain, "assets/systray.png");
 				URL fireUrl = fire.toURI().toURL();
 				ImageIcon fireIcon = new ImageIcon(fireUrl, "tray-icon");
 				Image fireImg = fireIcon.getImage();

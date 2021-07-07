@@ -24,9 +24,11 @@ public abstract class CategoriedItems<T> {
 	}
 
 	protected List<T> addCategory(String cat) {
-		names.add(cat);
+		return addCategory(cat, new ArrayList<T>());
+	}
 
-		List<T> result = new ArrayList<T>();
+	protected List<T> addCategory(String cat, List<T> result) {
+		names.add(cat);
 		data.put(cat, result);
 		return result;
 	}

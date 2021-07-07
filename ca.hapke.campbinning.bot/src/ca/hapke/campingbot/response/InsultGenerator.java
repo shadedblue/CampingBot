@@ -2,17 +2,15 @@ package ca.hapke.campingbot.response;
 
 import java.util.List;
 
+import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.category.HasPersistedCategories;
-import ca.hapke.campingbot.category.PersistedCategoriedStrings;
-import ca.hapke.campingbot.log.CategoriedPersistence;
 
 /**
  * Singleton for the InsultFragments to find me
  * 
  * @author Nathan Hapke
  */
-public class InsultGenerator implements HasCategories<String>, HasPersistedCategories {
+public class InsultGenerator implements HasCategories<String> {
 	private static InsultGenerator instance = new InsultGenerator();
 
 	public static InsultGenerator getInstance() {
@@ -20,12 +18,12 @@ public class InsultGenerator implements HasCategories<String>, HasPersistedCateg
 	}
 
 	private InsultGenerator() {
-		categories = new PersistedCategoriedStrings(INSULT_CATEGORY);
+		categories = new CategoriedStringsPersisted(INSULTS_CONTAINER, INSULT_CATEGORY);
 	}
 
 	private static final String INSULT_CATEGORY = "insult";
 	public static final String INSULTS_CONTAINER = "Insults";
-	private PersistedCategoriedStrings categories;
+	private CategoriedStringsPersisted categories;
 
 	@Override
 	public List<String> getCategoryNames() {
@@ -51,10 +49,5 @@ public class InsultGenerator implements HasCategories<String>, HasPersistedCateg
 		return categories.getSize(s);
 	}
 
-	@Override
-	public void loadPersistence(CategoriedPersistence cats) {
-		List<String> insults = cats.getValues();
-		categories.loadPersistence(INSULT_CATEGORY, insults, cats);
-	}
 
 }

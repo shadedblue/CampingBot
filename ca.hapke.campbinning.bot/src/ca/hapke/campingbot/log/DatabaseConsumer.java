@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 
 import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
 import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
@@ -221,16 +222,54 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 	}
 
 	public void updatePersistence(Object e) {
-		EntityManager mgr = getManager();
-		mgr.getTransaction().begin();
-		mgr.merge(e);
-		mgr.getTransaction().commit();
+		if (e != null) {
+			EntityManager mgr = getManager();
+			mgr.getTransaction().begin();
+			mgr.merge(e);
+			mgr.getTransaction().commit();
+		}
 	}
 
 	public void addPersistence(Object e) {
+		if (e != null) {
+			EntityManager mgr = getManager();
+			mgr.getTransaction().begin();
+			mgr.persist(e);
+			mgr.getTransaction().commit();
+		}
+	}
+
+	public CategoriedPersistence loadCategoriedStrings(String container, String category) {
+		CategoriedPersistence cats = null;
+		boolean addCats = false;
 		EntityManager mgr = getManager();
-		mgr.getTransaction().begin();
-		mgr.persist(e);
-		mgr.getTransaction().commit();
+		try {
+			mgr.getTransaction().begin();
+
+			String query = "SELECT c FROM " + CategoriedPersistence.class.getName() + " c WHERE c."
+					+ CategoriedPersistence.CONTAINER_NAME + " = ?1 AND c." + CategoriedPersistence.CATEGORY_NAME
+					+ " = ?2";
+			Query q = mgr.createQuery(query);
+			q.setParameter(1, container);
+			q.setParameter(2, category);
+			cats = (CategoriedPersistence) q.getSingleResult();
+
+		} catch (Exception e1) {
+			System.err.println(e1.getLocalizedMessage());
+		} finally {
+			mgr.getTransaction().rollback();
+
+			if (cats == null) {
+				cats = new CategoriedPersistence();
+				cats.setContainer(container);
+				cats.setCategory(category);
+				addCats = true;
+			}
+		}
+
+		if (addCats && cats != null) {
+			addPersistence(cats);
+		}
+		return cats;
 	}
 }

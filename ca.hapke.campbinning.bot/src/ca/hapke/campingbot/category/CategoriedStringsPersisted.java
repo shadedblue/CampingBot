@@ -9,33 +9,33 @@ import ca.hapke.campingbot.log.CategoriedPersistence;
 import ca.hapke.campingbot.log.DatabaseConsumer;
 
 /**
+ * CategoriedPersistence is connected to the List<> in the super-class and notifies the DB as appropriate
+ * 
  * @author Nathan Hapke
  */
-public class PersistedCategoriedStrings extends CategoriedStrings {
+public class CategoriedStringsPersisted extends CategoriedStrings {
 
 	private Map<List<String>, CategoriedPersistence> persistenceMap = new HashMap<>();
+	private String container;
 
-	public PersistedCategoriedStrings(String... categoryNames) {
-		super(categoryNames);
-		// TODO Auto-generated constructor stub
+	public CategoriedStringsPersisted(String container, String... categoryNames) {
+		// HACK need to set the category before calls to add them, so we have to duplicate the code here... annoyingly.
+		super();
+		this.container = container;
+		for (String k : categoryNames) {
+			addCategory(k);
+		}
 	}
 
-	public void loadPersistence(String category, List<String> values, CategoriedPersistence persistence) {
-		if (!contains(category)) {
-			names.add(category);
-			data.put(category, values);
-		} else {
-			List<String> oldList = data.get(category);
-
-			// merge old list into new one (without duplicates)
-			for (String t : oldList) {
-				if (!values.contains(t)) {
-					values.add(t);
-				}
-			}
-			data.put(category, values);
-			persistenceMap.put(values, persistence);
-		}
+	@Override
+	protected List<String> addCategory(String cat) {
+		List<String> list = data.get(cat);
+		if (list != null)
+			return list;
+		CategoriedPersistence cp = DatabaseConsumer.getInstance().loadCategoriedStrings(/* null, */container, cat);
+		list = cp.getValues();
+		persistenceMap.put(list, cp);
+		return super.addCategory(cat, list);
 	}
 
 	@Override
