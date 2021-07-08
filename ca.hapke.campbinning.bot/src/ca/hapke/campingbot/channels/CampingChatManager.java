@@ -1,6 +1,7 @@
 package ca.hapke.campingbot.channels;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
@@ -10,6 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
+import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.log.EventItem;
 import ca.hapke.campingbot.log.EventLogger;
 import ca.hapke.campingbot.response.CommandResult;
@@ -22,8 +24,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
@@ -32,7 +32,6 @@ import ca.odell.glazedlists.matchers.Matcher;
 public class CampingChatManager {
 	public static final ResponseCommandType JoinThreadCommand = new ResponseCommandType("JoinThread",
 			BotCommandIds.THREAD | BotCommandIds.SET);
-	private boolean shouldSave = false;
 	private static CampingChatManager instance;
 	private CampingBotEngine bot;
 
@@ -49,13 +48,6 @@ public class CampingChatManager {
 
 	private CampingChatManager(CampingBotEngine bot) {
 		this.bot = bot;
-		ListEventListener<CampingChat> listChangeListener = new ListEventListener<CampingChat>() {
-			@Override
-			public void listChanged(ListEvent<CampingChat> changes) {
-				shouldSave = true;
-			}
-		};
-		chatEvents.addListEventListener(listChangeListener);
 	}
 
 	private final Map<Long, CampingChat> chats = new HashMap<>();
@@ -69,6 +61,13 @@ public class CampingChatManager {
 					return item.isAnnounce();
 				}
 			}));
+
+	public void load() {
+		List<CampingChat> incoming = DatabaseConsumer.getInstance().loadChats();
+		for (CampingChat cc : incoming) {
+			add(cc);
+		}
+	}
 
 	public CampingChat get(Long chatId) {
 		boolean shouldNotify = false;
@@ -102,7 +101,6 @@ public class CampingChatManager {
 		String chatname = null;
 		try {
 			Chat tChat = bot.execute(new GetChat(Long.toString(chatId)));
-			shouldSave = true;
 
 			if (tChat.isGroupChat() || tChat.isSuperGroupChat()) {
 				chatname = tChat.getTitle();

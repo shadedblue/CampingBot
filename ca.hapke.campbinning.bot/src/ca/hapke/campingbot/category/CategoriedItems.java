@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+
 import ca.hapke.util.CollectionUtil;
 
 /**
@@ -45,6 +47,13 @@ public abstract class CategoriedItems<T> {
 
 	public int getSize(String cat) {
 		return getList(cat).size();
+	}
+
+	/**
+	 * Returns an immutable version
+	 */
+	public List<T> getListView(String cat) {
+		return ImmutableList.<T>builder().addAll(getList(cat)).build();
 	}
 
 	protected List<T> getList(String cat) {

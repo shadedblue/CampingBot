@@ -41,7 +41,6 @@ import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.voting.RantCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
 import ca.hapke.campingbot.voting.ufc.UfcCommand;
-import ca.hapke.campingbot.xml.ContentLoader;
 
 /**
  * @author Nathan Hapke
@@ -113,10 +112,6 @@ public class CampingBot extends CampingBotEngine {
 		addStatusUpdate(statusCommand);
 
 		InsultGenerator insultGenerator = InsultGenerator.getInstance();
-		ContentLoader fullSerializer = new ContentLoader(protectionDomain, spellCommand, hypeCommand, partyCommand,
-				chatManager, userMonitor, insultGenerator, enhanceCommand);
-		serializer = fullSerializer;
-		addPostConfigInit(fullSerializer);
 
 		hasCategories.add(insultGenerator);
 		quantityCommand = new QuantityCommand(hasCategories);

@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import ca.hapke.campingbot.category.CategoriedItems;
-import ca.hapke.campingbot.category.CategoriedStrings;
+import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 
 /**
@@ -17,9 +16,9 @@ import ca.hapke.campingbot.commands.api.AbstractCommand;
  */
 public class SpellPacks {
 
+	private static final String ALIAS_CATEGORY = "alias";
 	private Map<String, CategoriedItems<String>> categoriesByGenre = new HashMap<>();
 	private Map<String, String> aliasResolver = new HashMap<>();
-	private Map<String, Set<String>> allAliases = new HashMap<>();
 
 	public CategoriedItems<String> get(String genre, boolean shouldCreate) {
 		CategoriedItems<String> c = categoriesByGenre.get(genre);
@@ -28,21 +27,23 @@ public class SpellPacks {
 			c = categoriesByGenre.get(resolved);
 		}
 		if (c == null && shouldCreate) {
-			c = new CategoriedStrings(SpellCommand.ITEM_CATEGORY, SpellCommand.EXCLAMATION_CATEGORY);
+			String spell_genre = SpellCommand.SPELL + AbstractCommand.DELIMITER + genre;
+			c = new CategoriedStringsPersisted(spell_genre, SpellCommand.ITEM_CATEGORY,
+					SpellCommand.EXCLAMATION_CATEGORY, ALIAS_CATEGORY);
 			categoriesByGenre.put(genre, c);
+			List<String> aliases = c.getListView(ALIAS_CATEGORY);
+			for (String a : aliases) {
+				this.aliasResolver.put(a.toLowerCase(), genre);
+			}
 		}
 		return c;
 	}
 
 	public void addAliases(String genre, Collection<String> toAdd) {
-		Set<String> current = allAliases.get(genre);
-		if (current == null) {
-			current = new TreeSet<>();
-			allAliases.put(genre, current);
-		}
-		current.addAll(toAdd);
+		CategoriedItems<String> pack = categoriesByGenre.get(genre);
 		for (String a : toAdd) {
-			this.aliasResolver.put(a.toLowerCase(), genre);
+			if (pack.put(ALIAS_CATEGORY, a))
+				this.aliasResolver.put(a.toLowerCase(), genre);
 		}
 	}
 
@@ -90,8 +91,9 @@ public class SpellPacks {
 		return categoriesByGenre.entrySet();
 	}
 
-	public Set<String> getAliases(String genre) {
-		return allAliases.get(genre);
+	public List<String> getAliases(String genre) {
+		CategoriedItems<String> pack = categoriesByGenre.get(genre);
+		return pack.getListView(ALIAS_CATEGORY);
 	}
 
 	public int size() {

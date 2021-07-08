@@ -11,14 +11,13 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.CampingSystem;
+import ca.hapke.campingbot.log.DatabaseConsumer;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
@@ -28,7 +27,6 @@ import ca.odell.glazedlists.matchers.Matcher;
  */
 public class CampingUserMonitor {
 
-	private boolean shouldSave = false;
 	public static final int UNKNOWN_USER_ID = -1;
 	private static CampingUserMonitor instance = new CampingUserMonitor();
 
@@ -37,13 +35,6 @@ public class CampingUserMonitor {
 	}
 
 	private CampingUserMonitor() {
-		ListEventListener<CampingUser> listChangeListener = new ListEventListener<CampingUser>() {
-			@Override
-			public void listChanged(ListEvent<CampingUser> listChanges) {
-				shouldSave = true;
-			}
-		};
-		users.addListEventListener(listChangeListener);
 	}
 
 	private final ObservableElementList.Connector<CampingUser> userConnector = GlazedLists
@@ -61,6 +52,13 @@ public class CampingUserMonitor {
 			return CampingSystem.getInstance().isAdmin(item);
 		}
 	});
+
+	public void load() {
+		List<CampingUser> incoming = DatabaseConsumer.getInstance().loadUsers();
+		for (CampingUser u : incoming) {
+			addUser(u);
+		}
+	}
 
 	public long getNextCampingId() {
 		usedCampingIds.add(nextCampingId);
@@ -182,8 +180,6 @@ public class CampingUserMonitor {
 				usernameTarget.setTelegramId(telegramId);
 				usernameTarget.setSeenInteraction(interacting);
 				telegramIdMap.put(telegramId, usernameTarget);
-
-				shouldSave = true;
 			}
 			target = usernameTarget;
 		} else if (target != null && usernameTarget == null) {
@@ -191,8 +187,6 @@ public class CampingUserMonitor {
 				// learned the username
 				target.setUsername(username);
 				usernameMap.put(usernameKey, target);
-
-				shouldSave = true;
 			}
 		}
 		if (target != null && usernameTarget != null && target != usernameTarget) {
@@ -200,8 +194,6 @@ public class CampingUserMonitor {
 			usernameMap.put(usernameKey, target);
 			users.remove(usernameTarget);
 			target.setSeenInteraction(usernameTarget.isSeenInteraction());
-
-			shouldSave = true;
 		}
 		if (target != null) {
 			target.setFirstname(firstname);
@@ -222,7 +214,6 @@ public class CampingUserMonitor {
 			String usernameKey = CampingUtil.generateUsernameKey(username);
 			usernameMap.put(usernameKey, target);
 		}
-		shouldSave = true;
 	}
 
 	public EventList<CampingUser> getUsers() {

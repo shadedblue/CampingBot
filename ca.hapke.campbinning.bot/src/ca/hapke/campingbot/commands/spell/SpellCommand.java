@@ -31,7 +31,11 @@ import ca.hapke.util.StringUtil;
  */
 public class SpellCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
 
-	private static final String SPELL = "Spell";
+	public static final String SPELL = "Spell";
+	private static final String PACK_CATEGORY = "pack";
+	static final String ADJECTIVE_CATEGORY = "adjective";
+	static final String EXCLAMATION_CATEGORY = "exclamation";
+	static final String ITEM_CATEGORY = "item";
 
 	public static final SlashCommandType SlashSpellCommand = new SlashCommandType(SPELL, "spell",
 			BotCommandIds.SPELL | BotCommandIds.USE);
@@ -46,10 +50,6 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 	private static final TextFragment AND_YELLS = new TextFragment(" and yells \"");
 	private static final TextFragment END_QUOTE = new TextFragment("\"");
 
-	static final String ADJECTIVE_CATEGORY = "adjective";
-	static final String EXCLAMATION_CATEGORY = "exclamation";
-	static final String ITEM_CATEGORY = "item";
-
 	private CampingBot bot;
 
 	private SpellPacks packs = new SpellPacks();
@@ -62,7 +62,11 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		castManager = new SpellCastingManager(bot);
 		CalendarMonitor.getInstance().add(castManager);
 
-		categories = new CategoriedStringsPersisted(SPELL, ADJECTIVE_CATEGORY);
+		categories = new CategoriedStringsPersisted(SPELL, PACK_CATEGORY, ADJECTIVE_CATEGORY);
+		List<String> genres = categories.getListView(PACK_CATEGORY);
+		for (String genre : genres) {
+			packs.get(genre, true);
+		}
 	}
 
 	@Override

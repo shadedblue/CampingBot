@@ -2,7 +2,6 @@ package ca.hapke.campingbot.commands;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -61,7 +60,7 @@ public class QuantityCommand extends AbstractCommand implements SlashCommand {
 		SpellPacks packs = sc.getPacks();
 		for (Map.Entry<String, CategoriedItems<String>> e : packs.entrySet()) {
 			String genre = e.getKey();
-			Set<String> aliases = packs.getAliases(genre);
+			List<String> aliases = packs.getAliases(genre);
 			CategoriedItems<String> data = e.getValue();
 			cr.add(genre, TextStyle.Underline);
 			if (aliases != null && aliases.size() > 0) {

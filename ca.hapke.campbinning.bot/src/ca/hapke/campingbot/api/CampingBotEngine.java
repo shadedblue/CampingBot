@@ -89,7 +89,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	protected MessageProcessor processor = new DefaultMessageProcessor();
 
-	protected ConfigSerializer serializer;
+	private ConfigSerializer serializer;
 	protected List<HasCategories<String>> hasCategories = new ArrayList<>();
 	private List<PostConfigInit> wantsInits = new ArrayList<>();
 
@@ -123,6 +123,8 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 
 	public final void init() {
 //		serializer.load();
+		userMonitor.load();
+		chatManager.load();
 		FilterList<CampingUser> admins = userMonitor.getAdminUsers();
 		for (CampingUser admin : admins) {
 			CampingChat chat = chatManager.get(admin.getTelegramId());

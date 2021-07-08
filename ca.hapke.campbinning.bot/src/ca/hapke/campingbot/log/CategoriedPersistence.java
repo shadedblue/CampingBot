@@ -1,5 +1,6 @@
 package ca.hapke.campingbot.log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CollectionTable;
@@ -20,19 +21,9 @@ import javax.persistence.Table;
 @Table(name = CategoriedPersistence.TABLE, schema = DatabaseConsumer.SCHEMA)
 public class CategoriedPersistence {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-
-	@Column(name = CategoriedPersistence.CONTAINER_NAME)
 	private String container;
-
-	@Column(name = CategoriedPersistence.CATEGORY_NAME)
 	private String category;
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = TABLE + "_" + VALUES, joinColumns = @JoinColumn(name = "id"))
-	@Column(name = VALUES)
 	private List<String> values;
 
 	public static final String CONTAINER_NAME = "container";
@@ -40,23 +31,29 @@ public class CategoriedPersistence {
 	public static final String TABLE = "categoried";
 	public static final String VALUES = "values";
 
-	public void setValues(List<String> values) {
-		this.values = values;
-	}
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	public int getId() {
 		return id;
 	}
 
+	@Column(name = CategoriedPersistence.CONTAINER_NAME)
 	public String getContainer() {
 		return container;
 	}
 
+	@Column(name = CategoriedPersistence.CATEGORY_NAME)
 	public String getCategory() {
 		return category;
 	}
 
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = TABLE + "_" + VALUES, joinColumns = @JoinColumn(name = "id"))
+	@Column(name = VALUES, nullable = false)
 	public List<String> getValues() {
+		// FIXME I don't know if this connects to JPA properly.
+		if (values == null)
+			values = new ArrayList<String>();
 		return values;
 	}
 
@@ -72,6 +69,10 @@ public class CategoriedPersistence {
 		this.category = category;
 	}
 
+	public void setValues(List<String> values) {
+		this.values = values;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -79,7 +80,7 @@ public class CategoriedPersistence {
 		builder.append(id);
 		builder.append(" ");
 		builder.append(container);
-		builder.append(":");
+		builder.append("->");
 		builder.append(category);
 		builder.append("]");
 		return builder.toString();

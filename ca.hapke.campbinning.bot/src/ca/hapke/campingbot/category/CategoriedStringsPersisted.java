@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import ca.hapke.campingbot.log.CategoriedPersistence;
 import ca.hapke.campingbot.log.DatabaseConsumer;
 
@@ -40,30 +42,45 @@ public class CategoriedStringsPersisted extends CategoriedStrings {
 
 	@Override
 	public boolean put(String cat, String item) {
+		EntityManager mgr = DatabaseConsumer.getInstance().getManager();
+		mgr.getTransaction().begin();
 		boolean result = super.put(cat, item);
 		if (result) {
 			CategoriedPersistence persistence = persistenceMap.get(getList(cat));
-			DatabaseConsumer.getInstance().updatePersistence(persistence);
+			DatabaseConsumer.getInstance().updatePersistence(persistence, true);
+			mgr.getTransaction().commit();
+		} else {
+			mgr.getTransaction().rollback();
 		}
 		return result;
 	}
 
 	@Override
 	public boolean putAll(String cat, Collection<String> items) {
+		EntityManager mgr = DatabaseConsumer.getInstance().getManager();
+		mgr.getTransaction().begin();
 		boolean result = super.putAll(cat, items);
 		if (result) {
 			CategoriedPersistence persistence = persistenceMap.get(getList(cat));
-			DatabaseConsumer.getInstance().updatePersistence(persistence);
+			DatabaseConsumer.getInstance().updatePersistence(persistence, true);
+			mgr.getTransaction().commit();
+		} else {
+			mgr.getTransaction().rollback();
 		}
 		return result;
 	}
 
 	@Override
 	public boolean putAll(String cat, String... items) {
+		EntityManager mgr = DatabaseConsumer.getInstance().getManager();
+		mgr.getTransaction().begin();
 		boolean result = super.putAll(cat, items);
 		if (result) {
 			CategoriedPersistence persistence = persistenceMap.get(getList(cat));
-			DatabaseConsumer.getInstance().updatePersistence(persistence);
+			DatabaseConsumer.getInstance().updatePersistence(persistence, true);
+			mgr.getTransaction().commit();
+		} else {
+			mgr.getTransaction().rollback();
 		}
 		return result;
 	}

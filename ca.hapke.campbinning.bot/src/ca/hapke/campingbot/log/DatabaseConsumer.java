@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -222,11 +223,19 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 	}
 
 	public void updatePersistence(Object e) {
+		updatePersistence(e, false);
+	}
+
+	public void updatePersistence(Object e, boolean callerTransaction) {
 		if (e != null) {
 			EntityManager mgr = getManager();
-			mgr.getTransaction().begin();
+			if (!callerTransaction)
+				mgr.getTransaction().begin();
+
 			mgr.merge(e);
-			mgr.getTransaction().commit();
+
+			if (!callerTransaction)
+				mgr.getTransaction().commit();
 		}
 	}
 
@@ -237,6 +246,24 @@ public class DatabaseConsumer implements CalendaredEvent<Void>, AutoCloseable {
 			mgr.persist(e);
 			mgr.getTransaction().commit();
 		}
+	}
+
+	public List<CampingUser> loadUsers() {
+		EntityManager mgr = getManager();
+		mgr.getTransaction().begin();
+		String query = "SELECT u FROM " + CampingUser.class.getName() + " u";
+		List<CampingUser> result = mgr.createQuery(query, CampingUser.class).getResultList();
+		mgr.getTransaction().rollback();
+		return result;
+	}
+
+	public List<CampingChat> loadChats() {
+		EntityManager mgr = getManager();
+		mgr.getTransaction().begin();
+		String query = "SELECT c FROM " + CampingChat.class.getName() + " c ";
+		List<CampingChat> result = mgr.createQuery(query, CampingChat.class).getResultList();
+		mgr.getTransaction().rollback();
+		return result;
 	}
 
 	public CategoriedPersistence loadCategoriedStrings(String container, String category) {
