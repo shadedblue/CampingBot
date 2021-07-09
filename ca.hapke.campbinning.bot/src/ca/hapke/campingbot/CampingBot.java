@@ -112,6 +112,9 @@ public class CampingBot extends CampingBotEngine {
 		addStatusUpdate(statusCommand);
 
 		InsultGenerator insultGenerator = InsultGenerator.getInstance();
+//		ContentSerializer contentSerializer = new ContentSerializer(protectionDomain, spellCommand, hypeCommand,
+//				partyCommand, insultGenerator, enhanceCommand);
+//		contentSerializer.load();
 
 		hasCategories.add(insultGenerator);
 		quantityCommand = new QuantityCommand(hasCategories);

@@ -49,7 +49,7 @@ public class CategoriedPersistence {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = TABLE + "_" + VALUES, joinColumns = @JoinColumn(name = "id"))
-	@Column(name = VALUES, nullable = false)
+	@Column(columnDefinition = "text", name = VALUES, nullable = false)
 	public List<String> getValues() {
 		// FIXME I don't know if this connects to JPA properly.
 		if (values == null)
