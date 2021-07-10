@@ -30,7 +30,7 @@ public class CalendarMonitor extends TimerThreadWithKill {
 	}
 
 	private EventList<CalendaredEvent<?>> calendaredEvents = GlazedLists
-			.threadSafeList(new BasicEventList<CalendaredEvent>());
+			.threadSafeList(new BasicEventList<CalendaredEvent<?>>());
 
 	@Override
 	protected void doWork() {
@@ -93,7 +93,7 @@ public class CalendarMonitor extends TimerThreadWithKill {
 			invoke(e, timeProvider, timeProvider.getMostNearestPast());
 		}
 	}
-	
+
 	public <T> boolean remove(CalendaredEvent<T> e) {
 		return calendaredEvents.remove(e);
 	}
