@@ -20,6 +20,7 @@ public class SpellPropogationManager {
 	private Map<CampingUser, LinkedList<CastStruct>> defensiveTargets = new HashMap<>();
 	private Map<CampingUser, Long> deadTimestamps = new HashMap<>();
 	private Map<CampingUser, LinkedList<PendingCast>> pendingCasts;
+	private CampingUser me;
 
 	public SpellPropogationManager(Map<CampingUser, LinkedList<PendingCast>> pendingCasts) {
 		this.pendingCasts = pendingCasts;
@@ -110,11 +111,9 @@ public class SpellPropogationManager {
 
 		int pendingFromVictimSize = pendingFromVictim.size();
 		if (completedFromVictim + pendingFromVictimSize >= 2) {
-			// victim cannot cast for a while
+			// Combo Breaker -- victim cannot cast for a while
 			deadTimestamps.put(victim, now + EXPIRY_DURATION);
-
-			// TODO cancel the castersPending's?
-
+			cancelPending(victim);
 			return ComboType.Breaker;
 		}
 
@@ -122,8 +121,15 @@ public class SpellPropogationManager {
 			offenseTimes.removeFirst();
 			offenseTimes.removeFirst();
 			offenseTimes.removeFirst();
-			deadTimestamps.put(victim, now + EXPIRY_DURATION);
-			return ComboType.KO;
+			if (victim.equals(me)) {
+				cancelPending(caster);
+				deadTimestamps.put(caster, now + EXPIRY_DURATION);
+				return ComboType.Revenge;
+			} else {
+				cancelPending(victim);
+				deadTimestamps.put(victim, now + EXPIRY_DURATION);
+				return ComboType.KO;
+			}
 		}
 
 		LinkedList<CastStruct> victimDefenseTimes = getTimes(defensiveTargets, victim);
@@ -142,6 +148,10 @@ public class SpellPropogationManager {
 		return ComboType.Normal;
 	}
 
+	private void cancelPending(CampingUser from) {
+		pendingCasts.remove(from);
+	}
+
 	private static <K, V> LinkedList<V> getTimes(Map<K, LinkedList<V>> timestamps, K value) {
 		LinkedList<V> l = timestamps.get(value);
 		if (l == null) {
@@ -151,8 +161,11 @@ public class SpellPropogationManager {
 		return l;
 	}
 
-//	private static String getInvocationKey(CampingUser caster, CampingUser victim) {
-//		return caster.getCampingId() + DELIMITER + victim.getCampingId();
-//	}
+	// need setter so this happens after config load
+	public void setMe(CampingUser me) {
+		if (this.me == null)
+			this.me = me;
+	}
+
 
 }

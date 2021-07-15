@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.api.IStatus;
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
@@ -59,6 +61,24 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 	public SpellCommand(CampingBot bot) {
 		this.bot = bot;
+		bot.addStatusUpdate(new IStatus() {
+			@Override
+			public void statusOnline() {
+			}
+
+			@Override
+			public void statusOffline() {
+			}
+
+			@Override
+			public void statusMeProvided(CampingUser me) {
+				castManager.setMe(me);
+			}
+
+			@Override
+			public void connectFailed(TelegramApiException e) {
+			}
+		});
 		castManager = new SpellCastingManager(bot);
 		CalendarMonitor.getInstance().add(castManager);
 

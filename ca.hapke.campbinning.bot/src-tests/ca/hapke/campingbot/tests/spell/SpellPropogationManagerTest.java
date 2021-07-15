@@ -32,26 +32,27 @@ public class SpellPropogationManagerTest {
 	private CampingUser nh;
 	private CampingUser jm;
 	private CampingUser aa;
+	private CampingUser bot;
 
 	public SpellPropogationManagerTest() {
 		rtv = um.monitor(1l, "robtheviking", "R", "S", true);
 		nh = um.monitor(2l, "shadedblue", "N", "H", true);
 		jm = um.monitor(3l, "jakeford", "J", "M", true);
 		aa = um.monitor(4l, "aandy", "A", "A", true);
+		bot = um.monitor(5l, "devbot", "D", "B", true);
 	}
 
 	@BeforeEach
 	void setUp() throws Exception {
 		pendingCasts = new HashMap<>();
 		propMgr = new SpellPropogationManager(pendingCasts);
+		propMgr.setMe(bot);
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
 		pendingCasts = null;
 		propMgr = null;
-		rtv = null;
-		nh = null;
 	}
 
 	@Test
@@ -106,7 +107,6 @@ public class SpellPropogationManagerTest {
 
 	@Test
 	void test3CastedGangBang() {
-
 		ComboType first = propMgr.getComboResult(rtv, aa);
 		assertEquals(ComboType.Normal, first);
 
@@ -115,5 +115,17 @@ public class SpellPropogationManagerTest {
 
 		ComboType third = propMgr.getComboResult(nh, aa);
 		assertEquals(ComboType.GangBang, third);
+	}
+
+	@Test
+	void test3CastedBotRevenge() {
+		ComboType first = propMgr.getComboResult(rtv, bot);
+		assertEquals(ComboType.Normal, first);
+
+		ComboType second = propMgr.getComboResult(rtv, bot);
+		assertEquals(ComboType.Normal, second);
+
+		ComboType third = propMgr.getComboResult(rtv, bot);
+		assertEquals(ComboType.Revenge, third);
 	}
 }

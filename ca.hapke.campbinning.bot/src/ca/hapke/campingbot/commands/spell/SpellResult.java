@@ -2,6 +2,8 @@ package ca.hapke.campingbot.commands.spell;
 
 import java.util.List;
 
+import ca.hapke.campingbot.commands.api.ResponseCommandType;
+import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.InsultFragment;
 import ca.hapke.campingbot.response.fragments.InsultFragment.Perspective;
@@ -47,27 +49,35 @@ public class SpellResult {
 		this.failure = failure;
 	}
 
-	public TextCommandResult provideCommandResult() {
-		TextCommandResult out;
+	public CommandResult provideCommandResult(CommandResult result) {
+		if (result == null) {
+			ResponseCommandType cmd;
+			if (success) {
+				cmd = SpellCommand.SlashSpellCommand;
+			} else {
+				cmd = SpellCommand.SpellDipshitCommand;
+			}
+			result = new TextCommandResult(cmd);
+		}
+
 		if (success) {
-			out = new TextCommandResult(SpellCommand.SlashSpellCommand, spell);
+			result.add(spell);
 		} else {
 			switch (failure) {
 			case NoVictim:
-				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
-						ResultFragment.COLON_SPACE, NO_VICTIM_COMMAND, new InsultFragment(Perspective.You));
+				result.add(new MentionFragment(fromUser), ResultFragment.COLON_SPACE, NO_VICTIM_COMMAND,
+						new InsultFragment(Perspective.You));
 				break;
 			case CastAtBot:
-				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
-						ResultFragment.COLON_SPACE, NOT_BOT_COMMAND, new InsultFragment(Perspective.You));
+				result.add(new MentionFragment(fromUser), ResultFragment.COLON_SPACE, NOT_BOT_COMMAND,
+						new InsultFragment(Perspective.You));
 				break;
 			default:
-				out = new TextCommandResult(SpellCommand.SpellDipshitCommand, new MentionFragment(fromUser),
-						ResultFragment.COLON_SPACE, UNKNOWN_FAIL);
+				result.add(new MentionFragment(fromUser), ResultFragment.COLON_SPACE, UNKNOWN_FAIL);
 				break;
 			}
 		}
-		return out;
+		return result;
 	}
 
 	public boolean isSuccess() {

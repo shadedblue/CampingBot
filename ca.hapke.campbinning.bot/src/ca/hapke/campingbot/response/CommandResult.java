@@ -65,8 +65,17 @@ public abstract class CommandResult {
 //		return sent;
 //	}
 
-	public CommandResult add(ResultFragment e) {
-		fragments.add(e);
+	public CommandResult add(List<ResultFragment> frags) {
+		for (ResultFragment e : frags) {
+			fragments.add(e);
+		}
+		return this;
+	}
+
+	public CommandResult add(ResultFragment... frags) {
+		for (ResultFragment e : frags) {
+			fragments.add(e);
+		}
 		return this;
 	}
 
