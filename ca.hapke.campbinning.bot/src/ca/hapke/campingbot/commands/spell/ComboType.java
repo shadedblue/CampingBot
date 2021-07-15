@@ -5,6 +5,7 @@ package ca.hapke.campingbot.commands.spell;
  */
 public enum ComboType {
 	Normal,
+	GangBang,
 	Fizzle,
 	KO,
 	Breaker,

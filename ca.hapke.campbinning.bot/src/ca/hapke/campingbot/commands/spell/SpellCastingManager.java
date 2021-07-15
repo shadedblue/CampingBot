@@ -28,31 +28,19 @@ import ca.hapke.campingbot.util.ImageLink;
 public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
 	private static final String KNOCK_OUT = "KKNNNNOOOOCCKKKK OUUUUTTTTT";
-
-	private class PendingCast {
-
-		private final CampingUser victim;
-		private final SpellResult result;
-		private final CampingChat chat;
-		private int waits;
-
-		public PendingCast(CampingUser victim, SpellResult result, CampingChat chat, int waits) {
-			this.victim = victim;
-			this.result = result;
-			this.chat = chat;
-			this.waits = waits;
-		}
-
-	}
+	private static final String MG_G = "MG G";
+	private static final String NG_B = "NG B";
+	private static final String NG = "NG! ";
 
 	private TimesProvider<CampingUser> times = new TimesProvider<>();
 	private Map<CampingUser, LinkedList<PendingCast>> pendingCasts = new HashMap<>();
-	private SpellPropogationManager propogationManager = new SpellPropogationManager();
+	private SpellPropogationManager propogationManager = new SpellPropogationManager(pendingCasts);
 	private CampingBotEngine bot;
 	private static final String COMBO_BREAKER = "ComboBreaker";
 	private CategoriedItems<ImageLink> images;
 //	private List<ImageLink> breakerImages;
 	private ImageLink koDeadImg = new ImageLink("http://www.hapke.ca/images/spell-ko-dead.mp4", ImageLink.GIF);
+	private ImageLink gbImg = new ImageLink("http://www.hapke.ca/images/spell-gangbang-carrots.mp4", ImageLink.GIF);
 	private Resources resources;
 
 	public SpellCastingManager(CampingBot bot) {
@@ -93,10 +81,12 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
 	private void castNow(CampingUser caster, CampingUser victim, SpellResult spell, CampingChat chat) {
 		ComboType comboType = propogationManager.getComboResult(caster, victim);
-		if (comboType == ComboType.Dead) {
+
+		switch (comboType) {
+		case Dead:
+			// NO CAST!
 			return;
-		}
-		if (comboType == ComboType.Breaker) {
+		case Breaker:
 			// Remove all future victim => caster casts
 			pendingCasts.remove(victim);
 
@@ -105,6 +95,16 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 //					CollectionUtil.getRandom(breakerImages);
 			ImageCommandResult breaker = new ImageCommandResult(SpellCommand.SlashSpellCommand, img);
 			breaker.sendAndLog(bot, chat);
+			break;
+		case GangBang:
+			ImageCommandResult gb = new ImageCommandResult(SpellCommand.SlashSpellCommand, gbImg);
+			gb.sendAndLog(bot, chat);
+			break;
+		// NOOPs
+		case Fizzle:
+		case Normal:
+		case KO:
+			break;
 		}
 
 		TextCommandResult outgoingSpell = spell.provideCommandResult();
@@ -116,15 +116,38 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 			outgoingSpell.add(resources.getBall("fire"));
 		}
 
+		if (comboType == ComboType.GangBang) {
+
+			outgoingSpell.add(ResultFragment.NEWLINE);
+			outgoingSpell.add(ResultFragment.NEWLINE);
+			outgoingSpell.add(resources.getRandomFaceEmoji());
+			outgoingSpell.add(MG_G);
+			outgoingSpell.add(resources.getRandomFaceEmoji());
+			outgoingSpell.add(NG_B);
+			outgoingSpell.add(resources.getRandomFaceEmoji());
+			outgoingSpell.add(NG);
+			outgoingSpell.add(resources.getRandomBallEmoji());
+			outgoingSpell.add(resources.getRandomBallEmoji());
+			outgoingSpell.add(resources.getRandomBallEmoji());
+		}
+
 //		SendResult result = 
 		outgoingSpell.sendAndLog(bot, chat);
 
-		if (comboType == ComboType.Fizzle) {
+		switch (comboType) {
+		case Fizzle:
 			// TODO Punish a bit
-		} else if (comboType == ComboType.KO) {
-			// KO GIF
+			break;
+		case KO:
 			ImageCommandResult koDead = new ImageCommandResult(SpellCommand.SlashSpellCommand, koDeadImg);
 			koDead.sendAndLog(bot, chat);
+			break;
+		// NOOPs
+		case Normal:
+		case Breaker:
+		case Dead:
+		case GangBang:
+			break;
 		}
 	}
 
