@@ -20,8 +20,7 @@ import ca.hapke.campingbot.util.StagedJob;
 /**
  * @author Nathan Hapke
  */
-public class HypeCommand extends AbstractCommand
-		implements HasCategories<String>, SlashCommand {
+public class HypeCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
 	private static final String HYPE_CONTAINER = "Hype";
 	public static final String HYPE_CATEGORY = "hype";
 	public static final String DICK_CATEGORY = "dick";
@@ -108,4 +107,14 @@ public class HypeCommand extends AbstractCommand
 		return categories.getSize(s);
 	}
 
+	@Override
+	public String provideUiStatus() {
+		String out;
+		if (instance == null) {
+			out = "No active hype";
+		} else {
+			out = instance.toString();
+		}
+		return out;
+	}
 }

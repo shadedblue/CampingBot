@@ -34,8 +34,14 @@ public class SpellPropogationManager {
 		LinkedList<Long> times = getTimes(offensiveCasts, user);
 
 		expireOffensiveTimes(times);
+		int previousOffensives = times.size();
 
-		return times.size();
+		int pendingQty = 0;
+		LinkedList<PendingCast> casts = pendingCasts.get(user);
+		if (casts != null) {
+			pendingQty = casts.size();
+		}
+		return previousOffensives + pendingQty;
 	}
 
 	protected void expireOffensiveTimes(LinkedList<Long> times) {
@@ -166,6 +172,5 @@ public class SpellPropogationManager {
 		if (this.me == null)
 			this.me = me;
 	}
-
 
 }

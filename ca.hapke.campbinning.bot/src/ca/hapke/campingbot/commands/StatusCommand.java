@@ -108,4 +108,9 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	public AccessLevel accessRequired() {
 		return AccessLevel.Admin;
 	}
+
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

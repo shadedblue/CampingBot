@@ -116,4 +116,8 @@ public class RedditCommand extends AbstractCommand implements SlashCommand, Text
 		return matches;
 	}
 
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

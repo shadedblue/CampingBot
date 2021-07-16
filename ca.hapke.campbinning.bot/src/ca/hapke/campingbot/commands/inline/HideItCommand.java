@@ -274,4 +274,9 @@ public class HideItCommand extends InlineCommandBase implements CallbackCommand 
 	public TopicManager getTopics() {
 		return topics;
 	}
+
+	@Override
+	public String provideUiStatus() {
+		return "Cache Size: " + confirmedCache.size();
+	}
 }

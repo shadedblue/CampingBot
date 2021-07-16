@@ -156,4 +156,9 @@ public class PartyEverydayCommand extends AbstractCommand implements HasCategori
 	public int getSize(String s) {
 		return categories.getSize(s);
 	}
+
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

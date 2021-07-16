@@ -7,6 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.calendaring.monitor.CalendarMonitor;
+import ca.hapke.calendaring.timing.ByCalendar;
+import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.api.IStatus;
@@ -226,4 +228,20 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		return categories.getSize(s);
 	}
 
+	@Override
+	public String provideUiStatus() {
+		TimesProvider<CampingUser> timeProvider = castManager.getTimeProvider();
+		ByCalendar<CampingUser> nearestFuture = timeProvider.getNearestFuture();
+		String s;
+		if (nearestFuture != null) {
+			s = nearestFuture.getFuture().toString();
+		} else {
+			s = "Unscheduled";
+		}
+		String timeString = "Next Run: " + s;
+
+		String pendingString = castManager.getPendingString();
+
+		return timeString + "\n" + pendingString;
+	}
 }

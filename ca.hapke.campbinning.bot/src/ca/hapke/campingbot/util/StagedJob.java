@@ -8,6 +8,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class StagedJob<T extends JobDetails> extends StatusThread {
 	protected AbstractQueue<T> jobs = new ConcurrentLinkedQueue<>();
+	private int step;
+	private int steps;
+	private int attempt;
+	private int attempts;
 
 	public StagedJob(T first) {
 		jobs.add(first);
@@ -17,11 +21,12 @@ public class StagedJob<T extends JobDetails> extends StatusThread {
 	protected void doWork() {
 		while (jobs.size() > 0 && !kill) {
 			JobDetails job = jobs.poll();
-			int step = 0;
-			int attempt = 0;
+			step = 0;
+			attempt = 0;
 			boolean abortJob = false;
-			while (step < job.getNumSteps() && !abortJob) {
-				int attempts = job.getNumAttempts(step);
+			steps = job.getNumSteps();
+			while (step < steps && !abortJob) {
+				attempts = job.getNumAttempts(step);
 				boolean success = job.doStep(step, attempt);
 				if (job.shouldAbort())
 					break;
@@ -51,6 +56,22 @@ public class StagedJob<T extends JobDetails> extends StatusThread {
 
 	public boolean add(T e) {
 		return jobs.add(e);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(jobs.size() + " jobs\n");
+
+		builder.append("1: Step " + step + "/" + steps + " Attempt " + attempt + "/" + attempts);
+		int n = 1;
+		for (T t : jobs) {
+			if (n >= 2) {
+				builder.append(n + ": Steps " + t.getNumSteps());
+			}
+			n++;
+		}
+		return builder.toString();
 	}
 
 }

@@ -385,4 +385,8 @@ public class AfdHotPotato extends AbstractCommand
 		return topicChanger;
 	}
 
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

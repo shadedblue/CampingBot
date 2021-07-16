@@ -98,6 +98,7 @@ public abstract class CampingBotUi extends JFrame {
 		public void doWork(ByCalendar<Void> event, Void value) {
 			userModel.fireTableDataChanged();
 			calendaredModel.fireTableDataChanged();
+			updateCommandStatus();
 		}
 
 		@Override
@@ -149,6 +150,7 @@ public abstract class CampingBotUi extends JFrame {
 	private JList<EventItem> lstLog;
 	private JButton btnReply;
 	private ProtectionDomain protectionDomain;
+	private JTextArea txtCommandStatus;
 
 	/**
 	 * Create the frame.
@@ -169,7 +171,7 @@ public abstract class CampingBotUi extends JFrame {
 				TimerThreadWithKill.shutdownThreads();
 			}
 		});
-		setBounds(100, 100, 1284, 720);
+		setBounds(100, 100, 1493, 720);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -414,6 +416,17 @@ public abstract class CampingBotUi extends JFrame {
 		lblConnection.setBounds(0, 5, 19, 108);
 		contentPane.add(lblConnection);
 
+		CategoryLabel lblCommandStatus = new CategoryLabel("CommandStatus", new Color(0, 128, 128));
+		lblCommandStatus.setBounds(1268, 5, 19, 665);
+		contentPane.add(lblCommandStatus);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(1297, 4, 172, 666);
+		contentPane.add(scrollPane);
+
+		txtCommandStatus = new JTextArea();
+		scrollPane.setViewportView(txtCommandStatus);
+
 		Image app = null;
 		try {
 			File f = AbstractLoader.getFileNotInBinFolder(protectionDomain, "assets/app.png");
@@ -478,6 +491,11 @@ public abstract class CampingBotUi extends JFrame {
 
 		statusUpdater.updateUserInfo(bot.getBotUsername(), -1);
 		intervalThread.add(new UiTableRefresher());
+		updateCommandStatus();
+	}
+
+	public void updateCommandStatus() {
+		txtCommandStatus.setText(bot.getCommandStatus());
 	}
 
 	protected void bringDown() {

@@ -80,4 +80,16 @@ public abstract class AbstractCommand {
 		return AccessLevel.User;
 	}
 
+	public abstract String provideUiStatus();
+
+	public String getUiStatus() {
+		String provided = provideUiStatus();
+		if (provided == null)
+			return null;
+		String out = getClass().getSimpleName();
+		if (provided != null && provided.length() > 0) {
+			out = out + "\n" + provided;
+		}
+		return out;
+	}
 }

@@ -325,4 +325,9 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	public int getSize(String s) {
 		return categories.getSize(s);
 	}
+
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

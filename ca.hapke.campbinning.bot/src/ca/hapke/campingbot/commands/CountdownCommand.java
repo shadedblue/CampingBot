@@ -104,4 +104,9 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 		// adjust for starting and ending on a Sunday:
 		return daysWithoutWeekends + (startW == DayOfWeek.SUNDAY ? 1 : 0) + (endW == DayOfWeek.SUNDAY ? 1 : 0);
 	}
+
+	@Override
+	public String provideUiStatus() {
+		return countdownTarget.toString();
+	}
 }

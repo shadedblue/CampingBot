@@ -379,4 +379,9 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 	public CrazyCaseProcessor getCrazyCase() {
 		return crazyCase;
 	}
+
+	@Override
+	public String provideUiStatus() {
+		return mode.toString();
+	}
 }

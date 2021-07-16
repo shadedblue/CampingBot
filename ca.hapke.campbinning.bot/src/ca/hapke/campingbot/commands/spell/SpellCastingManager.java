@@ -4,6 +4,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
@@ -27,6 +28,7 @@ import ca.hapke.campingbot.util.ImageLink;
  */
 public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
+	private static final int DELAY_AMOUNT = 15;
 	private static final String KNOCK_OUT = "KKNNNNOOOOCCKKKK OUUUUTTTTT";
 	private static final String MG_G = "MG G";
 	private static final String NG_B = "NG B";
@@ -72,7 +74,7 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 				futures = new LinkedList<>();
 				pendingCasts.put(caster, futures);
 
-				times.add(new ByFrequency<CampingUser>(caster, 15, ChronoUnit.SECONDS));
+				times.add(new ByFrequency<CampingUser>(caster, DELAY_AMOUNT, ChronoUnit.SECONDS));
 			}
 			futures.add(pending);
 		}
@@ -184,5 +186,33 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
 	public void setMe(CampingUser me) {
 		propogationManager.setMe(me);
+	}
+
+	public String getPendingString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(pendingCasts.size());
+		sb.append(" pending\n");
+		for (Entry<CampingUser, LinkedList<PendingCast>> e : pendingCasts.entrySet()) {
+			CampingUser from = e.getKey();
+			LinkedList<PendingCast> tos = e.getValue();
+
+			sb.append(from.getFirstOrUserName());
+			sb.append("=>");
+
+			boolean first = true;
+			for (PendingCast to : tos) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(", ");
+				}
+				sb.append(to.victim.getFirstOrUserName());
+				sb.append("(");
+				sb.append(to.waits);
+				sb.append(")");
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 }

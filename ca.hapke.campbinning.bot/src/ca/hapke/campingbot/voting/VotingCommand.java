@@ -234,4 +234,12 @@ public abstract class VotingCommand<T> extends CallbackCommandBase
 		return Integer.toString(messageId);
 	}
 
+	@Override
+	public String provideUiStatus() {
+		String out = inProgress.size() + " votes in progress";
+		for (VoteTracker<T> voteTracker : inProgress) {
+			out = out + "\n" + voteTracker.getBannerString();
+		}
+		return out;
+	}
 }

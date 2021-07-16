@@ -88,4 +88,8 @@ public class SetInitialsCommand extends AbstractCommand implements SlashCommand 
 		return null;
 	}
 
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

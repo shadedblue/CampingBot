@@ -96,4 +96,8 @@ public class QuantityCommand extends AbstractCommand implements SlashCommand {
 		return prettyName;
 	}
 
+	@Override
+	public String provideUiStatus() {
+		return null;
+	}
 }

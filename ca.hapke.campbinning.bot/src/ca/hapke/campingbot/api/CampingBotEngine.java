@@ -3,6 +3,7 @@ package ca.hapke.campingbot.api;
 import java.security.ProtectionDomain;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -643,6 +644,32 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			PostConfigInit initable = (PostConfigInit) command;
 			wantsInits.add(initable);
 		}
+	}
+
+	public String getCommandStatus() {
+		StringBuilder sb = new StringBuilder();
+
+		addCommands(sb, "InlineCommands", inlineCommands);
+		addCommands(sb, "TextCommands", textCommands);
+		addCommands(sb, "CallbackCommands", callbackCommands);
+		addCommands(sb, "SlashCommands", slashCommands.values());
+
+		return sb.toString();
+	}
+
+	protected static <T> void addCommands(StringBuilder sb, String type, Collection<T> cmds) {
+		sb.append(type + " (" + cmds.size() + ")\n");
+		for (T command : cmds) {
+			if (command instanceof AbstractCommand) {
+				AbstractCommand ac = (AbstractCommand) command;
+				String s = ac.getUiStatus();
+				if (s != null) {
+					sb.append(s);
+					sb.append("\n");
+				}
+			}
+		}
+		sb.append("\n");
 	}
 
 	private final void addInlineCommand(InlineCommand ic) {
