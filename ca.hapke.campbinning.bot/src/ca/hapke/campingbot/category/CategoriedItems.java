@@ -16,10 +16,12 @@ import ca.hapke.util.CollectionUtil;
  * @author Nathan Hapke
  */
 public abstract class CategoriedItems<T> {
-	protected List<String> names = new ArrayList<>();
-	protected Map<String, List<T>> data = new HashMap<>();
+	protected final List<String> names = new ArrayList<>();
+	protected final Map<String, List<T>> data = new HashMap<>();
+	protected final String container;
 
-	public CategoriedItems(String... categoryNames) {
+	public CategoriedItems(String container, String... categoryNames) {
+		this.container = container;
 		for (String k : categoryNames) {
 			addCategory(k);
 		}

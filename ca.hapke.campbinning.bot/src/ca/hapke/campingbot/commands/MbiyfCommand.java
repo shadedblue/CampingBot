@@ -93,7 +93,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 		this.bot = campingBot;
 		this.res = res;
 
-		this.mbiyfImages = new CategoriedImageLinks(FRIDAY_IMAGES);
+		this.mbiyfImages = new CategoriedImageLinks(MBIYF, FRIDAY_IMAGES);
 //		fridayImages = mbiyfImages.getList(FRIDAY_IMAGES);
 		for (int i = 1; i <= 7; i++) {
 			String url = "http://www.hapke.ca/images/mbiyf" + i + ".mp4";

@@ -54,7 +54,7 @@ public class PartyEverydayCommand extends AbstractCommand implements HasCategori
 	private Pattern p;
 	protected CampingBot bot;
 	private CategoriedStringsPersisted categories = new CategoriedStringsPersisted(PARTY, EXCESSIVE_CATEGORY);
-	private CategoriedItems<ImageLink> imgCategories = new CategoriedImageLinks(NSFW_CATEGORY, SFW_CATEGORY);
+	private CategoriedItems<ImageLink> imgCategories = new CategoriedImageLinks(PARTY, NSFW_CATEGORY, SFW_CATEGORY);
 
 	public PartyEverydayCommand(CampingBot bot) {
 		this.bot = bot;

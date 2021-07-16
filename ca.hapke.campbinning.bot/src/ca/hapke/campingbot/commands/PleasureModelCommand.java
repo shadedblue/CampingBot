@@ -33,7 +33,7 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 
 	public PleasureModelCommand(CampingBot bot) {
 		this.bot = bot;
-		categories = new CategoriedImageLinks(PLEASURE_MODEL);
+		categories = new CategoriedImageLinks(PLEASURE_MODEL, PLEASURE_MODEL);
 //		images = categories.getList(PLEASURE_MODEL);
 		categories.put(PLEASURE_MODEL, new ImageLink("http://www.hapke.ca/images/lame.jpg", ImageLink.STATIC));
 		categories.put(PLEASURE_MODEL, new ImageLink("http://www.hapke.ca/images/business-time.gif", ImageLink.GIF));

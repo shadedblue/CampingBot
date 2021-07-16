@@ -17,16 +17,10 @@ import ca.hapke.campingbot.log.DatabaseConsumer;
  */
 public class CategoriedStringsPersisted extends CategoriedStrings {
 
-	private Map<List<String>, CategoriedPersistence> persistenceMap = new HashMap<>();
-	private String container;
+	private Map<List<String>, CategoriedPersistence> persistenceMap;
 
 	public CategoriedStringsPersisted(String container, String... categoryNames) {
-		// HACK need to set the category before calls to add them, so we have to duplicate the code here... annoyingly.
-		super();
-		this.container = container;
-		for (String k : categoryNames) {
-			addCategory(k);
-		}
+		super(container, categoryNames);
 	}
 
 	@Override
@@ -36,6 +30,8 @@ public class CategoriedStringsPersisted extends CategoriedStrings {
 			return list;
 		CategoriedPersistence cp = DatabaseConsumer.getInstance().loadCategoriedStrings(/* null, */container, cat);
 		list = cp.getValues();
+		if (persistenceMap == null)
+			persistenceMap = new HashMap<>();
 		persistenceMap.put(list, cp);
 		return super.addCategory(cat, list);
 	}

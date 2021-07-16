@@ -28,6 +28,7 @@ import ca.hapke.campingbot.util.ImageLink;
  */
 public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
+	private static final String CONTAINER = SpellCommand.SPELL + "Manager";
 	private static final int DELAY_AMOUNT = 15;
 	private static final String KNOCK_OUT = "KKNNNNOOOOCCKKKK OUUUUTTTTT";
 	private static final String MG_G = "MG G";
@@ -49,7 +50,7 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 		this.bot = bot;
 		propogationManager = new SpellPropogationManager(pendingCasts);
 		resources = bot.getRes();
-		images = new CategoriedImageLinks(COMBO_BREAKER);
+		images = new CategoriedImageLinks(CONTAINER, COMBO_BREAKER);
 		for (int i = 1; i <= 7; i++) {
 			String url = "http://www.hapke.ca/images/spell-combo-breaker-" + i + ".gif";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);

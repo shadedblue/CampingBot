@@ -9,8 +9,8 @@ import ca.hapke.util.CollectionUtil;
  */
 public class CategoriedStrings extends CategoriedItems<String> {
 
-	public CategoriedStrings(String... categoryNames) {
-		super(categoryNames);
+	public CategoriedStrings(String container, String... categoryNames) {
+		super(container, categoryNames);
 	}
 
 	@Override

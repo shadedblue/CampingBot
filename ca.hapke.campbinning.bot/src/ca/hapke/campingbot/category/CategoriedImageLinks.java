@@ -7,8 +7,8 @@ import ca.hapke.campingbot.util.ImageLink;
  */
 public class CategoriedImageLinks extends CategoriedItems<ImageLink> {
 
-	public CategoriedImageLinks(String... categoryNames) {
-		super(categoryNames);
+	public CategoriedImageLinks(String container, String... categoryNames) {
+		super(container, categoryNames);
 	}
 
 	@Override

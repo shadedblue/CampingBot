@@ -159,7 +159,7 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 		this.garbler = new CharacterRepeater(true).addAtEnd(new FontGarbler(0.3));
 		categories = new CategoriedStringsPersisted(ENHANCE_CONTAINER, RICK_ROLL, OVER_ENHANCED);
 
-		this.categoriesImages = new CategoriedImageLinks(RICK_ROLL);
+		this.categoriesImages = new CategoriedImageLinks(ENHANCE_CONTAINER, RICK_ROLL);
 		for (int i = 1; i <= 3; i++) {
 			String url = "http://www.hapke.ca/images/rick" + i + ".mp4";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
