@@ -57,7 +57,6 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.CampingSystem;
-import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.api.IStatus;
 import ca.hapke.campingbot.category.HasCategories;
 import ca.hapke.campingbot.channels.CampingChat;
@@ -127,7 +126,7 @@ public abstract class CampingBotUi extends JFrame {
 	private DefaultEventTableModel<CalendaredEvent<?>> calendaredModel;
 
 	private EventLogger eventLogger = EventLogger.getInstance();
-	private CampingBotEngine bot;
+	private CampingBot bot;
 	private JScrollPane sclUsers;
 	private JLabel lblStatus;
 	private JButton btnConnect;
@@ -151,6 +150,8 @@ public abstract class CampingBotUi extends JFrame {
 	private JButton btnReply;
 	private ProtectionDomain protectionDomain;
 	private JTextArea txtCommandStatus;
+	private JButton btnSpells;
+	private FrmSpells frmSpells;
 
 	/**
 	 * Create the frame.
@@ -355,7 +356,7 @@ public abstract class CampingBotUi extends JFrame {
 		contentPane.add(lblBySeconds);
 
 		CategoryLabel lblCategory = new CategoryLabel("Categories", Color.orange);
-		lblCategory.setBounds(765, 7, 19, 127);
+		lblCategory.setBounds(736, 7, 19, 127);
 		contentPane.add(lblCategory);
 
 		cmbCategories = new JComboBox<String>();
@@ -376,11 +377,11 @@ public abstract class CampingBotUi extends JFrame {
 		}
 		ComboBoxModel<String> aModel = new DefaultComboBoxModel<String>(categoriesList);
 		cmbCategories.setModel(aModel);
-		cmbCategories.setBounds(788, 5, 397, 26);
+		cmbCategories.setBounds(759, 5, 341, 26);
 		contentPane.add(cmbCategories);
 
 		sclCategories = new JScrollPane();
-		sclCategories.setBounds(785, 33, 474, 101);
+		sclCategories.setBounds(756, 33, 419, 101);
 		contentPane.add(sclCategories);
 
 		txtCategoryValue = new JTextArea();
@@ -405,7 +406,7 @@ public abstract class CampingBotUi extends JFrame {
 				}
 			}
 		});
-		btnAddToCategory.setBounds(1188, 5, 70, 26);
+		btnAddToCategory.setBounds(1105, 5, 70, 26);
 		contentPane.add(btnAddToCategory);
 
 		CategoryLabel lblUsers = new CategoryLabel("Users", Color.blue);
@@ -426,6 +427,19 @@ public abstract class CampingBotUi extends JFrame {
 
 		txtCommandStatus = new JTextArea();
 		scrollPane.setViewportView(txtCommandStatus);
+
+		btnSpells = new JButton("Spells");
+		btnSpells.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (frmSpells == null)
+					frmSpells = new FrmSpells(bot.getSpells());
+				frmSpells.setVisible(true);
+			}
+		});
+		btnSpells.setBounds(1179, 5, 79, 26);
+		contentPane.add(btnSpells);
 
 		Image app = null;
 		try {

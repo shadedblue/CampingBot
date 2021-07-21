@@ -37,9 +37,9 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 	public static final String SPELL = "Spell";
 	private static final String PACK_CATEGORY = "pack";
-	static final String ADJECTIVE_CATEGORY = "adjective";
-	static final String EXCLAMATION_CATEGORY = "exclamation";
-	static final String ITEM_CATEGORY = "item";
+	public static final String ADJECTIVE_CATEGORY = "adjective";
+	public static final String EXCLAMATION_CATEGORY = "exclamation";
+	public static final String ITEM_CATEGORY = "item";
 
 	public static final SlashCommandType SlashSpellCommand = new SlashCommandType(SPELL, "spell",
 			BotCommandIds.SPELL | BotCommandIds.USE);
@@ -203,6 +203,25 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		return out;
 	}
 
+	public void addPack(String name) {
+		categories.put(PACK_CATEGORY, name);
+		/* CategoriedItems<String> result = */
+		packs.get(name, true);
+	}
+
+	public void addSpellItem(String genre, String value) {
+		addSpellEntry(genre, ITEM_CATEGORY, value);
+	}
+
+	public void addSpellExclamation(String genre, String value) {
+		addSpellEntry(genre, EXCLAMATION_CATEGORY, value);
+	}
+
+	protected void addSpellEntry(String genre, String category, String value) {
+		CategoriedItems<String> cats = packs.get(genre, false);
+		cats.put(category, value);
+	}
+
 	@Override
 	public void addItem(String category, String value) {
 		CategoriedItems<String> cats;
@@ -244,4 +263,5 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 
 		return timeString + "\n" + pendingString;
 	}
+
 }

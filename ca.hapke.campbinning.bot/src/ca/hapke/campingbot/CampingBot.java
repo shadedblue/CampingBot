@@ -207,4 +207,8 @@ public class CampingBot extends CampingBotEngine {
 		return res;
 	}
 
+	public SpellCommand getSpells() {
+		return spellCommand;
+	}
+
 }
