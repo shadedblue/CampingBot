@@ -16,8 +16,8 @@ public class SpellPropogationManager {
 	private static final int KO_QTY = 3;
 	private static final long EXPIRY_DURATION = 10 * 60 * 1000l;
 
-	private Map<CampingUser, LinkedList<Long>> offensiveCasts = new HashMap<>();
-	private Map<CampingUser, LinkedList<CastStruct>> defensiveTargets = new HashMap<>();
+	private Map<CampingUser, LinkedList<CastStruct>> outgoingDealt = new HashMap<>();
+	private Map<CampingUser, LinkedList<CastStruct>> damageReceived = new HashMap<>();
 	private Map<CampingUser, Long> deadTimestamps = new HashMap<>();
 	private Map<CampingUser, LinkedList<PendingCast>> pendingCasts;
 	private CampingUser me;
@@ -31,9 +31,9 @@ public class SpellPropogationManager {
 	}
 
 	public int getWaits(CampingUser user) {
-		LinkedList<Long> times = getTimes(offensiveCasts, user);
+		LinkedList<CastStruct> times = getTimes(outgoingDealt, user);
 
-		expireOffensiveTimes(times);
+		expireTimes(times);
 		int previousOffensives = times.size();
 
 		int pendingQty = 0;
@@ -44,26 +44,11 @@ public class SpellPropogationManager {
 		return previousOffensives + pendingQty;
 	}
 
-	protected void expireOffensiveTimes(LinkedList<Long> times) {
-		expireOffensiveTimes(times, getTimestamp());
+	protected void expireTimes(LinkedList<CastStruct> times) {
+		expireTimes(times, getTimestamp());
 	}
 
-	protected void expireDefensiveTimes(LinkedList<CastStruct> times) {
-		expireDefensiveTimes(times, getTimestamp());
-	}
-
-	protected void expireOffensiveTimes(LinkedList<Long> times, long now) {
-		while (!times.isEmpty()) {
-			Long t = times.getFirst();
-			if (now - t >= EXPIRY_DURATION) {
-				times.removeFirst();
-			} else {
-				break;
-			}
-		}
-	}
-
-	protected void expireDefensiveTimes(LinkedList<CastStruct> times, long now) {
+	protected void expireTimes(LinkedList<CastStruct> times, long now) {
 		while (!times.isEmpty()) {
 			Long t = times.getFirst().time;
 			if (now - t >= EXPIRY_DURATION) {
@@ -75,8 +60,10 @@ public class SpellPropogationManager {
 	}
 
 	public ComboType getComboResult(CampingUser caster, CampingUser victim) {
-		if (victim == null || caster == null)
+		if (victim == null || caster == null) {
+			System.err.println("Fizzle!");
 			return ComboType.Fizzle;
+		}
 
 		long now = getTimestamp();
 		if (deadTimestamps.containsKey(caster)) {
@@ -84,23 +71,22 @@ public class SpellPropogationManager {
 			if (now - t >= EXPIRY_DURATION) {
 				deadTimestamps.remove(caster);
 			} else {
+				System.err.println("Dead!");
 				return ComboType.Dead;
 			}
 		}
 
-		LinkedList<Long> offenseTimes = getTimes(offensiveCasts, caster);
-		expireOffensiveTimes(offenseTimes);
-		offenseTimes.add(now);
+		LinkedList<CastStruct> offenseTimes = getTimes(outgoingDealt, caster);
+		expireTimes(offenseTimes);
+		offenseTimes.add(new CastStruct(victim, now));
 
-		LinkedList<CastStruct> casterDefenseTimes = getTimes(defensiveTargets, caster);
+		LinkedList<CastStruct> casterDefenseTimes = getTimes(damageReceived, caster);
 
-//			List<CastStruct> completedFromCaster = new ArrayList<>(KO_QTY);
 		int completedFromVictim = 0;
 		for (CastStruct cs : casterDefenseTimes) {
-			CampingUser smiter = cs.caster;
+			CampingUser smiter = cs.user;
 
 			if (smiter.equals(victim)) {
-//					completedFromCaster.add(cs);
 				completedFromVictim++;
 			}
 		}
@@ -114,8 +100,10 @@ public class SpellPropogationManager {
 				}
 			}
 		}
-
 		int pendingFromVictimSize = pendingFromVictim.size();
+
+		System.out.println(
+				"Victim has landed " + completedFromVictim + " and " + pendingFromVictimSize + " pending" + "");
 		if (completedFromVictim + pendingFromVictimSize >= 2) {
 			// Combo Breaker -- victim cannot cast for a while
 			deadTimestamps.put(victim, now + EXPIRY_DURATION);
@@ -123,10 +111,11 @@ public class SpellPropogationManager {
 			return ComboType.Breaker;
 		}
 
-		if (offenseTimes.size() >= KO_QTY) {
-			offenseTimes.removeFirst();
-			offenseTimes.removeFirst();
-			offenseTimes.removeFirst();
+		int damageLandedOnVictim = countDamage(offenseTimes, victim);
+		System.out.println("Caster has landed " + damageLandedOnVictim);
+		if (damageLandedOnVictim >= KO_QTY) {
+			eliminate3(offenseTimes, victim);
+
 			if (victim.equals(me)) {
 				cancelPending(caster);
 				deadTimestamps.put(caster, now + EXPIRY_DURATION);
@@ -138,20 +127,44 @@ public class SpellPropogationManager {
 			}
 		}
 
-		LinkedList<CastStruct> victimDefenseTimes = getTimes(defensiveTargets, victim);
-		expireDefensiveTimes(victimDefenseTimes);
-		victimDefenseTimes.add(new CastStruct(caster, now));
-		Set<CampingUser> victimRecentlyHitBy = new HashSet<>();
-		for (CastStruct cs : victimDefenseTimes) {
-			CampingUser smiter = cs.caster;
-			victimRecentlyHitBy.add(smiter);
+		LinkedList<CastStruct> victimHitByTimes = getTimes(damageReceived, victim);
+		expireTimes(victimHitByTimes);
+		victimHitByTimes.add(new CastStruct(caster, now));
+		Set<CampingUser> victimizedBy = new HashSet<>();
+		for (CastStruct cs : victimHitByTimes) {
+			CampingUser smiter = cs.user;
+			victimizedBy.add(smiter);
 		}
-		if (victimRecentlyHitBy.size() >= 3) {
+		if (victimizedBy.size() >= 3) {
 			deadTimestamps.put(victim, now + EXPIRY_DURATION);
 			return ComboType.GangBang;
 		}
 
 		return ComboType.Normal;
+	}
+
+	private int countDamage(LinkedList<CastStruct> offenseTimes, CampingUser victim) {
+		int n = 0;
+		for (CastStruct cast : offenseTimes) {
+			if (cast.user.equals(victim)) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	private void eliminate3(LinkedList<CastStruct> offenseTimes, CampingUser victim) {
+		int n = 3;
+		int i = 0;
+		while (n > 0 && i < offenseTimes.size()) {
+			CastStruct cast = offenseTimes.get(i);
+			if (cast.user.equals(victim)) {
+				offenseTimes.remove(cast);
+				n--;
+			} else {
+				i++;
+			}
+		}
 	}
 
 	private void cancelPending(CampingUser from) {

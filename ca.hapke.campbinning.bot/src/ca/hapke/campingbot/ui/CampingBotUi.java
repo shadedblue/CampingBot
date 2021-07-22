@@ -172,7 +172,7 @@ public abstract class CampingBotUi extends JFrame {
 				TimerThreadWithKill.shutdownThreads();
 			}
 		});
-		setBounds(100, 100, 1493, 720);
+		setBounds(100, 100, 1700, 720);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -422,7 +422,7 @@ public abstract class CampingBotUi extends JFrame {
 		contentPane.add(lblCommandStatus);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(1297, 4, 172, 666);
+		scrollPane.setBounds(1297, 4, 385, 666);
 		contentPane.add(scrollPane);
 
 		txtCommandStatus = new JTextArea();

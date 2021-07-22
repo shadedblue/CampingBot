@@ -51,7 +51,7 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 		propogationManager = new SpellPropogationManager(pendingCasts);
 		resources = bot.getRes();
 		images = new CategoriedImageLinks(CONTAINER, COMBO_BREAKER);
-		for (int i = 1; i <= 7; i++) {
+		for (int i = 1; i <= 4; i++) {
 			String url = "http://www.hapke.ca/images/spell-combo-breaker-" + i + ".gif";
 			ImageLink lnk = new ImageLink(url, ImageLink.GIF);
 			images.put(COMBO_BREAKER, lnk);
@@ -85,6 +85,7 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
 	private void castNow(CampingUser caster, CampingUser victim, SpellResult spell, CampingChat chat) {
 		ComboType comboType = propogationManager.getComboResult(caster, victim);
+		System.out.println("Casting " + caster + " => " + victim + " (" + comboType + ")!");
 
 		CommandResult outgoing = null;
 		switch (comboType) {
@@ -158,20 +159,31 @@ public class SpellCastingManager implements CalendaredEvent<CampingUser> {
 
 	@Override
 	public void doWork(ByCalendar<CampingUser> event, CampingUser caster) {
+		System.out.println("SpellCastingManager::doWork " + caster);
+
 		LinkedList<PendingCast> futures = pendingCasts.get(caster);
 
-		if (futures != null) {
+		boolean remove = false;
+		if (futures == null || futures.size() == 0) {
+			remove = true;
+		} else {
 			PendingCast nextCast = futures.peek();
 			nextCast.waits--;
+			System.out.println("Next cast is on: " + nextCast.victim + " in " + nextCast.waits + " more activations");
 			if (nextCast.waits == 0) {
 				futures.remove();
 				castNow(caster, nextCast.victim, nextCast.result, nextCast.chat);
 
 				if (futures.isEmpty()) {
-					pendingCasts.remove(caster);
-					times.remove(event);
+					remove = true;
 				}
 			}
+		}
+
+		if (remove) {
+			System.out.println("Remove " + caster + "!");
+			pendingCasts.remove(caster);
+			times.remove(event);
 		}
 	}
 

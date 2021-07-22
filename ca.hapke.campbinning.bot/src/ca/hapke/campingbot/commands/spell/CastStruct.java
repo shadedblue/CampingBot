@@ -6,11 +6,11 @@ import ca.hapke.campingbot.users.CampingUser;
  * @author Nathan Hapke
  */
 public class CastStruct {
-	public final CampingUser caster;
+	public final CampingUser user;
 	public final Long time;
 
-	public CastStruct(CampingUser caster, Long time) {
-		this.caster = caster;
+	public CastStruct(CampingUser user, Long time) {
+		this.user = user;
 		this.time = time;
 	}
 
@@ -18,7 +18,7 @@ public class CastStruct {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CastStruct [");
-		builder.append(caster);
+		builder.append(user);
 		builder.append(" @ ");
 		builder.append(time);
 		builder.append("]");
