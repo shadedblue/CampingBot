@@ -13,6 +13,7 @@ import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
 import ca.hapke.campingbot.afd2021.AfdHotPotato;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
+import ca.hapke.campingbot.commands.AmpDetectorCommand;
 import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.FuckMeCommand;
@@ -58,6 +59,7 @@ public class CampingBot extends CampingBotEngine {
 	private EnhanceCommand enhanceCommand;
 	private IunnoCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
+	private AmpDetectorCommand ampCommand;
 
 	private CountdownCommand countdownGen;
 	private HypeCommand hypeCommand;
@@ -89,6 +91,7 @@ public class CampingBot extends CampingBotEngine {
 		enhanceCommand = new EnhanceCommand(this);
 		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
+		ampCommand = new AmpDetectorCommand();
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
@@ -134,6 +137,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(fuCommand);
 		addCommand(iunnoCommand);
 		addCommand(partyCommand);
+		addCommand(ampCommand);
 		addCommand(countdownGen);
 		addCommand(enhanceCommand);
 		addCommand(hypeCommand);
