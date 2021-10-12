@@ -31,6 +31,8 @@ import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.processors.CharacterRepeater;
+import ca.hapke.campingbot.processors.EnhanceBrooklyn99Processor;
+import ca.hapke.campingbot.processors.EnhanceNumberProcessor;
 import ca.hapke.campingbot.processors.FontGarbler;
 import ca.hapke.campingbot.processors.MessageProcessor;
 import ca.hapke.campingbot.response.CommandResult;
@@ -156,7 +158,8 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	public EnhanceCommand(CampingBot bot) {
 		this.bot = bot;
 		res = bot.getRes();
-		this.garbler = new CharacterRepeater(true).addAtEnd(new FontGarbler(0.3));
+		this.garbler = new EnhanceBrooklyn99Processor().addAtEnd(new CharacterRepeater(false))
+				.addAtEnd(new EnhanceNumberProcessor()).addAtEnd(new FontGarbler(0.2));
 		categories = new CategoriedStringsPersisted(ENHANCE_CONTAINER, RICK_ROLL, OVER_ENHANCED);
 
 		this.categoriesImages = new CategoriedImageLinks(ENHANCE_CONTAINER, RICK_ROLL);
