@@ -93,7 +93,7 @@
 		<dependency>
 			<groupId>ca.hapke</groupId>
 			<artifactId>util</artifactId>
-			<version>0.1.0</version>
+			<version>[0.3.0,]</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
 		<dependency>

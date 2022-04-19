@@ -261,13 +261,13 @@ public ContentParser(ParserSharedInputState state) {
 					sg.setAdjectives(a);
 				
 			{
-			_loop885:
+			_loop66:
 			do {
 				if ((LA(1)==14)) {
 					__xml_pack(sg);
 				}
 				else {
-					break _loop885;
+					break _loop66;
 				}
 				
 			} while (true);
@@ -338,14 +338,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop879:
+			_loop60:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					ig.addItem("insult", val);
 				}
 				else {
-					break _loop879;
+					break _loop60;
 				}
 				
 			} while (true);
@@ -391,13 +391,13 @@ public ContentParser(ParserSharedInputState state) {
 			match(21);
 			{
 			{
-			_loop916:
+			_loop97:
 			do {
 				if ((LA(1)==22)) {
 					__xml_chat(cm);
 				}
 				else {
-					break _loop916;
+					break _loop97;
 				}
 				
 			} while (true);
@@ -441,13 +441,13 @@ public ContentParser(ParserSharedInputState state) {
 			}
 			}
 			{
-			_loop929:
+			_loop110:
 			do {
 				if ((LA(1)==25)) {
 					__xml_user(um);
 				}
 				else {
-					break _loop929;
+					break _loop110;
 				}
 				
 			} while (true);
@@ -479,14 +479,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop875:
+			_loop56:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					pc.addItem("excessive", val);
 				}
 				else {
-					break _loop875;
+					break _loop56;
 				}
 				
 			} while (true);
@@ -512,14 +512,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop867:
+			_loop48:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					ec.addItem("rickroll", val);
 				}
 				else {
-					break _loop867;
+					break _loop48;
 				}
 				
 			} while (true);
@@ -545,14 +545,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			String val;
 			{
-			_loop871:
+			_loop52:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					ec.addItem("over", val);
 				}
 				else {
-					break _loop871;
+					break _loop52;
 				}
 				
 			} while (true);
@@ -600,14 +600,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop900:
+			_loop81:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop900;
+					break _loop81;
 				}
 				
 			} while (true);
@@ -633,14 +633,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop904:
+			_loop85:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop904;
+					break _loop85;
 				}
 				
 			} while (true);
@@ -666,14 +666,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop896:
+			_loop77:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop896;
+					break _loop77;
 				}
 				
 			} while (true);
@@ -767,14 +767,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop892:
+			_loop73:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop892;
+					break _loop73;
 				}
 				
 			} while (true);
@@ -800,14 +800,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop908:
+			_loop89:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop908;
+					break _loop89;
 				}
 				
 			} while (true);
@@ -833,14 +833,14 @@ public ContentParser(ParserSharedInputState state) {
 			{
 			vals = new ArrayList<String>(); String val;
 			{
-			_loop912:
+			_loop93:
 			do {
 				if ((LA(1)==31)) {
 					val=__xml_item();
 					vals.add(val);
 				}
 				else {
-					break _loop912;
+					break _loop93;
 				}
 				
 			} while (true);
@@ -1017,7 +1017,7 @@ public ContentParser(ParserSharedInputState state) {
 					String value;
 				
 			{
-			_loop924:
+			_loop105:
 			do {
 				if ((LA(1)==31)) {
 					value=__xml_item();
@@ -1032,7 +1032,7 @@ public ContentParser(ParserSharedInputState state) {
 						
 				}
 				else {
-					break _loop924;
+					break _loop105;
 				}
 				
 			} while (true);

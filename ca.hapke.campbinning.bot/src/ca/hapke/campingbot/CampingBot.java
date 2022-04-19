@@ -26,6 +26,7 @@ import ca.hapke.campingbot.commands.QuantityCommand;
 import ca.hapke.campingbot.commands.RedditCommand;
 import ca.hapke.campingbot.commands.SetInitialsCommand;
 import ca.hapke.campingbot.commands.StatusCommand;
+import ca.hapke.campingbot.commands.UserlistCommand;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
@@ -69,6 +70,7 @@ public class CampingBot extends CampingBotEngine {
 	private SetInitialsCommand initialsCommand;
 	private RedditCommand redditCommand;
 	private QuantityCommand quantityCommand;
+	private UserlistCommand userlistCommand;
 
 	private CalendarMonitor calMonitor;
 	private AprilFoolsDayEnabler afdEnabler;
@@ -108,6 +110,7 @@ public class CampingBot extends CampingBotEngine {
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 		statusCommand = new StatusCommand(hideItCommand);
+		userlistCommand = new UserlistCommand();
 
 		happyNewYearEvent = new HappyNewYearEvent(this);
 		ballBustingEvent = new BallBustingEvent(this);
@@ -142,6 +145,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(enhanceCommand);
 		addCommand(hypeCommand);
 		addCommand(statusCommand);
+		addCommand(userlistCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
 		addCommand(potatoCommand);

@@ -175,7 +175,7 @@ public class MbiyfCommand extends AbstractCommand implements TextCommand, Calend
 			return null;
 
 		CampingUser me = bot.getMeCamping();
-		if (targetUser == me && !userRestriction.contains(me)) {
+		if (targetUser == me && (userRestriction != null && !userRestriction.contains(me))) {
 			return new TextCommandResult(MbiyfDipshitCommand, new MentionFragment(campingFromUser),
 					NOT_BALLSING_MYSELF);
 		}

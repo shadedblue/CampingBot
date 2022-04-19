@@ -1,0 +1,10 @@
+SELECT u.firstname, u.lastname, count(a."campingUserId")
+	FROM public.activity a, users u
+	where a.timestamp >= 1611296637
+	and
+	a."campingUserId"  = u.campingid
+	group by  u.campingid, u.lastname
+	order by count desc;
+
+
+https://www.epochconverter.com/timestamp-list

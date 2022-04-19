@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.log.DatabaseConsumer;
+import ca.hapke.campingbot.users.CampingUser.Birthday;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -204,6 +205,8 @@ public class CampingUserMonitor {
 	}
 
 	public void addUser(CampingUser target) {
+		// force bday object to get created
+		Birthday bday = target.getBirthday();
 		users.add(target);
 
 		long telegramId = target.getTelegramId();

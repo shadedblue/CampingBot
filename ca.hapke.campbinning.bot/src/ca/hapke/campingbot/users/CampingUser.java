@@ -172,6 +172,14 @@ public class CampingUser implements Serializable {
 	}
 
 	public Birthday getBirthday() {
+		if (birthday != null)
+			return birthday;
+
+		if (birthdayMonth <= 0 || birthdayDay <= 0 || birthdayMonth > 12 || birthdayDay > 31)
+			return null;
+
+		birthday = new Birthday(birthdayMonth, birthdayDay);
+
 		return birthday;
 	}
 
@@ -285,6 +293,14 @@ public class CampingUser implements Serializable {
 		support.firePropertyChange("birthdayDay", -1, day);
 		support.firePropertyChange("birthdayMonth", -1, month);
 		updatePersistence();
+	}
+
+	public int getBirthdayMonth() {
+		return birthdayMonth;
+	}
+
+	public int getBirthdayDay() {
+		return birthdayDay;
 	}
 
 	public void setBirthdayDay(int day) {

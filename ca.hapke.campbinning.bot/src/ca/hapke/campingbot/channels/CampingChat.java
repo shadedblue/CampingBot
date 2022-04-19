@@ -66,9 +66,10 @@ public class CampingChat {
 	}
 
 	public void setChatId(long chatId) {
-		if (this.chatId == UNKNOWN_ID)
+		if (this.chatId == UNKNOWN_ID) {
 			this.chatId = chatId;
-		updatePersistence();
+			updatePersistence();
+		}
 	}
 
 	public String getChatname() {
