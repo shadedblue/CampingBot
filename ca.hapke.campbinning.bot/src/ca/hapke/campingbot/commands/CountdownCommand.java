@@ -38,7 +38,7 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 
 	public static final String COUNTDOWN_CONTAINER = "Countdown";
 	// Month is 0-indexed for some stupid inconsistent reason...
-	private ZonedDateTime countdownTarget = new GregorianCalendar(2021, 5, 20, 23, 0, 00).toZonedDateTime();
+	private ZonedDateTime countdownTarget = new GregorianCalendar(2022, 7, 19, 15, 0, 00).toZonedDateTime();
 	private Resources res;
 	private MbiyfCommand ballsCommand;
 	private TimeFormatter tf = new TimeFormatter(2, " ", false, true);
@@ -63,7 +63,12 @@ public class CountdownCommand extends AbstractCommand implements SlashCommand {
 //			CampingUser target = userMonitor.getUser(jamieson);
 //			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, null));
 //			result.add(" TELLS CSL AND HUSBANDCHOAD TO SSUUUCCCKKKK IIIITTTTT", CaseChoice.Upper);
-			result.add("RICK & MORTY SEASON 5", CaseChoice.Upper);
+			result.add("EPIC CABINNING - HOPE STYLE", CaseChoice.Upper);
+			result.add("Aug 19-23 / 2022", CaseChoice.Normal);
+			result.add("71644 Leaf Lane, Hope, BC V0X 1L5", CaseChoice.Normal);
+			result.add(
+					"Turn south off of the highway two miles east of the Hope Slide when you see the Sunshine Valley sign. Turn right at the four way stop sign and then left on the second road, Leaf Lane. The cabin is the third property on the left. The cabin has a sign on a pole at the front of the property with the local lot number, C37.",
+					CaseChoice.Normal);
 
 //			result.add(new MentionFragment(target, MentionDisplay.Nickname, CaseChoice.Upper, null, "'s"));
 
