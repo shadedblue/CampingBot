@@ -27,6 +27,7 @@ import ca.hapke.campingbot.commands.RedditCommand;
 import ca.hapke.campingbot.commands.SetInitialsCommand;
 import ca.hapke.campingbot.commands.StatusCommand;
 import ca.hapke.campingbot.commands.UserlistCommand;
+import ca.hapke.campingbot.commands.WhatIsMyIpCommand;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
@@ -68,6 +69,7 @@ public class CampingBot extends CampingBotEngine {
 	private HideItCommand hideItCommand;
 	private NicknameCommand nicknameCommand;
 	private SetInitialsCommand initialsCommand;
+	private WhatIsMyIpCommand myIpCommand;
 	private RedditCommand redditCommand;
 	private QuantityCommand quantityCommand;
 	private UserlistCommand userlistCommand;
@@ -88,6 +90,7 @@ public class CampingBot extends CampingBotEngine {
 		spellCommand = new SpellCommand(this);
 		nicknameCommand = new NicknameCommand();
 		initialsCommand = new SetInitialsCommand();
+		myIpCommand = new WhatIsMyIpCommand();
 		pleasureCommand = new PleasureModelCommand(this);
 		fuCommand = new FuckMeCommand(this);
 		enhanceCommand = new EnhanceCommand(this);
@@ -132,6 +135,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(spellCommand);
 		addCommand(nicknameCommand);
 		addCommand(initialsCommand);
+		addCommand(myIpCommand);
 		addCommand(hideItCommand);
 		addCommand(ballsCommand);
 		addCommand(ufcCommand);
