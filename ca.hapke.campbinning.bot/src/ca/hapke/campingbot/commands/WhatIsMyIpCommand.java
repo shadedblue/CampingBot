@@ -30,18 +30,19 @@ public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
+		String resultText = "My current IP address is ";
 		try (java.util.Scanner s = new java.util.Scanner(new java.net.URL("https://api.ipify.org").openStream(),
 				"UTF-8").useDelimiter("\\A")) {
 			String ip = s.next();
-			String resultText = "My current IP address is " + ip;
+			resultText = resultText + ip;
 //			System.out.println(resultText);
-			CommandResult result = new TextCommandResult(SlashMyIp);
-			result.add(resultText);
-			return result;
 		} catch (java.io.IOException e) {
+			resultText = resultText + "unknown...\n" + e.getMessage();
 		}
+		CommandResult result = new TextCommandResult(SlashMyIp);
+		result.add(resultText);
+		return result;
 
-		return null;
 	}
 
 	@Override
