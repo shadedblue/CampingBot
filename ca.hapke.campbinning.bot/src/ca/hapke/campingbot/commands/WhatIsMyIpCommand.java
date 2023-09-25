@@ -17,8 +17,20 @@ import ca.hapke.campingbot.users.CampingUser;
  */
 public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 
+	private String ip = "?";
+
+	public WhatIsMyIpCommand() {
+		try (java.util.Scanner s = new java.util.Scanner(new java.net.URL("https://api.ipify.org").openStream(),
+				"UTF-8").useDelimiter("\\A")) {
+			ip = s.next();
+		} catch (java.io.IOException e) {
+			ip = "unknown... " + e.getMessage();
+		}
+	}
+
 	private static final String MY_IP = "myip";
-	public static final SlashCommandType SlashMyIp = new SlashCommandType(MY_IP, MY_IP,
+	private static final String PRETTY_MY_IP = "What Is My Ip?";
+	public static final SlashCommandType SlashMyIp = new SlashCommandType(PRETTY_MY_IP, MY_IP,
 			BotCommandIds.TEXT | BotCommandIds.USE);
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashMyIp };
 
@@ -30,19 +42,11 @@ public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		String resultText = "My current IP address is ";
-		try (java.util.Scanner s = new java.util.Scanner(new java.net.URL("https://api.ipify.org").openStream(),
-				"UTF-8").useDelimiter("\\A")) {
-			String ip = s.next();
-			resultText = resultText + ip;
-//			System.out.println(resultText);
-		} catch (java.io.IOException e) {
-			resultText = resultText + "unknown...\n" + e.getMessage();
-		}
+		String resultText = "My current IP address is " + ip;
+
 		CommandResult result = new TextCommandResult(SlashMyIp);
 		result.add(resultText);
 		return result;
-
 	}
 
 	@Override
@@ -57,7 +61,6 @@ public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 
 	@Override
 	public String provideUiStatus() {
-		return null;
+		return "IP Address: " + ip;
 	}
-
 }
