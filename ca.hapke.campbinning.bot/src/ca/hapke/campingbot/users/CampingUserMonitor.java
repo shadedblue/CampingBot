@@ -97,7 +97,11 @@ public class CampingUserMonitor {
 	}
 
 	public CampingUser getUser(User user) {
-		return getUser(user, user.getFirstName());
+		CampingUser foundUser = getUser(user, user.getFirstName());
+		if (foundUser == null) {
+			foundUser = monitor(user);
+		}
+		return foundUser;
 	}
 
 	public CampingUser getUser(long id) {
@@ -122,7 +126,7 @@ public class CampingUserMonitor {
 
 	public CampingUser monitor(User fromUser) {
 		Long id = fromUser.getId();
-		long telegramId = id != null ? id.intValue() : UNKNOWN_USER_ID;
+		long telegramId = id != null ? id.longValue() : UNKNOWN_USER_ID;
 		String username = fromUser.getUserName();
 
 		String lastname = fromUser.getLastName();
