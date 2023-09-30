@@ -19,6 +19,7 @@ import ca.hapke.campingbot.commands.inline.HideItMessage;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextStyle;
+import ca.hapke.campingbot.ui.CampingBotUi;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.util.TimeFormatter;
 
@@ -62,6 +63,9 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) {
 		TextCommandResult r = new TextCommandResult(SlashStatus);
+		r.add("Version: ", TextStyle.Bold);
+		r.add(CampingBotUi.BUILD_DATE);
+		r.newLine();
 		r.add("Online Since", TextStyle.Bold);
 		r.add(": ");
 		if (onlineTime != null) {
@@ -75,7 +79,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 		r.add("\nHide It", TextStyle.Bold);
 
 		Map<String, String> confirmedTopics = hideIt.getTopics().asMap();
-		r.add("\n");
+		r.newLine();
 		r.add("Topics (" + confirmedTopics.size() + ") ", TextStyle.Italic);
 		for (Map.Entry<String, String> e : confirmedTopics.entrySet()) {
 			r.add(e.getValue());
@@ -86,7 +90,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 		r.add("\n");
 		r.add("Messages (" + msgs.size() + ") ", TextStyle.Italic);
 		for (Entry<Integer, HideItMessage> e : msgs.entrySet()) {
-			r.add("\n");
+			r.newLine();
 			r.add(e.getKey());
 			r.add(": ");
 			r.add(e.getValue().getClearText());

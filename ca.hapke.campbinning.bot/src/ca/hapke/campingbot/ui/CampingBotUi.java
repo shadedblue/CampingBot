@@ -117,6 +117,7 @@ public abstract class CampingBotUi extends JFrame {
 	}
 
 	private static final String CAMPING_BOT = "Camping Bot";
+	public static final String BUILD_DATE = "2023-09-30";
 	private static final long serialVersionUID = -4742415703187806424L;
 	private JPanel contentPane;
 
@@ -257,7 +258,7 @@ public abstract class CampingBotUi extends JFrame {
 
 		///
 
-		lblStatus = new JLabel("Offline");
+		lblStatus = new JLabel("Version: " + BUILD_DATE + "\nOffline");
 		lblStatus.setVerticalAlignment(SwingConstants.TOP);
 		lblStatus.setBounds(22, 36, 116, 77);
 		contentPane.add(lblStatus);
@@ -646,7 +647,8 @@ public abstract class CampingBotUi extends JFrame {
 			} else {
 				idStr = "";
 			}
-			lblStatus.setText("<html>" + connected + ": <br>" + username + idStr + "</html>");
+			lblStatus.setText(
+					"<html>Version: " + BUILD_DATE + "<br>" + connected + ": <br>" + username + idStr + "</html>");
 			String tooltip = username + " :: " + connected + " | " + CAMPING_BOT;
 			setTitle(tooltip);
 			if (trayIcon != null)
@@ -658,7 +660,7 @@ public abstract class CampingBotUi extends JFrame {
 	/**
 	 * Provide the ProtectionDomain for your subclass, so that the Serializer can find the config.xml file. This should
 	 * be as simple as:
-	 * 
+	 *
 	 * @return SubClass.class.getProtectionDomain();
 	 */
 	public abstract ProtectionDomain provideProtectionDomain();
