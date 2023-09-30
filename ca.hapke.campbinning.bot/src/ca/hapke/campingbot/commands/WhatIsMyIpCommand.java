@@ -1,5 +1,8 @@
 package ca.hapke.campingbot.commands;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -18,21 +21,31 @@ import ca.hapke.campingbot.users.CampingUser;
 public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 
 	private String ip = "?";
+	private LocalDateTime foundAt;
+	private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd/yy HH:mm");
 
 	public WhatIsMyIpCommand() {
+		searchForIp();
+	}
+
+	protected void searchForIp() {
 		try (java.util.Scanner s = new java.util.Scanner(new java.net.URL("https://api.ipify.org").openStream(),
 				"UTF-8").useDelimiter("\\A")) {
 			ip = s.next();
+			foundAt = LocalDateTime.now();
 		} catch (java.io.IOException e) {
 			ip = "unknown... " + e.getMessage();
 		}
 	}
 
 	private static final String MY_IP = "myip";
+	private static final String WHAT_IS_MY_IP = "whatismyip";
 	private static final String PRETTY_MY_IP = "What Is My Ip?";
 	public static final SlashCommandType SlashMyIp = new SlashCommandType(PRETTY_MY_IP, MY_IP,
 			BotCommandIds.TEXT | BotCommandIds.USE);
-	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashMyIp };
+	public static final SlashCommandType SlashWhatIsMyIp = new SlashCommandType(PRETTY_MY_IP, WHAT_IS_MY_IP,
+			BotCommandIds.TEXT | BotCommandIds.USE);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashMyIp, SlashWhatIsMyIp };
 
 	@Override
 	public SlashCommandType[] getSlashCommandsToRespondTo() {
@@ -42,10 +55,14 @@ public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		String resultText = "My current IP address is " + ip;
+		searchForIp();
 
 		CommandResult result = new TextCommandResult(SlashMyIp);
-		result.add(resultText);
+		result.add("My current IP address is " + ip);
+		if (dtf != null) {
+			result.newLine();
+			result.add(dtf.format(foundAt));
+		}
 		return result;
 	}
 
