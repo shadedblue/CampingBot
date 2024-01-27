@@ -115,9 +115,4 @@ public class RedditCommand extends AbstractCommand implements SlashCommand, Text
 		boolean matches = matcher.find();
 		return matches;
 	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
-	}
 }

@@ -228,9 +228,4 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 
 		return null;
 	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
-	}
 }

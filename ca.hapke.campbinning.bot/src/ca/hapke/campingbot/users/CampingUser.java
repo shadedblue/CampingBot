@@ -280,13 +280,19 @@ public class CampingUser implements Serializable {
 	}
 
 	public Birthday setBirthday(MonthDay monthDay) {
-		int month = monthDay.getMonthValue();
-		int day = monthDay.getDayOfMonth();
-
+		int month, day;
 		int oldDay = this.birthdayDay;
 		int oldMonth = this.birthdayMonth;
+		if (monthDay == null) {
+			month = -1;
+			day = -1;
+			birthday = null;
+		} else {
+			month = monthDay.getMonthValue();
+			day = monthDay.getDayOfMonth();
+			birthday = new Birthday(month, day);
+		}
 
-		birthday = new Birthday(month, day);
 		this.birthdayDay = day;
 		this.birthdayMonth = month;
 
@@ -298,7 +304,7 @@ public class CampingUser implements Serializable {
 	}
 
 	public Birthday setBirthday(int month, int day) {
-		if (month == -1 || day == -1 || month > 12 || day > 31)
+		if (month <= -1 || day <= -1 || month > 12 || day > 31)
 			return null;
 
 		birthday = new Birthday(month, day);

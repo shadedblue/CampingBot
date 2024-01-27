@@ -20,6 +20,7 @@ import ca.hapke.campingbot.commands.FuckMeCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.IunnoCommand;
 import ca.hapke.campingbot.commands.MbiyfCommand;
+import ca.hapke.campingbot.commands.OpinionCommand;
 import ca.hapke.campingbot.commands.PartyEverydayCommand;
 import ca.hapke.campingbot.commands.PleasureModelCommand;
 import ca.hapke.campingbot.commands.QuantityCommand;
@@ -86,6 +87,7 @@ public class CampingBot extends CampingBotEngine {
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
 	public static final ResponseCommandType LogStringCommand = new ResponseCommandType("LogString", 0);
 	private AfdHotPotato potatoCommand;
+	private OpinionCommand opinionCommand;
 
 	public CampingBot(ProtectionDomain protectionDomain) {
 		super(protectionDomain);
@@ -117,6 +119,7 @@ public class CampingBot extends CampingBotEngine {
 		statusCommand = new StatusCommand(hideItCommand);
 		userlistCommand = new UserlistCommand();
 		userCommand = new UserCommand(this);
+		opinionCommand = new OpinionCommand();
 
 		happyNewYearEvent = new HappyNewYearEvent(this);
 		ballBustingEvent = new BallBustingEvent(this);
@@ -157,6 +160,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
 		addCommand(potatoCommand);
+		addCommand(opinionCommand);
 
 		addEvent(afdEnabler);
 		addEvent(databaseConsumer);

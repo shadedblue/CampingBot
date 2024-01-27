@@ -24,6 +24,7 @@ import ca.hapke.campingbot.users.CampingUser.Birthday;
  * @author Nathan Hapke
  */
 public class SetCommand extends AbstractCommand implements SlashCommand {
+	private static final String REMOVE = "remove";
 	private static final String BIRTHDAY = "birthday";
 	private static final String BDAY = "bday";
 	private static final String INITIALS = "initials";
@@ -106,12 +107,22 @@ public class SetCommand extends AbstractCommand implements SlashCommand {
 						error = true;
 					}
 				} catch (NumberFormatException e) {
-					result.add("Value must be in the format m-d");
+					result.add("Value must be in the format m-d, or '");
+					result.add(REMOVE);
+					result.add("'");
 					error = true;
 				} catch (DateTimeException dte) {
 					result.add(dte.getMessage());
 					error = true;
 				}
+			} else if (REMOVE.equalsIgnoreCase(bday)) {
+				target.setBirthday(null);
+				result.add(target);
+				result.add("'s birthday removed");
+			} else {
+				result.add("Value must be in the format m-d, or '");
+				result.add(REMOVE);
+				result.add("'");
 			}
 		} else {
 			addFieldInfo(result);
@@ -132,10 +143,5 @@ public class SetCommand extends AbstractCommand implements SlashCommand {
 		result.add(BIRTHDAY, TextStyle.Bold);
 		result.add("/");
 		result.add(BDAY, TextStyle.Bold);
-	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
 	}
 }

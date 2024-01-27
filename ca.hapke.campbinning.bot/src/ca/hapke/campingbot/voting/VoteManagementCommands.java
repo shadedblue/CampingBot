@@ -117,9 +117,4 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 			return extendVoting(message, campingFromUser);
 		return null;
 	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
-	}
 }

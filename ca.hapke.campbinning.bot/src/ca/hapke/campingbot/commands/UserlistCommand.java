@@ -73,11 +73,6 @@ public class UserlistCommand extends AbstractCommand implements SlashCommand {
 	}
 
 	@Override
-	public String provideUiStatus() {
-		return null;
-	}
-
-	@Override
 	public AccessLevel accessRequired() {
 		return AccessLevel.Admin;
 	}

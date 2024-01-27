@@ -57,10 +57,4 @@ public class PleasureModelCommand extends AbstractCommand implements TextCommand
 	public String getCommandName() {
 		return PLEASURE_MODEL;
 	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
-	}
-
 }

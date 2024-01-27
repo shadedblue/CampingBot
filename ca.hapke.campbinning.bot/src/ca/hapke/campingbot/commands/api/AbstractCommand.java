@@ -80,7 +80,9 @@ public abstract class AbstractCommand {
 		return AccessLevel.User;
 	}
 
-	public abstract String provideUiStatus();
+	public String provideUiStatus() {
+		return null;
+	}
 
 	public String getUiStatus() {
 		String provided = provideUiStatus();

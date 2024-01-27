@@ -70,9 +70,4 @@ public class FuckMeCommand extends AbstractCommand implements TextCommand, Slash
 	public String getCommandName() {
 		return FUCK_ME;
 	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
-	}
 }

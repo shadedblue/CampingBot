@@ -59,11 +59,6 @@ public class AmpDetectorCommand extends AbstractCommand implements HasCategories
 	}
 
 	@Override
-	public String provideUiStatus() {
-		return null;
-	}
-
-	@Override
 	public List<String> getCategoryNames() {
 		return categories.getCategoryNames();
 	}

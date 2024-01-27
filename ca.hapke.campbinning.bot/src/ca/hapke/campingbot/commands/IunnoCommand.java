@@ -60,9 +60,4 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 			CampingUser campingFromUser) {
 		return textCommand(campingFromUser, message.getEntities(), chatId, message);
 	}
-
-	@Override
-	public String provideUiStatus() {
-		return null;
-	}
 }
