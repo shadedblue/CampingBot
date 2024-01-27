@@ -89,6 +89,11 @@ public abstract class CommandResult {
 		return this;
 	}
 
+	public CommandResult add(Long msg) {
+		fragments.add(new TextFragment(Long.toString(msg)));
+		return this;
+	}
+
 	public CommandResult add(Integer msg, TextStyle style) {
 		fragments.add(new TextFragment(Integer.toString(msg), style));
 		return this;

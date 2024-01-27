@@ -8,6 +8,7 @@ import ca.hapke.campingbot.processors.MessageProcessor;
 public abstract class ResultFragment {
 	public static final TextFragment SPACE = new TextFragment(" ");
 	public static final TextFragment COLON_SPACE = new TextFragment(": ");
+	public static final TextFragment DASH_SPACE = new TextFragment("- ");
 	public static final TextFragment NEWLINE = new TextFragment("\n");
 
 	protected CaseChoice caseChoice;

@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.time.Month;
+import java.time.MonthDay;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
@@ -67,7 +68,6 @@ public class CampingUser implements Serializable {
 		public String toString() {
 			return birthdayString;
 		}
-
 	}
 
 	private long telegramId = -1;
@@ -279,12 +279,27 @@ public class CampingUser implements Serializable {
 		}
 	}
 
-	public void setBirthday(int month, int day) {
-		if (birthday != null)
-			return;
+	public Birthday setBirthday(MonthDay monthDay) {
+		int month = monthDay.getMonthValue();
+		int day = monthDay.getDayOfMonth();
 
+		int oldDay = this.birthdayDay;
+		int oldMonth = this.birthdayMonth;
+
+		birthday = new Birthday(month, day);
+		this.birthdayDay = day;
+		this.birthdayMonth = month;
+
+		support.firePropertyChange("birthdayDay", oldDay, day);
+		support.firePropertyChange("birthdayMonth", oldMonth, month);
+		updatePersistence();
+
+		return birthday;
+	}
+
+	public Birthday setBirthday(int month, int day) {
 		if (month == -1 || day == -1 || month > 12 || day > 31)
-			return;
+			return null;
 
 		birthday = new Birthday(month, day);
 		this.birthdayDay = day;
@@ -293,6 +308,8 @@ public class CampingUser implements Serializable {
 		support.firePropertyChange("birthdayDay", -1, day);
 		support.firePropertyChange("birthdayMonth", -1, month);
 		updatePersistence();
+
+		return birthday;
 	}
 
 	public int getBirthdayMonth() {
@@ -409,4 +426,5 @@ public class CampingUser implements Serializable {
 			mgr.getTransaction().commit();
 		}
 	}
+
 }

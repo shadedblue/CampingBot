@@ -24,8 +24,9 @@ import ca.hapke.campingbot.commands.PartyEverydayCommand;
 import ca.hapke.campingbot.commands.PleasureModelCommand;
 import ca.hapke.campingbot.commands.QuantityCommand;
 import ca.hapke.campingbot.commands.RedditCommand;
-import ca.hapke.campingbot.commands.SetInitialsCommand;
+import ca.hapke.campingbot.commands.SetCommand;
 import ca.hapke.campingbot.commands.StatusCommand;
+import ca.hapke.campingbot.commands.UserCommand;
 import ca.hapke.campingbot.commands.UserlistCommand;
 import ca.hapke.campingbot.commands.WhatIsMyIpCommand;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
@@ -68,11 +69,12 @@ public class CampingBot extends CampingBotEngine {
 	private SpellCommand spellCommand;
 	private HideItCommand hideItCommand;
 	private NicknameCommand nicknameCommand;
-	private SetInitialsCommand initialsCommand;
+	private SetCommand setCommand;
 	private WhatIsMyIpCommand myIpCommand;
 	private RedditCommand redditCommand;
 	private QuantityCommand quantityCommand;
 	private UserlistCommand userlistCommand;
+	private UserCommand userCommand;
 
 	private CalendarMonitor calMonitor;
 	private AprilFoolsDayEnabler afdEnabler;
@@ -89,7 +91,7 @@ public class CampingBot extends CampingBotEngine {
 		super(protectionDomain);
 		spellCommand = new SpellCommand(this);
 		nicknameCommand = new NicknameCommand();
-		initialsCommand = new SetInitialsCommand();
+		setCommand = new SetCommand(this);
 		myIpCommand = new WhatIsMyIpCommand();
 		pleasureCommand = new PleasureModelCommand(this);
 		fuCommand = new FuckMeCommand(this);
@@ -114,6 +116,7 @@ public class CampingBot extends CampingBotEngine {
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 		statusCommand = new StatusCommand(hideItCommand);
 		userlistCommand = new UserlistCommand();
+		userCommand = new UserCommand(this);
 
 		happyNewYearEvent = new HappyNewYearEvent(this);
 		ballBustingEvent = new BallBustingEvent(this);
@@ -134,7 +137,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(quantityCommand);
 		addCommand(spellCommand);
 		addCommand(nicknameCommand);
-		addCommand(initialsCommand);
+		addCommand(setCommand);
 		addCommand(myIpCommand);
 		addCommand(hideItCommand);
 		addCommand(ballsCommand);
@@ -150,6 +153,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(hypeCommand);
 		addCommand(statusCommand);
 		addCommand(userlistCommand);
+		addCommand(userCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
 		addCommand(potatoCommand);
