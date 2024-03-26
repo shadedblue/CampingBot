@@ -17,29 +17,21 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 //	private AfdMatrixPictures afdMatrix;
 	private AfdTooManyDicks afdDicks;
 
-	public static final boolean AFD_DEBUG = true;
-//	public static final boolean AFD_DEBUG = false;
+//	public static final boolean AFD_DEBUG = true;
+	public static final boolean AFD_DEBUG = false;
 
 	public AprilFoolsDayEnabler(CampingBot bot, AfdTooManyDicks afdDicks) {
 		this.afdDicks = afdDicks;
-		ByTimeOfYear<Boolean> enable, disable;
+		ByTimeOfYear<Boolean> enable;
 		if (AFD_DEBUG) {
 			// Testing
-			enable = new ByTimeOfYear<Boolean>(3, 25, 16, 4, true);
-			int min2 = enable.min + 16;
-			int h2 = enable.h;
-			if (min2 >= 60) {
-				min2 -= 60;
-				h2++;
-			}
-			disable = new ByTimeOfYear<Boolean>(enable.month, enable.d, h2, min2, false);
+			enable = new ByTimeOfYear<Boolean>(3, 26, 9, 37, true);
 		} else {
 			// Production
-			enable = new ByTimeOfYear<Boolean>(4, 1, 9, 0, true);
-			disable = new ByTimeOfYear<Boolean>(enable.month, enable.d, enable.h + 8, enable.min, false);
+			enable = new ByTimeOfYear<Boolean>(4, 1, 8, 50, true);
 		}
 
-		times = new TimesProvider<>(enable, disable);
+		times = new TimesProvider<>(enable);
 	}
 
 	@Override
@@ -61,5 +53,4 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 	public StartupMode getStartupMode() {
 		return StartupMode.Never;
 	}
-
 }

@@ -13,7 +13,6 @@ import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
 import ca.hapke.campingbot.afd2024.AfdTooManyDicks;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.AmpDetectorCommand;
 import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
@@ -47,7 +46,6 @@ import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.voting.RantCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
 import ca.hapke.campingbot.voting.ufc.UfcCommand;
-import ca.odell.glazedlists.EventList;
 
 /**
  * @author Nathan Hapke
@@ -165,9 +163,9 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(redditCommand);
 //		addCommand(potatoCommand);
 		addCommand(opinionCommand);
+		addCommand(afdDicks);
 
 		addEvent(afdEnabler);
-		addEvent(afdDicks);
 		addEvent(databaseConsumer);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);

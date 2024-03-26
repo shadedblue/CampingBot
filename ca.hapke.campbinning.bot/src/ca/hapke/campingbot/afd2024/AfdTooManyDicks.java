@@ -15,6 +15,7 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.Resources;
+import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
 import ca.hapke.campingbot.afd2021.AybTopicChanger;
 import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.CampingChatManager;
@@ -25,6 +26,7 @@ import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
 import ca.odell.glazedlists.EventList;
@@ -32,7 +34,6 @@ import ca.odell.glazedlists.EventList;
 public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<Void>, TextCommand {
 
 	private CampingBot bot;
-	private Resources res;
 
 	private boolean enabled = false;
 	private TimesProvider<Void> times;
@@ -59,25 +60,30 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 		captions[5] = "The dance floor bro-hoe ratio\n" + "Five to one is a brodeo\n"
 				+ "Tell Steve and Mike it's time to go";
 		captions[6] = "Wait outside all night to find\n" + "Twenty dudes in a conga line";
-		captions[7] = "Easy to fix" + "TOO MANY DICKS ON THE DANCE FLOOR!\n" + "Spread out the dicks";
-		captions[8] = "Too many dudes\n" + "With too many dicks";
-		captions[9] = "Too close to my shit\n" + "Too hard to meet chicks";
-		captions[10] = "I need better odds\n" + "More broads, less rods";
-		captions[11] = "I came to do battle\n" + "Scadaddle with the cattle prods";
-		captions[12] = "Too many men\n" + "Too many boys\n" + "Too many misters\n" + "Not enough sisters";
-		captions[13] = "Too much time on, too many hands\n" + "Not enough ladies, too many mans";
-		captions[14] = "Too many dongs\n" + "Too many schlongs\n" + "Now sing this song";
-		captions[15] = "Too many dicks on the dance floor\n" + "Too many dicks on the dance floor\n"
+		captions[7] = "Easy to fix\n" + "TOO MANY DICKS ON THE DANCE FLOOR!";
+		captions[8] = "Spread out the dicks";
+		captions[9] = "Too many dudes\n" + "With too many dicks";
+		captions[10] = "Too close to my shit\n" + "Too hard to meet chicks";
+		captions[11] = "I need better odds\n" + "More broads, less rods";
+		captions[12] = "I came to do battle\n" + "Scadaddle with the cattle prods";
+		captions[13] = "Too many men\n" + "Too many boys\n" + "Too many misters\n" + "Not enough sisters";
+		captions[14] = "Too much time on, too many hands\n" + "Not enough ladies, too many mans";
+		captions[15] = "Too many dongs\n" + "Too many schlongs\n" + "Now sing this song\n\n"
+				+ "Too many dicks on the dance floor\n" + "Too many dicks on the dance floor\n"
 				+ "Too many dicks\n" + "Too many dicks on the dance floor\n" + "Too many dicks\n"
 				+ "Too many dicks on the dance floor";
+
 	}
 
 	public AfdTooManyDicks(CampingBot bot, Resources res) {
 		this.bot = bot;
-		this.res = res;
 		CampingChatManager chatMonitor = CampingChatManager.getInstance(bot);
 		announceChats = chatMonitor.getAnnounceChats();
-		times = new TimesProvider<Void>(new ByFrequency<Void>(null, 1, ChronoUnit.MINUTES));
+		if (AprilFoolsDayEnabler.AFD_DEBUG) {
+			times = new TimesProvider<Void>(new ByFrequency<Void>(null, 10, ChronoUnit.SECONDS));
+		} else {
+			times = new TimesProvider<Void>(new ByFrequency<Void>(null, 30, ChronoUnit.MINUTES));
+		}
 		topicChanger = new AybTopicChanger(bot, res);
 	}
 
@@ -88,23 +94,47 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 
 	@Override
 	public void doWork(ByCalendar<Void> event, Void value) {
-		if (!bot.isOnline() || i >= captions.length)
+		if (!bot.isOnline())
 			return;
 
-		ImageLink image = new ImageLink("http://www.hapke.ca/images/afd24/dick" + i + ".jpg", ImageLink.STATIC);
-		ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
-		send.add("TOO MANY DICKS ON THE DANCE FLOOR!");
-		send.newLine();
-		send.newLine();
-		String caption = captions[i];
-		if (caption != null)
+		if (i == 1) {
+			ImageLink image_mf = new ImageLink("http://www.hapke.ca/images/afd24/surprise-mf2.gif", ImageLink.GIF);
+			ImageCommandResult send_mf = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image_mf);
+			for (CampingChat chat : announceChats) {
+				send_mf.sendAndLog(bot, chat);
+			}
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+			}
+		}
+
+		if (i < captions.length) {
+			ImageLink image = new ImageLink("http://www.hapke.ca/images/afd24/dick" + i + ".gif", ImageLink.GIF);
+			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
+			send.add("TOO MANY DICKS ON THE DANCE FLOOR!", TextStyle.Bold);
+			send.newLine();
+			send.newLine();
+			String caption = captions[i];
+			if (caption != null)
+				send.add(caption);
+
+			for (CampingChat chat : announceChats) {
+				send.sendAndLog(bot, chat);
+			}
+		} else {
+			// finishing
+			ImageLink image = new ImageLink("http://www.hapke.ca/images/42069.jpg", ImageLink.STATIC);
+			String caption = "APRIL FOOLS, MOTHER FUCKERS";
+			ImageCommandResult send = new ImageCommandResult(AfdTooManyDicks.TooManyDicksCommand, image);
 			send.add(caption);
 
-		for (CampingChat chat : announceChats) {
-			send.sendAndLog(bot, chat);
+			for (CampingChat chat : announceChats) {
+				send.sendAndLog(bot, chat);
+			}
+			enabled = false;
 		}
 		i++;
-
 	}
 
 	@Override
@@ -118,17 +148,6 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 	}
 
 	public void enable(boolean on) {
-		if (enabled && !on) {
-			// finishing
-			ImageLink image = new ImageLink("http://www.hapke.ca/images/42069.jpg", ImageLink.STATIC);
-			String caption = "APRIL FOOLS, MOTHER FUCKERS";
-			ImageCommandResult send = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image);
-			send.add(caption);
-
-			for (CampingChat chat : announceChats) {
-				send.sendAndLog(bot, chat);
-			}
-		}
 		enabled = on;
 	}
 
@@ -136,15 +155,19 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
 			Message message) throws TelegramApiException {
 		for (CampingChat chat : announceChats) {
-			Consumer<CampingChat> changer = topicChanger.createTopicChanger();
-			changer.accept(chat);
+			if (chatId == chat.getChatId()) {
+				Consumer<CampingChat> changer = topicChanger.createTopicChanger();
+				changer.accept(chat);
+				return null;
+			}
 		}
 		return null;
 	}
 
 	@Override
 	public boolean isMatch(String msg, Message message) {
-		return Math.random() < 0.10;
+		boolean change = Math.random() < 0.10;
+		return change;
 	}
 
 	@Override
