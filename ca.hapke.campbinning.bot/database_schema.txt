@@ -1,0 +1,8 @@
+create table activity (
+	id serial primary key,
+	"campingUserId" bigint,
+	"chatId" bigint,
+	"telegramId" bigint,
+	"campingType" bigint,
+	message text,
+	"extraData" text )

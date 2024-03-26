@@ -19,12 +19,13 @@ import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
+import ca.hapke.campingbot.util.glazedlists.GeneratingMatcherEditor;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import ca.odell.glazedlists.matchers.Matcher;
+import ca.odell.glazedlists.matchers.MatcherEditor;
 
 /**
  * @author Nathan Hapke
@@ -48,19 +49,15 @@ public class CampingChatManager {
 
 	private CampingChatManager(CampingBotEngine bot) {
 		this.bot = bot;
+		matcherEditor.setModeCustom((CampingChat cc) -> cc.isAnnounce(), true);
 	}
 
 	private final Map<Long, CampingChat> chats = new HashMap<>();
 	private EventList<CampingChat> baseList = new ObservableElementList<>(new BasicEventList<CampingChat>(),
 			GlazedLists.beanConnector(CampingChat.class));
-	private final EventList<CampingChat> chatEvents = GlazedLists.threadSafeList(GlazedLists.readOnlyList(baseList));
-	private final EventList<CampingChat> announceChats = GlazedLists
-			.readOnlyList(new FilterList<CampingChat>(baseList, new Matcher<CampingChat>() {
-				@Override
-				public boolean matches(CampingChat item) {
-					return item.isAnnounce();
-				}
-			}));
+	private final EventList<CampingChat> chatEvents = GlazedLists.threadSafeList(baseList);
+	private GeneratingMatcherEditor<CampingChat> matcherEditor = new GeneratingMatcherEditor<>(baseList);
+	private final EventList<CampingChat> announceChats = new FilterList<CampingChat>(baseList, matcherEditor);
 
 	public void load() {
 		List<CampingChat> incoming = DatabaseConsumer.getInstance().loadChats();

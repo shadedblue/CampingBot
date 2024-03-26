@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Calendaring
+Bundle-SymbolicName: ca.hapke.calendaring
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: ca.hapke.calendaring
+Export-Package: ca.hapke.calendaring.event,
+ ca.hapke.calendaring.monitor,
+ ca.hapke.calendaring.timing

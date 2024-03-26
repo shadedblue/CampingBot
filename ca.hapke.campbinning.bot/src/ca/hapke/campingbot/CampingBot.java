@@ -10,9 +10,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.afd2020.AprilFoolsDayEnabler;
-import ca.hapke.campingbot.afd2021.AfdHotPotato;
+import ca.hapke.campingbot.afd2024.AfdTooManyDicks;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
+import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.commands.AmpDetectorCommand;
 import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
@@ -46,6 +47,7 @@ import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.voting.RantCommand;
 import ca.hapke.campingbot.voting.VoteManagementCommands;
 import ca.hapke.campingbot.voting.ufc.UfcCommand;
+import ca.odell.glazedlists.EventList;
 
 /**
  * @author Nathan Hapke
@@ -76,9 +78,12 @@ public class CampingBot extends CampingBotEngine {
 	private QuantityCommand quantityCommand;
 	private UserlistCommand userlistCommand;
 	private UserCommand userCommand;
+	private OpinionCommand opinionCommand;
 
 	private CalendarMonitor calMonitor;
 	private AprilFoolsDayEnabler afdEnabler;
+//	private AfdHotPotato potatoCommand;
+	private AfdTooManyDicks afdDicks;
 
 	private BallBustingEvent ballBustingEvent;
 	private HappyNewYearEvent happyNewYearEvent;
@@ -86,8 +91,6 @@ public class CampingBot extends CampingBotEngine {
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
 	public static final ResponseCommandType LogStringCommand = new ResponseCommandType("LogString", 0);
-	private AfdHotPotato potatoCommand;
-	private OpinionCommand opinionCommand;
 
 	public CampingBot(ProtectionDomain protectionDomain) {
 		super(protectionDomain);
@@ -111,8 +114,9 @@ public class CampingBot extends CampingBotEngine {
 
 		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
-		potatoCommand = new AfdHotPotato(this, res);
-		afdEnabler = new AprilFoolsDayEnabler(this, potatoCommand);
+//		potatoCommand = new AfdHotPotato(this, res);
+		afdDicks = new AfdTooManyDicks(this, res);
+		afdEnabler = new AprilFoolsDayEnabler(this, afdDicks);
 
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
@@ -159,10 +163,11 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(userCommand);
 		addCommand(voteManagementCommands);
 		addCommand(redditCommand);
-		addCommand(potatoCommand);
+//		addCommand(potatoCommand);
 		addCommand(opinionCommand);
 
 		addEvent(afdEnabler);
+		addEvent(afdDicks);
 		addEvent(databaseConsumer);
 		addEvent(happyNewYearEvent);
 		addEvent(ballBustingEvent);

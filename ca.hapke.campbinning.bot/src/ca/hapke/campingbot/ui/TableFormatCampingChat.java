@@ -4,11 +4,13 @@ import ca.hapke.campingbot.channels.CampingChat;
 import ca.hapke.campingbot.channels.ChatAllowed;
 import ca.hapke.campingbot.channels.ChatType;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
+import ca.odell.glazedlists.gui.WritableTableFormat;
 
 /**
  * @author Nathan Hapke
  */
-public class TableFormatCampingChat extends CampingTableFormat implements AdvancedTableFormat<CampingChat> {
+public class TableFormatCampingChat extends CampingTableFormat
+		implements AdvancedTableFormat<CampingChat>, WritableTableFormat<CampingChat> {
 
 	public TableFormatCampingChat() {
 		super(new String[] { "Name", "ID", "Type", "Status", "Announce?" }, new int[] { 125, 110, 80, 100, 75 });
@@ -48,6 +50,25 @@ public class TableFormatCampingChat extends CampingTableFormat implements Advanc
 
 		}
 		throw new IllegalStateException();
+	}
+
+	@Override
+	public boolean isEditable(CampingChat baseObject, int column) {
+		return column == 4;
+	}
+
+	@Override
+	public CampingChat setColumnValue(CampingChat baseObject, Object editedValue, int column) {
+		if (baseObject == null)
+			return null;
+
+		if (column == 4) {
+			if (editedValue instanceof Boolean) {
+				Boolean b = (Boolean) editedValue;
+				baseObject.setAnnounce(b);
+			}
+		}
+		return baseObject;
 	}
 
 }
