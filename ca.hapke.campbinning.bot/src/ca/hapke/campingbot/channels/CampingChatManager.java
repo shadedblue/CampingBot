@@ -1,8 +1,8 @@
 package ca.hapke.campingbot.channels;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -25,7 +25,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import ca.odell.glazedlists.matchers.MatcherEditor;
 
 /**
  * @author Nathan Hapke
@@ -52,10 +51,10 @@ public class CampingChatManager {
 		matcherEditor.setModeCustom((CampingChat cc) -> cc.isAnnounce(), true);
 	}
 
-	private final Map<Long, CampingChat> chats = new HashMap<>();
-	private EventList<CampingChat> baseList = new ObservableElementList<>(new BasicEventList<CampingChat>(),
+	private final Map<Long, CampingChat> chats = new ConcurrentHashMap<>();
+	private EventList<CampingChat> baseList = new ObservableElementList<>(
+			GlazedLists.threadSafeList(new BasicEventList<CampingChat>()),
 			GlazedLists.beanConnector(CampingChat.class));
-	private final EventList<CampingChat> chatEvents = GlazedLists.threadSafeList(baseList);
 	private GeneratingMatcherEditor<CampingChat> matcherEditor = new GeneratingMatcherEditor<>(baseList);
 	private final EventList<CampingChat> announceChats = new FilterList<CampingChat>(baseList, matcherEditor);
 
@@ -135,7 +134,7 @@ public class CampingChatManager {
 	}
 
 	public EventList<CampingChat> getChatList() {
-		return chatEvents;
+		return baseList;
 	}
 
 	public EventList<CampingChat> getAnnounceChats() {
