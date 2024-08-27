@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -108,6 +109,14 @@ public class UserCommand extends AbstractCommand implements SlashCommand {
 			result.add("Not Set");
 		} else {
 			result.add(nickname);
+		}
+		result.newLine();
+		result.add("Access Level: ", TextStyle.Bold);
+
+		if (CampingSystem.getInstance().isAdmin(target)) {
+			result.add("Admin");
+		} else {
+			result.add("User");
 		}
 
 		return result;

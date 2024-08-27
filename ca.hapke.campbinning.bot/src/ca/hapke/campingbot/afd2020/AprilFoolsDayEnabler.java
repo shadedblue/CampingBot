@@ -3,7 +3,6 @@ package ca.hapke.campingbot.afd2020;
 import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.event.StartupMode;
 import ca.hapke.calendaring.timing.ByCalendar;
-import ca.hapke.calendaring.timing.ByTimeOfYear;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.afd2024.AfdTooManyDicks;
@@ -21,17 +20,17 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 	public static final boolean AFD_DEBUG = false;
 
 	public AprilFoolsDayEnabler(CampingBot bot, AfdTooManyDicks afdDicks) {
-		this.afdDicks = afdDicks;
-		ByTimeOfYear<Boolean> enable;
-		if (AFD_DEBUG) {
-			// Testing
-			enable = new ByTimeOfYear<Boolean>(3, 26, 9, 37, true);
-		} else {
-			// Production
-			enable = new ByTimeOfYear<Boolean>(4, 1, 8, 50, true);
-		}
-
-		times = new TimesProvider<>(enable);
+//		this.afdDicks = afdDicks;
+//		ByTimeOfYear<Boolean> enable;
+//		if (AFD_DEBUG) {
+//			// Testing
+//			enable = new ByTimeOfYear<Boolean>(4, 6, 16, 00, true);
+//		} else {
+//			// Production
+//			enable = new ByTimeOfYear<Boolean>(4, 6, 15, 49, true);
+//		}
+//
+//		times = new TimesProvider<>(enable);
 	}
 
 	@Override
@@ -41,7 +40,7 @@ public class AprilFoolsDayEnabler implements CalendaredEvent<Boolean> {
 
 	@Override
 	public void doWork(ByCalendar<Boolean> event, Boolean value) {
-		afdDicks.enable(value);
+//		afdDicks.enable(value);
 	}
 
 	@Override

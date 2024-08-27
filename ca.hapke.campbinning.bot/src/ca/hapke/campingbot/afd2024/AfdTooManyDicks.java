@@ -46,12 +46,15 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 
 	private AybTopicChanger topicChanger;
 
+	private int lastRunMin = Integer.MIN_VALUE;
+
 	public static final ResponseCommandType TooManyDicksCommand = new ResponseCommandType(TOO_MANY_DICKS,
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.VOTING | BotCommandIds.USE);
 
 	static {
 		captions = new String[16];
-		captions[1] = "Going to the party\n" + "Sippin' on Bacardi\n" + "Wanna meet a hottie";
+		captions[1] = "Going to the party\n" + "Sippin' on Bacardi\n"
+				+ "Wanna meet a hottie\n\n\n(I'm sorry this didn't run on April 1st. Something totally un-related got fucked up in the bot.)";
 		captions[2] = "But there's Adam, Steve and Marty\n" + "There's Billy, Todd and Tommy\n"
 				+ "They're on leave from the army";
 		captions[3] = "The only boobs I'll see tonight will be made of origami";
@@ -82,7 +85,7 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 		if (AprilFoolsDayEnabler.AFD_DEBUG) {
 			times = new TimesProvider<Void>(new ByFrequency<Void>(null, 10, ChronoUnit.SECONDS));
 		} else {
-			times = new TimesProvider<Void>(new ByFrequency<Void>(null, 30, ChronoUnit.MINUTES));
+			times = new TimesProvider<Void>(new ByFrequency<Void>(null, 10, ChronoUnit.MINUTES));
 		}
 		topicChanger = new AybTopicChanger(bot, res);
 	}
@@ -94,9 +97,23 @@ public class AfdTooManyDicks extends AbstractCommand implements CalendaredEvent<
 
 	@Override
 	public void doWork(ByCalendar<Void> event, Void value) {
-		if (!bot.isOnline())
-			return;
+//		if (!bot.isOnline())
+//			return;
+//
+//		ZonedDateTime now = ZonedDateTime.now();
+//		int nowMin = now.get(ChronoField.MINUTE_OF_DAY);
+//
+//		System.out.print("Too many dicks (" + nowMin + ")... ");
+//		if (nowMin != lastRunMin && (AprilFoolsDayEnabler.AFD_DEBUG || (nowMin % 10) == 0)) {
+//			System.out.println("RUNNING");
+//			sendIt();
+//			lastRunMin = nowMin;
+//		} else {
+//			System.out.println("skipped");
+//		}
+	}
 
+	protected void sendIt() {
 		if (i == 1) {
 			ImageLink image_mf = new ImageLink("http://www.hapke.ca/images/afd24/surprise-mf2.gif", ImageLink.GIF);
 			ImageCommandResult send_mf = new ImageCommandResult(PleasureModelCommand.PleasureModelCommand, image_mf);
