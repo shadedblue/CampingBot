@@ -71,6 +71,7 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 	private Map<CommandResult, Integer> trackingPending = new HashMap<>();
 
 	private enum Direction {
+		//@formatter:off
 		UpLeft(7),
 		Up(8),
 		UpRight(9),
@@ -80,6 +81,7 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 		DownLeft(1),
 		Down(2),
 		DownRight(3);
+		//@formatter:on
 
 		public final int i;
 
@@ -286,7 +288,7 @@ public class EnhanceCommand extends AbstractCommand implements HasCategories<Str
 		return new TextFragment(garbler.processString(input, true));
 	}
 
-	private String getPictureFileId(Message replyTo) {
+	public static String getPictureFileId(Message replyTo) {
 		Animation ani = replyTo.getAnimation();
 		if (ani != null)
 			return ani.getFileId();

@@ -24,12 +24,7 @@ public class IunnoCommand extends AbstractCommand implements TextCommand, SlashC
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashIunno };
 	private static final String IUNNO_CATEGORY = "Iunno";
-	protected CampingBot bot;
 	private ImageLink iunnoImg = new ImageLink("http://www.hapke.ca/images/iunno.gif", ImageLink.GIF);
-
-	public IunnoCommand(CampingBot bot) {
-		this.bot = bot;
-	}
 
 	@Override
 	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,

@@ -1,0 +1,122 @@
+package ca.hapke.campingbot.commands;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import org.telegram.telegrambots.meta.api.methods.GetFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
+import ca.hapke.campingbot.commands.api.BotCommandIds;
+import ca.hapke.campingbot.commands.api.SlashCommand;
+import ca.hapke.campingbot.commands.api.SlashCommandType;
+import ca.hapke.campingbot.commands.api.TextCommand;
+import ca.hapke.campingbot.response.CommandResult;
+import ca.hapke.campingbot.response.ImageCommandResult;
+import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.util.ImageCache;
+import ca.hapke.campingbot.util.Sprite;
+
+public class OverlayAndrewCommand extends AbstractCommand implements TextCommand, SlashCommand {
+	private static final String OVERLAY_ANDREW = "OverlayAndrew";
+	private static final SlashCommandType SlashAndrew = new SlashCommandType(OVERLAY_ANDREW, "andrew",
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAndrew };
+	private static final String FOLDER_NAME = "assets";
+	private static final String OVERLAY_FILENAME = "andrew.png";
+	private CampingBot bot;
+	private Image andrew;
+
+	public OverlayAndrewCommand(CampingBot bot) {
+		this.bot = bot;
+	}
+
+	@Override
+	public SlashCommandType[] getSlashCommandsToRespondTo() {
+		return SLASH_COMMANDS;
+	}
+
+	@Override
+	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+			CampingUser campingFromUser) throws TelegramApiException {
+		return textCommand(campingFromUser, message.getEntities(), chatId, message);
+	}
+
+	@Override
+	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
+			Message message) throws TelegramApiException {
+
+		Message replyTo = message.getReplyToMessage();
+		String picFileId = EnhanceCommand.getPictureFileId(replyTo);
+		if (picFileId != null) {
+			return createPictureResponse(picFileId);
+		}
+		return null;
+	}
+
+	private CommandResult createPictureResponse(String picFileId) {
+		try {
+			GetFile get = new GetFile(picFileId);
+			File in = null;
+			in = bot.downloadFile(bot.execute(get));
+			BufferedImage originalImg = ImageIO.read(in);
+			Image overlay = getAndrew();
+
+			BufferedImage overlayedImage = overlayImage(originalImg, overlay);
+			File outImg = File.createTempFile(bot.getBotUsername(), ".jpg");
+			boolean success = ImageIO.write(overlayedImage, "jpeg", outImg);
+			if (success)
+				return new ImageCommandResult(SlashAndrew, outImg);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+
+	private Image getAndrew() {
+		if (andrew == null) {
+			ImageCache cache = ImageCache.getInstance();
+			Sprite overlay = cache.getImage(FOLDER_NAME, OVERLAY_FILENAME);
+			andrew = overlay.getFrame(0);
+		}
+		return andrew;
+	}
+
+	@Override
+	public boolean isMatch(String msg, Message message) {
+		String msgLower = msg.toLowerCase().trim();
+		return msgLower.startsWith("/" + SlashAndrew.slashCommand);
+	}
+
+	@Override
+	public String getCommandName() {
+		return OVERLAY_ANDREW;
+	}
+
+	public static BufferedImage overlayImage(Image base, Image overlay) {
+		int h = base.getHeight(null);
+		int w = base.getWidth(null);
+
+		int targetHeight = h / 2;
+		int targetWidth = w / 2;
+		int targetSize = Math.min(targetHeight, targetWidth);
+
+		Image overlayScaled = ImageCache.scaleToTileSize(overlay, targetSize);
+
+		BufferedImage resultImg = new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR);
+
+		Graphics gfx = resultImg.getGraphics();
+		gfx.drawImage(base, 0, 0, Color.white, null);
+		gfx.drawImage(overlayScaled, 0, (h * 5) / 6 - targetSize, null, null);
+		gfx.dispose();
+		return resultImg;
+	}
+}
