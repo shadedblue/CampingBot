@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
+import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.api.IStatus;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -27,6 +28,9 @@ import ca.hapke.util.TimeFormatter;
  * @author Nathan Hapke
  */
 public class StatusCommand extends AbstractCommand implements IStatus, SlashCommand {
+	private CampingBot bot;
+	private HideItCommand hideIt;
+
 	private static final String STATUS = "Status";
 	public static final SlashCommandType SlashStatus = new SlashCommandType(STATUS, "status",
 			BotCommandIds.TEXT | BotCommandIds.USE);
@@ -34,9 +38,9 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	private TimeFormatter tf = new TimeFormatter(2, ", ", false, false);
 	private ZonedDateTime onlineTime;
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL d, h:mm:ss a");
-	private HideItCommand hideIt;
 
-	public StatusCommand(HideItCommand hideIt) {
+	public StatusCommand(CampingBot bot, HideItCommand hideIt) {
+		this.bot = bot;
 		this.hideIt = hideIt;
 	}
 
@@ -87,7 +91,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 		}
 
 		Map<Integer, HideItMessage> msgs = hideIt.getConfirmedMessages();
-		r.add("\n");
+		r.newLine();
 		r.add("Messages (" + msgs.size() + ") ", TextStyle.Italic);
 		for (Entry<Integer, HideItMessage> e : msgs.entrySet()) {
 			r.newLine();
@@ -95,6 +99,11 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 			r.add(": ");
 			r.add(e.getValue().getClearText());
 		}
+		
+		r.newLine();
+		r.add("Commands", TextStyle.Italic);
+		r.newLine();
+		r.add(bot.getCommandStatus());
 		return r;
 	}
 

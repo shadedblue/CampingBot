@@ -122,7 +122,7 @@ public class CampingBot extends CampingBotEngine {
 
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
-		statusCommand = new StatusCommand(hideItCommand);
+		statusCommand = new StatusCommand(this, hideItCommand);
 		userlistCommand = new UserlistCommand();
 		userCommand = new UserCommand(this);
 		opinionCommand = new OpinionCommand();
