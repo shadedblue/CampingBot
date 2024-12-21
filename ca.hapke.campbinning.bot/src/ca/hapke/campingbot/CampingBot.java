@@ -19,6 +19,8 @@ import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.IunnoCommand;
 import ca.hapke.campingbot.commands.MbiyfCommand;
 import ca.hapke.campingbot.commands.OpinionCommand;
+import ca.hapke.campingbot.commands.OverlayAndrewCommand;
+import ca.hapke.campingbot.commands.OverlayNyandrewCommand;
 import ca.hapke.campingbot.commands.PartyEverydayCommand;
 import ca.hapke.campingbot.commands.PleasureModelCommand;
 import ca.hapke.campingbot.commands.QuantityCommand;
@@ -83,6 +85,8 @@ public class CampingBot extends CampingBotEngine {
 
 	private BallBustingEvent ballBustingEvent;
 	private HappyNewYearEvent happyNewYearEvent;
+	private OverlayAndrewCommand andrewCommand;
+	private OverlayNyandrewCommand nyandrewCommand;
 
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
@@ -100,6 +104,8 @@ public class CampingBot extends CampingBotEngine {
 		iunnoCommand = new IunnoCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
 		ampCommand = new AmpDetectorCommand();
+		andrewCommand = new OverlayAndrewCommand(this);
+		nyandrewCommand = new OverlayNyandrewCommand(this);
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
@@ -162,6 +168,8 @@ public class CampingBot extends CampingBotEngine {
 //		addCommand(potatoCommand);
 		addCommand(opinionCommand);
 //		addCommand(afdDicks);
+		addCommand(andrewCommand);
+		addCommand(nyandrewCommand);
 
 //		addEvent(afdEnabler);
 		addEvent(databaseConsumer);

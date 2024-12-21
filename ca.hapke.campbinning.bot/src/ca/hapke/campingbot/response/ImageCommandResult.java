@@ -21,13 +21,13 @@ import ca.hapke.campingbot.util.ImageLink;
  */
 public class ImageCommandResult extends CommandResult {
 	enum SendMode {
-		Url,
-		File;
+		Url, File;
 	}
 
 	private ImageLink image;
 	private SendMode mode;
 	private File file;
+	private int fileType = ImageLink.STATIC;
 
 	public ImageCommandResult(CommandType cmd, File file) {
 		super(cmd);
@@ -45,6 +45,12 @@ public class ImageCommandResult extends CommandResult {
 		super(cmd, fragments);
 		this.file = file;
 		this.mode = SendMode.File;
+	}
+
+	public void setFileType(int type) {
+		if (this.mode == SendMode.File) {
+			this.fileType = type;
+		}
 	}
 
 	public ImageCommandResult(CommandType cmd, ImageLink image) {
@@ -98,10 +104,29 @@ public class ImageCommandResult extends CommandResult {
 				}
 				break;
 			case File:
-				url = file.getAbsolutePath();
-				SendPhoto p = new SendPhoto();
-				p.setPhoto(new InputFile(file));
-				outMsg = completePhoto(bot, chatId, caption, p);
+				switch (fileType) {
+				case ImageLink.GIF:
+					SendAnimation ani = new SendAnimation();
+					ani.setChatId(Long.toString(chatId));
+					ani.setAnimation(new InputFile(file));
+					if (caption != null && caption.length() > 0) {
+						ani.setCaption(caption);
+						ani.setParseMode(BotConstants.MARKDOWN);
+					}
+					if (replyTo != null)
+						ani.setReplyToMessageId(replyTo);
+					if (keyboard != null)
+						ani.setReplyMarkup(keyboard);
+					outMsg = bot.execute(ani);
+					break;
+				case ImageLink.STATIC:
+				default:
+					url = file.getAbsolutePath();
+					SendPhoto p = new SendPhoto();
+					p.setPhoto(new InputFile(file));
+					outMsg = completePhoto(bot, chatId, caption, p);
+					break;
+				}
 				break;
 			}
 			if (outMsg == null)
