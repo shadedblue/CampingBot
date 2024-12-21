@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ca.hapke</groupId>
 	<artifactId>bot.framework</artifactId>
-	<version>0.5.1-SNAPSHOT</version>
+	<version>0.5.3-SNAPSHOT</version>
 	<name>CampingBotFramework</name>
 	<properties>
 		<junit.jupiter.version>5.7.1</junit.jupiter.version>
@@ -88,12 +88,12 @@
 		<dependency>
 			<groupId>ca.hapke</groupId>
 			<artifactId>calendaring</artifactId>
-			<version>0.2.0-SNAPSHOT</version>
+			<version>[0.2.2-SNAPSHOT,]</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.hapke</groupId>
 			<artifactId>util</artifactId>
-			<version>0.3.0-SNAPSHOT</version>
+			<version>[0.3.0-SNAPSHOT,]</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
 		<dependency>
