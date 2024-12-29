@@ -99,11 +99,11 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 			r.add(": ");
 			r.add(e.getValue().getClearText());
 		}
-		
+
 		r.newLine();
 		r.add("Commands", TextStyle.Italic);
 		r.newLine();
-		r.add(bot.getCommandStatus());
+		r.add(bot.getCommandList());
 		return r;
 	}
 

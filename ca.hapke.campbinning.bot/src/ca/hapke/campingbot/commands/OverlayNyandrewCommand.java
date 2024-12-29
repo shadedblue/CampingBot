@@ -5,16 +5,18 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import com.madgag.gif.fmsware.AnimatedGifEncoder;
 
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
@@ -25,13 +27,11 @@ import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
-import ca.hapke.campingbot.util.GifSequenceWriter;
 import ca.hapke.campingbot.util.ImageCache;
 import ca.hapke.campingbot.util.ImageLink;
 import ca.hapke.campingbot.util.Sprite;
 
 public class OverlayNyandrewCommand extends AbstractCommand implements TextCommand, SlashCommand {
-	private static final int FRAME_HOLD_LENGTH = 5;
 
 	private static final String OVERLAY_NYANDREW = "OverlayNyandrew";
 	private static final SlashCommandType SlashNyandrew = new SlashCommandType(OVERLAY_NYANDREW, "nyandrew",
@@ -41,6 +41,11 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 	private static final String[] OVERLAY_FILENAMES = { "nyandrew1.png", "nyandrew2.png" };
 	private CampingBot bot;
 	private Image[] overlays;
+
+	private static final int FRAME_HOLD_LENGTH = 3;
+	private static final int RESULT_WIDTH = 300;
+	private static final int ANDREW_WIDTH = RESULT_WIDTH;
+	private static final int STEP_DELTA = 10;
 
 	public OverlayNyandrewCommand(CampingBot bot) {
 		this.bot = bot;
@@ -89,7 +94,8 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 					System.err.println(msg);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Integer tId = message.getMessageId();
+				bot.logFailure(tId, campingFromUser, chatId, SlashNyandrew, e);
 			}
 			return null;
 		}
@@ -100,13 +106,14 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 		if (overlays == null) {
 			ImageCache cache = ImageCache.getInstance();
 			int qty = OVERLAY_FILENAMES.length;
-			overlays = new Image[qty];
+			Image[] newOverlays = new Image[qty];
 			for (int i = 0; i < qty; i++) {
 				String filename = OVERLAY_FILENAMES[i];
 
 				Sprite overlay = cache.getImage(FOLDER_NAME, filename);
-				overlays[i] = overlay.getFrame(0);
+				newOverlays[i] = overlay.getFrame(0);
 			}
+			this.overlays = newOverlays;
 		}
 		return overlays;
 	}
@@ -123,31 +130,33 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 	}
 
 	public static void overlayNyandrew(Image baseOriginal, Image[] overlays, File f) throws Exception {
-		ImageOutputStream outputStream = new FileImageOutputStream(f);
-		GifSequenceWriter writer = new GifSequenceWriter(outputStream, BufferedImage.TYPE_INT_RGB, 60, true);
+		OutputStream outputStream = new FileOutputStream(f);
+		AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+		encoder.start(outputStream);
+		encoder.setDelay(40);
+		// continuous
+		encoder.setRepeat(0);
+		encoder.setQuality(5);
 
-		Image baseScaled = ImageCache.scaleToTileSize(baseOriginal, 300);
-
-		int h = baseScaled.getHeight(null);
+		Image baseScaled = ImageCache.scaleToTileSize(baseOriginal, RESULT_WIDTH);
 		int w = baseScaled.getWidth(null);
-
-		int targetSize = w / 2;
+		int h = baseScaled.getHeight(null);
 
 		Image[] overlaysScaled = new Image[overlays.length];
-		int w2 = 0;
+		int hAndrew = 0;
 		for (int i = 0; i < overlays.length; i++) {
 			Image img = overlays[i];
-			Image scaled = ImageCache.scaleToHeight(img, targetSize);
+			Image scaled = ImageCache.scaleToTileSize(img, ANDREW_WIDTH);
 			overlaysScaled[i] = scaled;
-			w2 = scaled.getWidth(null);
+			hAndrew = scaled.getHeight(null);
 		}
 
-		final int stepLength = 20;
-		int qty = (2 * w2 + w) / stepLength;
-		int x = -w2 + 10;
+		int x = -ANDREW_WIDTH + 10;
+		int yLoc = (h - hAndrew) / 2;
 		int overlayIndex = 0;
 		int frameIndex = 0;
-		for (int i = 0; i < qty; i++) {
+
+		while (x < w) {
 			BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 			Graphics gfx = img.getGraphics();
 			gfx.drawImage(baseScaled, 0, 0, Color.white, null);
@@ -160,14 +169,14 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 					overlayIndex = 0;
 				}
 			}
-			gfx.drawImage(overlayScaled, x, (h * 5) / 6 - targetSize, null, null);
+			gfx.drawImage(overlayScaled, x, yLoc, null, null);
 			gfx.dispose();
-
-			writer.writeToSequence(img);
-			x += stepLength;
+			img.flush();
+			encoder.addFrame(img);
+			x += STEP_DELTA;
 		}
-
-		writer.close();
+		encoder.finish();
 		outputStream.close();
 	}
+
 }

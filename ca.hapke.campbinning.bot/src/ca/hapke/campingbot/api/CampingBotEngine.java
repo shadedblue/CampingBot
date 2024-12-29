@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -653,6 +654,25 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		addCommands(sb, "TextCommands", textCommands);
 		addCommands(sb, "CallbackCommands", callbackCommands);
 		addCommands(sb, "SlashCommands", slashCommands.values());
+
+		return sb.toString();
+	}
+
+	public String getCommandList() {
+		StringBuilder sb = new StringBuilder();
+
+		boolean first = true;
+		for (Entry<String, SlashCommandType> cmd : slashCommandMap.entrySet()) {
+			if (first)
+				first = false;
+			else
+				sb.append('\n');
+
+			sb.append('/');
+			sb.append(cmd.getKey());
+			sb.append(": ");
+			sb.append(cmd.getValue().slashCommand);
+		}
 
 		return sb.toString();
 	}

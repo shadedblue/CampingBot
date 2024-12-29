@@ -80,7 +80,8 @@ public class OverlayAndrewCommand extends AbstractCommand implements TextCommand
 					System.err.println(msg);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Integer tId = message.getMessageId();
+				bot.logFailure(tId, campingFromUser, chatId, SlashAndrew, e);
 			}
 			return null;
 		}
