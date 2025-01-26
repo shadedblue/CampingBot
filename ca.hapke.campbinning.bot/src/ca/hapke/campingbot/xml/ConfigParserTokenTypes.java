@@ -17,12 +17,13 @@ public interface ConfigParserTokenTypes {
 	// "<token>" = 8
 	int PCDATA = 9;
 	// "<botUsername>" = 10
-	// "<adminUser>" = 11
-	// "<dbHost>" = 12
-	// "<dbPort>" = 13
-	// "<dbUser>" = 14
-	// "<dbPass>" = 15
-	// "<dbDb>" = 16
-	// "<dbDriver>" = 17
-	// "<connectOnStartup>" = 18
+	// "<assets>" = 11
+	// "<adminUser>" = 12
+	// "<dbHost>" = 13
+	// "<dbPort>" = 14
+	// "<dbUser>" = 15
+	// "<dbPass>" = 16
+	// "<dbDb>" = 17
+	// "<dbDriver>" = 18
+	// "<connectOnStartup>" = 19
 }

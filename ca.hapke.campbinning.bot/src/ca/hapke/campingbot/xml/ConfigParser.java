@@ -109,20 +109,21 @@ public ConfigParser(ParserSharedInputState state) {
 			match(6);
 			{
 			
-					String token,botUsername,adminUser = null; 
+					String token,botUsername,adminUser = null,assets=null; 
 				
 			token=__xml_token();
 			botUsername=__xml_botUsername();
+			assets=__xml_assets();
 			{
 			switch ( LA(1)) {
-			case 11:
+			case 12:
 			{
 				adminUser=__xml_adminUser();
 				break;
 			}
 			case XML_END_TAG:
 			case 7:
-			case 18:
+			case 19:
 			{
 				break;
 			}
@@ -134,7 +135,7 @@ public ConfigParser(ParserSharedInputState state) {
 			}
 			{
 			switch ( LA(1)) {
-			case 18:
+			case 19:
 			{
 				__xml_connectOnStartup(cs);
 				break;
@@ -170,6 +171,7 @@ public ConfigParser(ParserSharedInputState state) {
 			
 					cs.setToken(token);
 					cs.setBotUsername(botUsername);
+					cs.setAssetsFolder(assets);
 					if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
 						int adminUser2 = Integer.parseInt(adminUser);
 						cs.setAdminUser(adminUser2);
@@ -230,7 +232,7 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_adminUser() throws RecognitionException, TokenStreamException {
+	public final String  __xml_assets() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -253,6 +255,29 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
+	public final String  __xml_adminUser() throws RecognitionException, TokenStreamException {
+		String value = null;
+		
+		Token  __xml_startTag = null;
+		Token  pcdata = null;
+		
+		try {      // for error handling
+			__xml_startTag = LT(1);
+			match(12);
+			{
+			pcdata = LT(1);
+			match(PCDATA);
+			value = pcdata.getText();
+			}
+			match(XML_END_TAG);
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_5);
+		}
+		return value;
+	}
+	
 	public final void __xml_connectOnStartup(
 		CampingSystem cs
 	) throws RecognitionException, TokenStreamException {
@@ -262,7 +287,7 @@ public ConfigParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(18);
+			match(19);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -279,7 +304,7 @@ public ConfigParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_5);
+			recover(ex,_tokenSet_6);
 		}
 	}
 	
@@ -326,29 +351,6 @@ public ConfigParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			__xml_startTag = LT(1);
-			match(12);
-			{
-			pcdata = LT(1);
-			match(PCDATA);
-			value = pcdata.getText();
-			}
-			match(XML_END_TAG);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_6);
-		}
-		return value;
-	}
-	
-	public final String  __xml_dbPort() throws RecognitionException, TokenStreamException {
-		String value = null;
-		
-		Token  __xml_startTag = null;
-		Token  pcdata = null;
-		
-		try {      // for error handling
-			__xml_startTag = LT(1);
 			match(13);
 			{
 			pcdata = LT(1);
@@ -364,7 +366,7 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_dbUser() throws RecognitionException, TokenStreamException {
+	public final String  __xml_dbPort() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -387,7 +389,7 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_dbPass() throws RecognitionException, TokenStreamException {
+	public final String  __xml_dbUser() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -410,7 +412,7 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_dbDb() throws RecognitionException, TokenStreamException {
+	public final String  __xml_dbPass() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -433,7 +435,7 @@ public ConfigParser(ParserSharedInputState state) {
 		return value;
 	}
 	
-	public final String  __xml_dbDriver() throws RecognitionException, TokenStreamException {
+	public final String  __xml_dbDb() throws RecognitionException, TokenStreamException {
 		String value = null;
 		
 		Token  __xml_startTag = null;
@@ -442,6 +444,29 @@ public ConfigParser(ParserSharedInputState state) {
 		try {      // for error handling
 			__xml_startTag = LT(1);
 			match(17);
+			{
+			pcdata = LT(1);
+			match(PCDATA);
+			value = pcdata.getText();
+			}
+			match(XML_END_TAG);
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_11);
+		}
+		return value;
+	}
+	
+	public final String  __xml_dbDriver() throws RecognitionException, TokenStreamException {
+		String value = null;
+		
+		Token  __xml_startTag = null;
+		Token  pcdata = null;
+		
+		try {      // for error handling
+			__xml_startTag = LT(1);
+			match(18);
 			{
 			pcdata = LT(1);
 			match(PCDATA);
@@ -469,6 +494,7 @@ public ConfigParser(ParserSharedInputState state) {
 		"\"<token>\"",
 		"PCDATA",
 		"\"<botUsername>\"",
+		"\"<assets>\"",
 		"\"<adminUser>\"",
 		"\"<dbHost>\"",
 		"\"<dbPort>\"",
@@ -495,22 +521,22 @@ public ConfigParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 264352L, 0L};
+		long[] data = { 2048L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 262304L, 0L};
+		long[] data = { 528544L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
 	private static final long[] mk_tokenSet_5() {
-		long[] data = { 160L, 0L};
+		long[] data = { 524448L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 8192L, 0L};
+		long[] data = { 160L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
@@ -534,5 +560,10 @@ public ConfigParser(ParserSharedInputState state) {
 		return data;
 	}
 	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
+	private static final long[] mk_tokenSet_11() {
+		long[] data = { 262144L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
 	
 	}

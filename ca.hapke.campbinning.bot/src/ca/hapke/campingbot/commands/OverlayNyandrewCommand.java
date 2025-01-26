@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.madgag.gif.fmsware.AnimatedGifEncoder;
 
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -37,7 +38,6 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 	private static final SlashCommandType SlashNyandrew = new SlashCommandType(OVERLAY_NYANDREW, "nyandrew",
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashNyandrew };
-	private static final String FOLDER_NAME = "assets";
 	private static final String[] OVERLAY_FILENAMES = { "nyandrew1.png", "nyandrew2.png" };
 	private CampingBot bot;
 	private Image[] overlays;
@@ -110,7 +110,7 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 			for (int i = 0; i < qty; i++) {
 				String filename = OVERLAY_FILENAMES[i];
 
-				Sprite overlay = cache.getImage(FOLDER_NAME, filename);
+				Sprite overlay = cache.getImage(CampingSystem.getInstance().getAssetsFolder(), filename);
 				newOverlays[i] = overlay.getFrame(0);
 			}
 			this.overlays = newOverlays;

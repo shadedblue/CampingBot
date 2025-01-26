@@ -18,17 +18,19 @@ document[ CampingSystem cs]
 
 <system> [CampingSystem cs]
 	{ 
-		String token,botUsername,adminUser = null; 
+		String token,botUsername,adminUser = null,assets=null; 
 	}
 	:
 	 token=<token>
 	 botUsername=<botUsername>
+	 assets=<assets>
 	(adminUser=<adminUser>)?
 	(<connectOnStartup>[cs])?
 	(<db>[cs]) ?
 	{
 		cs.setToken(token);
 		cs.setBotUsername(botUsername);
+		cs.setAssetsFolder(assets);
 		if (adminUser != null && !"null".equalsIgnoreCase(adminUser)) {
 			int adminUser2 = Integer.parseInt(adminUser);
 			cs.setAdminUser(adminUser2);
@@ -59,6 +61,9 @@ document[ CampingSystem cs]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <botUsername> returns [String value = null]
+    :   pcdata:PCDATA { value = pcdata.getText(); }
+    ;
+<assets> returns [String value = null]
     :   pcdata:PCDATA { value = pcdata.getText(); }
     ;
 <adminUser> returns [String value = null]

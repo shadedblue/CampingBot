@@ -55,13 +55,7 @@ public class ImageCache {
 
 				} else if (Objects.equals(protocol, "file")) {
 					File f;
-					f = searchFilesystem(folder, filename);
-					if (f == null) {
-						f = searchViaClassloader(folder, filename);
-					}
-					if (f == null) {
-						return null;
-					}
+					f = new File(folder + File.separator + filename);
 					try {
 						if (!isGif(f)) {
 							BufferedImage image = ImageIO.read(f);
@@ -71,7 +65,7 @@ public class ImageCache {
 
 						} else {
 							// load animated gif frames
-							ImageReader reader = (ImageReader) ImageIO.getImageReadersByFormatName(GIF).next();
+							ImageReader reader = ImageIO.getImageReadersByFormatName(GIF).next();
 							ImageInputStream iis = ImageIO.createImageInputStream(f);
 							reader.setInput(iis, false);
 							int numFrames = reader.getNumImages(true);

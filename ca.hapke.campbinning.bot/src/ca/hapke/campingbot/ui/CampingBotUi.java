@@ -117,7 +117,7 @@ public abstract class CampingBotUi extends JFrame {
 	}
 
 	private static final String CAMPING_BOT = "Camping Bot";
-	public static final String BUILD_DATE = "2024-12-21.2";
+	public static final String BUILD_DATE = "2025-01-25";
 	private static final long serialVersionUID = -4742415703187806424L;
 	private JPanel contentPane;
 

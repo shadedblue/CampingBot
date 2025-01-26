@@ -20,15 +20,17 @@ public class CampingSystem {
 	}
 
 	private String dbHost, dbUser, dbPass;
+	private String dbDb;
+	private String dbDriver;
 	private int dbPort = -1;
+
 	private int adminUser = -1;
 
 	private String token;
 	private String botUsername;
 	private boolean dbEnabled = false;
 	private boolean connectOnStartup = false;
-	private String dbDb;
-	private String dbDriver;
+	private String assetsFolder;
 
 	public String getDbHost() {
 		return dbHost;
@@ -100,6 +102,15 @@ public class CampingSystem {
 	public void setBotUsername(String botUsername) {
 		if (this.botUsername == null)
 			this.botUsername = botUsername;
+	}
+
+	public String getAssetsFolder() {
+		return assetsFolder;
+	}
+
+	public void setAssetsFolder(String assetsFolder) {
+		if (this.assetsFolder == null)
+			this.assetsFolder = assetsFolder;
 	}
 
 	public boolean isConnectOnStartup() {

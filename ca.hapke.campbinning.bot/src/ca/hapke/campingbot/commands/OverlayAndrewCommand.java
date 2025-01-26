@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
+import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -31,7 +32,6 @@ public class OverlayAndrewCommand extends AbstractCommand implements TextCommand
 	private static final SlashCommandType SlashAndrew = new SlashCommandType(OVERLAY_ANDREW, "andrew",
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAndrew };
-	private static final String FOLDER_NAME = "assets";
 	private static final String OVERLAY_FILENAME = "andrew.png";
 	private CampingBot bot;
 	private Image andrew;
@@ -91,7 +91,7 @@ public class OverlayAndrewCommand extends AbstractCommand implements TextCommand
 	private Image getAndrew() {
 		if (andrew == null) {
 			ImageCache cache = ImageCache.getInstance();
-			Sprite overlay = cache.getImage(FOLDER_NAME, OVERLAY_FILENAME);
+			Sprite overlay = cache.getImage(CampingSystem.getInstance().getAssetsFolder(), OVERLAY_FILENAME);
 			andrew = overlay.getFrame(0);
 		}
 		return andrew;
