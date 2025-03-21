@@ -117,7 +117,7 @@ public abstract class CampingBotUi extends JFrame {
 	}
 
 	private static final String CAMPING_BOT = "Camping Bot";
-	public static final String BUILD_DATE = "2025-01-25";
+	public static final String BUILD_DATE = "2025-03-21";
 	private static final long serialVersionUID = -4742415703187806424L;
 	private JPanel contentPane;
 
@@ -268,7 +268,7 @@ public abstract class CampingBotUi extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (CampingSystem.getInstance().canConnect()) {
-					bot.connect();
+					bot.connect(1);
 				} else {
 					JOptionPane.showMessageDialog(CampingBotUi.this,
 							"Cannot connect without the bot's username and token", "Failure",
@@ -619,9 +619,9 @@ public abstract class CampingBotUi extends JFrame {
 		}
 
 		@Override
-		public void statusOnline() {
+		public void statusOnline(int attemptNumber) {
 			btnConnect.setEnabled(false);
-			connected = ONLINE;
+			connected = ONLINE + "(Attempt #" + attemptNumber + ")";
 			statusChanged();
 		}
 
@@ -633,9 +633,9 @@ public abstract class CampingBotUi extends JFrame {
 		}
 
 		@Override
-		public void connectFailed(TelegramApiException e) {
+		public void connectFailed(int attemptNumber, TelegramApiException e) {
 			btnConnect.setEnabled(true);
-			connected = "Connect Failed: " + e.getMessage();
+			connected = "Connect Failed: (Attempt #" + attemptNumber + ")" + e.getMessage();
 			statusChanged();
 		}
 

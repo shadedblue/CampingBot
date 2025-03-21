@@ -50,7 +50,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public void statusOnline() {
+	public void statusOnline(int attemptNumber) {
 		onlineTime = ZonedDateTime.now();
 	}
 
@@ -59,7 +59,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public void connectFailed(TelegramApiException e) {
+	public void connectFailed(int attemptNumber, TelegramApiException e) {
 		onlineTime = null;
 	}
 

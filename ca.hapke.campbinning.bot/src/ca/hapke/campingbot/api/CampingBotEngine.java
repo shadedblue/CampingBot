@@ -102,7 +102,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 
 		@Override
-		public void statusOnline() {
+		public void statusOnline(int attemptNumber) {
 			online = true;
 		}
 
@@ -111,7 +111,7 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 
 		@Override
-		public void connectFailed(TelegramApiException e) {
+		public void connectFailed(int attemptNumber, TelegramApiException e) {
 			online = false;
 		}
 	}
@@ -147,7 +147,20 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 			new Thread("ConnectOnStartup") {
 				@Override
 				public void run() {
-					connect();
+					boolean success;
+					int i = 1;
+					while (true) {
+						success = connect(i);
+						if (success || i > 10)
+							break;
+						i++;
+						try {
+							Thread.sleep(5000L * i);
+						} catch (InterruptedException e) {
+							break;
+						}
+					}
+
 				}
 			}.start();
 		}
@@ -161,17 +174,19 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		}
 	}
 
-	public void connect() {
+	public boolean connect(int attemptNumber) {
 		try {
 			TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
 			api.registerBot(this);
 			for (IStatus status : statusMonitors) {
-				status.statusOnline();
+				status.statusOnline(attemptNumber);
 			}
+			return true;
 		} catch (TelegramApiException e) {
 			for (IStatus status : statusMonitors) {
-				status.connectFailed(e);
+				status.connectFailed(attemptNumber, e);
 			}
+			return false;
 		}
 	}
 

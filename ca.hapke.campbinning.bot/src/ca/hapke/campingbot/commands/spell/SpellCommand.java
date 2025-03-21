@@ -65,7 +65,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		this.bot = bot;
 		bot.addStatusUpdate(new IStatus() {
 			@Override
-			public void statusOnline() {
+			public void statusOnline(int attemptNumber) {
 			}
 
 			@Override
@@ -78,7 +78,7 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 			}
 
 			@Override
-			public void connectFailed(TelegramApiException e) {
+			public void connectFailed(int attemptNumber, TelegramApiException e) {
 			}
 		});
 		castManager = new SpellCastingManager(bot);

@@ -10,9 +10,9 @@ import ca.hapke.campingbot.users.CampingUser;
 public interface IStatus {
 	public void statusOffline();
 
-	public void statusOnline();
+	public void statusOnline(int attemptNumber);
 
 	public void statusMeProvided(CampingUser me);
 
-	public void connectFailed(TelegramApiException e);
+	public void connectFailed(int attemptNumber, TelegramApiException e);
 }
