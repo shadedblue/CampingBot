@@ -16,7 +16,7 @@ import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.FuckMeCommand;
 import ca.hapke.campingbot.commands.HypeCommand;
-import ca.hapke.campingbot.commands.IunnoCommand;
+import ca.hapke.campingbot.commands.GifsOfUsCommand;
 import ca.hapke.campingbot.commands.MbiyfCommand;
 import ca.hapke.campingbot.commands.OpinionCommand;
 import ca.hapke.campingbot.commands.OverlayAndrewCommand;
@@ -61,7 +61,7 @@ public class CampingBot extends CampingBotEngine {
 	private PleasureModelCommand pleasureCommand;
 	private FuckMeCommand fuCommand;
 	private EnhanceCommand enhanceCommand;
-	private IunnoCommand iunnoCommand;
+	private GifsOfUsCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
 	private AmpDetectorCommand ampCommand;
 
@@ -101,7 +101,7 @@ public class CampingBot extends CampingBotEngine {
 		pleasureCommand = new PleasureModelCommand(this);
 		fuCommand = new FuckMeCommand(this);
 		enhanceCommand = new EnhanceCommand(this);
-		iunnoCommand = new IunnoCommand(this);
+		iunnoCommand = new GifsOfUsCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
 		ampCommand = new AmpDetectorCommand();
 		andrewCommand = new OverlayAndrewCommand(this);
