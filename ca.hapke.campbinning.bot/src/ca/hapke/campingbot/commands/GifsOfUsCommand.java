@@ -21,11 +21,12 @@ import ca.hapke.campingbot.util.ImageLink;
 public class GifsOfUsCommand extends AbstractCommand implements SlashCommand {
 	//@formatter:off
 	private static final String[][] inputs = { 
-			{ "GifsUs:Iunno", "iunno", "http://www.hapke.ca/images/iunno.gif" }, 
-			{ "GifsUs:JamiesonMaybe", "maybe", "http://www.hapke.ca/images/jamieson-maybe.mp4" } ,
-			{ "GifsUs:JakeK", "k", "http://www.hapke.ca/images/jake-k.mp4" }, 
-			{ "GifsUs:ReubenLesbians", "lesbians", "http://www.hapke.ca/images/reuben-lesbians.mp4" } ,
-			{ "GifsUs:NateUgh", "ugh", "http://www.hapke.ca/images/nate-ugh.mp4" } 
+			{ "GifsUs:Iunno",			"iunno", 		"http://www.hapke.ca/images/iunno.gif" }, 
+			{ "GifsUs:JamiesonMaybe", 	"maybe", 		"http://www.hapke.ca/images/jamieson-maybe.mp4" },
+			{ "GifsUs:JakeK", 			"k", 			"http://www.hapke.ca/images/jake-k.mp4" }, 
+			{ "GifsUs:ReubenLesbians", 	"lesbians", 	"http://www.hapke.ca/images/reuben-lesbians.mp4" },
+			{ "GifsUs:NateUgh", 		"ugh", 			"http://www.hapke.ca/images/nate-ugh.mp4" }, 
+			{ "GifsUs:JustinYeah", 		"yeah", 		"http://www.hapke.ca/images/justin-yeah.mp4" } 
 	};
 	//@formatter:on
 	private static final SlashCommandType[] SLASH_COMMANDS;
