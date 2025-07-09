@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.commands;
+package ca.hapke.campingbot.commands.overlays;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -20,6 +20,7 @@ import com.madgag.gif.fmsware.AnimatedGifEncoder;
 
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.CampingSystem;
+import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -29,9 +30,12 @@ import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageCache;
+import ca.hapke.campingbot.util.ImageCache.Sprite;
 import ca.hapke.campingbot.util.ImageLink;
-import ca.hapke.campingbot.util.Sprite;
 
+/**
+ * @author Nathan Hapke
+ */
 public class OverlayNyandrewCommand extends AbstractCommand implements TextCommand, SlashCommand {
 
 	private static final String OVERLAY_NYANDREW = "OverlayNyandrew";
@@ -42,10 +46,10 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 	private CampingBot bot;
 	private Image[] overlays;
 
-	private static final int FRAME_HOLD_LENGTH = 3;
-	private static final int RESULT_WIDTH = 300;
+	public static final int FRAME_HOLD_LENGTH = 3;
+	public static final int RESULT_WIDTH = 300;
 	private static final int ANDREW_WIDTH = RESULT_WIDTH;
-	private static final int STEP_DELTA = 10;
+	public static final int STEP_DELTA = 10;
 
 	public OverlayNyandrewCommand(CampingBot bot) {
 		this.bot = bot;

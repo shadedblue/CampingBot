@@ -1,4 +1,4 @@
-package ca.hapke.campingbot.commands;
+package ca.hapke.campingbot.commands.overlays;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.CampingSystem;
+import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -25,8 +26,11 @@ import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageCache;
-import ca.hapke.campingbot.util.Sprite;
+import ca.hapke.campingbot.util.ImageCache.Sprite;
 
+/**
+ * @author Nathan Hapke
+ */
 public class OverlayAndrewCommand extends AbstractCommand implements TextCommand, SlashCommand {
 	private static final String OVERLAY_ANDREW = "OverlayAndrew";
 	private static final SlashCommandType SlashAndrew = new SlashCommandType(OVERLAY_ANDREW, "andrew",
