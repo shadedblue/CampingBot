@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import ca.hapke.campingbot.util.ImageCache;
-import ca.hapke.campingbot.util.ImageCache.Sprite;
+import ca.hapke.campingbot.util.Sprite;
 
 
 /*-
@@ -137,6 +137,18 @@ public class PictureBox extends JLabel {
 	public void setImage(String folder, String filename) {
 		try {
 			s = cache.getImage(folder, filename);
+			if (s == null)
+				return;
+			s.scale(boxWidth, boxHeight);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+
+	public void setImage(Sprite sprite) {
+		try {
+			s = sprite;
 			if (s == null)
 				return;
 			s.scale(boxWidth, boxHeight);

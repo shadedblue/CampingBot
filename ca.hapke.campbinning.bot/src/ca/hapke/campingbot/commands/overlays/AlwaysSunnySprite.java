@@ -4,7 +4,7 @@ import java.awt.Image;
 
 import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.util.ImageCache;
-import ca.hapke.campingbot.util.ImageCache.Sprite;
+import ca.hapke.campingbot.util.Sprite;
 
 /**
  * @author Nathan Hapke

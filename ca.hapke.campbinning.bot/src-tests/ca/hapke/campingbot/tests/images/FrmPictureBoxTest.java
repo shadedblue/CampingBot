@@ -5,11 +5,15 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
+import ca.hapke.campingbot.util.ImageCache;
+import ca.hapke.campingbot.util.Sprite;
 
 /**
  * @author Mr. Hapke
@@ -17,11 +21,9 @@ import javax.swing.border.LineBorder;
 public class FrmPictureBoxTest extends JFrame {
 
 	private static final long serialVersionUID = 8643869947757940158L;
-	private static final String FOLDER1 = "images";
-	private static final String FOLDER2 = "pics 2";
-	private String[] FOLDERS = new String[] { FOLDER1, FOLDER1, FOLDER1, FOLDER1, FOLDER1, FOLDER1, FOLDER2 };
-	private String[] IMAGES = new String[] { "fire-32.gif", "me-golf.jpg", "bowserTip64.png", "fireball_32.png",
-			"flower_32.png", "mushroom_32.png", "sunset.jpg" };
+	private static final String FOLDER = "assets";
+	private String[] FOLDERS = new String[] { FOLDER };
+	private String[] IMAGES = new String[] { "andrew.png" };
 	private int i = 0;
 	private PictureBox picTest;
 
@@ -52,13 +54,16 @@ public class FrmPictureBoxTest extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[] { 355, 0 };
-		gbl_contentPane.rowHeights = new int[] { 204, 204, 0 };
-		gbl_contentPane.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_contentPane.rowWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
+		gbl_contentPane.columnWidths = new int[] { 0 };
+		gbl_contentPane.rowHeights = new int[] { 0 };
+		gbl_contentPane.columnWeights = new double[] { 0.0 };
+		gbl_contentPane.rowWeights = new double[] { 1.0 };
 		contentPane.setLayout(gbl_contentPane);
 
-		picTest = new PictureBox(this, FOLDERS[0], IMAGES[0]);
+		String folder = FOLDERS[0];
+		String file = IMAGES[0];
+		picTest = new PictureBox(this, folder, file);
+		Sprite originalImg = ImageCache.getInstance().getImage(folder, file);
 		picTest.setBorder(new LineBorder(new Color(0, 0, 0)));
 		picTest.setCustomBorder(5, Color.cyan);
 		GridBagConstraints gbc_picTest = new GridBagConstraints();
@@ -70,6 +75,9 @@ public class FrmPictureBoxTest extends JFrame {
 		gbc_picTest.gridx = 0;
 		gbc_picTest.gridy = 0;
 		contentPane.add(picTest, gbc_picTest);
+
+		File outImg = File.createTempFile("silly-image", ".gif");
+		overlayAlwaysSunny(originalImg, spriteSet, outImg);
 
 	}
 }

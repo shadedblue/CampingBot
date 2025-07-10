@@ -44,7 +44,8 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 
 	//@formatter:off
 	private static final AlwaysSunnySprite[][] spriteSets = {
-		{ new AlwaysSunnySprite("sunny-charlie.png", 0.4, 0.5) } 
+		{ new AlwaysSunnySprite("sunny-restaurant-charlie.png", 0.4, 0.5),
+		  new AlwaysSunnySprite("sunny-restaurant-mac.png"    , 0.4, 0.5)} 
 	};
 
 	//@formatter:on

@@ -30,8 +30,8 @@ import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageCache;
-import ca.hapke.campingbot.util.ImageCache.Sprite;
 import ca.hapke.campingbot.util.ImageLink;
+import ca.hapke.campingbot.util.Sprite;
 
 /**
  * @author Nathan Hapke
