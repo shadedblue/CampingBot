@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.io.File;
 
@@ -12,20 +13,22 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import ca.hapke.campingbot.CampingSystem;
+import ca.hapke.campingbot.commands.overlays.AlwaysSunnySprite;
+import ca.hapke.campingbot.commands.overlays.OverlayAlwaysSunnyCommand;
 import ca.hapke.campingbot.util.ImageCache;
 import ca.hapke.campingbot.util.Sprite;
 
 /**
  * @author Mr. Hapke
  */
-public class FrmPictureBoxTest extends JFrame {
+public class FrmAlwaysSunnyTest extends JFrame {
 
 	private static final long serialVersionUID = 8643869947757940158L;
 	private static final String FOLDER = "assets";
-	private String[] FOLDERS = new String[] { FOLDER };
-	private String[] IMAGES = new String[] { "andrew.png" };
-	private int i = 0;
+	private static final String FILENAME = "andrew.png";
 	private PictureBox picTest;
+	private File resultFile;
 
 	/**
 	 * Launch the application.
@@ -35,7 +38,7 @@ public class FrmPictureBoxTest extends JFrame {
 			@Override
 			public void run() {
 				try {
-					FrmPictureBoxTest frame = new FrmPictureBoxTest();
+					FrmAlwaysSunnyTest frame = new FrmAlwaysSunnyTest();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -44,10 +47,9 @@ public class FrmPictureBoxTest extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
-	public FrmPictureBoxTest() {
+	public FrmAlwaysSunnyTest() throws Exception {
+		CampingSystem.getInstance().setAssetsFolder(FOLDER);
+
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 381, 457);
 		JPanel contentPane = new JPanel();
@@ -60,10 +62,9 @@ public class FrmPictureBoxTest extends JFrame {
 		gbl_contentPane.rowWeights = new double[] { 1.0 };
 		contentPane.setLayout(gbl_contentPane);
 
-		String folder = FOLDERS[0];
-		String file = IMAGES[0];
-		picTest = new PictureBox(this, folder, file);
-		Sprite originalImg = ImageCache.getInstance().getImage(folder, file);
+		picTest = new PictureBox(this, FOLDER, FILENAME);
+		Sprite originalSprite = ImageCache.getInstance().getImage(FOLDER, FILENAME);
+		Image originalImg = originalSprite.getFirstFrame();
 		picTest.setBorder(new LineBorder(new Color(0, 0, 0)));
 		picTest.setCustomBorder(5, Color.cyan);
 		GridBagConstraints gbc_picTest = new GridBagConstraints();
@@ -76,8 +77,13 @@ public class FrmPictureBoxTest extends JFrame {
 		gbc_picTest.gridy = 0;
 		contentPane.add(picTest, gbc_picTest);
 
-		File outImg = File.createTempFile("silly-image", ".gif");
-		overlayAlwaysSunny(originalImg, spriteSet, outImg);
-
+		resultFile = File.createTempFile("silly-image", ".gif");
+//		System.out.println("Using Temp file: " + resultFile.toString());
+		resultFile.deleteOnExit();
+		AlwaysSunnySprite[] overlaySet = OverlayAlwaysSunnyCommand.SPRITE_SETS[0];
+		OverlayAlwaysSunnyCommand.overlayAlwaysSunny(originalImg, overlaySet, resultFile);
+		String resultKey = "sunny-overlayed";
+		Sprite resultSprite = ImageCache.loadGif(resultKey, resultFile);
+		picTest.setImage(resultSprite);
 	}
 }

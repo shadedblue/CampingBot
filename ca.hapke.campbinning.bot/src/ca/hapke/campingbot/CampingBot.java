@@ -33,6 +33,7 @@ import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.inline.HideItCommand;
 import ca.hapke.campingbot.commands.inline.NicknameCommand;
+import ca.hapke.campingbot.commands.overlays.OverlayAlwaysSunnyCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayAndrewCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayNyandrewCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
@@ -87,6 +88,7 @@ public class CampingBot extends CampingBotEngine {
 	private HappyNewYearEvent happyNewYearEvent;
 	private OverlayAndrewCommand andrewCommand;
 	private OverlayNyandrewCommand nyandrewCommand;
+	private OverlayAlwaysSunnyCommand alwaysSunnyCommand;
 
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
 			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
@@ -106,6 +108,7 @@ public class CampingBot extends CampingBotEngine {
 		ampCommand = new AmpDetectorCommand();
 		andrewCommand = new OverlayAndrewCommand(this);
 		nyandrewCommand = new OverlayNyandrewCommand(this);
+		alwaysSunnyCommand = new OverlayAlwaysSunnyCommand(this);
 
 		ballsCommand = new MbiyfCommand(this, res);
 		processor.addAtEnd(ballsCommand.getCrazyCase());
@@ -170,6 +173,7 @@ public class CampingBot extends CampingBotEngine {
 //		addCommand(afdDicks);
 		addCommand(andrewCommand);
 		addCommand(nyandrewCommand);
+		addCommand(alwaysSunnyCommand);
 
 //		addEvent(afdEnabler);
 		addEvent(databaseConsumer);

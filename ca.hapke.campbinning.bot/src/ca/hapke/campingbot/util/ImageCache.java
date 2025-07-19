@@ -49,10 +49,7 @@ public class ImageCache {
 			try {
 				if (Objects.equals(protocol, "jar")) {
 					InputStream in = searchJar(folder, filename);
-					BufferedImage image = ImageIO.read(in);
-					if (image != null) {
-						sprite = new Sprite(key, image);
-					}
+					sprite = loadStaticImage(key, in);
 
 				} else if (Objects.equals(protocol, "file")) {
 					File f;
@@ -62,32 +59,9 @@ public class ImageCache {
 					}
 					try {
 						if (!isGif(f)) {
-							BufferedImage image = ImageIO.read(f);
-							if (image != null)
-								sprite = new Sprite(key, image);
-
+							sprite = loadStaticImage(key, f);
 						} else {
-							// load animated gif frames
-							ImageReader reader = ImageIO.getImageReadersByFormatName(GIF).next();
-							ImageInputStream iis = ImageIO.createImageInputStream(f);
-							reader.setInput(iis, false);
-							int numFrames = reader.getNumImages(true);
-							if (numFrames > 0) {
-								Image[] images = new Image[numFrames];
-								int[] delays = new int[numFrames];
-								for (int i = 0; i < numFrames; i++) {
-									BufferedImage frame = reader.read(i);
-									images[i] = frame;
-									IIOMetadataNode root = (IIOMetadataNode) reader.getImageMetadata(i)
-											.getAsTree("javax_imageio_gif_image_1.0");
-									IIOMetadataNode gce = (IIOMetadataNode) root
-											.getElementsByTagName("GraphicControlExtension").item(0);
-
-									int delay = Integer.valueOf(gce.getAttribute("delayTime"));
-									delays[i] = delay;
-								}
-								sprite = new Sprite(key, images, delays);
-							}
+							sprite = loadGif(key, f);
 						}
 					} catch (Exception e) {
 					}
@@ -100,6 +74,46 @@ public class ImageCache {
 		}
 
 		return sprite;
+	}
+
+	public static Sprite loadGif(String key, File f) throws IOException {
+		// load animated gif frames
+		ImageReader reader = ImageIO.getImageReadersByFormatName(GIF).next();
+		ImageInputStream iis = ImageIO.createImageInputStream(f);
+		reader.setInput(iis, false);
+		int numFrames = reader.getNumImages(true);
+		if (numFrames > 0) {
+			Image[] images = new Image[numFrames];
+			int[] delays = new int[numFrames];
+			for (int i = 0; i < numFrames; i++) {
+				BufferedImage frame = reader.read(i);
+				images[i] = frame;
+				IIOMetadataNode root = (IIOMetadataNode) reader.getImageMetadata(i)
+						.getAsTree("javax_imageio_gif_image_1.0");
+				IIOMetadataNode gce = (IIOMetadataNode) root.getElementsByTagName("GraphicControlExtension").item(0);
+
+				int delay = Integer.valueOf(gce.getAttribute("delayTime"));
+				delays[i] = delay;
+			}
+			return new Sprite(key, images, delays);
+		}
+		return null;
+	}
+
+	public static Sprite loadStaticImage(String key, File f) throws IOException {
+		BufferedImage image = ImageIO.read(f);
+		if (image != null)
+			return new Sprite(key, image);
+		else
+			return null;
+	}
+
+	public static Sprite loadStaticImage(String key, InputStream in) throws IOException {
+		BufferedImage image = ImageIO.read(in);
+		if (image != null) {
+			return new Sprite(key, image);
+		}
+		return null;
 	}
 
 	public static Image scaleToTileSize(Image image, int tileSize) {
@@ -204,7 +218,7 @@ public class ImageCache {
 		return null;
 	}
 
-	private static String getFilenameKey(String folder, String filename) {
+	public static String getFilenameKey(String folder, String filename) {
 		return folder + DELIMITER + filename;
 	}
 }

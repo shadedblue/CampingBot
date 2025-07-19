@@ -125,19 +125,17 @@ public class Sprite {
 		}
 	}
 
-	private Image getFirstFrame() {
+	public Image getFirstFrame() {
 		if (scaledFrames == null)
 			return null;
 
-		Image firstFrame = null;
 		for (int i = 0; i < scaledFrames.length; i++) {
 			Image f = scaledFrames[i];
 			if (f != null) {
-				firstFrame = f;
-				break;
+				return f;
 			}
 		}
-		return firstFrame;
+		return null;
 	}
 
 	public int getWidth() {

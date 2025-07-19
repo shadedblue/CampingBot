@@ -43,9 +43,12 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 	public static final int FRAME_HOLD_LENGTH = 15;
 
 	//@formatter:off
-	private static final AlwaysSunnySprite[][] spriteSets = {
-		{ new AlwaysSunnySprite("sunny-restaurant-charlie.png", 0.4, 0.5),
-		  new AlwaysSunnySprite("sunny-restaurant-mac.png"    , 0.4, 0.5)} 
+	public static final AlwaysSunnySprite[] RESTAURANT_SET = { 
+			new AlwaysSunnySprite("sunny-restaurant-charlie.png", 1d, 0.5d),
+			new AlwaysSunnySprite("sunny-restaurant-mac.png",     0d, 0.5d)
+	};
+	public static final AlwaysSunnySprite[][] SPRITE_SETS = {
+		RESTAURANT_SET 
 	};
 
 	//@formatter:on
@@ -70,8 +73,8 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		String picFileId = EnhanceCommand.getPictureFileId(replyTo);
 		if (picFileId != null) {
 			try {
-				int index = (int) (spriteSets.length * Math.random());
-				AlwaysSunnySprite[] spriteSet = spriteSets[index];
+				int index = (int) (SPRITE_SETS.length * Math.random());
+				AlwaysSunnySprite[] spriteSet = SPRITE_SETS[index];
 				GetFile get = new GetFile(picFileId);
 				File in = null;
 				in = bot.downloadFile(bot.execute(get));
@@ -103,7 +106,7 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		OutputStream outputStream = new FileOutputStream(f);
 		AnimatedGifEncoder encoder = new AnimatedGifEncoder();
 		encoder.start(outputStream);
-		encoder.setDelay(40);
+		encoder.setDelay(10000);
 		// continuous
 		encoder.setRepeat(0);
 		encoder.setQuality(5);
@@ -112,39 +115,21 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		int w = baseScaled.getWidth(null);
 		int h = baseScaled.getHeight(null);
 
-		Image[] overlaysScaled = new Image[overlays.length];
 		for (int i = 0; i < overlays.length; i++) {
 			AlwaysSunnySprite sprite = overlays[i];
 			int scaledHeight = (int) (h * sprite.heightPct);
 			Image overlayImage = sprite.getImage();
 
-			Image scaled = ImageCache.scaleToTileSize(overlayImage, scaledHeight);
-			overlaysScaled[i] = scaled;
-		}
+			Image overlayScaled = ImageCache.scaleToTileSize(overlayImage, scaledHeight);
 
-		int overlayIndex = 0;
-		int frameIndex = 0;
-
-		for (int i = 0; i < overlays.length; i++) {
-			AlwaysSunnySprite sprite = overlays[i];
-
-			Image scaled = overlaysScaled[i];
-			int hScaled = scaled.getHeight(null);
-			int wScaled = scaled.getWidth(null);
+			int hScaled = overlayScaled.getHeight(null);
+			int wScaled = overlayScaled.getWidth(null);
 			int yLoc = (h - hScaled);
 			int x = (int) ((w - wScaled) * sprite.locationPct);
 			BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 			Graphics gfx = img.getGraphics();
 			gfx.drawImage(baseScaled, 0, 0, Color.white, null);
-			Image overlayScaled = overlaysScaled[overlayIndex];
-			frameIndex++;
-			if (frameIndex >= FRAME_HOLD_LENGTH) {
-				frameIndex = 0;
-				overlayIndex++;
-				if (overlayIndex >= overlaysScaled.length) {
-					overlayIndex = 0;
-				}
-			}
+
 			gfx.drawImage(overlayScaled, x, yLoc, null, null);
 			gfx.dispose();
 			img.flush();
