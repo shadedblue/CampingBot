@@ -40,14 +40,12 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAs };
 	private CampingBot bot;
 
-	public static final int FRAME_HOLD_LENGTH = 15;
-
 	//@formatter:off
-	public static final AlwaysSunnySprite[] RESTAURANT_SET = { 
+	public static final AlwaysSunnyOverlaySet RESTAURANT_SET = new AlwaysSunnyOverlaySet(2000,
 			new AlwaysSunnySprite("sunny-restaurant-charlie.png", 1d, 0.5d),
 			new AlwaysSunnySprite("sunny-restaurant-mac.png",     0d, 0.5d)
-	};
-	public static final AlwaysSunnySprite[][] SPRITE_SETS = {
+	);
+	public static final AlwaysSunnyOverlaySet[] SPRITE_SETS = {
 		RESTAURANT_SET 
 	};
 
@@ -74,7 +72,7 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		if (picFileId != null) {
 			try {
 				int index = (int) (SPRITE_SETS.length * Math.random());
-				AlwaysSunnySprite[] spriteSet = SPRITE_SETS[index];
+				AlwaysSunnyOverlaySet spriteSet = SPRITE_SETS[index];
 				GetFile get = new GetFile(picFileId);
 				File in = null;
 				in = bot.downloadFile(bot.execute(get));
@@ -102,11 +100,12 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		return null;
 	}
 
-	public static void overlayAlwaysSunny(Image baseOriginal, AlwaysSunnySprite[] overlays, File f) throws Exception {
+	public static void overlayAlwaysSunny(Image baseOriginal, AlwaysSunnyOverlaySet overlaySet, File f)
+			throws Exception {
 		OutputStream outputStream = new FileOutputStream(f);
 		AnimatedGifEncoder encoder = new AnimatedGifEncoder();
 		encoder.start(outputStream);
-		encoder.setDelay(10000);
+		encoder.setDelay(overlaySet.delay);
 		// continuous
 		encoder.setRepeat(0);
 		encoder.setQuality(5);
@@ -115,6 +114,7 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		int w = baseScaled.getWidth(null);
 		int h = baseScaled.getHeight(null);
 
+		AlwaysSunnySprite[] overlays = overlaySet.sprites;
 		for (int i = 0; i < overlays.length; i++) {
 			AlwaysSunnySprite sprite = overlays[i];
 			int scaledHeight = (int) (h * sprite.heightPct);
