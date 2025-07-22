@@ -158,6 +158,7 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 				boolean outputCreated = outImg.exists();
 				if (outputCreated) {
 					ImageCommandResult icr = new ImageCommandResult(command, outImg);
+					icr.setReplyTo(replyTo.getMessageId());
 					icr.setFileType(ImageLink.GIF);
 					return icr;
 				} else {
