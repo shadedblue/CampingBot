@@ -15,7 +15,6 @@ import javax.swing.border.LineBorder;
 
 import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.commands.overlays.AlwaysSunnyOverlaySet;
-import ca.hapke.campingbot.commands.overlays.AlwaysSunnySprite;
 import ca.hapke.campingbot.commands.overlays.OverlayAlwaysSunnyCommand;
 import ca.hapke.campingbot.util.ImageCache;
 import ca.hapke.campingbot.util.Sprite;
@@ -79,9 +78,9 @@ public class FrmAlwaysSunnyTest extends JFrame {
 		contentPane.add(picTest, gbc_picTest);
 
 		resultFile = File.createTempFile("silly-image", ".gif");
-//		System.out.println("Using Temp file: " + resultFile.toString());
+		System.out.println("Using Temp file: " + resultFile.toString());
 		resultFile.deleteOnExit();
-		AlwaysSunnyOverlaySet overlaySet = OverlayAlwaysSunnyCommand.SPRITE_SETS[0];
+		AlwaysSunnyOverlaySet overlaySet = OverlayAlwaysSunnyCommand.PEPE_SILVIE_SET;
 		OverlayAlwaysSunnyCommand.overlayAlwaysSunny(originalImg, overlaySet, resultFile);
 		String resultKey = "sunny-overlayed";
 		Sprite resultSprite = ImageCache.loadGif(resultKey, resultFile);

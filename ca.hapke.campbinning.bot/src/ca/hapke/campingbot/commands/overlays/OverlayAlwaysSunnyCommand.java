@@ -37,16 +37,30 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 	private static final String OVERLAY_ALWAYS_SUNNY = "OverlayAlwaysSunny";
 	private static final SlashCommandType SlashAs = new SlashCommandType(OVERLAY_ALWAYS_SUNNY, "as",
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
-	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAs };
+	private static final SlashCommandType SlashSunny = new SlashCommandType(OVERLAY_ALWAYS_SUNNY, "sunny",
+			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
+	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAs, SlashSunny };
 	private CampingBot bot;
 
 	//@formatter:off
-	public static final AlwaysSunnyOverlaySet RESTAURANT_SET = new AlwaysSunnyOverlaySet(2000,
-			new AlwaysSunnySprite("sunny-restaurant-charlie.png", 1d, 0.5d),
-			new AlwaysSunnySprite("sunny-restaurant-mac.png",     0d, 0.5d)
+	public static final AlwaysSunnyOverlaySet RESTAURANT_SET = new AlwaysSunnyOverlaySet("restaurant", 2000,
+		new AlwaysSunnySprite("sunny-restaurant-charlie.png", 1d, 0.5d),
+		new AlwaysSunnySprite("sunny-restaurant-mac.png",     0d, 0.5d)
+	);
+	public static final AlwaysSunnyOverlaySet PEPE_SILVIE_SET = new AlwaysSunnyOverlaySet("pepe", 100,
+		new AlwaysSunnySprite("sunny-pepe-00000.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00001.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00002.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00003.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00004.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00005.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00006.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00007.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00008.png", 0.2d, 0.5d),
+		new AlwaysSunnySprite("sunny-pepe-00009.png", 0.2d, 0.5d)
 	);
 	public static final AlwaysSunnyOverlaySet[] SPRITE_SETS = {
-		RESTAURANT_SET 
+		RESTAURANT_SET, PEPE_SILVIE_SET
 	};
 
 	//@formatter:on
@@ -71,8 +85,27 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		String picFileId = EnhanceCommand.getPictureFileId(replyTo);
 		if (picFileId != null) {
 			try {
-				int index = (int) (SPRITE_SETS.length * Math.random());
-				AlwaysSunnyOverlaySet spriteSet = SPRITE_SETS[index];
+				AlwaysSunnyOverlaySet spriteSet = null;
+
+				String text = message.getText();
+				String[] words = text.split(" ");
+				if (words.length >= 2) {
+					// check if second word is a given name
+					String second = words[1];
+					for (AlwaysSunnyOverlaySet set : SPRITE_SETS) {
+						if (set.name.equalsIgnoreCase(second)) {
+							spriteSet = set;
+							break;
+						}
+					}
+				}
+
+				if (spriteSet == null) {
+					// default: randomize
+					int index = (int) (SPRITE_SETS.length * Math.random());
+					spriteSet = SPRITE_SETS[index];
+				}
+
 				GetFile get = new GetFile(picFileId);
 				File in = null;
 				in = bot.downloadFile(bot.execute(get));
@@ -83,18 +116,18 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 
 				boolean outputCreated = outImg.exists();
 				if (outputCreated) {
-					ImageCommandResult icr = new ImageCommandResult(SlashAs, outImg);
+					ImageCommandResult icr = new ImageCommandResult(command, outImg);
 					icr.setFileType(ImageLink.GIF);
 					return icr;
 				} else {
 					Integer tId = message.getMessageId();
 					String msg = "Failed to write image to HD: " + outImg.getAbsolutePath();
-					bot.logFailure(tId, campingFromUser, chatId, SlashAs, new Exception(msg));
+					bot.logFailure(tId, campingFromUser, chatId, command, new Exception(msg));
 					System.err.println(msg);
 				}
 			} catch (Exception e) {
 				Integer tId = message.getMessageId();
-				bot.logFailure(tId, campingFromUser, chatId, SlashAs, e);
+				bot.logFailure(tId, campingFromUser, chatId, command, e);
 			}
 		}
 		return null;
