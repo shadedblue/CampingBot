@@ -48,19 +48,45 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		new AlwaysSunnySprite("sunny-restaurant-mac.png",     0d, 0.5d)
 	);
 	public static final AlwaysSunnyOverlaySet PEPE_SILVIE_SET = new AlwaysSunnyOverlaySet("pepe", 100,
-		new AlwaysSunnySprite("sunny-pepe-00000.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00001.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00002.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00003.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00004.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00005.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00006.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00007.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00008.png", 0.2d, 0.5d),
-		new AlwaysSunnySprite("sunny-pepe-00009.png", 0.2d, 0.5d)
-	);
+			new AlwaysSunnySprite("sunny-pepe-00000.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00001.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00002.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00003.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00004.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00005.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00006.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00007.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00008.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-pepe-00009.png", 0.2d, 0.5d)
+		);
+	public static final AlwaysSunnyOverlaySet DEE_SMOKING_SET1 = new AlwaysSunnyOverlaySet("dee", 100,
+			new AlwaysSunnySprite("sunny-dee-00000.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00001.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00002.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00003.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00004.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00005.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00006.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00007.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00008.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00009.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00010.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00011.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00012.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00013.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00014.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00015.png", 0.2d, 0.5d)
+		);
+	public static final AlwaysSunnyOverlaySet DEE_SMOKING_SET2 = new AlwaysSunnyOverlaySet("dee", 100,
+			new AlwaysSunnySprite("sunny-dee-00005.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00006.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00007.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00008.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00009.png", 0.2d, 0.5d),
+			new AlwaysSunnySprite("sunny-dee-00010.png", 0.2d, 0.5d)
+		);
 	public static final AlwaysSunnyOverlaySet[] SPRITE_SETS = {
-		RESTAURANT_SET, PEPE_SILVIE_SET
+		RESTAURANT_SET, PEPE_SILVIE_SET, DEE_SMOKING_SET1, DEE_SMOKING_SET2
 	};
 
 	//@formatter:on
