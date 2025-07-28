@@ -4,6 +4,7 @@ import java.security.ProtectionDomain;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -676,17 +677,33 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	public String getCommandList() {
 		StringBuilder sb = new StringBuilder();
 
+		Comparator<SlashCommandType> alphabeticalComparator = new Comparator<>() {
+			@Override
+			public int compare(SlashCommandType a, SlashCommandType b) {
+				String slashA = a.slashCommand;
+				String slashB = b.slashCommand;
+				return slashB.compareTo(slashA);
+			}
+		};
+		//@formatter:off
+		List<SlashCommandType> sortedCommands = slashCommands.entries().stream()
+				.map((Entry<SlashCommandType, SlashCommand> e) -> e.getKey())
+				.sorted(alphabeticalComparator)
+				.toList();
+		//@formatter:off
+
 		boolean first = true;
-		for (Entry<String, SlashCommandType> cmd : slashCommandMap.entrySet()) {
+//		for (Entry<String, SlashCommandType> cmd : slashCommandMap.entrySet()) {
+		for (SlashCommandType cmd : sortedCommands) {
 			if (first)
 				first = false;
 			else
 				sb.append('\n');
 
 			sb.append('/');
-			sb.append(cmd.getKey());
+			sb.append(cmd.slashCommand);
 			sb.append(": ");
-			sb.append(cmd.getValue().slashCommand);
+			sb.append(cmd.getPrettyName());
 		}
 
 		return sb.toString();

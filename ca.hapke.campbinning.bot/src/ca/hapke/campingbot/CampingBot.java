@@ -11,12 +11,12 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.commands.AmpDetectorCommand;
 import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.FuckMeCommand;
-import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.GifsOfUsCommand;
+import ca.hapke.campingbot.commands.HelpCommand;
+import ca.hapke.campingbot.commands.HypeCommand;
 import ca.hapke.campingbot.commands.MbiyfCommand;
 import ca.hapke.campingbot.commands.OpinionCommand;
 import ca.hapke.campingbot.commands.PartyEverydayCommand;
@@ -58,13 +58,13 @@ public class CampingBot extends CampingBotEngine {
 	private VoteManagementCommands voteManagementCommands;
 
 	private StatusCommand statusCommand;
+	private HelpCommand helpCommand;
 	private MbiyfCommand ballsCommand;
 	private PleasureModelCommand pleasureCommand;
 	private FuckMeCommand fuCommand;
 	private EnhanceCommand enhanceCommand;
 	private GifsOfUsCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
-	private AmpDetectorCommand ampCommand;
 
 	private CountdownCommand countdownGen;
 	private HypeCommand hypeCommand;
@@ -105,7 +105,6 @@ public class CampingBot extends CampingBotEngine {
 		enhanceCommand = new EnhanceCommand(this);
 		iunnoCommand = new GifsOfUsCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
-		ampCommand = new AmpDetectorCommand();
 		andrewCommand = new OverlayAndrewCommand(this);
 		nyandrewCommand = new OverlayNyandrewCommand(this);
 		alwaysSunnyCommand = new OverlayAlwaysSunnyCommand(this);
@@ -126,6 +125,7 @@ public class CampingBot extends CampingBotEngine {
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
 		statusCommand = new StatusCommand(this, hideItCommand);
+		helpCommand = new HelpCommand(this);
 		userlistCommand = new UserlistCommand();
 		userCommand = new UserCommand(this);
 		opinionCommand = new OpinionCommand();
@@ -159,7 +159,7 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(fuCommand);
 		addCommand(iunnoCommand);
 		addCommand(partyCommand);
-		addCommand(ampCommand);
+		addCommand(helpCommand);
 		addCommand(countdownGen);
 		addCommand(enhanceCommand);
 		addCommand(hypeCommand);
