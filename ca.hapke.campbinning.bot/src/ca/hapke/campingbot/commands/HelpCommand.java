@@ -35,7 +35,9 @@ public class HelpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
+		System.out.println("Help!: " + command.toString());
 		String commands = bot.getCommandList();
+		System.out.println(commands);
 		TextCommandResult result = new TextCommandResult(command, new TextFragment(commands));
 		return result;
 	}
