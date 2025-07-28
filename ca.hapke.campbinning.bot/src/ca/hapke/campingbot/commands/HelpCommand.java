@@ -11,6 +11,7 @@ import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextFragment;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
@@ -19,7 +20,7 @@ import ca.hapke.campingbot.users.CampingUser;
  */
 public class HelpCommand extends AbstractCommand implements SlashCommand {
 
-	private static final SlashCommandType SLASH_HELP = new SlashCommandType("help", "?", BotCommandIds.REGULAR_CHAT);
+	private static final SlashCommandType SLASH_HELP = new SlashCommandType("help", "help", BotCommandIds.REGULAR_CHAT);
 	private static final SlashCommandType[] SLASH_COMMAND_TYPES = new SlashCommandType[] { SLASH_HELP };
 	private final CampingBot bot;
 
@@ -35,10 +36,10 @@ public class HelpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		System.out.println("Help!: " + command.toString());
-		String commands = bot.getCommandList();
-		System.out.println(commands);
-		TextCommandResult result = new TextCommandResult(command, new TextFragment(commands));
+		TextCommandResult result = new TextCommandResult(command,
+				new TextFragment("List of Commands", TextStyle.Underline));
+		result.newLine();
+		bot.appendCommandList(result);
 		return result;
 	}
 

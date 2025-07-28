@@ -59,6 +59,7 @@ import ca.hapke.campingbot.response.InsultGenerator;
 import ca.hapke.campingbot.response.SendResult;
 import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.TextFragment;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.xml.ConfigLoader;
@@ -674,17 +675,16 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		return sb.toString();
 	}
 
-	public String getCommandList() {
-		StringBuilder sb = new StringBuilder();
+	private static final Comparator<SlashCommandType> alphabeticalComparator = new Comparator<>() {
+		@Override
+		public int compare(SlashCommandType a, SlashCommandType b) {
+			String slashA = a.slashCommand;
+			String slashB = b.slashCommand;
+			return slashA.compareTo(slashB);
+		}
+	};
 
-		Comparator<SlashCommandType> alphabeticalComparator = new Comparator<>() {
-			@Override
-			public int compare(SlashCommandType a, SlashCommandType b) {
-				String slashA = a.slashCommand;
-				String slashB = b.slashCommand;
-				return slashB.compareTo(slashA);
-			}
-		};
+	public void appendCommandList(CommandResult cr) {
 		//@formatter:off
 		List<SlashCommandType> sortedCommands = slashCommands.entries().stream()
 				.map((Entry<SlashCommandType, SlashCommand> e) -> e.getKey())
@@ -693,20 +693,14 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 		//@formatter:off
 
 		boolean first = true;
-//		for (Entry<String, SlashCommandType> cmd : slashCommandMap.entrySet()) {
 		for (SlashCommandType cmd : sortedCommands) {
 			if (first)
 				first = false;
 			else
-				sb.append('\n');
-
-			sb.append('/');
-			sb.append(cmd.slashCommand);
-			sb.append(": ");
-			sb.append(cmd.getPrettyName());
+				cr.newLine();
+			cr.add("/" + cmd.slashCommand, TextStyle.Bold);
+			cr.add(": " + cmd.getPrettyName());
 		}
-
-		return sb.toString();
 	}
 
 	protected static <T> void addCommands(StringBuilder sb, String type, Collection<T> cmds) {
