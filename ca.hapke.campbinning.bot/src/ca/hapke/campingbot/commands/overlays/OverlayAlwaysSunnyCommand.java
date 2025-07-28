@@ -100,8 +100,50 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		new AlwaysSunnySprite("sunny-fat-mac-00019.png", 0.2d, 0.6d),
 		new AlwaysSunnySprite("sunny-fat-mac-00020.png", 0.2d, 0.6d)
 	);
+	public static final AlwaysSunnyOverlaySet CHARLIE_FISTS_SET = new AlwaysSunnyOverlaySet("fists", 100,
+		new AlwaysSunnySprite("sunny-charlie-fists-00000.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00001.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00002.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00003.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00004.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00005.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00006.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00007.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00008.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00009.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00010.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00011.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00012.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00013.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00014.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00015.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00016.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00017.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00018.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00019.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00020.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00021.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00022.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00023.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00024.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00025.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00026.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00027.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00028.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00029.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00030.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00031.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00032.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00033.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00034.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00035.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00036.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00037.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00038.png", 1.0d, 0.8d),
+		new AlwaysSunnySprite("sunny-charlie-fists-00039.png", 1.0d, 0.8d)
+	);
 	public static final AlwaysSunnyOverlaySet[] SPRITE_SETS = {
-		RESTAURANT_SET, PEPE_SILVIE_SET, DEE_SMOKING_SET, FAT_MAC_SET
+		RESTAURANT_SET, PEPE_SILVIE_SET, DEE_SMOKING_SET, FAT_MAC_SET, CHARLIE_FISTS_SET
 	};
 
 	//@formatter:on
