@@ -43,7 +43,7 @@ public class CampingUserMonitor {
 	private final EventList<CampingUser> users = GlazedLists
 			.threadSafeList(new ObservableElementList<>(new BasicEventList<CampingUser>(), userConnector));
 
-	private long nextCampingId = 1;
+	private long nextCampingId = 0;
 	private Set<Long> usedCampingIds = new HashSet<>();
 	private final Map<Long, CampingUser> telegramIdMap = new HashMap<>();
 	private final Map<String, CampingUser> usernameMap = new HashMap<>();
@@ -220,6 +220,10 @@ public class CampingUserMonitor {
 		if (username != null && !"null".equalsIgnoreCase(username)) {
 			String usernameKey = CampingUtil.generateUsernameKey(username);
 			usernameMap.put(usernameKey, target);
+		}
+		long cId = target.getCampingId();
+		if (cId >= nextCampingId) {
+			nextCampingId = cId + 1;
 		}
 	}
 
