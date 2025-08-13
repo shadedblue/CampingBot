@@ -20,6 +20,7 @@ public class HelpCommand extends SlashCommand {
 
 	private static final SlashCommandType SLASH_HELP = new SlashCommandType("help", "help", BotCommandIds.REGULAR_CHAT);
 	private static final SlashCommandType[] SLASH_COMMAND_TYPES = new SlashCommandType[] { SLASH_HELP };
+	private static final boolean DEBUG = true;
 	private final CampingBot bot;
 
 	public HelpCommand(CampingBot bot) {
@@ -40,8 +41,14 @@ public class HelpCommand extends SlashCommand {
 		String[] bySpaces = msg.split(" ");
 		if (bySpaces.length > 1) {
 			String cmdName = bySpaces[1];
+			if (DEBUG)
+				System.out.println("Help command requested for: " + cmdName);
 			SlashCommandType cmdType = bot.getSlashCommandType(cmdName);
+			if (DEBUG)
+				System.out.println("Command type found: " + cmdType);
 			SlashCommand cmd = bot.getSlashCommand(cmdType);
+			if (DEBUG)
+				System.out.println("Command found: " + cmd);
 			if (cmd != null && cmdType != null) {
 				cmd.getHelpText(cmdType);
 				return result;
