@@ -9,9 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
-import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.api.IStatus;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -27,8 +25,7 @@ import ca.hapke.util.TimeFormatter;
 /**
  * @author Nathan Hapke
  */
-public class StatusCommand extends AbstractCommand implements IStatus, SlashCommand {
-	private CampingBot bot;
+public class StatusCommand extends SlashCommand implements IStatus {
 	private HideItCommand hideIt;
 
 	private static final String STATUS = "Status";
@@ -39,8 +36,7 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	private ZonedDateTime onlineTime;
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLLL d, h:mm:ss a");
 
-	public StatusCommand(CampingBot bot, HideItCommand hideIt) {
-		this.bot = bot;
+	public StatusCommand(HideItCommand hideIt) {
 		this.hideIt = hideIt;
 	}
 
@@ -118,7 +114,9 @@ public class StatusCommand extends AbstractCommand implements IStatus, SlashComm
 	}
 
 	@Override
-	public AccessLevel accessRequired() {
-		return AccessLevel.Admin;
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add(
+				"This command displays the current status of the bot, including online time and topics/messages managed by the Hide It command.",
+				TextStyle.Italic);
 	}
 }

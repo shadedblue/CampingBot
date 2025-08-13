@@ -17,7 +17,7 @@ import ca.hapke.calendaring.timing.ByFrequency;
 import ca.hapke.calendaring.timing.TimesProvider;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.api.CampingBotEngine;
-import ca.hapke.campingbot.callback.api.CallbackCommandBase;
+import ca.hapke.campingbot.callback.api.CallbackCommand;
 import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
@@ -41,8 +41,8 @@ import ca.odell.glazedlists.GlazedLists;
 /**
  * @author Nathan Hapke
  */
-public abstract class VotingCommand<T> extends CallbackCommandBase
-		implements CalendaredEvent<Void>, TextCommand, SlashCommand {
+public abstract class VotingCommand<T> extends SlashCommand
+		implements CalendaredEvent<Void>, TextCommand, CallbackCommand {
 	public static final ResponseCommandType VoteTopicInitiationCommand = new ResponseCommandType("VoteTopicInitiation",
 			BotCommandIds.VOTING | BotCommandIds.REGULAR_CHAT | BotCommandIds.SET);
 	public static final ResponseCommandType VoteActivatorCompleteCommand = new ResponseCommandType(

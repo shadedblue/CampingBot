@@ -8,20 +8,20 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageLink;
 
 /**
  * @author Nathan Hapke
  */
-public class FuckMeCommand extends AbstractCommand implements TextCommand, SlashCommand {
+public class FuckMeCommand extends SlashCommand implements TextCommand {
 
 	private static final String FU = "fu";
 	private static final String FUCK_ME = "Fuck me?";
@@ -69,5 +69,10 @@ public class FuckMeCommand extends AbstractCommand implements TextCommand, Slash
 	@Override
 	public String getCommandName() {
 		return FUCK_ME;
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("No fuck youuuuuuu!");
 	}
 }

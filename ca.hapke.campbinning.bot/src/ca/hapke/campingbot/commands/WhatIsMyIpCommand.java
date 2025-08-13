@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -18,7 +17,7 @@ import ca.hapke.campingbot.users.CampingUser;
 /**
  * @author Nathan Hapke
  */
-public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
+public class WhatIsMyIpCommand extends SlashCommand {
 
 	private String ip = "?";
 	private LocalDateTime foundAt;
@@ -79,5 +78,12 @@ public class WhatIsMyIpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public String provideUiStatus() {
 		return "IP Address: " + ip;
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("This command returns the current IP address of the bot.");
+		result.newLine();
+		result.add("Admin access required.");
 	}
 }

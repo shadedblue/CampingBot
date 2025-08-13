@@ -4,13 +4,11 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.CampingBot;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
-import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 
@@ -18,7 +16,7 @@ import ca.hapke.campingbot.users.CampingUser;
  * 
  * @author Nathan Hapke
  */
-public class HelpCommand extends AbstractCommand implements SlashCommand {
+public class HelpCommand extends SlashCommand {
 
 	private static final SlashCommandType SLASH_HELP = new SlashCommandType("help", "help", BotCommandIds.REGULAR_CHAT);
 	private static final SlashCommandType[] SLASH_COMMAND_TYPES = new SlashCommandType[] { SLASH_HELP };
@@ -36,15 +34,39 @@ public class HelpCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		TextCommandResult result = new TextCommandResult(command,
-				new TextFragment("List of Commands", TextStyle.Underline));
+		TextCommandResult result = new TextCommandResult(command);
+
+		String msg = message.getText();
+		String[] bySpaces = msg.split(" ");
+		if (bySpaces.length > 1) {
+			String cmdName = bySpaces[1];
+			SlashCommandType cmdType = bot.getSlashCommandType(cmdName);
+			SlashCommand cmd = bot.getSlashCommand(cmdType);
+			if (cmd != null && cmdType != null) {
+				cmd.getHelpText(cmdType);
+				return result;
+			} else {
+				result.add("No command found with name: " + cmdName);
+				return result;
+			}
+		}
+
+		result.add("List of Commands:", TextStyle.Underline);
 		result.newLine();
 		bot.appendCommandList(result);
+		result.newLine();
+		result.newLine();
+		result.add("For more information on a command, type /help <command name>.", TextStyle.Italic);
 		return result;
 	}
 
 	@Override
 	public String getCommandName() {
 		return SLASH_HELP.getPrettyName();
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		// Not used
 	}
 }

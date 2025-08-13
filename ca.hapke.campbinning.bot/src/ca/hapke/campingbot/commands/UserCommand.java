@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.CampingSystem;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -23,7 +22,7 @@ import ca.hapke.campingbot.users.CampingUser.Birthday;
 /**
  * @author Nathan Hapke
  */
-public class UserCommand extends AbstractCommand implements SlashCommand {
+public class UserCommand extends SlashCommand {
 
 	private static final String prettyName = "User Information";
 	private static final String slashCommand = "user";
@@ -125,5 +124,15 @@ public class UserCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public String getCommandName() {
 		return prettyName;
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("Get information about a user.");
+		result.newLine();
+		result.add("Usage: ");
+		result.add("/user [username|reply to message]");
+		result.newLine();
+		result.add("If no user is specified, the command will use the user who sent the command.");
 	}
 }

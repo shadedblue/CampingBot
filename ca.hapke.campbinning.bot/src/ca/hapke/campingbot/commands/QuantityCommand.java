@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.category.CategoriedItems;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -23,7 +22,7 @@ import ca.hapke.util.StringUtil;
 /**
  * @author Nathan Hapke
  */
-public class QuantityCommand extends AbstractCommand implements SlashCommand {
+public class QuantityCommand extends SlashCommand {
 
 	private static final String prettyName = "Quantity";
 	private static final String slashCommand = "quantity";
@@ -94,5 +93,16 @@ public class QuantityCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public String getCommandName() {
 		return prettyName;
+	}
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("This command lists the number of items in each category of the bot.");
+		result.add("It can be used to see how many items are available for each command.", TextStyle.Italic);
+		result.newLine();
+		result.add("You can also use it to see how many spells are available in each spell pack.");
+		result.newLine();
+		result.add("Use /quantity <command name> to see the number of items in a specific command's categories.");
+		result.newLine();
+		result.add("Use /quantity <spell pack name> to see the number of spells in a specific spell pack.");
 	}
 }

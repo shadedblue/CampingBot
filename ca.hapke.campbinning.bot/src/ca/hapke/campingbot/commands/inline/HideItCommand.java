@@ -23,7 +23,9 @@ import com.google.common.cache.LoadingCache;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.callback.api.CallbackCommand;
 import ca.hapke.campingbot.callback.api.CallbackId;
+import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
+import ca.hapke.campingbot.commands.api.InlineCommand;
 import ca.hapke.campingbot.commands.api.InlineCommandBase;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.log.DatabaseConsumer;
@@ -38,7 +40,7 @@ import ca.hapke.util.StringUtil;
 /**
  * @author Nathan Hapke
  */
-public class HideItCommand extends InlineCommandBase implements CallbackCommand {
+public class HideItCommand extends AbstractCommand implements CallbackCommand, InlineCommand {
 	public static final ResponseCommandType HideItSendCommand = new ResponseCommandType("HideItSend",
 			BotCommandIds.INLINE | BotCommandIds.TEXT | BotCommandIds.SET);
 	public static final ResponseCommandType HideItRevealCommand = new ResponseCommandType("HideItReveal",

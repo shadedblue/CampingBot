@@ -5,16 +5,29 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
 import ca.hapke.campingbot.response.CommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
  * @author Nathan Hapke
  */
-public interface SlashCommand {
-	public SlashCommandType[] getSlashCommandsToRespondTo();
+public abstract class SlashCommand extends AbstractCommand {
+	public abstract SlashCommandType[] getSlashCommandsToRespondTo();
 
-	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
+	public abstract CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException;
 
-	public AccessLevel accessRequired();
+	public AccessLevel accessRequired() {
+		return AccessLevel.User;
+	}
+
+	public TextCommandResult getHelpText(SlashCommandType cmd) {
+		TextCommandResult result = new TextCommandResult(cmd);
+		result.add(cmd.prettyName, TextStyle.Underline);
+		appendHelpText(cmd, result);
+		return result;
+	}
+
+	protected abstract void appendHelpText(SlashCommandType cmd, TextCommandResult result);
 }

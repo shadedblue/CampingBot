@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import ca.hapke.campingbot.BotConstants;
 import ca.hapke.campingbot.callback.api.CallbackId;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
-import ca.hapke.campingbot.commands.api.InlineCommandBase;
+import ca.hapke.campingbot.commands.api.InlineCommand;
 import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -29,6 +29,7 @@ import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
 import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.util.CampingUtil;
 import ca.hapke.util.StringUtil;
 
@@ -37,7 +38,7 @@ import ca.hapke.util.StringUtil;
  * 
  * @author Nathan Hapke
  */
-public class NicknameCommand extends InlineCommandBase implements SlashCommand {
+public class NicknameCommand extends SlashCommand implements InlineCommand {
 	public static final ResponseCommandType NicknameConversionCommand = new ResponseCommandType("NicknameConversion",
 			BotCommandIds.NICKNAME | BotCommandIds.USE);
 	public static final ResponseCommandType SetNicknameRejectedCommand = new ResponseCommandType("SetNicknameRejected",
@@ -50,6 +51,8 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 	private static final SlashCommandType[] SLASH_COMMANDS = new SlashCommandType[] { SlashAllNicknames,
 			SlashSetNickname };
 
+	protected CampingUserMonitor userMonitor = CampingUserMonitor.getInstance();
+	
 	@Override
 	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
@@ -227,5 +230,15 @@ public class NicknameCommand extends InlineCommandBase implements SlashCommand {
 			return setNicknameCommand(campingFromUser, message);
 
 		return null;
+	}
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		if (cmd == SlashAllNicknames) {
+			result.add("Lists all nicknames in the system.");
+		} else if (cmd == SlashSetNickname) {
+			result.add("Sets a nickname for a user. Usage: /setnickname @user nickname");
+			result.add("\nNote: You cannot set your own nickname, and nicknames cannot contain any of the following characters: ");
+			result.add(StringUtil.join(invalidCharacters, ", "));
+		}
 	}
 }

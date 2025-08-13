@@ -4,7 +4,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -16,7 +15,7 @@ import ca.hapke.campingbot.users.CampingUserMonitor;
 /**
  * @author Nathan Hapke
  */
-public class OpinionCommand extends AbstractCommand implements SlashCommand {
+public class OpinionCommand extends SlashCommand {
 	private static final String OPINION = "Opinion";
 	public static final SlashCommandType SlashOpinion = new SlashCommandType(OPINION, "opinion",
 			BotCommandIds.TEXT | BotCommandIds.USE);
@@ -57,5 +56,9 @@ public class OpinionCommand extends AbstractCommand implements SlashCommand {
 	@Override
 	public SlashCommandType[] getSlashCommandsToRespondTo() {
 		return SLASH_COMMANDS;
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 	}
 }

@@ -2,6 +2,7 @@ package ca.hapke.campingbot.commands.spell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -23,6 +24,7 @@ import ca.hapke.campingbot.commands.api.ResponseCommandType;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.response.fragments.MentionFragment;
 import ca.hapke.campingbot.response.fragments.ResultFragment;
 import ca.hapke.campingbot.response.fragments.TextFragment;
@@ -33,7 +35,7 @@ import ca.hapke.util.StringUtil;
 /**
  * @author Nathan Hapke
  */
-public class SpellCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
+public class SpellCommand extends SlashCommand implements HasCategories<String> {
 
 	public static final String SPELL = "Spell";
 	private static final String PACK_CATEGORY = "pack";
@@ -264,4 +266,14 @@ public class SpellCommand extends AbstractCommand implements HasCategories<Strin
 		return timeString + "\n" + pendingString;
 	}
 
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("Available spell packs:");
+		for (Entry<String, CategoriedItems<String>> e : packs.entrySet()) {
+			result.newLine();
+			String genre = e.getKey();
+
+			result.add(genre);
+		}
+	}
 }

@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
+import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
@@ -30,6 +31,11 @@ public class RantCommand extends VotingCommand<Integer> {
 	protected VoteTracker<Integer> initiateVote(CampingUser ranter, CampingUser activater, Long chatId,
 			Message activation, Message topic) throws VoteInitiationException, TelegramApiException {
 		return new RantTracker(bot, ranter, activater, chatId, activation, topic);
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("You can reply to a message to vote on that, or end a text-message with /rant.");
 	}
 
 }

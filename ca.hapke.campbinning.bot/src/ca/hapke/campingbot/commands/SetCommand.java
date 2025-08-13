@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campingbot.AccessLevel;
 import ca.hapke.campingbot.BotChoicePriority;
 import ca.hapke.campingbot.CampingBot;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -23,7 +22,7 @@ import ca.hapke.campingbot.users.CampingUser.Birthday;
 /**
  * @author Nathan Hapke
  */
-public class SetCommand extends AbstractCommand implements SlashCommand {
+public class SetCommand extends SlashCommand {
 	private static final String REMOVE = "remove";
 	private static final String BIRTHDAY = "birthday";
 	private static final String BDAY = "bday";
@@ -143,5 +142,16 @@ public class SetCommand extends AbstractCommand implements SlashCommand {
 		result.add(BIRTHDAY, TextStyle.Bold);
 		result.add("/");
 		result.add(BDAY, TextStyle.Bold);
+		result.add(": formatted in the style MonthNumber-DayNumber... Ex: 4-20 for April 20th");
+	}
+	
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("Set a user's initials or birthday.");
+		result.newLine();
+		result.add("Format: /set @user field value");
+		result.newLine();
+		addFieldInfo(result);
 	}
 }

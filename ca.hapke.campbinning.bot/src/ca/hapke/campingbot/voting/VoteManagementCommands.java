@@ -2,7 +2,6 @@ package ca.hapke.campingbot.voting;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -16,7 +15,7 @@ import ca.hapke.campingbot.users.CampingUser;
 /**
  * @author Nathan Hapke
  */
-public class VoteManagementCommands extends AbstractCommand implements SlashCommand {
+public class VoteManagementCommands extends SlashCommand {
 	private static final SlashCommandType SlashVoteExtend = new SlashCommandType("VoteExtend", "extend",
 			BotCommandIds.VOTING | BotCommandIds.FINISH);
 	private static final SlashCommandType SlashVoteForceComplete = new SlashCommandType("VoteForceComplete", "complete",
@@ -116,5 +115,11 @@ public class VoteManagementCommands extends AbstractCommand implements SlashComm
 		if (command == SlashVoteExtend)
 			return extendVoting(message, campingFromUser);
 		return null;
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		// TODO Auto-generated method stub
+		
 	}
 }

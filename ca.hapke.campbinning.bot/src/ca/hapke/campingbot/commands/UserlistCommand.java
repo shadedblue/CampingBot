@@ -4,7 +4,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ca.hapke.campingbot.AccessLevel;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
@@ -18,7 +17,7 @@ import ca.hapke.campingbot.users.CampingUserMonitor;
 /**
  * @author Nathan Hapke
  */
-public class UserlistCommand extends AbstractCommand implements SlashCommand {
+public class UserlistCommand extends SlashCommand {
 
 	private static final String prettyName = "Userlist";
 	private static final String slashCommand = "userlist";
@@ -73,7 +72,7 @@ public class UserlistCommand extends AbstractCommand implements SlashCommand {
 	}
 
 	@Override
-	public AccessLevel accessRequired() {
-		return AccessLevel.Admin;
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("This command lists all users, along with their IDs and birthdays.");
 	}
 }

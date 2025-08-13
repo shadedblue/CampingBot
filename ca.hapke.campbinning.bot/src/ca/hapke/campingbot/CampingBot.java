@@ -11,7 +11,6 @@ import ca.hapke.calendaring.event.CalendaredEvent;
 import ca.hapke.calendaring.monitor.CalendarMonitor;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.commands.CountdownCommand;
 import ca.hapke.campingbot.commands.EnhanceCommand;
 import ca.hapke.campingbot.commands.FuckMeCommand;
 import ca.hapke.campingbot.commands.GifsOfUsCommand;
@@ -66,7 +65,6 @@ public class CampingBot extends CampingBotEngine {
 	private GifsOfUsCommand iunnoCommand;
 	private PartyEverydayCommand partyCommand;
 
-	private CountdownCommand countdownGen;
 	private HypeCommand hypeCommand;
 	private SpellCommand spellCommand;
 	private HideItCommand hideItCommand;
@@ -116,7 +114,6 @@ public class CampingBot extends CampingBotEngine {
 		ufcCommand = new UfcCommand(this, res);
 		voteManagementCommands = new VoteManagementCommands(rantCommand);
 
-		countdownGen = new CountdownCommand(res, ballsCommand);
 		hypeCommand = new HypeCommand(this);
 //		potatoCommand = new AfdHotPotato(this, res);
 //		afdDicks = new AfdTooManyDicks(this, res);
@@ -124,7 +121,7 @@ public class CampingBot extends CampingBotEngine {
 
 		redditCommand = new RedditCommand();
 		hideItCommand = new HideItCommand(this, databaseConsumer);
-		statusCommand = new StatusCommand(this, hideItCommand);
+		statusCommand = new StatusCommand(hideItCommand);
 		helpCommand = new HelpCommand(this);
 		userlistCommand = new UserlistCommand();
 		userCommand = new UserCommand(this);
@@ -160,7 +157,6 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(iunnoCommand);
 		addCommand(partyCommand);
 		addCommand(helpCommand);
-		addCommand(countdownGen);
 		addCommand(enhanceCommand);
 		addCommand(hypeCommand);
 		addCommand(statusCommand);

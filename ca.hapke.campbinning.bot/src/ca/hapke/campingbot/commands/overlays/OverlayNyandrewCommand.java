@@ -7,13 +7,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.madgag.gif.fmsware.AnimatedGifEncoder;
@@ -21,13 +19,12 @@ import com.madgag.gif.fmsware.AnimatedGifEncoder;
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.CampingSystem;
 import ca.hapke.campingbot.commands.EnhanceCommand;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
-import ca.hapke.campingbot.commands.api.TextCommand;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageCache;
 import ca.hapke.campingbot.util.ImageLink;
@@ -36,7 +33,7 @@ import ca.hapke.campingbot.util.Sprite;
 /**
  * @author Nathan Hapke
  */
-public class OverlayNyandrewCommand extends AbstractCommand implements TextCommand, SlashCommand {
+public class OverlayNyandrewCommand extends SlashCommand {
 
 	private static final String OVERLAY_NYANDREW = "OverlayNyandrew";
 	private static final SlashCommandType SlashNyandrew = new SlashCommandType(OVERLAY_NYANDREW, "nyandrew",
@@ -63,13 +60,6 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 	@Override
 	public CommandResult respondToSlashCommand(SlashCommandType command, Message message, Long chatId,
 			CampingUser campingFromUser) throws TelegramApiException {
-		return textCommand(campingFromUser, message.getEntities(), chatId, message);
-	}
-
-	@Override
-	public CommandResult textCommand(CampingUser campingFromUser, List<MessageEntity> entities, Long chatId,
-			Message message) throws TelegramApiException {
-
 		Message replyTo = message.getReplyToMessage();
 		String picFileId = EnhanceCommand.getPictureFileId(replyTo);
 		if (picFileId != null) {
@@ -120,12 +110,6 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 			this.overlays = newOverlays;
 		}
 		return overlays;
-	}
-
-	@Override
-	public boolean isMatch(String msg, Message message) {
-		String msgLower = msg.toLowerCase().trim();
-		return msgLower.startsWith("/" + SlashNyandrew.slashCommand);
 	}
 
 	@Override
@@ -183,4 +167,7 @@ public class OverlayNyandrewCommand extends AbstractCommand implements TextComma
 		outputStream.close();
 	}
 
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	}
 }

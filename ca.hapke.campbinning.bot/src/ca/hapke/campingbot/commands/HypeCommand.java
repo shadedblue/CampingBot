@@ -7,12 +7,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import ca.hapke.campingbot.api.CampingBotEngine;
 import ca.hapke.campingbot.category.CategoriedStringsPersisted;
 import ca.hapke.campingbot.category.HasCategories;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.NoopCommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.users.CampingUserMonitor;
 import ca.hapke.campingbot.util.StagedJob;
@@ -20,7 +20,7 @@ import ca.hapke.campingbot.util.StagedJob;
 /**
  * @author Nathan Hapke
  */
-public class HypeCommand extends AbstractCommand implements HasCategories<String>, SlashCommand {
+public class HypeCommand extends SlashCommand implements HasCategories<String> {
 	private static final String HYPE_CONTAINER = "Hype";
 	public static final String HYPE_CATEGORY = "hype";
 	public static final String DICK_CATEGORY = "dick";
@@ -116,5 +116,9 @@ public class HypeCommand extends AbstractCommand implements HasCategories<String
 			out = instance.toString();
 		}
 		return out;
+	}
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 	}
 }

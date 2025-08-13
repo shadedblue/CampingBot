@@ -20,12 +20,12 @@ import com.madgag.gif.fmsware.AnimatedGifEncoder;
 
 import ca.hapke.campingbot.CampingBot;
 import ca.hapke.campingbot.commands.EnhanceCommand;
-import ca.hapke.campingbot.commands.api.AbstractCommand;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
 import ca.hapke.campingbot.commands.api.SlashCommandType;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.ImageCommandResult;
+import ca.hapke.campingbot.response.TextCommandResult;
 import ca.hapke.campingbot.users.CampingUser;
 import ca.hapke.campingbot.util.ImageCache;
 import ca.hapke.campingbot.util.ImageLink;
@@ -33,7 +33,7 @@ import ca.hapke.campingbot.util.ImageLink;
 /**
  * @author Nathan Hapke
  */
-public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashCommand {
+public class OverlayAlwaysSunnyCommand extends SlashCommand {
 	private static final String OVERLAY_ALWAYS_SUNNY = "OverlayAlwaysSunny";
 	private static final SlashCommandType SlashAs = new SlashCommandType(OVERLAY_ALWAYS_SUNNY, "as",
 			BotCommandIds.SILLY_RESPONSE | BotCommandIds.GIF);
@@ -254,5 +254,14 @@ public class OverlayAlwaysSunnyCommand extends AbstractCommand implements SlashC
 		}
 		encoder.finish();
 		outputStream.close();
+	}
+	
+
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("Available sets: ");
+		for (AlwaysSunnyOverlaySet set : SPRITE_SETS) {
+			result.add("- " + set.name);
+		}
 	}
 }

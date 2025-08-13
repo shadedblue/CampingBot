@@ -27,7 +27,8 @@ import ca.hapke.campingbot.voting.VoteTracker;
 import ca.hapke.campingbot.voting.VotingCommand;
 
 /**
- * NA vote should send to the Summarizer and close out the previous rounds and send the next fight message
+ * NA vote should send to the Summarizer and close out the previous rounds and
+ * send the next fight message
  * 
  * @author Nathan Hapke
  */
@@ -199,4 +200,12 @@ public class UfcCommand extends VotingCommand<Integer> {
 		return messageId + AbstractCommand.DELIMITER + fightId + AbstractCommand.DELIMITER + round;
 	}
 
+	@Override
+	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("To start a UFC voting, reply to a message with the format:");
+		result.newLine();
+		result.add("FighterA - FighterB - Rounds");
+		result.newLine();
+		result.add("FighterC - FighterD - Rounds");
+	}
 }

@@ -761,4 +761,14 @@ public abstract class CampingBotEngine extends TelegramLongPollingBot {
 	public CampingUser getMeCamping() {
 		return meCamping;
 	}
+	
+	public SlashCommand getSlashCommand(SlashCommandType slashCommandType) {
+		return slashCommands.get(slashCommandType).stream()
+				.findFirst().orElse(null);
+	}
+
+	public SlashCommandType getSlashCommandType(String command) {
+		SlashCommandType slashCommandType = slashCommandMap.get(command);
+		return slashCommandType;
+	}
 }
