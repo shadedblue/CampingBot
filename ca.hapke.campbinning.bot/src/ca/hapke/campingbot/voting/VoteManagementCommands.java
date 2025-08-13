@@ -118,7 +118,7 @@ public class VoteManagementCommands extends SlashCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		// TODO Auto-generated method stub
 		
 	}

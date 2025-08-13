@@ -255,13 +255,13 @@ public class OverlayAlwaysSunnyCommand extends SlashCommand {
 		encoder.finish();
 		outputStream.close();
 	}
-	
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("Available sets: ");
 		for (AlwaysSunnyOverlaySet set : SPRITE_SETS) {
-			result.add("- " + set.name);
+			result.newLine();
+			result.add(set.name);
 		}
 	}
 }

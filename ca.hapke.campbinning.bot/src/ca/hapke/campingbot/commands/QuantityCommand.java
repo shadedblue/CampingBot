@@ -95,7 +95,7 @@ public class QuantityCommand extends SlashCommand {
 		return prettyName;
 	}
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("This command lists the number of items in each category of the bot.");
 		result.add("It can be used to see how many items are available for each command.", TextStyle.Italic);
 		result.newLine();

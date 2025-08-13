@@ -81,7 +81,7 @@ public class WhatIsMyIpCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("This command returns the current IP address of the bot.");
 		result.newLine();
 		result.add("Admin access required.");

@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import ca.hapke.campingbot.AccessLevel;
 import ca.hapke.campingbot.api.IStatus;
 import ca.hapke.campingbot.commands.api.BotCommandIds;
 import ca.hapke.campingbot.commands.api.SlashCommand;
@@ -114,9 +113,8 @@ public class StatusCommand extends SlashCommand implements IStatus {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add(
-				"This command displays the current status of the bot, including online time and topics/messages managed by the Hide It command.",
-				TextStyle.Italic);
+				"This command displays the current status of the bot, including online time and topics/messages managed by the Hide It command.");
 	}
 }

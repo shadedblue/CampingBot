@@ -201,7 +201,7 @@ public class UfcCommand extends VotingCommand<Integer> {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("To start a UFC voting, reply to a message with the format:");
 		result.newLine();
 		result.add("FighterA - FighterB - Rounds");

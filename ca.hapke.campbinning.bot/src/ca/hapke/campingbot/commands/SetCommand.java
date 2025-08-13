@@ -147,7 +147,7 @@ public class SetCommand extends SlashCommand {
 	
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("Set a user's initials or birthday.");
 		result.newLine();
 		result.add("Format: /set @user field value");

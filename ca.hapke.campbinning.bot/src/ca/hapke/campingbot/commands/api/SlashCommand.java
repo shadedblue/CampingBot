@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ca.hapke.campingbot.AccessLevel;
 import ca.hapke.campingbot.response.CommandResult;
 import ca.hapke.campingbot.response.TextCommandResult;
-import ca.hapke.campingbot.response.fragments.TextStyle;
 import ca.hapke.campingbot.users.CampingUser;
 
 /**
@@ -22,12 +21,5 @@ public abstract class SlashCommand extends AbstractCommand {
 		return AccessLevel.User;
 	}
 
-	public TextCommandResult getHelpText(SlashCommandType cmd) {
-		TextCommandResult result = new TextCommandResult(cmd);
-		result.add(cmd.prettyName, TextStyle.Underline);
-		appendHelpText(cmd, result);
-		return result;
-	}
-
-	protected abstract void appendHelpText(SlashCommandType cmd, TextCommandResult result);
+	public abstract void appendHelpText(SlashCommandType cmd, TextCommandResult result);
 }

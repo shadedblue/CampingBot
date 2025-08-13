@@ -72,7 +72,7 @@ public class UserlistCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("This command lists all users, along with their IDs and birthdays.");
 	}
 }

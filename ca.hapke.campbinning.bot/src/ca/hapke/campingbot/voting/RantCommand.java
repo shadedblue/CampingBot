@@ -34,7 +34,7 @@ public class RantCommand extends VotingCommand<Integer> {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("You can reply to a message to vote on that, or end a text-message with /rant.");
 	}
 

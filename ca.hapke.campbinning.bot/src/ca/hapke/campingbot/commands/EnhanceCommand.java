@@ -331,9 +331,9 @@ public class EnhanceCommand extends SlashCommand implements HasCategories<String
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
-		result.add("This can target a text message, or a static image.");
-		result.add("If you target a static image, you can also specify a portion of the image to enhance by adding a direction after");
-		result.add("The default direction is Mid. Up|Down|Left|Right|UpLeft|UpRight|DownLeft|DownRight]");
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("This can target a text message, or a static image.\n");
+		result.add("If you target a static image, you can also specify a portion of the image to enhance by adding a direction after\n");
+		result.add("Mid (Default)|Up|Down|Left|Right|UpLeft|UpRight|DownLeft|DownRight]");
 	}
 }

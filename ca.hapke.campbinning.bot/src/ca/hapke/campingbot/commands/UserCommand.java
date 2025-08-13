@@ -127,7 +127,7 @@ public class UserCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("Get information about a user.");
 		result.newLine();
 		result.add("Usage: ");

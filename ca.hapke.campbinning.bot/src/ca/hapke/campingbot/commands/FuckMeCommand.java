@@ -72,7 +72,7 @@ public class FuckMeCommand extends SlashCommand implements TextCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("No fuck youuuuuuu!");
 	}
 }

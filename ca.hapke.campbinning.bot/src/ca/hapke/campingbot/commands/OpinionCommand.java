@@ -59,6 +59,6 @@ public class OpinionCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 	}
 }

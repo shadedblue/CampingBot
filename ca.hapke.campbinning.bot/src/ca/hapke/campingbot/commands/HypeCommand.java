@@ -119,6 +119,8 @@ public class HypeCommand extends SlashCommand implements HasCategories<String> {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+		result.add("You can also search for a particular string in the hypes.\n");
+		result.add("If you reply to a message, it will search for a hype from that user.");
 	}
 }

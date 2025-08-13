@@ -267,7 +267,7 @@ public class SpellCommand extends SlashCommand implements HasCategories<String> 
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		result.add("Available spell packs:");
 		for (Entry<String, CategoriedItems<String>> e : packs.entrySet()) {
 			result.newLine();

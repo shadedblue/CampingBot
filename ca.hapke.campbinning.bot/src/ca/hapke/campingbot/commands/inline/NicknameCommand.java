@@ -232,7 +232,7 @@ public class NicknameCommand extends SlashCommand implements InlineCommand {
 		return null;
 	}
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		if (cmd == SlashAllNicknames) {
 			result.add("Lists all nicknames in the system.");
 		} else if (cmd == SlashSetNickname) {

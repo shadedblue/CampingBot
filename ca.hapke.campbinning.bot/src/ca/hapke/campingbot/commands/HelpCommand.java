@@ -20,7 +20,7 @@ public class HelpCommand extends SlashCommand {
 
 	private static final SlashCommandType SLASH_HELP = new SlashCommandType("help", "help", BotCommandIds.REGULAR_CHAT);
 	private static final SlashCommandType[] SLASH_COMMAND_TYPES = new SlashCommandType[] { SLASH_HELP };
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private final CampingBot bot;
 
 	public HelpCommand(CampingBot bot) {
@@ -50,7 +50,9 @@ public class HelpCommand extends SlashCommand {
 			if (DEBUG)
 				System.out.println("Command found: " + cmd);
 			if (cmd != null && cmdType != null) {
-				cmd.getHelpText(cmdType);
+				result.add(cmdType.prettyName, TextStyle.Underline);
+				result.newLine();
+				cmd.appendHelpText(cmdType, result);
 				return result;
 			} else {
 				result.add("No command found with name: " + cmdName);
@@ -73,7 +75,7 @@ public class HelpCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
+	public void appendHelpText(SlashCommandType cmd, TextCommandResult result) {
 		// Not used
 	}
 }
