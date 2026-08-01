@@ -5,3 +5,4 @@ CampingBot.bat
 /bin/
 /target/
 /antxr-generated/
+/settings.xml
