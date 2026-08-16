@@ -88,6 +88,7 @@ public class ImageCache {
 			for (int i = 0; i < numFrames; i++) {
 				BufferedImage frame = reader.read(i);
 				images[i] = frame;
+<<<<<<< HEAD
 				IIOMetadataNode root = (IIOMetadataNode) reader.getImageMetadata(i).getAsTree("javax_imageio_gif_image_1.0");
 				IIOMetadataNode gce = (IIOMetadataNode) root.getElementsByTagName("GraphicControlExtension").item(0);
 
@@ -228,6 +229,136 @@ public class ImageCache {
 	 */
 	private boolean folderIsAbsolute(String folder) {
 		return (folder.charAt(0) == '/');
+=======
+				IIOMetadataNode root = (IIOMetadataNode) reader.getImageMetadata(i)
+						.getAsTree("javax_imageio_gif_image_1.0");
+				IIOMetadataNode gce = (IIOMetadataNode) root.getElementsByTagName("GraphicControlExtension").item(0);
+
+				int delay = Integer.valueOf(gce.getAttribute("delayTime"));
+				delays[i] = delay;
+			}
+			return new Sprite(key, images, delays);
+		}
+		return null;
+	}
+
+	public static Sprite loadStaticImage(String key, File f) throws IOException {
+		BufferedImage image = ImageIO.read(f);
+		if (image != null)
+			return new Sprite(key, image);
+		else
+			return null;
+	}
+
+	public static Sprite loadStaticImage(String key, InputStream in) throws IOException {
+		BufferedImage image = ImageIO.read(in);
+		if (image != null) {
+			return new Sprite(key, image);
+		}
+		return null;
+	}
+
+	public static Image scaleToTileSize(Image image, int tileSize) {
+		Image result = image;
+		int w = image.getWidth(null);
+		int h = image.getHeight(null);
+		boolean tooBig = w > tileSize || h > tileSize;
+		if (tooBig) {
+			int x, y;
+			if (w > h) {
+				x = tileSize;
+				y = -1;
+			} else {
+				x = -1;
+				y = tileSize;
+			}
+			result = image.getScaledInstance(x, y, Image.SCALE_SMOOTH);
+		}
+		return result;
+	}
+
+	public static Image scaleToHeight(Image image, int h2) {
+		Image result = image;
+		int w1 = image.getWidth(null);
+		int h1 = image.getHeight(null);
+		double aspect = ((double) w1) / h1;
+		int w2 = (int) (h2 * aspect);
+		result = image.getScaledInstance(w2, h2, Image.SCALE_SMOOTH);
+
+		return result;
+	}
+
+	private boolean isGif(File f) {
+		if (f == null)
+			return false;
+
+		String name = f.getName();
+		int len = name.length();
+		if (len > 3) {
+			String ext = name.substring(len - 3, len);
+			if (GIF.equalsIgnoreCase(ext)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public InputStream searchJar(String folder, String filename) {
+		String path;
+		if (folder != null && folder.length() > 0) {
+			path = '/' + folder + '/' + filename;
+		} else {
+			path = '/' + filename;
+		}
+		InputStream in = getClass().getResourceAsStream(path);
+		return in;
+	}
+
+	public File searchViaClassloader(String folder, String filename) {
+		ProtectionDomain pd = getClass().getProtectionDomain();
+		ClassLoader cl = pd.getClassLoader();
+
+		File f;
+		int i = 0;
+		String fullFilename = (folder != null ? (folder + File.separatorChar) : "") + filename;
+		while (i < 10) {
+			URL res = cl.getResource(fullFilename);
+			try {
+				URI uri = res.toURI();
+
+				f = new File(uri);
+				if (f.exists())
+					return f;
+			} catch (Exception e) {
+				System.err.println("[CL]: URI Exception");
+			}
+			fullFilename = ".." + File.separatorChar + fullFilename;
+			i++;
+		}
+		System.err.println("File not found [CL]: Folder[" + folder + "] Filename[" + filename + "]");
+		return null;
+	}
+
+	public File searchFilesystem(String folder, String filename) {
+		String userDir = System.getProperty("user.dir");
+		File f;
+		File dir = new File(userDir);
+
+		int i = 0;
+		while (i < 10) {
+			String slashFolder = folder != null ? (File.separatorChar + folder) : "";
+			String path = dir.getAbsolutePath() + slashFolder + File.separatorChar + filename;
+			f = new File(path);
+			if (f.exists())
+				return f;
+			dir = dir.getParentFile();
+			if (dir == null || !dir.canRead())
+				break;
+			i++;
+		}
+		System.err.println("File not found [FS]: Folder[" + folder + "] Filename[" + filename + "]");
+		return null;
+>>>>>>> branch 'master' of https://github.com/shadedblue/CampingBot.git
 	}
 
 	public static String getFilenameKey(String folder, String filename) {

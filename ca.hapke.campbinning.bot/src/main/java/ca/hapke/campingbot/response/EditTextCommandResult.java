@@ -35,6 +35,7 @@ public class EditTextCommandResult extends CommandResult {
 		this.message = message;
 	}
 
+<<<<<<< HEAD
 	public EditTextCommandResult(CommandType cmd, Message message, List<ResultFragment> fragments, InlineKeyboardMarkup keyboard) {
 		super(cmd, fragments);
 		this.message = message;
@@ -54,6 +55,21 @@ public class EditTextCommandResult extends CommandResult {
 
 		if (keyboard instanceof InlineKeyboardMarkup kbm)
 			send.setReplyMarkup(kbm);
+=======
+	@Override
+	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
+		String old = message.getText();
+		String text = bot.getProcessor().process(true, fragments);
+		if (old.equalsIgnoreCase(text))
+			return new SendResult("Edit ignored: same text as before.", message, null);
+
+		EditMessageText send = new EditMessageText();
+		send.setChatId(Long.toString(message.getChatId()));
+		send.setMessageId(message.getMessageId());
+
+		if (keyboard != null && keyboard instanceof InlineKeyboardMarkup)
+			send.setReplyMarkup((InlineKeyboardMarkup) keyboard);
+>>>>>>> branch 'master' of https://github.com/shadedblue/CampingBot.git
 
 		send.setText(text);
 		send.setParseMode(BotConstants.MARKDOWN);

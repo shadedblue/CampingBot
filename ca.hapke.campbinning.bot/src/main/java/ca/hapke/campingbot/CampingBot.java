@@ -34,6 +34,7 @@ import ca.hapke.campingbot.commands.inline.HideItCommand;
 import ca.hapke.campingbot.commands.inline.NicknameCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayAlwaysSunnyCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayAndrewCommand;
+<<<<<<< HEAD
 import ca.hapke.campingbot.commands.overlays.OverlayJakeCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayNyandrewCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
@@ -173,6 +174,143 @@ public class CampingBot extends CampingBotEngine {
 		addCommand(andrewCommand);
 		addCommand(nyandrewCommand);
 		addCommand(jakeCommand);
+=======
+import ca.hapke.campingbot.commands.overlays.OverlayNyandrewCommand;
+import ca.hapke.campingbot.commands.spell.SpellCommand;
+import ca.hapke.campingbot.events.BallBustingEvent;
+import ca.hapke.campingbot.events.HappyNewYearEvent;
+import ca.hapke.campingbot.response.InsultGenerator;
+import ca.hapke.campingbot.response.TextCommandResult;
+import ca.hapke.campingbot.response.fragments.TextStyle;
+import ca.hapke.campingbot.users.CampingUser;
+import ca.hapke.campingbot.users.CampingUserMonitor;
+import ca.hapke.campingbot.voting.RantCommand;
+import ca.hapke.campingbot.voting.VoteManagementCommands;
+import ca.hapke.campingbot.voting.ufc.UfcCommand;
+
+/**
+ * @author Nathan Hapke
+ */
+public class CampingBot extends CampingBotEngine {
+	private Resources res = new Resources();
+	private RantCommand rantCommand;
+	private UfcCommand ufcCommand;
+	private VoteManagementCommands voteManagementCommands;
+
+	private StatusCommand statusCommand;
+	private HelpCommand helpCommand;
+	private MbiyfCommand ballsCommand;
+	private PleasureModelCommand pleasureCommand;
+	private FuckMeCommand fuCommand;
+	private EnhanceCommand enhanceCommand;
+	private GifsOfUsCommand iunnoCommand;
+	private PartyEverydayCommand partyCommand;
+
+	private HypeCommand hypeCommand;
+	private SpellCommand spellCommand;
+	private HideItCommand hideItCommand;
+	private NicknameCommand nicknameCommand;
+	private SetCommand setCommand;
+	private WhatIsMyIpCommand myIpCommand;
+	private RedditCommand redditCommand;
+	private QuantityCommand quantityCommand;
+	private UserlistCommand userlistCommand;
+	private UserCommand userCommand;
+	private OpinionCommand opinionCommand;
+
+	private CalendarMonitor calMonitor;
+//	private AprilFoolsDayEnabler afdEnabler;
+//	private AfdHotPotato potatoCommand;
+//	private AfdTooManyDicks afdDicks;
+
+	private BallBustingEvent ballBustingEvent;
+	private HappyNewYearEvent happyNewYearEvent;
+	private OverlayAndrewCommand andrewCommand;
+	private OverlayNyandrewCommand nyandrewCommand;
+	private OverlayAlwaysSunnyCommand alwaysSunnyCommand;
+
+	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
+			BotCommandIds.REGULAR_CHAT | BotCommandIds.TEXT | BotCommandIds.USE);
+	public static final ResponseCommandType LogStringCommand = new ResponseCommandType("LogString", 0);
+
+	public CampingBot(ProtectionDomain protectionDomain) {
+		super(protectionDomain);
+		spellCommand = new SpellCommand(this);
+		nicknameCommand = new NicknameCommand();
+		setCommand = new SetCommand(this);
+		myIpCommand = new WhatIsMyIpCommand();
+		pleasureCommand = new PleasureModelCommand(this);
+		fuCommand = new FuckMeCommand(this);
+		enhanceCommand = new EnhanceCommand(this);
+		iunnoCommand = new GifsOfUsCommand(this);
+		partyCommand = new PartyEverydayCommand(this);
+		andrewCommand = new OverlayAndrewCommand(this);
+		nyandrewCommand = new OverlayNyandrewCommand(this);
+		alwaysSunnyCommand = new OverlayAlwaysSunnyCommand(this);
+
+		ballsCommand = new MbiyfCommand(this, res);
+		processor.addAtEnd(ballsCommand.getCrazyCase());
+
+		rantCommand = new RantCommand(this);
+		ufcCommand = new UfcCommand(this, res);
+		voteManagementCommands = new VoteManagementCommands(rantCommand);
+
+		hypeCommand = new HypeCommand(this);
+//		potatoCommand = new AfdHotPotato(this, res);
+//		afdDicks = new AfdTooManyDicks(this, res);
+//		afdEnabler = new AprilFoolsDayEnabler(this, afdDicks);
+
+		redditCommand = new RedditCommand();
+		hideItCommand = new HideItCommand(this, databaseConsumer);
+		statusCommand = new StatusCommand(hideItCommand);
+		helpCommand = new HelpCommand(this);
+		userlistCommand = new UserlistCommand();
+		userCommand = new UserCommand(this);
+		opinionCommand = new OpinionCommand();
+
+		happyNewYearEvent = new HappyNewYearEvent(this);
+		ballBustingEvent = new BallBustingEvent(this);
+
+		addStatusUpdate(statusCommand);
+
+		InsultGenerator insultGenerator = InsultGenerator.getInstance();
+//		ContentSerializer contentSerializer = new ContentSerializer(protectionDomain, spellCommand, hypeCommand,
+//				partyCommand, insultGenerator, enhanceCommand);
+//		contentSerializer.load();
+
+		hasCategories.add(insultGenerator);
+		quantityCommand = new QuantityCommand(hasCategories);
+	}
+
+	@Override
+	protected void addCommandsAndEvents() {
+		addCommand(quantityCommand);
+		addCommand(spellCommand);
+		addCommand(nicknameCommand);
+		addCommand(setCommand);
+		addCommand(myIpCommand);
+		addCommand(hideItCommand);
+		addCommand(ballsCommand);
+		addCommand(ufcCommand);
+		addCommand(rantCommand);
+		addCommand(pleasureCommand);
+		addCommand(fuCommand);
+		addCommand(iunnoCommand);
+		addCommand(partyCommand);
+		addCommand(helpCommand);
+		addCommand(enhanceCommand);
+		addCommand(hypeCommand);
+		addCommand(statusCommand);
+		addCommand(userlistCommand);
+		addCommand(userCommand);
+		addCommand(voteManagementCommands);
+		addCommand(redditCommand);
+//		addCommand(potatoCommand);
+		addCommand(opinionCommand);
+//		addCommand(afdDicks);
+		addCommand(andrewCommand);
+		addCommand(nyandrewCommand);
+>>>>>>> branch 'master' of https://github.com/shadedblue/CampingBot.git
 		addCommand(alwaysSunnyCommand);
 
 //		addEvent(afdEnabler);

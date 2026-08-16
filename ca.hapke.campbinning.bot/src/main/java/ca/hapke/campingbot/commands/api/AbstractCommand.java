@@ -19,6 +19,7 @@ public abstract class AbstractCommand {
 	public abstract String getCommandName();
 
 	public static InlineKeyboardMarkup createKeyboard(String[] buttons, String[] values) {
+<<<<<<< HEAD
 		return createKeyboard(buttons, values, 5);
 	}
 
@@ -37,6 +38,22 @@ public abstract class AbstractCommand {
 			row.add(b);
 			across++;
 			if (across >= cols) {
+=======
+		InlineKeyboardMarkup board = new InlineKeyboardMarkup();
+		List<InlineKeyboardButton> row = new ArrayList<>();
+
+		List<List<InlineKeyboardButton>> fullKeyboard = new ArrayList<List<InlineKeyboardButton>>();
+
+		int across = 0;
+		for (int i = 0; i < buttons.length; i++) {
+			String text = buttons[i];
+			String value = values[i];
+			InlineKeyboardButton b = new InlineKeyboardButton(text);
+			b.setCallbackData(value);
+			row.add(b);
+			across++;
+			if (across >= 5) {
+>>>>>>> branch 'master' of https://github.com/shadedblue/CampingBot.git
 				across = 0;
 				fullKeyboard.add(row);
 				row = new ArrayList<>();

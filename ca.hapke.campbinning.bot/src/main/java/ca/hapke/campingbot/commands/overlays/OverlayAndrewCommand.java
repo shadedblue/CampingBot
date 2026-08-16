@@ -85,8 +85,12 @@ public class OverlayAndrewCommand extends SlashCommand {
 	private Image getAndrew() {
 		if (andrew == null) {
 			ImageCache cache = ImageCache.getInstance();
+<<<<<<< HEAD
 			String assetsFolder = CampingSystem.getInstance().getAssetsFolder();
 			Sprite overlay = cache.getImage(assetsFolder, OVERLAY_FILENAME);
+=======
+			Sprite overlay = cache.getImage(CampingSystem.getInstance().getAssetsFolder(), OVERLAY_FILENAME);
+>>>>>>> branch 'master' of https://github.com/shadedblue/CampingBot.git
 			andrew = overlay.getFrame(0);
 		}
 		return andrew;

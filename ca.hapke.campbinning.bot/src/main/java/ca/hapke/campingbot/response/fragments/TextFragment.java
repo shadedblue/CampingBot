@@ -13,11 +13,14 @@ public class TextFragment extends ResultFragment {
 		this.value = value;
 	}
 
+<<<<<<< HEAD
 	public TextFragment(char value) {
 		super(CaseChoice.Normal, TextStyle.Normal);
 		this.value = Character.toString(value);
 	}
 
+=======
+>>>>>>> branch 'master' of https://github.com/shadedblue/CampingBot.git
 	public TextFragment(String value, TextStyle ts) {
 		super(CaseChoice.Normal, ts);
 		this.value = value;
