@@ -88,8 +88,7 @@ public class ImageCache {
 			for (int i = 0; i < numFrames; i++) {
 				BufferedImage frame = reader.read(i);
 				images[i] = frame;
-				IIOMetadataNode root = (IIOMetadataNode) reader.getImageMetadata(i)
-						.getAsTree("javax_imageio_gif_image_1.0");
+				IIOMetadataNode root = (IIOMetadataNode) reader.getImageMetadata(i).getAsTree("javax_imageio_gif_image_1.0");
 				IIOMetadataNode gce = (IIOMetadataNode) root.getElementsByTagName("GraphicControlExtension").item(0);
 
 				int delay = Integer.valueOf(gce.getAttribute("delayTime"));
@@ -205,7 +204,12 @@ public class ImageCache {
 		int i = 0;
 		while (i < 10) {
 			String slashFolder = folder != null ? (File.separatorChar + folder) : "";
-			String path = dir.getAbsolutePath() + slashFolder + File.separatorChar + filename;
+			String path;
+			if (folderIsAbsolute(folder)) {
+				path = folder + File.separatorChar + filename;
+			} else {
+				path = dir.getAbsolutePath() + slashFolder + File.separatorChar + filename;
+			}
 			f = new File(path);
 			if (f.exists())
 				return f;
@@ -216,6 +220,14 @@ public class ImageCache {
 		}
 		System.err.println("File not found [FS]: Folder[" + folder + "] Filename[" + filename + "]");
 		return null;
+
+	}
+
+	/**
+	 * TODO add windows drive:\ support
+	 */
+	private boolean folderIsAbsolute(String folder) {
+		return (folder.charAt(0) == '/');
 	}
 
 	public static String getFilenameKey(String folder, String filename) {

@@ -34,6 +34,7 @@ import ca.hapke.campingbot.commands.inline.HideItCommand;
 import ca.hapke.campingbot.commands.inline.NicknameCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayAlwaysSunnyCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayAndrewCommand;
+import ca.hapke.campingbot.commands.overlays.OverlayJakeCommand;
 import ca.hapke.campingbot.commands.overlays.OverlayNyandrewCommand;
 import ca.hapke.campingbot.commands.spell.SpellCommand;
 import ca.hapke.campingbot.events.BallBustingEvent;
@@ -86,6 +87,7 @@ public class CampingBot extends CampingBotEngine {
 	private HappyNewYearEvent happyNewYearEvent;
 	private OverlayAndrewCommand andrewCommand;
 	private OverlayNyandrewCommand nyandrewCommand;
+	private OverlayJakeCommand jakeCommand;
 	private OverlayAlwaysSunnyCommand alwaysSunnyCommand;
 
 	public static final ResponseCommandType TalkCommand = new ResponseCommandType("Talk",
@@ -104,6 +106,7 @@ public class CampingBot extends CampingBotEngine {
 		iunnoCommand = new GifsOfUsCommand(this);
 		partyCommand = new PartyEverydayCommand(this);
 		andrewCommand = new OverlayAndrewCommand(this);
+		jakeCommand = new OverlayJakeCommand(this);
 		nyandrewCommand = new OverlayNyandrewCommand(this);
 		alwaysSunnyCommand = new OverlayAlwaysSunnyCommand(this);
 
@@ -169,6 +172,7 @@ public class CampingBot extends CampingBotEngine {
 //		addCommand(afdDicks);
 		addCommand(andrewCommand);
 		addCommand(nyandrewCommand);
+		addCommand(jakeCommand);
 		addCommand(alwaysSunnyCommand);
 
 //		addEvent(afdEnabler);

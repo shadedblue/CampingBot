@@ -241,7 +241,6 @@ public class FuckMeCommand extends SlashCommand implements TextCommand, Callback
 
 	@Override
 	public EventItem reactToCallback(CallbackId id, CallbackQuery callbackQuery) {
-		System.out.println(id);
 		FuTracker tracker = inProgress.get(id.getUpdateId());
 		if (tracker == null)
 			return null;
