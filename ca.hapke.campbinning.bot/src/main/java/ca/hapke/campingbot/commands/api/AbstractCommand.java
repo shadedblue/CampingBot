@@ -19,6 +19,10 @@ public abstract class AbstractCommand {
 	public abstract String getCommandName();
 
 	public static InlineKeyboardMarkup createKeyboard(String[] buttons, String[] values) {
+		return createKeyboard(buttons, values, 5);
+	}
+
+	public static InlineKeyboardMarkup createKeyboard(String[] buttons, String[] values, int cols) {
 		InlineKeyboardMarkup board = new InlineKeyboardMarkup();
 		List<InlineKeyboardButton> row = new ArrayList<>();
 
@@ -32,7 +36,7 @@ public abstract class AbstractCommand {
 			b.setCallbackData(value);
 			row.add(b);
 			across++;
-			if (across >= 5) {
+			if (across >= cols) {
 				across = 0;
 				fullKeyboard.add(row);
 				row = new ArrayList<>();

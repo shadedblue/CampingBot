@@ -8,7 +8,6 @@ import ca.hapke.campingbot.util.CollectionUtil;
 public class BlotProcessor extends MessageProcessor {
 
 	private static final double DEFAULT_SENSITIVITY = 0.4;
-//	private static final double SENSITIVITY = 0.4;
 	private Character[] blots;
 	private double sensitivity;
 	public static final Character[] blotsAll;
@@ -55,5 +54,4 @@ public class BlotProcessor extends MessageProcessor {
 
 		return sb.toString();
 	}
-
 }

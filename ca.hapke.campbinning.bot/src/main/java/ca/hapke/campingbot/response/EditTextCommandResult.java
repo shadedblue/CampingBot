@@ -35,6 +35,12 @@ public class EditTextCommandResult extends CommandResult {
 		this.message = message;
 	}
 
+	public EditTextCommandResult(CommandType cmd, Message message, List<ResultFragment> fragments, InlineKeyboardMarkup keyboard) {
+		super(cmd, fragments);
+		this.message = message;
+		this.keyboard = keyboard;
+	}
+
 	@Override
 	public SendResult sendInternal(CampingBotEngine bot, Long chatId) throws TelegramApiException {
 		String old = message.getText();
@@ -46,8 +52,8 @@ public class EditTextCommandResult extends CommandResult {
 		send.setChatId(Long.toString(message.getChatId()));
 		send.setMessageId(message.getMessageId());
 
-		if (keyboard != null && keyboard instanceof InlineKeyboardMarkup)
-			send.setReplyMarkup((InlineKeyboardMarkup) keyboard);
+		if (keyboard instanceof InlineKeyboardMarkup kbm)
+			send.setReplyMarkup(kbm);
 
 		send.setText(text);
 		send.setParseMode(BotConstants.MARKDOWN);

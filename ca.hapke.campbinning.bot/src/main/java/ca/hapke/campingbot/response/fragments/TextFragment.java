@@ -13,6 +13,11 @@ public class TextFragment extends ResultFragment {
 		this.value = value;
 	}
 
+	public TextFragment(char value) {
+		super(CaseChoice.Normal, TextStyle.Normal);
+		this.value = Character.toString(value);
+	}
+
 	public TextFragment(String value, TextStyle ts) {
 		super(CaseChoice.Normal, ts);
 		this.value = value;

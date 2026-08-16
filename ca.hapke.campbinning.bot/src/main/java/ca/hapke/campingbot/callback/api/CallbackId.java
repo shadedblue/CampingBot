@@ -1,5 +1,6 @@
 package ca.hapke.campingbot.callback.api;
 
+import java.util.Arrays;
 import java.util.List;
 
 import ca.hapke.campingbot.commands.api.AbstractCommand;
@@ -77,4 +78,9 @@ public class CallbackId {
 		return ids;
 	}
 
+	@Override
+	public String toString() {
+		return "CallbackId [command=" + command + ", updateId=" + updateId + ", ids=" + Arrays.toString(ids) + ", result="
+				+ result + "]";
+	}
 }
